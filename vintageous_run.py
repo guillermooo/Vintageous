@@ -1,6 +1,8 @@
 import sublime
 import sublime_plugin
 
+import pprint
+
 from Vintageous.vi import motions
 from Vintageous.vi import actions
 from Vintageous.vi.constants import (MODE_INSERT, MODE_NORMAL, MODE_VISUAL,
@@ -36,6 +38,7 @@ class ViExecutionState(object):
 class ViRunCommand(sublime_plugin.TextCommand):
     def run(self, edit, **vi_cmd_data):
         print("Data in ViRunCommand:", vi_cmd_data)
+        # pprint.pprint(vi_cmd_data)
         try:
             # XXX: Fix this. When should we run the motion exactly?
             if vi_cmd_data['action']:

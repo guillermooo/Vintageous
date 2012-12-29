@@ -85,9 +85,12 @@
 	{ "keys": ["o"], "command": "set_action", "args": {"action": "vi_visual_o"}, "context": [{"key": "vi_mode_visual_any"}] },
 
 	{ "keys": ["D"], "command": "set_composite", "args": {"motion": "vi_dollar", "action": "vi_d"}, "context": [{"key": "setting.command_mode"}] },
+	// FIXME: X behaves linewise in visual mode. The following command is wrong at the moment.
+	{ "keys": ["X"], "command": "set_composite", "args": {"motion": "vi_dollar", "action": "vi_d"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_mode_visual"}]},
 
 	{ "keys": ["y"], "command": "set_action", "args": {"action": "vi_y"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["x"], "command": "set_action", "args": {"action": "vi_x"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["X"], "command": "set_action", "args": {"action": "vi_big_x"}, "context": [{"key": "setting.command_mode"}] },
 
 	{ "keys": ["p"], "command": "set_action", "args": {"action": "vi_p"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["P"], "command": "set_action", "args": {"action": "vi_big_p"}, "context": [{"key": "setting.command_mode"}] },
