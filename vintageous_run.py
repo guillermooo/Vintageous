@@ -69,15 +69,18 @@ class ViRunCommand(sublime_plugin.TextCommand):
         self.reposition_caret(vi_cmd_data)
 
     def reorient_caret(self, vi_cmd_data):
+        if not vi_cmd_data['__reorient_caret']:
+            return
+
         if self.view.has_non_empty_selection_region():
             if (vi_cmd_data['motion'] and 'args' in vi_cmd_data['motion'] and
                 (vi_cmd_data['motion']['args'].get('by') == 'characters' or
                  vi_cmd_data['motion']['args'].get('by') == 'lines' or
                  vi_cmd_data['motion']['args'].get('by') == 'words')):
                     if vi_cmd_data['motion']['args'].get('forward'):
-                        self.view.run_command('reorient_caret', {'mode': vi_cmd_data['mode']})
+                        self.view.run_command('reorient_caret', {'mode': vi_cmd_data['mode'] ,'_internal_mode': vi_cmd_data['_internal_mode']})
                     else:
-                        self.view.run_command('reorient_caret', {'forward': False, 'mode': vi_cmd_data['mode']})
+                        self.view.run_command('reorient_caret', {'forward': False, 'mode': vi_cmd_data['mode'], '_internal_mode': vi_cmd_data['_internal_mode']})
 
     def reposition_caret(self, vi_cmd_data):
         if self.view.has_non_empty_selection_region():

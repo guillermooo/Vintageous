@@ -212,6 +212,10 @@ class VintageState(object):
             # TODO: Try to unify user-input collection (both for registers and this kind of
             # argument).
             'user_input': self.user_input,
+            # TODO: Interim solution to avoid problems with this step. Many commands don't need
+            # this and it's causing quite some trouble. Let commands specify an explicit command
+            # to reorient the caret as occurs with other hooks.
+            '__reorient_caret': False
         }
 
         # Make sure we run NORMAL mode actions in _MODE_INTERNAL_VISUAL mode.

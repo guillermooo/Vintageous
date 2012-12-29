@@ -261,16 +261,18 @@ def vi_big_p(vi_cmd_data):
 
 
 def vi_dd(vi_cmd_data):
+	# Assume _MODE_INTERNAL_VISUAL. Can't be issued in any other mode.
 	vi_cmd_data['_internal_mode'] = _MODE_INTERNAL_VISUAL
 	vi_cmd_data['can_yank'] = True
 	vi_cmd_data['motion']['command'] = 'move'
 	vi_cmd_data['motion']['args'] = {'by': 'lines', 'extend': True, 'forward': True}
-	vi_cmd_data['count'] = vi_cmd_data['count'] - 1
 	vi_cmd_data['motion_required'] = False
-	vi_cmd_data['post_motion'] = [['visual_extend_to_full_line', {'_internal_mode': vi_cmd_data['_internal_mode']}],]
+	vi_cmd_data['pre_motion'] = ['_vi_dd_pre_motion', {'_internal_mode': vi_cmd_data['_internal_mode']}]
+	vi_cmd_data['post_motion'] = [['_vi_dd_post_motion', {'_internal_mode': vi_cmd_data['_internal_mode']}],]
 	vi_cmd_data['action']['command'] = 'left_delete'
 	vi_cmd_data['action']['args'] = {}
-	vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+	# TODO: Doesn't seem necessary, as we always end up with empty selections.
+	# vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
 	return vi_cmd_data
 

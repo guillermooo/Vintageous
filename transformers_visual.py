@@ -66,13 +66,22 @@ class CollapseToBegin(sublime_plugin.TextCommand):
 
 
 class ReorientCaret(sublime_plugin.TextCommand):
-    def run(self, edit, forward=True, mode=None):
+    def run(self, edit, forward=True, mode=None, _internal_mode=None):
         sels = list(self.view.sel())
         self.view.sel().clear()
 
         new_sels = []
         for s in sels:
-            if mode != MODE_VISUAL_LINE:
+            # TODO: Workaround to avoid a bug when moving lines down, such as in 3dd.
+            # We should allow for including an explicit reorient_caret command, as we do
+            # for other hooks.
+            if _internal_mode == _MODE_INTERNAL_VISUAL:
+                if self.view.substr(s.b - 1) == '\n':
+                    new_sels.append(s)
+                else:
+                    new_sels.append(sublime.Region(s.a, s.b - 1))
+
+            elif mode != MODE_VISUAL_LINE:
                 if s.end() - s.begin() == 1:
                     if forward:
                         if s.b < s.a:
@@ -84,8 +93,7 @@ class ReorientCaret(sublime_plugin.TextCommand):
                             new_sels.append(sublime.Region(s.b, s.a))
                         else:
                             new_sels.append(s)
-                else:
-                    new_sels.append(s)
+
             else:
                 if forward:
                     if self.view.full_line(s.b).a == s.b and self.view.full_line(s.b).b == s.a:
@@ -228,6 +236,27 @@ class VisualExtendToFullLine(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
+class _vi_dd_pre_motion(sublime_plugin.TextCommand):
+    def run(self, edit, _internal_mode=None):
+        def f(view, s):
+            if _internal_mode == _MODE_INTERNAL_VISUAL:
+                current_line = view.line(s.b)
+                return sublime.Region(current_line.a, current_line.a)
+            return s
+
+        regions_transformer(self.view, f)
+
+
+class _vi_dd_post_motion(sublime_plugin.TextCommand):
+    def run(self, edit, _internal_mode=None):
+        def f(view, s):
+            if view.substr(s.b - 1) != '\n':
+                return sublime.Region(s.a, view.full_line(s.b).b)
+            return s
+
+        regions_transformer(self.view, f)
+
+
 class VisualExtendToLine(sublime_plugin.TextCommand):
     def run(self, edit):
         sels = list(self.view.sel())
@@ -243,7 +272,8 @@ class VisualExtendToLine(sublime_plugin.TextCommand):
 
 
 class ViReorientCaret(sublime_plugin.TextCommand):
-    def run(self, edit, mode=None):
+    # XXX: Dead code.
+    def run(self, edit, mode=None, _internal_mode=None):
         if mode != MODE_VISUAL_LINE:
             return
 
@@ -483,7 +513,6 @@ class _extend_b_to_hard_eol(sublime_plugin.TextCommand):
                     return sublime.Region(s.a, hard_eol)
 
             elif state.mode == MODE_NORMAL:
-                print ("HEY HEY EHYEAGYAGDSASGGAASG")
                 pass
 
             return s
