@@ -1,0 +1,37 @@
+running text (in-line)
+running text (last word)
+running text (first word)
+
+running text (first word is a multidigit number)
+running text (first word is a digit)
+
+running text (first word is multiple white space chars)
+running text (first word is a white space chars)
+
+running text (first word is multiple punctuation)
+running text (first word is one punctuation)
+
+running text (last word is a multidigit number)
+running text (last word is a digit)
+
+running text (last word is multiple white space chars)
+running text (last word is a white space chars)
+
+running text (last word is multiple punctuation)
+running text (last word is one punctuation)
+
+next line is empty
+next line starts with whole word
+next line starts with whitespace
+next line starts with pucntuation
+next line starts with digit
+
+
+repeat with code instead of running text
+
+multiple empty lines
+multiple white space-only lines
+
+one word lines
+one digit lines
+one white space lines

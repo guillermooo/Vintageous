@@ -1,0 +1,45 @@
+LINES
+
+=================
+      Legend
+=================
+^ 	 	bol
+_ 	 	char
+$ 	 	eol
+|    	sel.a
+> or <	sel.b
+=		selected
+=================
+
+
+^ _ _ _ _ _ _ _ _ $
+ 0 1 2 3 4 5 6 7 8 9
+^|_=_=_=_=_=_=_=_>$			view.line()
+^|_=_=_=_=_=_=_=_=$>		view.full_line()
+
+
+^|_=_=_=_=_=_=_=_=$>
+ a                 b
+
+view.line(a) != view.line(b)
+view.line(a) == view.line(b-1)
+
+view.full_line(a).b == b
+
+^|$>
+ 0 1
+ a b
+
+view.full_line(a).b == b
+
+EMTPY LINE FORWARD
+
+view.line(b-1).empty()
+
+ a
+^|$=
+^=_>$
+   b
+
+view.line(a) == view.line(b-2)
+view.line(b-2).empty()
