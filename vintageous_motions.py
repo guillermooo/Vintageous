@@ -27,9 +27,8 @@ class ViMoveToHardBol(sublime_plugin.TextCommand):
 
 
 class ViFindInLineInclusive(sublime_plugin.TextCommand):
-    def run(self, edit, extend=False, character=None):
+    def run(self, edit, extend=False, character=None, _internal_mode=None):
         def f(view, s):
-            # Assume MODE_NORMAL for now.
             line_text = view.substr(sublime.Region(s.b + 1, view.line(s.b).b))
             offset = s.b + 1 - view.line(s.b).a
 
@@ -40,6 +39,11 @@ class ViFindInLineInclusive(sublime_plugin.TextCommand):
 
             if where > -1:
                 pt = view.line(s.b).a + where + offset
+
+                state = VintageState(view)
+                if state.mode == MODE_VISUAL or _internal_mode == _MODE_INTERNAL_VISUAL:
+                    return sublime.Region(s.a, pt + 1)
+
                 return sublime.Region(pt, pt)
 
             return s
