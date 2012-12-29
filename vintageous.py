@@ -192,7 +192,8 @@ class VintageState(object):
             # This is the only hook that takes a list of commands to execute.
             # Specify commands as a list of [command, args] elements (don't use tuples).
             'post_motion': [],
-            # Set to True if the command must be able to populate the registers.
+            # Set to True if the command must be able to populate the registers. This will cause
+            # Vintageous to propagate copied text to the unnamed register as needed.
             'can_yank': False,
             # Some commands operate CHARACTERWISE but always yank LINEWISE, so we need this.
             'yanks_linewise': False,
@@ -207,7 +208,9 @@ class VintageState(object):
             'is_digraph_start': False,
             # See constants.py for a detailed explanation.
             '_internal_mode': None,
-            # User input, such as arguments to the t and f fommands.
+            # User input, such as arguments to the t and f commands.
+            # TODO: Try to unify user-input collection (both for registers and this kind of
+            # argument).
             'user_input': self.user_input,
         }
 
