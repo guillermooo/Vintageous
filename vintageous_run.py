@@ -17,13 +17,14 @@ from Vintageous.vintageous import VintageState
 
 
 class ViExecutionState(object):
-    # So far, I've encountered one case (when moving words) where global state for the command
-    # execution seems necessary: When issuing *w* from an EMPTYLINE in VISUALMODE, the FIRSTCHARACTER
-    # of the FIRSTWORD on the NEXTLINE is selected. By issuing *w* again after that, we should
-    # advance to the NEXTWORD. However, due to the way *w* motions are adjusted now in a post
-    # motion hook, the second case is indistinguishable from the first one, so this helps to
-    # disambiguate.
-    # XXX: Resetting this class should be done in many places, like when changing modes.
+    # So far, I've encountered one case where global state for the command execution seems
+    # necessary: When issuing *w* from an EMPTYLINE in VISUALMODE, the FIRSTCHARACTER of the
+    # FIRSTWORD on the NEXTLINE is selected. By issuing *w* again after that, we should advance to
+    # the NEXTWORD. However, due to the way *w* motions are adjusted now in a post motion hook,
+    # the second case is indistinguishable from the first one, so this helps to disambiguate.
+    # XXX: Resetting this class should be done in many places, like when changing modes (???).
+    # XXX: We need to store this as we store VintageState. Otherwise there'll be conflicts when
+    # switching between views.
     dont_shrink_word = False
 
     @staticmethod
@@ -85,6 +86,7 @@ class ViRunCommand(sublime_plugin.TextCommand):
     def reposition_caret(self, vi_cmd_data):
         if self.view.has_non_empty_selection_region():
             if vi_cmd_data['reposition_caret']:
+                # XXX ??? ??? ???
                 pass
                 self.view.run_command(*vi_cmd_data['reposition_caret'])
 
