@@ -18,6 +18,7 @@ class ViMoveToHardBol(sublime_plugin.TextCommand):
                 hard_bol += 1
             a, b = (hard_bol, hard_bol) if not extend else (s.a, hard_bol)
             # Avoid ending up with a en empty selection while on visual mode.
+
             if extend and s.a == hard_bol:
                 b = b + 1
             new_sels.append(sublime.Region(a, b))
@@ -78,5 +79,19 @@ class ViFindInLineExclusive(sublime_plugin.TextCommand):
                 return sublime.Region(pt - 1, pt - 1)
 
             return s
+
+        regions_transformer(self.view, f)
+
+
+class ViGoToLine(sublime_plugin.TextCommand):
+    def run(self, edit, extend=False, line=None):
+        line = line if line > 0 else 1
+        dest = self.view.text_point(line - 1, 0)
+
+        def f(view, s):
+            if not extend:
+                return sublime.Region(dest, dest)
+            else:
+                return sublime.Region(s.a, dest)
 
         regions_transformer(self.view, f)

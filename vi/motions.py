@@ -81,8 +81,16 @@ def vi_dollar(vi_cmd_data):
 
 
 def vi_big_g(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = 'move_to'
-    vi_cmd_data['motion']['args'] = {'to': 'eof'}
+    # FIXME: Cannot go to line 1. We need to signal when the count is user-provided and when it's
+    # a default value.
+    if vi_cmd_data['count'] > 1:
+        target = vi_cmd_data['count']
+        vi_cmd_data['count'] = 1
+        vi_cmd_data['motion']['command'] = 'vi_go_to_line'
+        vi_cmd_data['motion']['args'] = {'line': target}
+    else:
+        vi_cmd_data['motion']['command'] = 'move_to'
+        vi_cmd_data['motion']['args'] = {'to': 'eof'}
 
     if vi_cmd_data['mode'] == MODE_VISUAL:
         vi_cmd_data['motion']['args']['extend'] = True
@@ -95,9 +103,17 @@ def vi_big_g(vi_cmd_data):
 
 
 def vi_gg(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = 'move_to'
-    vi_cmd_data['motion']['args'] = {'to': 'bof'}
-    vi_cmd_data['post_motion'] = [['clip_end_to_line',],]
+    # FIXME: Cannot go to line 1. We need to signal when the count is user-provided and when it's
+    # a default value.
+    if vi_cmd_data['count'] > 1:
+        target = vi_cmd_data['count']
+        vi_cmd_data['count'] = 1
+        vi_cmd_data['motion']['command'] = 'vi_go_to_line'
+        vi_cmd_data['motion']['args'] = {'line': target}
+    else:
+        vi_cmd_data['motion']['command'] = 'move_to'
+        vi_cmd_data['motion']['args'] = {'to': 'bof'}
+        vi_cmd_data['post_motion'] = [['clip_end_to_line',],]
 
     if vi_cmd_data['mode'] == MODE_VISUAL:
         vi_cmd_data['motion']['args']['extend'] = True
