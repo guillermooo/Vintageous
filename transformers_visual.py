@@ -72,16 +72,7 @@ class ReorientCaret(sublime_plugin.TextCommand):
 
         new_sels = []
         for s in sels:
-            # TODO: Workaround to avoid a bug when moving lines down, such as in 3dd.
-            # We should allow for including an explicit reorient_caret command, as we do
-            # for other hooks.
-            if _internal_mode == _MODE_INTERNAL_VISUAL:
-                if self.view.substr(s.b - 1) == '\n':
-                    new_sels.append(s)
-                else:
-                    new_sels.append(sublime.Region(s.a, s.b - 1))
-
-            elif mode != MODE_VISUAL_LINE:
+            if mode != MODE_VISUAL_LINE:
                 if s.end() - s.begin() == 1:
                     if forward:
                         if s.b < s.a:
@@ -93,6 +84,8 @@ class ReorientCaret(sublime_plugin.TextCommand):
                             new_sels.append(sublime.Region(s.b, s.a))
                         else:
                             new_sels.append(s)
+                else:
+                    new_sels.append(s)
 
             else:
                 if forward:

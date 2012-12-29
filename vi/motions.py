@@ -152,6 +152,7 @@ def vi_underscore(vi_cmd_data):
 
 
 def vi_l(vi_cmd_data):
+    vi_cmd_data['__reorient_caret'] = True
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': True}
 
@@ -169,6 +170,7 @@ def vi_l(vi_cmd_data):
 
 
 def vi_h(vi_cmd_data):
+    vi_cmd_data['__reorient_caret'] = True
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': False}
 
@@ -182,6 +184,7 @@ def vi_h(vi_cmd_data):
 
 
 def vi_j(vi_cmd_data):
+    vi_cmd_data['__reorient_caret'] = True
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': True}
 
@@ -203,6 +206,7 @@ def vi_j(vi_cmd_data):
 
 
 def vi_k(vi_cmd_data):
+    vi_cmd_data['__reorient_caret'] = True
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': False}
 
@@ -227,6 +231,7 @@ def vi_k(vi_cmd_data):
 
 
 def vi_w(vi_cmd_data):
+    vi_cmd_data['__reorient_caret'] = True
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'words', 'forward': True}
     vi_cmd_data['post_every_motion'] = ['dont_stay_on_eol_forward',]
@@ -240,6 +245,7 @@ def vi_w(vi_cmd_data):
     return vi_cmd_data
 
 def vi_b(vi_cmd_data):
+    vi_cmd_data['__reorient_caret'] = True
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'words', 'forward': False}
 
@@ -264,6 +270,7 @@ def vi_e(vi_cmd_data):
     #
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'word_ends', 'forward': True}
+    vi_cmd_data['__reorient_caret'] = True
 
     # TODO: Seems like we're mixing modes here.
     if (vi_cmd_data['_internal_mode'] == _MODE_INTERNAL_VISUAL or
