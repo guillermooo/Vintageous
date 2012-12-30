@@ -95,3 +95,7 @@ class ViGoToLine(sublime_plugin.TextCommand):
                 return sublime.Region(s.a, dest)
 
         regions_transformer(self.view, f)
+
+        # FIXME: Bringing the selections into view will be undesirable in many cases. Maybe we
+        # should have an optional .scroll_selections_into_view() step during command execution.
+        self.view.show(self.view.sel()[0])
