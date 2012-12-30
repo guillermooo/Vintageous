@@ -26,6 +26,7 @@ digraphs = {
     ('vi_g_action', 'vi_g_u'): ('vi_g_u', DIGRAPH_ACTION),
 
     ('vi_g_action', 'vi_gg'): ('vi_gg', DIGRAPH_MOTION),
+    # XXX: I don't think the following is needed.
     ('vi_f_first_step', 'vi_set_user_input'): ('vi_f', DIGRAPH_MOTION),
 }
 
