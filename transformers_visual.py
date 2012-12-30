@@ -1,10 +1,10 @@
 import sublime
 import sublime_plugin
 
-from Vintageous.vintageous import VintageState
+from Vintageous.state import VintageState
 from Vintageous.vi import utils
 from Vintageous.vi.constants import MODE_NORMAL, MODE_VISUAL_LINE, MODE_VISUAL, _MODE_INTERNAL_VISUAL
-from Vintageous.vintageous_run import ViExecutionState
+from Vintageous.run import ViExecutionState
 
 
 # XXX: This is a very bad name. Better: ConvertSelectionsToVisualMode

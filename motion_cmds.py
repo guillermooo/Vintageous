@@ -3,7 +3,7 @@ import sublime_plugin
 
 from Vintageous.vi.constants import regions_transformer
 from Vintageous.vi.constants import MODE_VISUAL, MODE_NORMAL, _MODE_INTERNAL_VISUAL
-from Vintageous.vintageous import VintageState
+from Vintageous.state import VintageState
 
 
 class ViMoveToHardBol(sublime_plugin.TextCommand):

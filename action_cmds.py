@@ -1,8 +1,8 @@
 import sublime
 import sublime_plugin
 
-from Vintageous.vintageous import VintageState
-from Vintageous.vintageous import IrreversibleTextCommand
+from Vintageous.state import VintageState
+from Vintageous.state import IrreversibleTextCommand
 from Vintageous.vi import utils
 from Vintageous.vi.constants import MODE_NORMAL
 
@@ -277,4 +277,3 @@ class ViT(IrreversibleTextCommand):
             state.user_input = character
             state.expecting_user_input= False
             state.run()
-

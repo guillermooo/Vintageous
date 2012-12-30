@@ -13,7 +13,7 @@ from Vintageous.vi.constants import digraphs
 from Vintageous.vi.settings import SettingsManager, VintageSettings, SublimeSettings
 from Vintageous.vi.registers import Registers
 from Vintageous.vi import registers
-from Vintageous.vintageous import VintageState
+from Vintageous.state import VintageState
 
 
 class ViExecutionState(object):
