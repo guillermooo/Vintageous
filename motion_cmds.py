@@ -99,3 +99,21 @@ class ViGoToLine(sublime_plugin.TextCommand):
         # FIXME: Bringing the selections into view will be undesirable in many cases. Maybe we
         # should have an optional .scroll_selections_into_view() step during command execution.
         self.view.show(self.view.sel()[0])
+
+
+class ViPercent(sublime_plugin.TextCommand):
+    def run(self, edit, extend=False, percent=None):
+        if percent == None:
+            return
+
+        row = self.view.rowcol(self.view.size())[0] * (percent / 100)
+
+        def f(view, s):
+            pt = view.text_point(row, 0)
+            return sublime.Region(pt, pt)
+
+        regions_transformer(self.view, f)
+
+        # FIXME: Bringing the selections into view will be undesirable in many cases. Maybe we
+        # should have an optional .scroll_selections_into_view() step during command execution.
+        self.view.show(self.view.sel()[0])
