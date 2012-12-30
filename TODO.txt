@@ -1,8 +1,10 @@
 TODO
 ====
 
+* implement <count>%
 * implement F and T
 * improve <count>G and <count>gg
 * improve _
+* improve w in visual mode when starting on an empty line
 
-* simplify .reorient_caret() and make it more similar to any other execution hook
+* simplify .reorient_caret() and make it more similar to other execution hooks

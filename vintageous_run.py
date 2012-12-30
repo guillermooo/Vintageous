@@ -23,7 +23,7 @@ class ViExecutionState(object):
     # the NEXTWORD. However, due to the way *w* motions are adjusted now in a post motion hook,
     # the second case is indistinguishable from the first one, so this helps to disambiguate.
     # XXX: Resetting this class should be done in many places, like when changing modes (???).
-    # XXX: We need to store this as we store VintageState. Otherwise there'll be conflicts when
+    # XXX: Use view settings for storage as in VintageState. Otherwise there'll be conflicts when
     # switching between views.
     dont_shrink_word = False
 
@@ -33,7 +33,7 @@ class ViExecutionState(object):
 
     @staticmethod
     def reset():
-        ViExecutionState.dont_shrink_word = False
+        ViExecutionState.reset_word_state()
 
 
 class ViRunCommand(sublime_plugin.TextCommand):
