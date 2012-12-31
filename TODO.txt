@@ -2,6 +2,7 @@ TODO
 ====
 
 * improve <count>%: s.a must be inclusive in reversed motions
+* improve . command: make it accept a count
 * implement f, t, F, T: add support for counts
 * improve <count>G and <count>gg
 * improve w in visual mode when starting on an empty line

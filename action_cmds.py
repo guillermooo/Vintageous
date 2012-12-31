@@ -317,3 +317,17 @@ class CollectUserInput(IrreversibleTextCommand):
         state.user_input = character
         state.expecting_user_input= False
         state.run()
+
+
+class _repeat_command(IrreversibleTextCommand):
+    """Repeats a Sublime Text command.
+    """
+    def __init__(self, view):
+        IrreversibleTextCommand.__init__(self, view)
+
+    def run(self, command=None, command_args={}, times=0):
+        if command == None:
+            return
+
+        for i in range(times):
+            self.view.run_command(command, command_args)
