@@ -159,10 +159,12 @@ def vi_underscore(vi_cmd_data):
         vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': True}
         vi_cmd_data['count'] = vi_cmd_data['count'] - 1
 
-        if vi_cmd_data['mode'] == MODE_VISUAL:
+        if vi_cmd_data['mode'] == MODE_NORMAL:
+            vi_cmd_data['pre_motion'] = ['_vi_underscore_pre_motion', {'mode': vi_cmd_data['mode']}]
+            vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion', {'mode': vi_cmd_data['mode']}],]
+        elif vi_cmd_data['mode'] == MODE_VISUAL:
             vi_cmd_data['motion']['args']['extend'] = True
-
-        vi_cmd_data['post_motion'] = [['move_to_first_non_white_space_char', {'extend': True}],]
+            vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion', {'mode': vi_cmd_data['mode'], 'extend': True}],]
 
     return vi_cmd_data
 

@@ -711,3 +711,29 @@ class _vi_b_post_every_motion(sublime_plugin.TextCommand):
             return s
 
         regions_transformer(self.view, f)
+
+
+class _vi_underscore_pre_motion(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, _internal_mode=None):
+        def f(view, s):
+            if mode == MODE_NORMAL:
+                line = view.line(s.b)
+                return sublime.Region(line.a, line.a)
+            return s
+
+        regions_transformer(self.view, f)
+
+
+class _vi_underscore_post_motion(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, _internal_mode=None, extend=False):
+        def f(view, s):
+            if mode == MODE_NORMAL:
+                pt = utils.next_non_white_space_char(view, s.b)
+                return sublime.Region(pt, pt)
+            elif mode == MODE_VISUAL:
+                line = view.line(s.b - 1)
+                pt = utils.next_non_white_space_char(view, line.a)
+                return sublime.Region(s.a, pt + 1)
+            return s
+
+        regions_transformer(self.view, f)
