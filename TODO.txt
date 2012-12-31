@@ -6,5 +6,8 @@ TODO
 * improve <count>G and <count>gg
 * improve w in visual mode when starting on an empty line
 * some commands need reorienting the caret, like F, T, gg, etc. to include the current char in visual mode
+* bug in D: in normal mode, empty lines shouldn't be deleted
+* bug in C: in nomrmal mode, empty lines shouldn't be deleted
+* cancel action if selections didn't change after motion: this is a bug in dfx, for instance
 
 * simplify .reorient_caret() and make it more similar to other execution hooks
