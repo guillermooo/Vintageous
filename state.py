@@ -74,6 +74,8 @@ class VintageState(object):
         action = self.settings.vi['action']
         target = 'action'
 
+        print("OLD:", self.settings.vi['action'], "NEW:", name)
+
         # Check for digraphs like cc, dd, yy.
         if action and name:
             name, type_ = digraphs.get((action, name), ('', None))

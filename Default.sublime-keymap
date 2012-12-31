@@ -118,5 +118,7 @@
 	{ "keys": ["F"], "command": "vi_big_f", "context": [{"key": "vi_mode_visual"}] },
 
 	// Collects user input for commands such as t, f, T, F.
-	{ "keys": ["<character>"], "command": "collect_user_input", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_user_input"}] }
+	{ "keys": ["<character>"], "command": "collect_user_input", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_user_input"}] },
+
+	{ "keys": [">"], "command": "set_action", "args": {"action": "vi_lambda"}, "context": [{"key": "vi_mode_normal"}] }
 ]
