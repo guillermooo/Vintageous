@@ -52,6 +52,31 @@ class ViFindInLineInclusive(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
+class ViReverseFindInLineInclusive(sublime_plugin.TextCommand):
+    def run(self, edit, extend=False, character=None, _internal_mode=None):
+        def f(view, s):
+            line_text = view.substr(sublime.Region(view.line(s.b).a, s.b))
+            offset = 0
+
+            try:
+                where = line_text.index(character)
+            except ValueError:
+                where = -1
+
+            if where > -1:
+                pt = view.line(s.b).a + where
+
+                state = VintageState(view)
+                if state.mode == MODE_VISUAL or _internal_mode == _MODE_INTERNAL_VISUAL:
+                    return sublime.Region(s.a, pt)
+
+                return sublime.Region(pt, pt)
+
+            return s
+
+        regions_transformer(self.view, f)
+
+
 class ViFindInLineExclusive(sublime_plugin.TextCommand):
     """Contrary to *f*, *t* does not look past the caret's position, so if ``character`` is under
        the caret, nothing happens.
@@ -77,6 +102,38 @@ class ViFindInLineExclusive(sublime_plugin.TextCommand):
                 if state.mode == MODE_VISUAL or _internal_mode == _MODE_INTERNAL_VISUAL:
                     return sublime.Region(s.a, pt)
                 return sublime.Region(pt - 1, pt - 1)
+
+            return s
+
+        regions_transformer(self.view, f)
+
+
+class ViReverseFindInLineExclusive(sublime_plugin.TextCommand):
+    """Contrary to *F*, *T* does not look past the caret's position, so if ``character`` is right
+       before the caret, nothing happens.
+    """
+    def run(self, edit, extend=False, character=None, _internal_mode=None):
+        def f(view, s):
+            line_text = view.substr(sublime.Region(view.line(s.b).a, s.b))
+            offset = 0
+
+            try:
+                # *T* must leave the caret on the RHS of the found character.
+                where = line_text.index(character) + 1
+            except ValueError:
+                where = -1
+
+            if where > -1:
+                pt = view.line(s.b).a + where
+
+                state = VintageState(view)
+                # TODO: Handling modes via global state seems to be the right thing to do. Perhaps
+                # _MODE_INTERNAL_VISUAL could become a first-class mode. We know anyway that it's
+                # equivalent to MODE_NORMAL, so the necessary post processing can alway be done
+                # to ensure that we end up in MODE_NORMAL after the command.
+                if state.mode == MODE_VISUAL or _internal_mode == _MODE_INTERNAL_VISUAL:
+                    return sublime.Region(s.a, pt)
+                return sublime.Region(pt, pt)
 
             return s
 

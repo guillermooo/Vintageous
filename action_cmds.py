@@ -277,3 +277,43 @@ class ViT(IrreversibleTextCommand):
             state.user_input = character
             state.expecting_user_input= False
             state.run()
+
+
+class ViBigT(IrreversibleTextCommand):
+    def __init__(self, view):
+        IrreversibleTextCommand.__init__(self, view)
+
+    # XXX: Delete argument when it isn't needed any more.
+    def run(self, character=None):
+        state = VintageState(self.view)
+        if character is None:
+            state.motion = 'vi_big_t'
+            # XXX: Maybe we should simply use ["t", "<character>"] in the key map and be done
+            # with this.
+            state.expecting_user_input = True
+        else:
+            state.user_input = character
+            state.expecting_user_input= False
+            state.run()
+
+
+class ViBigF(IrreversibleTextCommand):
+    def __init__(self, view):
+        IrreversibleTextCommand.__init__(self, view)
+
+    # XXX: Delete argument when it isn't needed any more.
+    def run(self):
+        state = VintageState(self.view)
+        state.motion = 'vi_big_f'
+        state.expecting_user_input = True
+
+
+class CollectUserInput(IrreversibleTextCommand):
+    def __init__(self, view):
+        IrreversibleTextCommand.__init__(self, view)
+
+    def run(self, character=None):
+        state = VintageState(self.view)
+        state.user_input = character
+        state.expecting_user_input= False
+        state.run()

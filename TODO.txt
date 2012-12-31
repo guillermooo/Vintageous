@@ -2,9 +2,9 @@ TODO
 ====
 
 * implement <count>%
-* implement F and T
+* implement f, t, F, T: add support for counts
 * improve <count>G and <count>gg
-* improve _
 * improve w in visual mode when starting on an empty line
+* some commands need reorienting the caret, like F, T, gg, etc. to include the current char in visual mode
 
 * simplify .reorient_caret() and make it more similar to other execution hooks

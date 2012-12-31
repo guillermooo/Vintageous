@@ -318,6 +318,20 @@ def vi_t(vi_cmd_data):
     return vi_cmd_data
 
 
+def vi_big_t(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = 'vi_reverse_find_in_line_exclusive'
+    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_input'], '_internal_mode': vi_cmd_data['_internal_mode']}
+
+    return vi_cmd_data
+
+
+def vi_big_f(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = 'vi_reverse_find_in_line_inclusive'
+    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_input'], '_internal_mode': vi_cmd_data['_internal_mode']}
+
+    return vi_cmd_data
+
+
 def vi_percent(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_percent'
     vi_cmd_data['motion']['args'] = {'percent': vi_cmd_data['count']}
