@@ -10,5 +10,6 @@ TODO
 * bug in D: in normal mode, empty lines shouldn't be deleted
 * bug in C: in nomrmal mode, empty lines shouldn't be deleted
 * cancel action if selections didn't change after motion: this is a bug in dfx, for instance
+* improve jumplist: enable jumplist for unsaved buffers
 
 * simplify .reorient_caret() and make it more similar to other execution hooks

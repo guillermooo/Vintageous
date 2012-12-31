@@ -69,6 +69,8 @@ class ViRunCommand(sublime_plugin.TextCommand):
         self.do_post_motion(vi_cmd_data)
         self.reposition_caret(vi_cmd_data)
 
+        self.add_to_jump_list(vi_cmd_data)
+
     def reorient_caret(self, vi_cmd_data):
         if not vi_cmd_data['__reorient_caret']:
             return
@@ -178,3 +180,8 @@ class ViRunCommand(sublime_plugin.TextCommand):
     def do_post_action(self, vi_cmd_data):
         if vi_cmd_data['post_action']:
             self.view.run_command(*vi_cmd_data['post_action'])
+
+    def add_to_jump_list(self, vi_cmd_data):
+        if vi_cmd_data['is_jump']:
+            print("XXX XXX XXX XX XXX XXX")
+            self.view.run_command('vi_add_to_jump_list')

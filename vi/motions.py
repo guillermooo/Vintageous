@@ -4,6 +4,9 @@ from Vintageous.vi.constants import (MODE_NORMAL, MODE_VISUAL, MODE_VISUAL_LINE,
 
 # $
 def vi_dollar(vi_cmd_data):
+    if vi_cmd_data['count'] > 5:
+        vi_cmd_data['is_jump'] = True
+
     # No count given.
     if vi_cmd_data['count'] == 1:
         vi_cmd_data['motion']['command'] = 'move_to'
@@ -81,6 +84,9 @@ def vi_dollar(vi_cmd_data):
 
 
 def vi_big_g(vi_cmd_data):
+    if (vi_cmd_data['count'] > 5) or vi_cmd_data['count'] == 1:
+        vi_cmd_data['is_jump'] = True
+
     # FIXME: Cannot go to line 1. We need to signal when the count is user-provided and when it's
     # a default value.
     if vi_cmd_data['count'] > 1:
@@ -103,6 +109,9 @@ def vi_big_g(vi_cmd_data):
 
 
 def vi_gg(vi_cmd_data):
+    if (vi_cmd_data['count'] > 5) or vi_cmd_data['count'] == 1:
+        vi_cmd_data['is_jump'] = True
+
     # FIXME: Cannot go to line 1. We need to signal when the count is user-provided and when it's
     # a default value.
     if vi_cmd_data['count'] > 1:
@@ -147,6 +156,9 @@ def vi_zero(vi_cmd_data):
 
 
 def vi_underscore(vi_cmd_data):
+    if vi_cmd_data['count'] > 5:
+        vi_cmd_data['is_jump'] = True
+
     if vi_cmd_data['count'] == 1:
         vi_cmd_data['motion']['command'] = 'move_to'
         vi_cmd_data['motion']['args'] = {'to': 'bol'}
@@ -202,6 +214,9 @@ def vi_h(vi_cmd_data):
 
 
 def vi_j(vi_cmd_data):
+    if vi_cmd_data['count'] > 5:
+        vi_cmd_data['is_jump'] = True
+
     vi_cmd_data['__reorient_caret'] = True
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': True}
@@ -224,6 +239,9 @@ def vi_j(vi_cmd_data):
 
 
 def vi_k(vi_cmd_data):
+    if vi_cmd_data['count'] > 5:
+        vi_cmd_data['is_jump'] = True
+
     vi_cmd_data['__reorient_caret'] = True
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': False}
@@ -333,8 +351,18 @@ def vi_big_f(vi_cmd_data):
 
 
 def vi_percent(vi_cmd_data):
+    vi_cmd_data['is_jump'] = True
+
     vi_cmd_data['motion']['command'] = 'vi_percent'
     vi_cmd_data['motion']['args'] = {'percent': vi_cmd_data['count']}
+    vi_cmd_data['count'] = 1
+
+    return vi_cmd_data
+
+
+def vi_double_single_quote(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = 'vi_latest_jump'
+    vi_cmd_data['motion']['args'] = {}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data

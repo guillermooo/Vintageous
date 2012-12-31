@@ -217,7 +217,9 @@ class VintageState(object):
             # TODO: Interim solution to avoid problems with this step. Many commands don't need
             # this and it's causing quite some trouble. Let commands specify an explicit command
             # to reorient the caret as occurs with other hooks.
-            '__reorient_caret': False
+            '__reorient_caret': False,
+            # Whether the motion is considered a jump.
+            'is_jump': False,
         }
 
         # Make sure we run NORMAL mode actions in _MODE_INTERNAL_VISUAL mode.
