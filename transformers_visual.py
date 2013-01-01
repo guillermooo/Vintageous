@@ -338,16 +338,9 @@ class _vi_w_post_every_motion(sublime_plugin.TextCommand):
             state = VintageState(view)
 
             if state.mode == MODE_NORMAL:
-                offset = 0
-                if (view.full_line(s.b - 1).b == s.b or
-                    view.line(s.b).b == s.b):
-                        if view.line(s.b).empty():
-                            offset = -1
-
-                        if view.line(s.b).b == s.b:
-                            return sublime.Region(s.a, s.b + 2 + offset)
-                        else:
-                            return sublime.Region(s.a, s.b + 1 + offset)
+                if view.substr(s.b) == '\n':
+                    if not view.line(s.b).empty():
+                        return sublime.Region(s.b + 1, s.b + 1)
 
             if state.mode == MODE_VISUAL:
                 # FIXME: Moving from EMPTYLINE to NONEMPTYLINE should select FIRSTCHAR on NEXTLINE
@@ -735,5 +728,16 @@ class _vi_underscore_post_motion(sublime_plugin.TextCommand):
                 pt = utils.next_non_white_space_char(view, line.a)
                 return sublime.Region(s.a, pt + 1)
             return s
+
+        regions_transformer(self.view, f)
+
+
+class _vi_j_pre_motion(sublime_plugin.TextCommand):
+    # Assume NORMAL_MODE / _MODE_INTERNAL_VISUAL
+    # This code is probably duplicated.
+    def run(self, edit):
+        def run(view, s):
+            line = view.line(s.b)
+            return sublime.Region(line.a, line.a)
 
         regions_transformer(self.view, f)
