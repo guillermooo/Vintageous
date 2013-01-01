@@ -340,7 +340,9 @@ class _vi_w_post_every_motion(sublime_plugin.TextCommand):
             if state.mode == MODE_NORMAL:
                 if view.substr(s.b) == '\n':
                     if not view.line(s.b).empty():
-                        return sublime.Region(s.b + 1, s.b + 1)
+                        r = sublime.Region(s.b + 1, s.b + 1)
+                        pt = utils.next_non_white_space_char(view, r.b, white_space='\t ')
+                        return sublime.Region(pt, pt)
 
             if state.mode == MODE_VISUAL:
                 # FIXME: Moving from EMPTYLINE to NONEMPTYLINE should select FIRSTCHAR on NEXTLINE
