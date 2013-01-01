@@ -224,7 +224,7 @@ def vi_j(vi_cmd_data):
     if vi_cmd_data['_internal_mode'] == _MODE_INTERNAL_VISUAL:
         vi_cmd_data['motion']['args']['extend'] = True
         vi_cmd_data['pre_motion'] = ['_vi_j_pre_motion',]
-        vi_cmd_data['post_motion'] = [['visual_extend_to_full_line', {'_internal_mode': vi_cmd_data['_internal_mode']}],]
+        vi_cmd_data['post_motion'] = [['_vi_j_post_motion',],]
     elif vi_cmd_data['mode'] == MODE_VISUAL:
         vi_cmd_data['motion']['args']['extend'] = True
         vi_cmd_data['post_motion'] = [['visual_clip_end_to_eol',],]

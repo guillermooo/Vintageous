@@ -214,7 +214,9 @@ class VisualExtendToFullLine(sublime_plugin.TextCommand):
         def f(view, s):
             if _internal_mode == _MODE_INTERNAL_VISUAL:
                 if s.a <= s.b:
-                    if view.line(s.b).a != s.b:
+                    if view.substr(s.b - 1) == '\n' and view.line(s.b - 1).empty():
+                        return s
+                    elif view.line(s.b).a != s.b:
                         return sublime.Region(self.view.full_line(s.b - 1).b,
                                               self.view.line(s.a).a)
                     else:
@@ -738,8 +740,23 @@ class _vi_j_pre_motion(sublime_plugin.TextCommand):
     # Assume NORMAL_MODE / _MODE_INTERNAL_VISUAL
     # This code is probably duplicated.
     def run(self, edit):
-        def run(view, s):
+        def f(view, s):
             line = view.line(s.b)
-            return sublime.Region(line.a, line.a)
+            if view.substr(s.b) == '\n':
+                return sublime.Region(line.a, line.a + 1)
+            else:
+                return sublime.Region(line.a, line.b)
+
+        regions_transformer(self.view, f)
+
+
+class _vi_j_post_motion(sublime_plugin.TextCommand):
+    # Assume NORMAL_MODE / _MODE_INTERNAL_VISUAL
+    # This code is probably duplicated.
+    def run(self, edit):
+        def f(view, s):
+            a = view.line(s.a).a
+            b = view.line(s.b - 1).b
+            return sublime.Region(a, b + 1)
 
         regions_transformer(self.view, f)
