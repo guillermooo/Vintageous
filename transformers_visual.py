@@ -349,42 +349,52 @@ class _vi_w_post_every_motion(sublime_plugin.TextCommand):
                         return sublime.Region(pt, pt)
 
             if state.mode == MODE_VISUAL:
-                # FIXME: Moving from EMPTYLINE to NONEMPTYLINE should select FIRSTCHAR on NEXTLINE
-                # only, but it selects a WORD and the FIRSTCHAR of the following WORD too.
 
-                # When starting from an empty line, select only the FIRSTCHAR of the FIRSTWORD on
-                # NEXTLINE.
-                if view.size() == s.b:
-                    return sublime.Region(s.a, s.b)
+                if not utils.is_region_reversed(view, s):
+                    # FIXME: Moving from EMPTYLINE to NONEMPTYLINE should select FIRSTCHAR on NEXTLINE
+                    # only, but it selects a WORD and the FIRSTCHAR of the following WORD too.
 
-                elif view.line(s.a) != view.line(s.b):
-                    if s.b == view.word(view.line(s.b).a).b + 1 and not ViExecutionState.dont_shrink_word:
-                        return sublime.Region(s.a, view.line(s.b).a + 1)
-                    else:
-                        # Next *w* won't be a special case again.
-                        ViExecutionState.reset_word_state()
+                    # When starting from an empty line, select only the FIRSTCHAR of the FIRSTWORD on
+                    # NEXTLINE.
+                    if view.size() == s.b:
+                        return sublime.Region(s.a, s.b)
 
-                # If after the motion we're on an empty line, stay there.
-                if view.substr(s.b - 1) == '\n' and view.line(s.b - 1).empty():
-                    return s
+                    elif view.line(s.a) != view.line(s.b):
+                        if s.b == view.word(view.line(s.b).a).b + 1 and not ViExecutionState.dont_shrink_word:
+                            return sublime.Region(s.a, view.line(s.b).a + 1)
+                        else:
+                            # Next *w* won't be a special case again.
+                            ViExecutionState.reset_word_state()
 
-                # Always select the FIRSTCHAR of NEXTWORD skipping any WHITESPACE.
-                # XXX: Possible infinite loop at EOF.
-                pt = s.b
-                while True:
-                    pt = utils.next_non_white_space_char(view, pt, white_space='\t ')
-                    # We're on an EMPTYLINE, so stay here.
-                    if view.substr(pt) == '\n' and view.line(pt).empty():
-                        break
-                    # NEWLINECHAR after NONEMPTYLINE; keep going.
-                    elif view.substr(pt) == '\n':
-                        pt += 1
-                        continue
-                    # Any NONWHITESPACECHAR; stop here.
-                    else:
-                        break
+                    # If after the motion we're on an empty line, stay there.
+                    if view.substr(s.b - 1) == '\n' and view.line(s.b - 1).empty():
+                        return s
 
-                s = sublime.Region(s.a, pt + 1)
+                    # Always select the FIRSTCHAR of NEXTWORD skipping any WHITESPACE.
+                    # XXX: Possible infinite loop at EOF.
+                    pt = s.b
+                    while True:
+                        pt = utils.next_non_white_space_char(view, pt, white_space='\t ')
+                        # We're on an EMPTYLINE, so stay here.
+                        if view.substr(pt) == '\n' and view.line(pt).empty():
+                            break
+                        # NEWLINECHAR after NONEMPTYLINE; keep going.
+                        elif view.substr(pt) == '\n':
+                            pt += 1
+                            continue
+                        # Any NONWHITESPACECHAR; stop here.
+                        else:
+                            break
+
+                    s = sublime.Region(s.a, pt + 1)
+
+                # Reversed selections...
+                else:
+                    # Skip over NEWLINECHAR at EOL if on NONEMPTYLINE.
+                    if view.substr(s.b) == '\n' and not view.line(s.b).empty():
+                        # FIXME: Don't swallow empty lines.
+                        pt = utils.next_non_white_space_char(view, s.b, white_space='\t \n')
+                        return sublime.Region(s.a, pt)
 
             return s
 
@@ -396,13 +406,14 @@ class _vi_w_pre_motion(sublime_plugin.TextCommand):
         def f(view, s):
             state = VintageState(view)
             if state.mode == MODE_VISUAL:
-                # When issuing *w* from an empty line in visual mode, Vim will select the FIRSTCHAR
-                # of the FIRSTWORD on the NEXTLINE. Make sure here that, if that has been the case
-                # before this command, the post_every_motion hook won't get confused and fail to
-                # advance one word.
-                if view.line(s.b).a + 1 == s.b:
-                    if view.substr(s.b) not in ('\t '):
-                        ViExecutionState.dont_shrink_word = True
+                if not utils.is_region_reversed(view, s):
+                    # When issuing *w* from an empty line in visual mode, Vim will select the FIRSTCHAR
+                    # of the FIRSTWORD on the NEXTLINE. Make sure here that, if that has been the case
+                    # before this command, the post_every_motion hook won't get confused and fail to
+                    # advance one word.
+                    if view.line(s.b).a + 1 == s.b:
+                        if view.substr(s.b) not in ('\t '):
+                            ViExecutionState.dont_shrink_word = True
             return s
 
         regions_transformer(self.view, f)
@@ -413,9 +424,12 @@ class _vi_w_pre_every_motion(sublime_plugin.TextCommand):
         def f(view, s):
             state = VintageState(view)
             if state.mode == MODE_VISUAL:
-                if view.substr(s.b - 1) != '\n':
-                    # Ensures that we don't skip over WORDS of length 1.
-                    return sublime.Region(s.a, s.b - 1)
+                if not utils.is_region_reversed(view, s):
+                    if view.substr(s.b - 1) != '\n':
+                        # Ensures that we don't skip over WORDS of length 1.
+                        return sublime.Region(s.a, s.b - 1)
+                else:
+                    return sublime.Region(s.a, s.b + 1)
             return s
 
         regions_transformer(self.view, f)
