@@ -340,7 +340,9 @@ class _vi_w_post_every_motion(sublime_plugin.TextCommand):
             state = VintageState(view)
 
             if state.mode == MODE_NORMAL:
-                if view.substr(s.b) == '\n':
+                if s.b == view.size():
+                    return sublime.Region(view.size() - 1, view.size() - 1)
+                elif view.substr(s.b) == '\n':
                     if not view.line(s.b).empty():
                         r = sublime.Region(s.b + 1, s.b + 1)
                         pt = utils.next_non_white_space_char(view, r.b, white_space='\t ')
@@ -352,7 +354,10 @@ class _vi_w_post_every_motion(sublime_plugin.TextCommand):
 
                 # When starting from an empty line, select only the FIRSTCHAR of the FIRSTWORD on
                 # NEXTLINE.
-                if view.line(s.a) != view.line(s.b):
+                if view.size() == s.b:
+                    return sublime.Region(s.a, s.b)
+
+                elif view.line(s.a) != view.line(s.b):
                     if s.b == view.word(view.line(s.b).a).b + 1 and not ViExecutionState.dont_shrink_word:
                         return sublime.Region(s.a, view.line(s.b).a + 1)
                     else:
