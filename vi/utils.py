@@ -104,7 +104,7 @@ def orient_region_left(r):
 
 
 def next_non_white_space_char(view, pt, white_space='\t '):
-    while view.substr(pt) in white_space:
+    while (view.substr(pt) in white_space) and (pt <= view.size()):
         pt += 1
     return pt
 

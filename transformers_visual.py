@@ -582,8 +582,10 @@ class _vi_e_post_every_motion(sublime_plugin.TextCommand):
                         return s
 
             elif mode == MODE_NORMAL:
+                    if s.b == view.size():
+                        return s
                     # If we're at BOL one LINE down; move to NEXTWORD WORDEND exclusive.
-                    if utils.is_at_bol(self.view, s):
+                    elif utils.is_at_bol(self.view, s):
                         next = utils.next_non_white_space_char(self.view, s.b, white_space='\t \n')
                         next = self.view.word(next)
                         return sublime.Region(next.b - 1, next.b - 1)
