@@ -347,7 +347,8 @@ def vi_big_t(vi_cmd_data):
 
 def vi_big_f(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_reverse_find_in_line_inclusive'
-    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_input'], '_internal_mode': vi_cmd_data['_internal_mode']}
+    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_input'], '_internal_mode': vi_cmd_data['_internal_mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['count'] = 1
 
     return vi_cmd_data
 

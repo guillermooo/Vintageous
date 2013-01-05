@@ -61,18 +61,26 @@ class ViFindInLineInclusive(sublime_plugin.TextCommand):
 
 
 class ViReverseFindInLineInclusive(sublime_plugin.TextCommand):
-    def run(self, edit, extend=False, character=None, _internal_mode=None):
+    def run(self, edit, extend=False, character=None, _internal_mode=None, count=1):
         def f(view, s):
             line_text = view.substr(sublime.Region(view.line(s.b).a, s.b))
             offset = 0
+            a, b = view.line(s.b).a, s.b
+            final_offset = -1
 
             try:
-                where = line_text.index(character)
-            except ValueError:
-                where = -1
+                for i in range(count):
+                    line_text = view.substr(sublime.Region(a, b))
+                    match_in_line = line_text.rindex(character)
 
-            if where > -1:
-                pt = view.line(s.b).a + where
+                    final_offset = match_in_line
+
+                    b = view.line(s.a).a + final_offset
+            except ValueError:
+                pass
+
+            if final_offset > -1:
+                pt = view.line(s.b).a + final_offset
 
                 state = VintageState(view)
                 if state.mode == MODE_VISUAL or _internal_mode == _MODE_INTERNAL_VISUAL:
