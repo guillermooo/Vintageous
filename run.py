@@ -183,5 +183,4 @@ class ViRunCommand(sublime_plugin.TextCommand):
 
     def add_to_jump_list(self, vi_cmd_data):
         if vi_cmd_data['is_jump']:
-            print("XXX XXX XXX XX XXX XXX")
             self.view.run_command('vi_add_to_jump_list')
