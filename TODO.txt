@@ -12,5 +12,6 @@ TODO
 * cancel action if selections didn't change after motion: this is a bug in dfx, for instance
 * improve jumplist: enable jumplist for unsaved buffers
 * implement H, L, M
+* unify handling of state in _* commands: use either parameters or VintageState.
 
 * simplify .reorient_caret() and make it more similar to other execution hooks
