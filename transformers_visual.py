@@ -735,6 +735,8 @@ class _vi_underscore_pre_motion(sublime_plugin.TextCommand):
             if mode == MODE_NORMAL:
                 line = view.line(s.b)
                 return sublime.Region(line.a, line.a)
+            elif _internal_mode == _MODE_INTERNAL_VISUAL:
+                return sublime.Region(view.line(s.b).a, view.full_line(s.b).b)
             return s
 
         regions_transformer(self.view, f)
@@ -750,6 +752,12 @@ class _vi_underscore_post_motion(sublime_plugin.TextCommand):
                 line = view.line(s.b - 1)
                 pt = utils.next_non_white_space_char(view, line.a)
                 return sublime.Region(s.a, pt)
+            elif _internal_mode == _MODE_INTERNAL_VISUAL:
+                if not s.empty() and view.substr(s.b - 1) == '\n':
+                    return s
+                else:
+                    return sublime.Region(s.a, view.full_line(s.b).b)
+                
             return s
 
         regions_transformer(self.view, f)

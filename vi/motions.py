@@ -162,9 +162,20 @@ def vi_underscore(vi_cmd_data):
         vi_cmd_data['is_jump'] = True
 
     if vi_cmd_data['count'] == 1:
-        vi_cmd_data['motion']['command'] = 'move_to'
-        vi_cmd_data['motion']['args'] = {'to': 'bol'}
-        vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion', {'mode': vi_cmd_data['mode']}],]
+        if vi_cmd_data['_internal_mode'] == _MODE_INTERNAL_VISUAL:
+            # XXX: This is sloppy. Make 'motion' a real motion and do away with 'pre_motion'. The
+            # problem is that VintageState or VintageRun automatically add that 'extend' property
+            # to motions, so we cannot simply say 'move_to' 'hardbol' in the motion.
+            # Perhaps 'extend' should always be added manually or not add it if the current mode
+            # is _MODE_INTERNAL_VISUAL.
+            vi_cmd_data['motion']['command'] = 'vi_no_op'
+            vi_cmd_data['motion']['args'] = {}
+            vi_cmd_data['pre_motion'] = ['move_to', {'to': 'hardbol'}]
+            vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion', {'_internal_mode': vi_cmd_data['_internal_mode']}],]
+        else:
+            vi_cmd_data['motion']['command'] = 'move_to'
+            vi_cmd_data['motion']['args'] = {'to': 'bol'}
+            vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion', {'mode': vi_cmd_data['mode']}],]
 
         if vi_cmd_data['mode'] == MODE_VISUAL:
             vi_cmd_data['motion']['args']['extend'] = True
@@ -174,7 +185,12 @@ def vi_underscore(vi_cmd_data):
         vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': True}
         vi_cmd_data['count'] = vi_cmd_data['count'] - 1
 
-        if vi_cmd_data['mode'] == MODE_NORMAL:
+        if vi_cmd_data['_internal_mode'] == _MODE_INTERNAL_VISUAL:
+            vi_cmd_data['motion']['command'] = 'move'
+            vi_cmd_data['motion']['args'] = {'by': 'lines', 'extend': True, 'forward': True}
+            vi_cmd_data['pre_motion'] = ['_vi_underscore_pre_motion', {'_internal_mode': vi_cmd_data['_internal_mode']}]
+            vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion', {'_internal_mode': vi_cmd_data['_internal_mode']}],]
+        elif vi_cmd_data['mode'] == MODE_NORMAL:
             vi_cmd_data['pre_motion'] = ['_vi_underscore_pre_motion', {'mode': vi_cmd_data['mode']}]
             vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion', {'mode': vi_cmd_data['mode']}],]
         elif vi_cmd_data['mode'] == MODE_VISUAL:
