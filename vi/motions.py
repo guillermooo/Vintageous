@@ -162,6 +162,7 @@ def vi_underscore(vi_cmd_data):
     if vi_cmd_data['count'] == 1:
         vi_cmd_data['motion']['command'] = 'move_to'
         vi_cmd_data['motion']['args'] = {'to': 'bol'}
+        vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion', {'mode': vi_cmd_data['mode']}],]
 
         if vi_cmd_data['mode'] == MODE_VISUAL:
             vi_cmd_data['motion']['args']['extend'] = True

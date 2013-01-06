@@ -582,10 +582,8 @@ class _vi_e_post_every_motion(sublime_plugin.TextCommand):
                         return s
 
             elif mode == MODE_NORMAL:
-                    if s.b == view.size():
-                        return s
                     # If we're at BOL one LINE down; move to NEXTWORD WORDEND exclusive.
-                    elif utils.is_at_bol(self.view, s):
+                    if utils.is_at_bol(self.view, s):
                         next = utils.next_non_white_space_char(self.view, s.b, white_space='\t \n')
                         next = self.view.word(next)
                         return sublime.Region(next.b - 1, next.b - 1)
@@ -751,7 +749,7 @@ class _vi_underscore_post_motion(sublime_plugin.TextCommand):
             elif mode == MODE_VISUAL:
                 line = view.line(s.b - 1)
                 pt = utils.next_non_white_space_char(view, line.a)
-                return sublime.Region(s.a, pt + 1)
+                return sublime.Region(s.a, pt)
             return s
 
         regions_transformer(self.view, f)
