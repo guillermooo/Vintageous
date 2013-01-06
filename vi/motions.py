@@ -167,7 +167,7 @@ def vi_underscore(vi_cmd_data):
             # problem is that VintageState or VintageRun automatically add 'extend': True
             # to motions, so we cannot simply say 'move_to' 'hardbol' in the motion.
             # Perhaps 'extend' should always be added manually or left unmodified if the current
-            # mode was _MODE_INTERNAL_VISUAL. Being explicit here looks like the better idea.
+            # mode was _MODE_INTERNAL_VISUAL. Being explicit with 'extend' looks like the better idea.
             vi_cmd_data['motion']['command'] = 'vi_no_op'
             vi_cmd_data['motion']['args'] = {}
             vi_cmd_data['pre_motion'] = ['move_to', {'to': 'hardbol'}]
