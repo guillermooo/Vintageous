@@ -150,6 +150,8 @@ def vi_zero(vi_cmd_data):
         if vi_cmd_data['mode'] == MODE_VISUAL:
             vi_cmd_data['motion']['args']['extend'] = True
 
+        # TODO: Unify handling of the 'extend' argument. All VISUAL modes need it, so either include
+        # it by default at some point, or let each command decide, as we do here.
         vi_cmd_data['post_motion'] = [['move_to_first_non_white_space_char', {'extend': True}],]
 
     return vi_cmd_data
