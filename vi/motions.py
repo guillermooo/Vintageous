@@ -163,11 +163,11 @@ def vi_underscore(vi_cmd_data):
 
     if vi_cmd_data['count'] == 1:
         if vi_cmd_data['_internal_mode'] == _MODE_INTERNAL_VISUAL:
-            # XXX: This is sloppy. Make 'motion' a real motion and do away with 'pre_motion'. The
-            # problem is that VintageState or VintageRun automatically add that 'extend' property
+            # TODO: This is sloppy. Make 'motion' a real motion and do away with 'pre_motion'. The
+            # problem is that VintageState or VintageRun automatically add 'extend': True
             # to motions, so we cannot simply say 'move_to' 'hardbol' in the motion.
-            # Perhaps 'extend' should always be added manually or not add it if the current mode
-            # is _MODE_INTERNAL_VISUAL.
+            # Perhaps 'extend' should always be added manually or left unmodified if the current
+            # mode was _MODE_INTERNAL_VISUAL. Being explicit here looks like the better idea.
             vi_cmd_data['motion']['command'] = 'vi_no_op'
             vi_cmd_data['motion']['args'] = {}
             vi_cmd_data['pre_motion'] = ['move_to', {'to': 'hardbol'}]
