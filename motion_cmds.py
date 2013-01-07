@@ -205,3 +205,43 @@ class ViPercent(sublime_plugin.TextCommand):
         # FIXME: Bringing the selections into view will be undesirable in many cases. Maybe we
         # should have an optional .scroll_selections_into_view() step during command execution.
         self.view.show(self.view.sel()[0])
+
+
+class ViBigH(sublime_plugin.TextCommand):
+    def run(self, edit, extend=False, count=0):
+        r = self.view.visible_region()
+        row, _ = self.view.rowcol(r.a)
+        row += count + 1
+
+        target = self.view.text_point(row, 0)
+
+        self.view.sel().clear()
+        self.view.sel().add(sublime.Region(target, target))
+        self.view.show(target)
+
+
+class ViBigL(sublime_plugin.TextCommand):
+    def run(self, edit, extend=False, count=0):
+        r = self.view.visible_region()
+        row, _ = self.view.rowcol(r.b)
+        row -= count + 1
+
+        target = self.view.text_point(row, 0)
+
+        self.view.sel().clear()
+        self.view.sel().add(sublime.Region(target, target))
+        self.view.show(target)
+
+
+class ViBigM(sublime_plugin.TextCommand):
+    def run(self, edit, extend=False):
+        r = self.view.visible_region()
+        row_a, _ = self.view.rowcol(r.a)
+        row_b, _ = self.view.rowcol(r.b)
+        row = ((row_a + row_b) / 2)
+
+        target = self.view.text_point(row, 0)
+
+        self.view.sel().clear()
+        self.view.sel().add(sublime.Region(target, target))
+        self.view.show(target)

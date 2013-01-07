@@ -33,6 +33,10 @@
 	{ "keys": ["G"], "command": "set_motion", "args": {"motion": "vi_big_g"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["%"], "command": "set_motion", "args": {"motion": "vi_percent"}, "context": [{"key": "setting.command_mode"}] },
 
+	{ "keys": ["H"], "command": "set_motion", "args": {"motion": "vi_big_h"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["M"], "command": "set_motion", "args": {"motion": "vi_big_m"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["L"], "command": "set_motion", "args": {"motion": "vi_big_l"}, "context": [{"key": "setting.command_mode"}] },
+
 	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_enter_visual_mode"}, "context": [{"key": "vi_mode_normal"}] },
 	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_enter_normal_mode"}, "context": [{"key": "vi_mode_visual"}] },
 	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_enter_visual_mode"}, "context": [{"key": "vi_mode_visual_line"}] },
