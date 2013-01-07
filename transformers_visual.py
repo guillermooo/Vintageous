@@ -757,7 +757,7 @@ class _vi_underscore_post_motion(sublime_plugin.TextCommand):
                     return s
                 else:
                     return sublime.Region(s.a, view.full_line(s.b).b)
-                
+
             return s
 
         regions_transformer(self.view, f)
@@ -785,5 +785,35 @@ class _vi_j_post_motion(sublime_plugin.TextCommand):
             a = view.line(s.a).a
             b = view.line(s.b - 1).b
             return sublime.Region(a, b + 1)
+
+        regions_transformer(self.view, f)
+
+
+class _vi_select_text_object(sublime_plugin.TextCommand):
+    def run(self, edit, text_object=None, _internal_mode=None, count=1, extend=False):
+        def f(view, s):
+            if _internal_mode == _MODE_INTERNAL_VISUAL:
+                offset = s.b - view.line(s.b).a
+                line_text = view.substr(sublime.Region(s.b, view.line(s.b).b))
+                if text_object in "\"'`":
+                    c_a = c_b = text_object
+                else:
+                    return s
+
+                try:
+                    pt_a = line_text.index(c_a)
+                except ValueError:
+                    return s
+
+                line_text = line_text[pt_a + 1:]
+
+                try:
+                    pt_b = line_text.index(c_b)
+                except ValueError:
+                    return s
+
+                return sublime.Region(s.b + pt_a + 1, s.b + pt_a + pt_b + 1)
+
+            return s
 
         regions_transformer(self.view, f)

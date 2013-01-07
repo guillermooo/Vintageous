@@ -107,6 +107,7 @@
 	// Twofold process: First set the motion, then collect user input and run global state.
 	{ "keys": ["f"], "command": "vi_f", "context": [{"key": "vi_mode_normal"}] },
 	{ "keys": ["f"], "command": "vi_f", "context": [{"key": "vi_mode_visual"}] },
+	// TODO: Is the following key binding needed?
 	{ "keys": ["<character>"], "command": "vi_f", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_user_input"}] },
 
 	// Twofold process: First set the motion, then collect user input and run global state.
@@ -121,6 +122,10 @@
 	{ "keys": ["F"], "command": "vi_big_f", "context": [{"key": "vi_mode_normal"}] },
 	{ "keys": ["F"], "command": "vi_big_f", "context": [{"key": "vi_mode_visual"}] },
 
+	// Twofold process: First set the motion, then collect user input and run global state.
+	{ "keys": ["i"], "command": "vi_i", "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_action"}] },
+	// { "keys": ["i"], "command": "vi_i", "context": [{"key": "vi_mode_visual"}, {"key": "vi_has_action"}] },
+	
 	// Collects user input for commands such as t, f, T, F.
 	{ "keys": ["<character>"], "command": "collect_user_input", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_user_input"}] },
 

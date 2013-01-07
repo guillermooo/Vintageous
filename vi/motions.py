@@ -407,6 +407,14 @@ def vi_big_f(vi_cmd_data):
     return vi_cmd_data
 
 
+def vi_i(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = '_vi_select_text_object'
+    vi_cmd_data['motion']['args'] = {'text_object': vi_cmd_data['user_input'], '_internal_mode': vi_cmd_data['_internal_mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['count'] = 1
+
+    return vi_cmd_data
+
+
 def vi_percent(vi_cmd_data):
     vi_cmd_data['is_jump'] = True
 

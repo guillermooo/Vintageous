@@ -307,6 +307,15 @@ class ViBigF(IrreversibleTextCommand):
         state.motion = 'vi_big_f'
         state.expecting_user_input = True
 
+class ViI(IrreversibleTextCommand):
+    def __init__(self, view):
+        IrreversibleTextCommand.__init__(self, view)
+
+    def run(self):
+        state = VintageState(self.view)
+        state.motion = 'vi_i'
+        state.expecting_user_input = True
+
 
 class CollectUserInput(IrreversibleTextCommand):
     def __init__(self, view):
