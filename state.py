@@ -218,6 +218,9 @@ class VintageState(object):
             '__reorient_caret': False,
             # Whether the motion is considered a jump.
             'is_jump': False,
+            # Some actions must be cancelled if the selections didn't change after the motion.
+            # Others, on the contrary, must always go ahead.
+            'cancel_action_if_motion_fails': False,
         }
 
         # Make sure we run NORMAL mode actions in _MODE_INTERNAL_VISUAL mode.

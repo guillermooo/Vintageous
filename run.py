@@ -39,7 +39,9 @@ class ViExecutionState(object):
 class ViRunCommand(sublime_plugin.TextCommand):
     def run(self, edit, **vi_cmd_data):
         print("Data in ViRunCommand:", vi_cmd_data)
-        # pprint.pprint(vi_cmd_data)
+
+        sels_before = list(self.view.sel())
+
         try:
             # XXX: Fix this. When should we run the motion exactly?
             if vi_cmd_data['action']:
@@ -48,6 +50,13 @@ class ViRunCommand(sublime_plugin.TextCommand):
                      not view.has_non_empty_selection_region())):
                         self.enter_visual_mode(vi_cmd_data)
                         self.do_whole_motion(vi_cmd_data)
+
+                sels_after = list(self.view.sel())
+
+                # The motion didn't change the selections: abort action if so required.
+                # TODO: What to do with .post_action() and .do_follow_up_mode() in this event?
+                if vi_cmd_data['cancel_action_if_motion_fails'] and (sels_after == sels_before):
+                    return
 
                 self.do_action(vi_cmd_data)
             else:

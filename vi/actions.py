@@ -43,6 +43,7 @@ def vi_enter_normal_insert_mode(vi_cmd_data):
 
 
 def vi_d(vi_cmd_data):
+    vi_cmd_data['cancel_action_if_motion_fails'] = True
     vi_cmd_data['can_yank'] = True
     vi_cmd_data['motion_required'] = True
     forward = vi_cmd_data['motion'].get('args') and vi_cmd_data['motion']['args'].get('forward')
@@ -127,6 +128,7 @@ def vi_c(vi_cmd_data):
     # XXX: This is wrong; mode cannot equal _MODE_INTERNAL_VISUAL (that's an _internal_mode).
     vi_cmd_data['mode'] = _MODE_INTERNAL_VISUAL
     vi_cmd_data['can_yank'] = True
+    vi_cmd_data['cancel_action_if_motion_fails'] = True
 
     vi_cmd_data['motion_required'] = True
     vi_cmd_data['action']['command'] = 'left_delete'
