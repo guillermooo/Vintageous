@@ -119,6 +119,7 @@ class ViEnterNormalMode(sublime_plugin.TextCommand):
         state = VintageState(self.view)
         self.view.run_command('collapse_to_direction')
         self.view.run_command('dont_stay_on_eol_backward')
+        state.reset()
         state.enter_normal_mode()
 
 
@@ -377,6 +378,7 @@ class _vi_zz(IrreversibleTextCommand):
 
         topmost_visible_row, _ = self.view.rowcol(self.view.visible_region().a)
         bottommost_visible_row, _ = self.view.rowcol(self.view.visible_region().b)
+
 
         middle_row = (topmost_visible_row + bottommost_visible_row) / 2
 
