@@ -139,5 +139,5 @@
 	{ "keys": [">"], "command": "set_action", "args": {"action": "vi_lambda"}, "context": [{"key": "vi_mode_normal"}] },
 	{ "keys": ["<"], "command": "set_action", "args": {"action": "vi_antilambda"}, "context": [{"key": "vi_mode_normal"}] },
 
-	{ "keys": ["'", "'"], "command": "set_motion", "args": {"motion": "vi_double_single_quote"}, "context": [{"key": "vi_mode_normal"}] }
+	{ "keys": ["'", "'"], "command": "set_motion", "args": {"motion": "vi_double_single_quote"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_state_next_character_is_user_input", "operand": false}] }
 ]

@@ -327,17 +327,34 @@ class VintageStateTracker(sublime_plugin.EventListener):
             elif operator == sublime.OP_NOT_EQUAL:
                 return False
 
+        # TODO: Perhaps unify all data collection in one single context.
         elif key == 'vi_state_expecting_register':
             if operator == sublime.OP_EQUAL:
                 return vintage_state.expecting_register
             elif operator == sublime.OP_NOT_EQUAL:
                 return not vintage_state.expecting_register
 
+        # TODO: Perhaps unify all data collection in one single context.
         elif key == 'vi_state_expecting_user_input':
             if operator == sublime.OP_EQUAL:
                 return vintage_state.expecting_user_input
             elif operator == sublime.OP_NOT_EQUAL:
                 return not vintage_state.expecting_user_input
+
+        # TODO: This context should encompass any state in which the next input character will be
+        #       consumed as user-provided input. However, it seems simpler to unify data collection
+        #       from users in one single context to begin with and get rid of this.
+        elif key == 'vi_state_next_character_is_user_input':
+            if operator == sublime.OP_EQUAL:
+                if operand == True:
+                    return (vintage_state.expecting_user_input or
+                            vintage_state.expecting_register)
+                elif operand == False:
+                    return not (vintage_state.expecting_user_input or
+                                vintage_state.expecting_register)
+            elif operator == sublime.OP_NOT_EQUAL:
+                return not (vintage_state.expecting_user_input or
+                            vintage_state.expecting_register)
 
         elif key == 'vi_mode_normal':
             if operator == sublime.OP_EQUAL:
