@@ -258,6 +258,7 @@ def vi_big_l(vi_cmd_data):
 
 def vi_big_m(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_big_m'
+    vi_cmd_data['motion']['args'] = {}
 
     if vi_cmd_data['mode'] == MODE_VISUAL:
         vi_cmd_data['motion']['args']['extend'] = True

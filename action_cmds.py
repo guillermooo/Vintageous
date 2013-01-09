@@ -340,3 +340,45 @@ class _repeat_command(IrreversibleTextCommand):
 
         for i in range(times):
             self.view.run_command(command, command_args)
+
+
+class _vi_z_enter(IrreversibleTextCommand):
+    def __init__(self, view):
+        IrreversibleTextCommand.__init__(self, view)
+
+    def run(self):
+        first_sel = self.view.sel()[0]
+        current_row = self.view.rowcol(first_sel.b)[0] - 1
+
+        topmost_visible_row, _ = self.view.rowcol(self.view.visible_region().a)
+
+        self.view.run_command('scroll_lines', {'amount': (topmost_visible_row - current_row)})
+        
+class _vi_z_minus(IrreversibleTextCommand):
+    def __init__(self, view):
+        IrreversibleTextCommand.__init__(self, view)
+
+    def run(self):
+        first_sel = self.view.sel()[0]
+        current_row = self.view.rowcol(first_sel.b)[0]
+
+        bottommost_visible_row, _ = self.view.rowcol(self.view.visible_region().b)
+
+        self.view.run_command('scroll_lines', {'amount': (bottommost_visible_row - current_row)})
+
+
+class _vi_zz(IrreversibleTextCommand):
+    def __init__(self, view):
+        IrreversibleTextCommand.__init__(self, view)
+
+    def run(self):
+        first_sel = self.view.sel()[0]
+        current_row = self.view.rowcol(first_sel.b)[0]
+
+        topmost_visible_row, _ = self.view.rowcol(self.view.visible_region().a)
+        bottommost_visible_row, _ = self.view.rowcol(self.view.visible_region().b)
+
+        middle_row = (topmost_visible_row + bottommost_visible_row) / 2
+
+        self.view.run_command('scroll_lines', {'amount': (middle_row - current_row)})
+               

@@ -363,6 +363,49 @@ def vi_g_u(vi_cmd_data):
     return vi_cmd_data
 
 
+def vi_z_action(vi_cmd_data):
+    """This doesn't do anything by itself, but tells global state to wait for a second action that
+       completes this one.
+    """
+    vi_cmd_data['motion_required'] = True
+    # Let global state know we still need a second action to complete this one.
+    vi_cmd_data['is_digraph_start'] = True
+    vi_cmd_data['action']['command'] = 'no_op'
+    vi_cmd_data['action']['args'] = {}
+
+    return vi_cmd_data
+
+
+def vi_z_enter(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['action']['command'] = '_vi_z_enter'
+    vi_cmd_data['action']['args'] = {}
+    # vi_cmd_data['post_action'] = ['collapse_to_begin',]
+    # vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+
+    return vi_cmd_data
+
+
+def vi_zz(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['action']['command'] = '_vi_zz'
+    vi_cmd_data['action']['args'] = {}
+    # vi_cmd_data['post_action'] = ['collapse_to_begin',]
+    # vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+
+    return vi_cmd_data
+
+
+def vi_z_minus(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['action']['command'] = '_vi_z_minus'
+    vi_cmd_data['action']['args'] = {}
+    # vi_cmd_data['post_action'] = ['collapse_to_begin',]
+    # vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+
+    return vi_cmd_data
+
+
 def vi_double_lambda(vi_cmd_data):
     # Assume _MODE_INTERNAL_VISUAL.
     if vi_cmd_data['count'] > 1:

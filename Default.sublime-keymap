@@ -78,6 +78,7 @@
 	{ "keys": ["g"], "command": "set_action", "args": {"action": "vi_g_action"}, "context": [{"key": "setting.command_mode"}] },
 
 	// gg can either be an action or a motion. It's a motion when there's a true action primed.
+	// TODO: Improve this.
 	{ "keys": ["g", "g"], "command": "set_motion", "args": {"motion": "vi_gg"}, "context": [{"key": "vi_has_action"}] },
 
 	// gg can either be an action or a motion. It's an action when there is no actual action.
@@ -85,6 +86,12 @@
 
 	{ "keys": ["U"], "command": "set_action", "args": {"action": "vi_g_big_u"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 	{ "keys": ["u"], "command": "set_action", "args": {"action": "vi_g_u"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
+
+	// This is a fake action that allows zz to be issued.
+	{ "keys": ["z"], "command": "set_action", "args": {"action": "vi_z_action"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["enter"], "command": "set_action", "args": {"action": "vi_z_enter"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
+	{ "keys": ["-"], "command": "set_action", "args": {"action": "vi_z_minus"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
+	{ "keys": ["z"], "command": "set_action", "args": {"action": "vi_zz"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 
 	// These come after the ones above so we don't need extra context checks.
 	{ "keys": ["o"], "command": "set_action", "args": {"action": "vi_visual_o"}, "context": [{"key": "vi_mode_visual_any"}] },

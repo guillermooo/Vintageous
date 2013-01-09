@@ -26,6 +26,9 @@ digraphs = {
     ('vi_antilambda', 'vi_antilambda'): ('vi_double_antilambda', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_big_u'): ('vi_g_big_u', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_u'): ('vi_g_u', DIGRAPH_ACTION),
+    ('vi_z_action', 'vi_z_enter'): ('vi_z_enter', DIGRAPH_ACTION),
+    ('vi_z_action', 'vi_z_minus'): ('vi_z_minus', DIGRAPH_ACTION),
+    ('vi_z_action', 'vi_zz'): ('vi_zz', DIGRAPH_ACTION),
 
     ('vi_g_action', 'vi_gg'): ('vi_gg', DIGRAPH_MOTION),
     # XXX: I don't think the following is needed.
@@ -34,7 +37,7 @@ digraphs = {
 
 
 # Actions that cannot run on their own --they require a qualifier.
-INCOMPLETE_ACTIONS = ('vi_g_action',)
+INCOMPLETE_ACTIONS = ('vi_g_action', 'vi_z_action')
 
 
 # TODO: This does not belong here.
