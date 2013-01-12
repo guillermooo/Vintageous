@@ -789,6 +789,20 @@ class _vi_j_post_motion(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
+class _vi_k_pre_motion(sublime_plugin.TextCommand):
+    # Assume NORMAL_MODE / _MODE_INTERNAL_VISUAL
+    # This code is probably duplicated.
+    def run(self, edit):
+        def f(view, s):
+            line = view.line(s.b)
+            if view.substr(s.b) == '\n':
+                return sublime.Region(line.b + 1, line.b)
+            else:
+                return sublime.Region(line.b + 1, line.a)
+
+        regions_transformer(self.view, f)
+
+
 class _vi_select_text_object(sublime_plugin.TextCommand):
     def run(self, edit, text_object=None, _internal_mode=None, count=1, extend=False):
         def f(view, s):
