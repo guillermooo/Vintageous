@@ -320,7 +320,7 @@ def vi_yy(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'lines', 'extend': True, 'forward': True}
     # TODO: yy should leave the caret where it found it. As a temporary solution, we'll leave it
-    # at HBOL, which is the lesser evil between that and HEOL.
+    # at BOL, which is the lesser evil between that and HEOL.
     vi_cmd_data['post_motion'] = [['_vi_yy_post_motion', {'_internal_mode': vi_cmd_data['_internal_mode']}],]
 
     vi_cmd_data['count'] = vi_cmd_data['count'] - 1
