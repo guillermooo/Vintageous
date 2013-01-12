@@ -1,8 +1,9 @@
 [
-	{ "keys": ["escape"], "command": "vi_enter_normal_mode_from_insert_mode", "context": [{"key": "setting.command_mode", "operand": false}] },
-	{ "keys": ["escape"], "command": "vi_enter_normal_mode", "context": [{"key": "vi_mode_visual_line", "operand": false}] },
-	{ "keys": ["escape"], "command": "vi_enter_normal_mode", "context": [{"key": "vi_mode_visual", "operand": false}] },
-	{ "keys": ["escape"], "command": "vi_run_normal_insert_mode_actions", "context": [{"key": "vi_mode_normal_insert"}] },
+	// TODO: Bring all key bindings to enter normal mode under a single one.
+	{ "keys": ["escape"], "command": "vi_enter_normal_mode_from_insert_mode", "context": [{"key": "setting.command_mode", "operand": false}, {"key": "vi_is_sublime_widget_or_console", "operand": false}] },
+	{ "keys": ["escape"], "command": "vi_enter_normal_mode", "context": [{"key": "vi_mode_visual_line", "operand": false}, {"key": "vi_is_sublime_widget_or_console", "operand": false}] },
+	{ "keys": ["escape"], "command": "vi_enter_normal_mode", "context": [{"key": "vi_mode_visual", "operand": false}, {"key": "vi_is_sublime_widget_or_console", "operand": false}] },
+	{ "keys": ["escape"], "command": "vi_run_normal_insert_mode_actions", "context": [{"key": "vi_mode_normal_insert"}, {"key": "vi_is_sublime_widget_or_console", "operand": false}] },
 
 	{ "keys": ["i"], "command": "set_action", "args": {"action": "vi_enter_insert_mode"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_mode_visual_any", "operand": false}] },
 

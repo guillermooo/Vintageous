@@ -318,6 +318,8 @@ class VintageStateTracker(sublime_plugin.EventListener):
     def on_query_context(self, view, key, operator, operand, match_all):
         vintage_state = VintageState(view)
 
+        # TODO: Move contexts to a separate file to reduce clutter.
+
         if key == "vi_mode_can_push_digit":
             motion_digits = not vintage_state.motion
             action_digits = vintage_state.motion
@@ -429,6 +431,23 @@ class VintageStateTracker(sublime_plugin.EventListener):
             elif operator == sublime.OP_NOT_EQUAL:
                 return not value
 
+        # Used to disable commands to enter normal mode. Input widgets should always operate in
+        # insert mode (actually, they should be completely ignored by Vintageous at this stage).
+        elif key == 'vi_is_sublime_widget_or_console':
+            is_console = False if (getattr(view, 'settings') is not None) else True
+            is_widget = view.settings().get('is_widget')
+            if operator == sublime.OP_EQUAL:
+                if operand is True:
+                    return (is_console or is_widget)
+
+                if operand is False:
+                    return not (is_console or is_widget)
+            elif operator == sublime.OP_NOT_EQUAL:
+                if operand is True:
+                    return not (is_console or is_widget)
+
+                if operand is False:
+                    return (is_console or is_widget)
         return False
 
 
