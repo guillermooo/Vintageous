@@ -817,3 +817,34 @@ class _vi_select_text_object(sublime_plugin.TextCommand):
             return s
 
         regions_transformer(self.view, f)
+
+
+class _vi_yy_pre_motion(sublime_plugin.TextCommand):
+    # Assume NORMAL_MODE / _MODE_INTERNAL_VISUAL
+    def run(self, edit, _internal_mode=None):
+        def f(view, s):
+            line = view.line(s.b)
+            return sublime.Region(line.a, line.b + 1)
+
+        regions_transformer(self.view, f)
+
+
+class _vi_yy_post_motion(sublime_plugin.TextCommand):
+    # Assume NORMAL_MODE / _MODE_INTERNAL_VISUAL
+    def run(self, edit, _internal_mode=None):
+        def f(view, s):
+            line = view.line(s.b - 1)
+            return sublime.Region(s.a, line.b + 1)
+
+        regions_transformer(self.view, f)
+
+
+class _vi_move_caret_to_first_non_white_space_character(sublime_plugin.TextCommand):
+    # Assume NORMAL_MODE / _MODE_INTERNAL_VISUAL
+    def run(self, edit, _internal_mode=None):
+        def f(view, s):
+            line = view.line(s.b - 1)
+            pt = utils.next_non_white_space_char(view, line.a)
+            return sublime.Region(pt, pt)
+
+        regions_transformer(self.view, f)

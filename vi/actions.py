@@ -311,21 +311,25 @@ def vi_y(vi_cmd_data):
 
 
 def vi_yy(vi_cmd_data):
+    # Assume NORMALMODE.
     # FIXME: Cannot copy (or maybe pasting is the problem) one empty line only.
     vi_cmd_data['_internal_mode'] = _MODE_INTERNAL_VISUAL
     vi_cmd_data['motion_required'] = False
 
+    vi_cmd_data['pre_motion'] = ['_vi_yy_pre_motion',]
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'lines', 'extend': True, 'forward': True}
-    vi_cmd_data['post_motion'] = [['visual_extend_to_full_line', {'_internal_mode': vi_cmd_data['_internal_mode']}],]
+    # TODO: yy should leave the caret where it found it. As a temporary solution, we'll leave it
+    # at HBOL, which is the lesser evil between that and HEOL.
+    vi_cmd_data['post_motion'] = [['_vi_yy_post_motion', {'_internal_mode': vi_cmd_data['_internal_mode']}],]
 
     vi_cmd_data['count'] = vi_cmd_data['count'] - 1
-
     vi_cmd_data['can_yank'] = True
 
     # The yanked text will be put in the clipboard if needed. This command shouldn't do any action.
     vi_cmd_data['action']['command'] = 'no_op'
     vi_cmd_data['action']['args'] = {}
+    vi_cmd_data['post_action'] = ['_vi_move_caret_to_first_non_white_space_character', {'_internal_mode': vi_cmd_data['_internal_mode']}]
 
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
