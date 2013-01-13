@@ -749,7 +749,7 @@ class _vi_underscore_post_motion(sublime_plugin.TextCommand):
                 pt = utils.next_non_white_space_char(view, s.b)
                 return sublime.Region(pt, pt)
             elif mode == MODE_VISUAL:
-                line = view.line(s.b - 1)
+                line = view.line(s.b)
                 pt = utils.next_non_white_space_char(view, line.a)
                 return sublime.Region(s.a, pt)
             elif _internal_mode == _MODE_INTERNAL_VISUAL:
@@ -856,7 +856,7 @@ class _vi_select_text_object(sublime_plugin.TextCommand):
                 else:
                     return s
 
-                text = view.substr(view.line(s.b))    
+                text = view.substr(view.line(s.b))
                 line = view.line(s.b)
                 text_before_caret = view.substr(sublime.Region(line.a, s.b + 1))
                 text_after_caret = view.substr(sublime.Region(s.b + 1, line.b))
