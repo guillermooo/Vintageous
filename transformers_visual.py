@@ -804,29 +804,87 @@ class _vi_k_pre_motion(sublime_plugin.TextCommand):
 
 
 class _vi_select_text_object(sublime_plugin.TextCommand):
+    PAIRS = {
+        '"': ('"', '"'),
+        "'": ("'", '"'),
+        "`": ("`", "`"),
+        "(": ("(", ")"),
+        ")": ("(", ")"),
+        # XXX: Does Vim really allow this one?
+        "[": ("[", "]"),
+        "]": ("[", "]"),
+    }
+
+    # XXX: Move to utils.
+    def find_previous(self, view, start, what):
+        limit = view.line(start).a
+        pt = start
+        while True:
+            if pt < limit:
+                return start
+
+            if view.substr(pt) == what:
+                return pt
+
+            pt -= 1
+
+        return start
+
+    # XXX: Move to utils.
+    def find_next(self, view, start, what):
+        limit = view.line(start).b
+        pt = start
+        while True:
+            if pt > limit:
+                return start
+
+            if view.substr(pt) == what:
+                return pt
+
+            pt += 1
+
+        return start
+
     def run(self, edit, text_object=None, _internal_mode=None, count=1, extend=False):
         def f(view, s):
+            # TODO: Vim seems to swallow the delimiters if you give this command a count, which is
+            #       a pretty weird behavior.
             if _internal_mode == _MODE_INTERNAL_VISUAL:
-                offset = s.b - view.line(s.b).a
-                line_text = view.substr(sublime.Region(s.b, view.line(s.b).b))
-                if text_object in "\"'`":
-                    c_a = c_b = text_object
+
+                if text_object in self.PAIRS:
+                    delim_a, delim_b = self.PAIRS[text_object]
                 else:
                     return s
 
-                try:
-                    pt_a = line_text.index(c_a)
-                except ValueError:
+                text = view.substr(view.line(s.b))    
+                line = view.line(s.b)
+                text_before_caret = view.substr(sublime.Region(line.a, s.b + 1))
+                text_after_caret = view.substr(sublime.Region(s.b + 1, line.b))
+
+                # Exit early if we don't have a pair of delimiters in the line.
+                if delim_a == delim_b:
+                    if len(text.split(delim_a)) < 2:
+                        return s
+                else:
+                    if not ((delim_a in text and delim_b in text) and
+                             text.index(delim_b) > text.index(delim_a)):
+                                return s
+
+                # Vim doesn't do anything if both delimiters are before the caret.
+                if delim_b not in text_after_caret and view.substr(s.b) != delim_b:
                     return s
 
-                line_text = line_text[pt_a + 1:]
+                if delim_a not in text_before_caret:
+                    lhs = s.b if view.line(s.b).a == s.b else s.b - 1
+                    lhs = self.find_next(view, lhs, delim_a)
+                    rhs = self.find_next(view, lhs + 1, delim_b)
+                    return sublime.Region(lhs + 1, rhs)
 
-                try:
-                    pt_b = line_text.index(c_b)
-                except ValueError:
-                    return s
-
-                return sublime.Region(s.b + pt_a + 1, s.b + pt_a + pt_b + 1)
+                else:
+                    lhs = s.b if view.line(s.b).a == s.b else s.b - 1
+                    lhs = self.find_previous(view, lhs, delim_a)
+                    rhs = self.find_next(view, lhs + 1, delim_b)
+                    return sublime.Region(lhs + 1, rhs)
 
             return s
 

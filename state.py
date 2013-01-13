@@ -431,9 +431,10 @@ class VintageStateTracker(sublime_plugin.EventListener):
             elif operator == sublime.OP_NOT_EQUAL:
                 return not value
 
-        # Used to disable commands to enter normal mode. Input widgets should always operate in
+        # Used to disable commands that enter normal mode. Input widgets should always operate in
         # insert mode (actually, they should be completely ignored by Vintageous at this stage).
         elif key == 'vi_is_sublime_widget_or_console':
+            # !! The following check is based on an implementation detail of Sublime Text. !!
             is_console = False if (getattr(view, 'settings') is not None) else True
             is_widget = view.settings().get('is_widget')
             if operator == sublime.OP_EQUAL:
