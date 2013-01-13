@@ -19,12 +19,6 @@ def is_at_hard_eol(view, reg):
     return view.full_line(reg.b - 1).b == reg.b
 
 
-# def _is_on_eol(view, reg, mode, _internal_mode):
-#   if _internal_mode in (_MODE_INTERNAL_VISUAL, MODE_NORMAL):
-#       return view.full_line(reg.b - 1).b == reg.b
-#   elif mode == MODE_VISUAL:
-#       return view.full_line(reg.b - 1).b == reg.b
-
 def is_at_bol(view, reg):
     return view.line(reg.b).a == reg.b
 

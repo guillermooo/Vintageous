@@ -737,6 +737,11 @@ class _vi_underscore_pre_motion(sublime_plugin.TextCommand):
                 return sublime.Region(line.a, line.a)
             elif _internal_mode == _MODE_INTERNAL_VISUAL:
                 return sublime.Region(view.line(s.b).a, view.full_line(s.b).b)
+            elif mode == MODE_VISUAL:
+                # TODO: This is sloppy. We're reorienting the caret here. We need to use the
+                #       existing mechanism for that or imrpove it (using a normal hook as for
+                #       other cases.)
+                return sublime.Region(s.end(), s.begin())
             return s
 
         regions_transformer(self.view, f)

@@ -174,6 +174,7 @@ def vi_underscore(vi_cmd_data):
             vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion', {'_internal_mode': vi_cmd_data['_internal_mode']}],]
         else:
             vi_cmd_data['motion']['command'] = 'move_to'
+            vi_cmd_data['pre_motion'] = ['_vi_underscore_pre_motion', {'mode': vi_cmd_data['mode']}]
             vi_cmd_data['motion']['args'] = {'to': 'bol'}
             vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion', {'mode': vi_cmd_data['mode']}],]
 
