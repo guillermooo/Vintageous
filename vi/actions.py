@@ -101,6 +101,14 @@ def vi_big_a(vi_cmd_data):
     return vi_cmd_data
 
 
+def vi_big_i(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['action']['command'] = '_vi_big_i'
+    vi_cmd_data['action']['args'] = {}
+
+    return vi_cmd_data
+
+
 def vi_a(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = 'vi_edit_after_caret'

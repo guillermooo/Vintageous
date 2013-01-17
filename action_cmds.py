@@ -5,6 +5,7 @@ from Vintageous.state import VintageState
 from Vintageous.state import IrreversibleTextCommand
 from Vintageous.vi import utils
 from Vintageous.vi.constants import MODE_NORMAL
+from Vintageous.vi.constants import regions_transformer
 
 
 class ViEditAtEol(sublime_plugin.TextCommand):
@@ -49,6 +50,18 @@ class ViEditAfterCaret(sublime_plugin.TextCommand):
         for s in new_sels:
             self.view.sel().add(s)
 
+
+class _vi_big_i(sublime_plugin.TextCommand):
+    def run(self, edit, extend=False):
+        def f(view, s):
+            line = view.line(s.b)
+            pt = utils.next_non_white_space_char(view, line.a)
+            return sublime.Region(pt, pt)
+
+        state = VintageState(self.view)
+        state.enter_insert_mode()
+
+        regions_transformer(self.view, f)
 
 class ViPaste(sublime_plugin.TextCommand):
     def run(self, edit, register=None, count=1):

@@ -28,7 +28,7 @@
 	{ "keys": ["$"], "command": "set_motion", "args": {"motion": "vi_dollar"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["_"], "command": "set_motion", "args": {"motion": "vi_underscore"}, "context": [{"key": "setting.command_mode"}] },
 
-	{ "keys": ["I"], "command": "set_composite", "args": {"motion": "vi_underscore", "action": "vi_enter_insert_mode"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["I"], "command": "set_action", "args": {"action": "vi_big_i"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["A"], "command": "set_action", "args": {"action": "vi_big_a"}, "context": [{"key": "setting.command_mode"}] },
 
 	{ "keys": ["G"], "command": "set_motion", "args": {"motion": "vi_big_g"}, "context": [{"key": "setting.command_mode"}] },
