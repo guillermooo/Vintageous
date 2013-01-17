@@ -56,26 +56,36 @@ class ViPaste(sublime_plugin.TextCommand):
         state = VintageState(self.view)
 
         if register:
-            text = state.registers[register]
+            fragments = state.registers[register]
         else:
             # TODO: There should be a simpler way of getting the unnamed register's content.
-            text = state.registers['"']
-
-        if text.endswith('\n'):
-            if not text.startswith('\n'):
-                text = '\n' + text
-            text = text[0:-1]
+            fragments = state.registers['"']
 
         sels = list(self.view.sel())
 
-        for s in sels:
+        if len(sels) == len(fragments):
+            sel_frag = zip(sels, fragments)
+        else:
+            sel_frag = zip(sels, [fragments[0],] * len(sels)) 
+
+        offset = 0
+        for s, text in sel_frag:
+            text = self.prepare_fragment(text)
             if text.startswith('\n'):
                 if utils.is_at_eol(self.view, s) or utils.is_at_bol(self.view, s):
                     self.paste_all(edit, self.view.line(s.b).b, text, count)
                 else:
                     self.paste_all(edit, self.view.line(s.b - 1).b, text, count)
             else:
-                self.paste_all(edit, s.b + 1, text, count)
+                self.paste_all(edit, s.b + offset + 1, text, count)
+                offset += len(text) * count
+
+    def prepare_fragment(self, text):
+        if text.endswith('\n'):
+            if not text.startswith('\n'):
+                text = '\n' + text
+            text = text[0:-1]
+        return text
 
     def paste_all(self, edit, at, text, count):
         for x in range(count):
@@ -84,30 +94,31 @@ class ViPaste(sublime_plugin.TextCommand):
 
 class ViPasteBefore(sublime_plugin.TextCommand):
     def run(self, edit, register=None, count=1):
-        # text = sublime.get_clipboard()
         state = VintageState(self.view)
 
         if register:
-            text = state.registers[register]
+            fragments = state.registers[register]
         else:
             # TODO: There should be a simpler way of getting the unnamed register's content.
-            text = state.registers['"']
-
-        if text.endswith('\n'):
-            if not text.startswith('\n'):
-                text = '\n' + text
-            text = text[0:-1]
+            fragments = state.registers['"']
 
         sels = list(self.view.sel())
 
-        for s in sels:
+        if len(sels) == len(fragments):
+            sel_frag = zip(sels, fragments)
+        else:
+            sel_frag = zip(sels, [fragments[0],] * len(sels)) 
+
+        offset = 0
+        for s, text in sel_frag:
             if text.startswith('\n'):
-                if not utils.is_at_bol(self.view, s):
-                    self.paste_all(edit, self.view.line(s.b - 1).a - 1, text, count)
+                if utils.is_at_eol(self.view, s) or utils.is_at_bol(self.view, s):
+                    self.paste_all(edit, self.view.line(s.b).a, text, count)
                 else:
-                    self.paste_all(edit, s.b - 1, text, count)
+                    self.paste_all(edit, self.view.line(s.b - 1).a, text, count)
             else:
-                self.paste_all(edit, s.b, text, count)
+                self.paste_all(edit, s.b + offset, text, count)
+                offset += len(text) * count
 
     def paste_all(self, edit, at, text, count):
         for x in range(count):
@@ -378,7 +389,6 @@ class _vi_zz(IrreversibleTextCommand):
 
         topmost_visible_row, _ = self.view.rowcol(self.view.visible_region().a)
         bottommost_visible_row, _ = self.view.rowcol(self.view.visible_region().b)
-
 
         middle_row = (topmost_visible_row + bottommost_visible_row) / 2
 

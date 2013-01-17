@@ -176,13 +176,14 @@ class ViRunCommand(sublime_plugin.TextCommand):
             self.view.run_command(cmd, args)
 
     def get_selected_text(self, vi_cmd_data):
-        text = '\n'.join([self.view.substr(r) for r in list(self.view.sel())])
-        if text and vi_cmd_data['yanks_linewise']:
-            if not text.startswith('\n'):
-                text = '\n' + text
-            if not text.endswith('\n'):
-                text = text + '\n'
-        return text
+        fragments = [self.view.substr(r) for r in list(self.view.sel())]
+        if fragments and vi_cmd_data['yanks_linewise']:
+            for i, f in enumerate(fragments):
+                if not f.startswith('\n'):
+                    fragments[i] = '\n' + f
+                if not f.endswith('\n'):
+                    fragments[i] = f + '\n'
+        return fragments
 
     def do_post_action(self, vi_cmd_data):
         if vi_cmd_data['post_action']:

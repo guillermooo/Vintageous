@@ -69,7 +69,12 @@ class Registers(object):
         # be any JSON type.
         if (name == REG_SYS_CLIPBOARD_1 or
             self.settings.view['vintage_use_sys_clipboard'] == True):
-                sublime.set_clipboard(value)
+                # Make sure Sublime Text does the right thing in the presence of multiple
+                # selections.
+                if len(value) > 1:
+                    self.view.run_command('copy')
+                else:
+                    sublime.set_clipboard(value[0])
 
     def set(self, name, value):
         """
