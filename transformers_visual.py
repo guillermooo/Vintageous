@@ -4,6 +4,7 @@ import sublime_plugin
 from Vintageous.state import VintageState
 from Vintageous.vi import utils
 from Vintageous.vi.constants import MODE_NORMAL, MODE_VISUAL_LINE, MODE_VISUAL, _MODE_INTERNAL_VISUAL
+from Vintageous.vi.constants import regions_transformer
 from Vintageous.run import ViExecutionState
 
 
@@ -598,21 +599,6 @@ class _vi_e_post_every_motion(sublime_plugin.TextCommand):
                     return s
 
         regions_transformer(self.view, f)
-
-
-# TODO: Move this to somewhere where it's easy to import from and use it for transformers.
-def regions_transformer(view, f):
-    """Applies ``f`` to every selection region in ``view`` and replaces the existing selections.
-    """
-    sels = list(view.sel())
-    view.sel().clear()
-
-    new_sels = []
-    for s in sels:
-        new_sels.append(f(view, s))
-
-    for s in new_sels:
-        view.sel().add(s)
 
 
 class _vi_e_pre_motion(sublime_plugin.TextCommand):
