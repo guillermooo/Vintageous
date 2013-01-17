@@ -18,14 +18,8 @@ class ExtendToMinimalWidth(sublime_plugin.TextCommand):
             if s.empty():
                 new_sels.append(sublime.Region(s.a, s.b + 1))
             else:
-                if s.a < s.b:
-                    if utils.is_at_hard_eol(self.view, s):
-                        new_sels.append(sublime.Region(s.a, s.b))
-                    else:
-                        new_sels.append(s)
-                else:
-                    new_sels.append(s)
-
+                new_sels.append(s)
+                
         for s in new_sels:
             self.view.sel().add(s)
 
