@@ -137,31 +137,32 @@ class VisualClipEndToBol(sublime_plugin.TextCommand):
             self.view.sel().add(s)
 
 
-class VisualDontOvershootLineRight(sublime_plugin.TextCommand):
-    def run(self, edit, **kwargs):
-        sels = list(self.view.sel())
-        self.view.sel().clear()
+class _vi_l_post_every_motion(sublime_plugin.TextCommand):
+    def run(self, edit, _internal_mode=None, **kwargs):
+        def f(view, s):
+            state = VintageState(view)
 
-        new_sels = []
+            if _internal_mode == _MODE_INTERNAL_VISUAL:
+                if (not s.empty() and view.substr(s.b - 1) == '\n'):
+                    return sublime.Region(s.b - 1, s.b - 1)
+                return s
 
-        for s in sels:
-            if (not utils.is_region_reversed(self.view, s) and
-                (utils.visual_is_end_at_bol(self.view, s) or
-                 utils.visual_is_on_empty_line_forward(self.view, s)) and
+            elif state.mode == MODE_VISUAL:
+                if (not utils.is_region_reversed(view, s) and
+                    (utils.visual_is_end_at_bol(view, s) or
+                     utils.visual_is_on_empty_line_forward(view, s)) and
+                     not s.b == view.size()):
+                        return utils.back_end_one_char(s)
+                # Reversed selection. We are at BOL one LINE down, so go back one CHARACTER.
+                elif (utils.is_region_reversed(view, s) and
+                      not utils.is_same_line(view, s.b - 1, s.b)):
+                            return utils.back_end_one_char(s)
+                else:
+                    return s
 
-                 not s.b == self.view.size()):
-                    new_sels.append(utils.back_end_one_char(s))
-            # Reversed selection. We are at BOL one LINE down, so
-            # go back one CHARACTER.
-            # FIXME: We need ST to compare regions or improve this.
-            elif (utils.is_region_reversed(self.view, s) and
-                  not utils.is_same_line(self.view, s.b - 1, s.b)):
-                        new_sels.append(utils.back_end_one_char(s))
-            else:
-                new_sels.append(s)
+            return s
 
-        for s in new_sels:
-            self.view.sel().add(s)
+        regions_transformer(self.view, f)
 
 
 class VisualDontOvershootLineLeft(sublime_plugin.TextCommand):

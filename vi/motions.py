@@ -206,12 +206,15 @@ def vi_l(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': True}
 
+    if vi_cmd_data['_internal_mode'] == _MODE_INTERNAL_VISUAL:
+        vi_cmd_data['motion']['args']['extend'] = True
+        vi_cmd_data['post_every_motion'] = ['_vi_l_post_every_motion', {'_internal_mode': _MODE_INTERNAL_VISUAL}]
     # EXCLUSIVE
     # v2l
     # Can move onto the new line character.
-    if vi_cmd_data['mode'] == MODE_VISUAL:
+    elif vi_cmd_data['mode'] == MODE_VISUAL:
         vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['post_every_motion'] = ['visual_dont_overshoot_line_right',]
+        vi_cmd_data['post_every_motion'] = ['_vi_l_post_every_motion',]
     # Cannot move onto the new line character.
     else:
         vi_cmd_data['post_every_motion'] = ['dont_overshoot_line_right',]
