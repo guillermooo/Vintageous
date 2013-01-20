@@ -124,7 +124,7 @@ class ViPasteBefore(sublime_plugin.TextCommand):
 
         offset = 0
         for s, text in sel_frag:
-            if text.startswith('\n'):
+            if text.endswith('\n'):
                 if utils.is_at_eol(self.view, s) or utils.is_at_bol(self.view, s):
                     self.paste_all(edit, self.view.line(s.b).a, text, count)
                 else:
