@@ -328,10 +328,14 @@ def vi_w(vi_cmd_data):
     vi_cmd_data['post_every_motion'] = ['_vi_w_post_every_motion',]
 
     if vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['pre_motion'] = ['_vi_w_pre_motion',]
         vi_cmd_data['pre_every_motion'] = ['_vi_w_pre_every_motion',]
         vi_cmd_data['motion']['args']['extend'] = True
         vi_cmd_data['post_every_motion'] = ['_vi_w_post_every_motion',]
+
+    # In _MODE_INTERNAL_VISUAL, things seem to work as in Vim except for a few corner cases.
+    # The two modes are similar enough, but the fact everyhing's working more or less as expected
+    # is quite by coincidence.
+    # XXX: Add specific code for _MODE_INTERNAL_VISUAL.
 
     return vi_cmd_data
 

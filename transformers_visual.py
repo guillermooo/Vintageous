@@ -354,12 +354,9 @@ class _vi_w_post_every_motion(sublime_plugin.TextCommand):
                     if view.size() == s.b:
                         return sublime.Region(s.a, s.b)
 
-                    elif view.line(s.a) != view.line(s.b):
-                        if s.b == view.word(view.line(s.b).a).b + 1 and not ViExecutionState.dont_shrink_word:
-                            return sublime.Region(s.a, view.line(s.b).a + 1)
-                        else:
-                            # Next *w* won't be a special case again.
-                            ViExecutionState.reset_word_state()
+                    if ViExecutionState.select_word_begin_from_empty_line:
+                        ViExecutionState.reset_word_state()
+                        return sublime.Region(s.a, view.word(view.line(s.b).a).a + 1)
 
                     # If after the motion we're on an empty line, stay there.
                     if view.substr(s.b - 1) == '\n' and view.line(s.b - 1).empty():
@@ -396,30 +393,21 @@ class _vi_w_post_every_motion(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
-class _vi_w_pre_motion(sublime_plugin.TextCommand):
-    def run(self, edit):
-        def f(view, s):
-            state = VintageState(view)
-            if state.mode == MODE_VISUAL:
-                if not utils.is_region_reversed(view, s):
-                    # When issuing *w* from an empty line in visual mode, Vim will select the FIRSTCHAR
-                    # of the FIRSTWORD on the NEXTLINE. Make sure here that, if that has been the case
-                    # before this command, the post_every_motion hook won't get confused and fail to
-                    # advance one word.
-                    if view.line(s.b).a + 1 == s.b:
-                        if view.substr(s.b) not in ('\t '):
-                            ViExecutionState.dont_shrink_word = True
-            return s
-
-        regions_transformer(self.view, f)
-
-
 class _vi_w_pre_every_motion(sublime_plugin.TextCommand):
     def run(self, edit, current_iteration=None, total_iterations=None):
         def f(view, s):
             state = VintageState(view)
             if state.mode == MODE_VISUAL:
                 if not utils.is_region_reversed(view, s):
+                    
+                    if (view.line(s.b - 1).empty() and
+                        view.substr(s.b) not in (' \t') and
+                        not view.line(s.b).empty()):
+                            # When issuing *w* from an empty line in visual mode, Vim will select the FIRSTCHAR
+                            # of the FIRSTWORD on the NEXTLINE. For that to happen, we need to signal here
+                            # that were in such a context.
+                            ViExecutionState.select_word_begin_from_empty_line = True
+
                     if view.substr(s.b - 1) != '\n':
                         # Ensures that we don't skip over WORDS of length 1.
                         return sublime.Region(s.a, s.b - 1)

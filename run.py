@@ -17,19 +17,16 @@ from Vintageous.state import VintageState
 
 
 class ViExecutionState(object):
-    # So far, I've encountered one case where global state for the command execution seems
-    # necessary: When issuing *w* from an EMPTYLINE in VISUALMODE, the FIRSTCHARACTER of the
-    # FIRSTWORD on the NEXTLINE is selected. By issuing *w* again after that, we should advance to
-    # the NEXTWORD. However, due to the way *w* motions are adjusted now in a post motion hook,
-    # the second case is indistinguishable from the first one, so this helps to disambiguate.
-    # XXX: Resetting this class should be done in many places, like when changing modes (???).
-    # XXX: Use view settings for storage as in VintageState. Otherwise there'll be conflicts when
-    # switching between views.
-    dont_shrink_word = False
+    # Ideally, this class' state should be reset at the end of each command.
+    # Tehrefore, use it only to communicate between different hooks, like
+    # _whatever_pre_motion, _whatever_post_every_motion, etc.
+    # If state should change between different command invocations, make it
+    # store date in view.settings(), or there'll be conflicts.
+    select_word_begin_from_empty_line = False
 
     @staticmethod
     def reset_word_state():
-        ViExecutionState.dont_shrink_word = False
+        ViExecutionState.select_word_begin_from_empty_line = False
 
     @staticmethod
     def reset():
