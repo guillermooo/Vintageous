@@ -65,7 +65,6 @@ class _vi_big_i(sublime_plugin.TextCommand):
 
 class ViPaste(sublime_plugin.TextCommand):
     def run(self, edit, register=None, count=1):
-        # text = sublime.get_clipboard()
         state = VintageState(self.view)
 
         if register:
@@ -94,7 +93,8 @@ class ViPaste(sublime_plugin.TextCommand):
                 offset += len(text) * count
 
     def prepare_fragment(self, text):
-        if text.endswith('\n'):
+        # TODO: Still not right. We can't paste EMPTYLINE+TEXT. The EMPTY line gets lost.
+        if text.endswith('\n') and text != '\n':
             if not text.startswith('\n'):
                 text = '\n' + text
             text = text[0:-1]
