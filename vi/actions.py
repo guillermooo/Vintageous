@@ -299,6 +299,8 @@ def vi_cc(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['post_motion'] = [['visual_extend_to_line',],]
 
+    # FIXME: cc should not delete empty lines, so we need a specific command here that takes that
+    # into account.
     vi_cmd_data['action']['command'] = 'right_delete'
     vi_cmd_data['action']['args'] = {}
     vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
