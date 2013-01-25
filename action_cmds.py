@@ -93,7 +93,7 @@ class ViPaste(sublime_plugin.TextCommand):
                 offset += len(text) * count
 
     def prepare_fragment(self, text):
-        # TODO: Still not right. We can't paste EMPTYLINE+TEXT. The EMPTY line gets lost.
+        # TODO: Still not right. We can't paste EMPTYLINE+NONEMPTYLINE. The EMPTYLINE gets lost.
         if text.endswith('\n') and text != '\n':
             if not text.startswith('\n'):
                 text = '\n' + text
