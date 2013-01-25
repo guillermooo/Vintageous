@@ -176,9 +176,9 @@ class ViRunCommand(sublime_plugin.TextCommand):
         fragments = [self.view.substr(r) for r in list(self.view.sel())]
         if fragments and vi_cmd_data['yanks_linewise']:
             for i, f in enumerate(fragments):
-                if not f.startswith('\n'):
-                    fragments[i] = '\n' + f
-                if not f.endswith('\n'):
+                # When should we add a newline character?
+                #  * always except when we have a non-\n-only string followed by a newline char.
+                if (not f.endswith('\n')) or (f == '\n') or f.endswith('\n\n'):
                     fragments[i] = f + '\n'
         return fragments
 
