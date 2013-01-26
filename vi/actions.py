@@ -454,6 +454,22 @@ def vi_double_antilambda(vi_cmd_data):
     return vi_cmd_data
 
 
+def vi_r(vi_cmd_data):
+    if vi_cmd_data['mode'] != MODE_VISUAL:
+        vi_cmd_data['_internal_mode'] = _MODE_INTERNAL_VISUAL
+
+    # TODO: If count > len(line), r should abort. We'd need _p_post_every_motion hook and tell
+    # ViRun to cancel if selections didn't change.
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['motion']['command'] = 'move'
+    vi_cmd_data['motion']['args'] = {'by': 'characters', 'extend': True, 'forward': True} 
+    vi_cmd_data['action']['command'] = '_vi_r'
+    vi_cmd_data['action']['args'] = {'character': vi_cmd_data['user_input'], '_internal_mode': vi_cmd_data['_internal_mode']}
+    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+    
+    return vi_cmd_data
+
+
 def vi_lambda(vi_cmd_data):
     vi_cmd_data['motion_required'] = True
     vi_cmd_data['action']['command'] = 'indent'

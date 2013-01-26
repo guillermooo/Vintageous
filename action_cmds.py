@@ -4,7 +4,7 @@ import sublime_plugin
 from Vintageous.state import VintageState
 from Vintageous.state import IrreversibleTextCommand
 from Vintageous.vi import utils
-from Vintageous.vi.constants import MODE_NORMAL
+from Vintageous.vi.constants import MODE_NORMAL, _MODE_INTERNAL_VISUAL
 from Vintageous.vi.constants import regions_transformer
 
 
@@ -271,6 +271,17 @@ class SetRegister(sublime_plugin.TextCommand):
             state.register = character
             state.expecting_register = False
 
+class ViR(sublime_plugin.TextCommand):
+    def run(self, edit, character=None):
+        state = VintageState(self.view)
+        if character is None:
+            state.action = 'vi_r'
+            state.expecting_user_input = True
+        else:
+            state.user_input = character
+            state.expecting_user_input= False
+            state.run()
+
 
 class ViF(sublime_plugin.TextCommand):
     def run(self, edit, character=None):
@@ -292,8 +303,6 @@ class ViT(IrreversibleTextCommand):
         state = VintageState(self.view)
         if character is None:
             state.motion = 'vi_t'
-            # XXX: Maybe we should simply use ["t", "<character>"] in the key map and be done
-            # with this.
             state.expecting_user_input = True
         else:
             state.user_input = character
@@ -404,3 +413,10 @@ class _vi_zz(IrreversibleTextCommand):
 
         self.view.run_command('scroll_lines', {'amount': (middle_row - current_row)})
                
+
+class _vi_r(sublime_plugin.TextCommand):
+    def run(self, edit, character=None, _internal_mode=None):
+        print("FOOBARS")
+        if _internal_mode == _MODE_INTERNAL_VISUAL:
+            for s in self.view.sel():
+                self.view.replace(edit, s, character * s.size())
