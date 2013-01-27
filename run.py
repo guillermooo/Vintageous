@@ -7,7 +7,7 @@ from Vintageous.vi import motions
 from Vintageous.vi import actions
 from Vintageous.vi.constants import (MODE_INSERT, MODE_NORMAL, MODE_VISUAL,
                          MODE_VISUAL_LINE, MODE_NORMAL_INSERT,
-                         _MODE_INTERNAL_VISUAL)
+                         _MODE_INTERNAL_NORMAL)
 from Vintageous.vi.constants import mode_to_str
 from Vintageous.vi.constants import digraphs
 from Vintageous.vi.settings import SettingsManager, VintageSettings, SublimeSettings
@@ -48,7 +48,7 @@ class ViRunCommand(sublime_plugin.TextCommand):
 
                 # The motion didn't change the selections: abort action if so required.
                 # TODO: What to do with .post_action() and .do_follow_up_mode() in this event?
-                if (vi_cmd_data['_internal_mode'] == _MODE_INTERNAL_VISUAL and
+                if (vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL and
                     all([v.empty() for v in self.view.sel()]) and
                     vi_cmd_data['cancel_action_if_motion_fails']):
                         return
@@ -85,9 +85,9 @@ class ViRunCommand(sublime_plugin.TextCommand):
                  vi_cmd_data['motion']['args'].get('by') == 'lines' or
                  vi_cmd_data['motion']['args'].get('by') == 'words')):
                     if vi_cmd_data['motion']['args'].get('forward'):
-                        self.view.run_command('reorient_caret', {'mode': vi_cmd_data['mode'] ,'_internal_mode': vi_cmd_data['_internal_mode']})
+                        self.view.run_command('reorient_caret', {'mode': vi_cmd_data['mode']})
                     else:
-                        self.view.run_command('reorient_caret', {'forward': False, 'mode': vi_cmd_data['mode'], '_internal_mode': vi_cmd_data['_internal_mode']})
+                        self.view.run_command('reorient_caret', {'forward': False, 'mode': vi_cmd_data['mode']})
 
     def reposition_caret(self, vi_cmd_data):
         if self.view.has_non_empty_selection_region():
@@ -97,12 +97,12 @@ class ViRunCommand(sublime_plugin.TextCommand):
                 self.view.run_command(*vi_cmd_data['reposition_caret'])
 
     def enter_visual_mode(self, vi_cmd_data):
-        # TODO: This step may be duplicated. Check motion definitions as well.
-        if vi_cmd_data['_internal_mode'] == _MODE_INTERNAL_VISUAL:
+        # FIXME: We shouldn't be adding args here; do this in the motion parsing phase instead.
+        if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
             vi_cmd_data['motion']['args']['extend'] = True
             return
 
-        if vi_cmd_data['action'] and not self.view.has_non_empty_selection_region():
+        if vi_cmd_data['mode'] != _MODE_INTERNAL_NORMAL and vi_cmd_data['action'] and not self.view.has_non_empty_selection_region():
             self.view.run_command('vi_enter_visual_mode')
             vi_cmd_data['motion']['args']['extend'] = True
             args = vi_cmd_data['motion'].get('args')

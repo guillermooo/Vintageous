@@ -1,15 +1,14 @@
 import sublime
 
-from Vintageous.vi.constants import _MODE_INTERNAL_VISUAL, MODE_NORMAL, MODE_VISUAL
+from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL, MODE_NORMAL, MODE_VISUAL
 
 
 def is_at_eol(view, reg):
     return view.line(reg.b).b == reg.b
 
 
-def _is_on_eol(view, reg, mode, _internal_mode):
-    if (_internal_mode == _MODE_INTERNAL_VISUAL or
-        mode == MODE_NORMAL):
+def _is_on_eol(view, reg, mode):
+    if mode in (_MODE_INTERNAL_NORMAL, MODE_NORMAL):
             return view.line(reg.b).b == reg.b
     elif mode == MODE_VISUAL:
         return view.full_line(reg.b - 1).b == reg.b

@@ -4,14 +4,13 @@ MODE_VISUAL = 1 << 2
 MODE_VISUAL_LINE = 1 << 3
 # The mode you enter when giving i a count.
 MODE_NORMAL_INSERT = 1 << 4
-# Vintageous always runs actions based on selections, even in NORMAL mode. Some Vim commands,
-# however, behave differently depending on whether the start mode was NORMAL or VISUAL. To
-# differentiate within Vintageous too, we need to add a fake internal visual mode that won't
-# interfere with the actual visual mode. _MODE_INTERNAL_VISUAL translates to what Vim understands
-# as NORMAL mode operation.
+# Vintageous always runs actions based on selections. Some Vim commands, however, behave
+# differently depending on whether the current mode is NORMAL or VISUAL. To differentiate NORMAL
+# mode operations (involving an action, not only a motion) from VISUAL mode, we need to add an
+# additional mode for handling selections that won't interfere with the actual VISUAL mode.
 #
-# Note that for motions we still use plain NORMAL mode.
-_MODE_INTERNAL_VISUAL = 1 << 5
+# Note that for pure motions we still use plain NORMAL mode.
+_MODE_INTERNAL_NORMAL = 1 << 5
 
 
 DIGRAPH_ACTION = 1

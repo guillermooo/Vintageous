@@ -1,5 +1,5 @@
 from Vintageous.vi.constants import (MODE_NORMAL, MODE_VISUAL, MODE_VISUAL_LINE,
-                          _MODE_INTERNAL_VISUAL)
+                          _MODE_INTERNAL_NORMAL)
 
 
 # $
@@ -15,7 +15,7 @@ def vi_dollar(vi_cmd_data):
         # CHARACTERWISE + INCLUSIVE
         # d$
         # TODO: If on hard eol, cancel movement; don't go to the next eol.
-        if vi_cmd_data['_internal_mode'] == _MODE_INTERNAL_VISUAL:
+        if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
             vi_cmd_data['motion']['args']['extend'] = True
             vi_cmd_data['post_motion'] = [['visual_clip_end_to_eol',],]
 
@@ -47,7 +47,7 @@ def vi_dollar(vi_cmd_data):
         # <count>$ must include the current line, so we subtract one.
         vi_cmd_data['count'] = vi_cmd_data['count'] - 1
 
-        if vi_cmd_data['_internal_mode'] == _MODE_INTERNAL_VISUAL:
+        if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
             vi_cmd_data['motion']['args']['extend'] = True
             # LINEWISE
             # 2d$
@@ -100,7 +100,7 @@ def vi_big_g(vi_cmd_data):
 
     if vi_cmd_data['mode'] == MODE_VISUAL:
         vi_cmd_data['motion']['args']['extend'] = True
-    elif vi_cmd_data['_internal_mode'] == _MODE_INTERNAL_VISUAL:
+    elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
         vi_cmd_data['motion']['args']['extend'] = True
     elif vi_cmd_data['mode'] == MODE_VISUAL_LINE:
         vi_cmd_data['motion']['args']['extend'] = True
@@ -126,7 +126,7 @@ def vi_gg(vi_cmd_data):
 
     if vi_cmd_data['mode'] == MODE_VISUAL:
         vi_cmd_data['motion']['args']['extend'] = True
-    elif vi_cmd_data['_internal_mode'] == _MODE_INTERNAL_VISUAL:
+    elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
         vi_cmd_data['motion']['args']['extend'] = True
     elif vi_cmd_data['mode'] == MODE_VISUAL_LINE:
         vi_cmd_data['motion']['args']['extend'] = True
@@ -162,16 +162,16 @@ def vi_underscore(vi_cmd_data):
         vi_cmd_data['is_jump'] = True
 
     if vi_cmd_data['count'] == 1:
-        if vi_cmd_data['_internal_mode'] == _MODE_INTERNAL_VISUAL:
+        if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
             # TODO: This is sloppy. Make 'motion' a real motion and do away with 'pre_motion'. The
             # problem is that VintageState or VintageRun automatically add 'extend': True
             # to motions, so we cannot simply say 'move_to' 'hardbol' in the motion.
             # Perhaps 'extend' should always be added manually or left unmodified if the current
-            # mode was _MODE_INTERNAL_VISUAL. Being explicit with 'extend' looks like the better idea.
+            # mode was _MODE_INTERNAL_NORMAL. Being explicit with 'extend' looks like the better idea.
             vi_cmd_data['motion']['command'] = 'vi_no_op'
             vi_cmd_data['motion']['args'] = {}
-            vi_cmd_data['pre_motion'] = ['move_to', {'to': 'hardbol'}]
-            vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion', {'_internal_mode': vi_cmd_data['_internal_mode']}],]
+            vi_cmd_data['pre_motion'] = ['move_to', {'to': 'hardbol', 'extend': True}]
+            vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion',],]
         else:
             vi_cmd_data['motion']['command'] = 'move_to'
             vi_cmd_data['pre_motion'] = ['_vi_underscore_pre_motion', {'mode': vi_cmd_data['mode']}]
@@ -186,11 +186,11 @@ def vi_underscore(vi_cmd_data):
         vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': True}
         vi_cmd_data['count'] = vi_cmd_data['count'] - 1
 
-        if vi_cmd_data['_internal_mode'] == _MODE_INTERNAL_VISUAL:
+        if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
             vi_cmd_data['motion']['command'] = 'move'
             vi_cmd_data['motion']['args'] = {'by': 'lines', 'extend': True, 'forward': True}
-            vi_cmd_data['pre_motion'] = ['_vi_underscore_pre_motion', {'_internal_mode': vi_cmd_data['_internal_mode']}]
-            vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion', {'_internal_mode': vi_cmd_data['_internal_mode']}],]
+            vi_cmd_data['pre_motion'] = ['_vi_underscore_pre_motion', {'mode': vi_cmd_data['mode']}]
+            vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion', {'mode': vi_cmd_data['mode']}],]
         elif vi_cmd_data['mode'] == MODE_NORMAL:
             vi_cmd_data['pre_motion'] = ['_vi_underscore_pre_motion', {'mode': vi_cmd_data['mode']}]
             vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion', {'mode': vi_cmd_data['mode']}],]
@@ -206,9 +206,9 @@ def vi_l(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': True}
 
-    if vi_cmd_data['_internal_mode'] == _MODE_INTERNAL_VISUAL:
+    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
         vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['post_every_motion'] = ['_vi_l_post_every_motion', {'_internal_mode': _MODE_INTERNAL_VISUAL}]
+        vi_cmd_data['post_every_motion'] = ['_vi_l_post_every_motion', {'mode': vi_cmd_data['mode']}]
     # EXCLUSIVE
     # v2l
     # Can move onto the new line character.
@@ -278,7 +278,7 @@ def vi_j(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': True}
 
-    if vi_cmd_data['_internal_mode'] == _MODE_INTERNAL_VISUAL:
+    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
         vi_cmd_data['motion']['args']['extend'] = True
         vi_cmd_data['pre_motion'] = ['_vi_j_pre_motion',]
         vi_cmd_data['post_motion'] = [['_vi_j_post_motion',],]
@@ -304,7 +304,7 @@ def vi_k(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': False}
 
-    if vi_cmd_data['_internal_mode'] == _MODE_INTERNAL_VISUAL:
+    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
         vi_cmd_data['motion']['args']['extend'] = True
         vi_cmd_data['pre_motion'] = ['_vi_k_pre_motion',]
     elif vi_cmd_data['mode'] == MODE_VISUAL:
@@ -335,10 +335,10 @@ def vi_w(vi_cmd_data):
         vi_cmd_data['motion']['args']['extend'] = True
         vi_cmd_data['post_every_motion'] = ['_vi_w_post_every_motion',]
 
-    # In _MODE_INTERNAL_VISUAL, things seem to work as in Vim except for a few corner cases.
+    # In _MODE_INTERNAL_NORMAL, things seem to work as in Vim except for a few corner cases.
     # The two modes are similar enough, but the fact everyhing's working more or less as expected
     # is quite by coincidence.
-    # XXX: Add specific code for _MODE_INTERNAL_VISUAL.
+    # XXX: Add specific code for _MODE_INTERNAL_NORMAL.
 
     return vi_cmd_data
 
@@ -347,15 +347,18 @@ def vi_b(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'words', 'forward': False}
 
-    if vi_cmd_data['mode'] in (MODE_NORMAL, _MODE_INTERNAL_VISUAL):
-        vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode'], '_internal_mode': vi_cmd_data['_internal_mode']}]
+    if vi_cmd_data['mode'] == MODE_NORMAL:
+        vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode'],}]
+        vi_cmd_data['post_every_motion'] = ['dont_stay_on_eol_backward',]
+    elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
+        vi_cmd_data['motion']['args']['extend'] = True
+        vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode'],}]
         vi_cmd_data['post_every_motion'] = ['dont_stay_on_eol_backward',]
     elif vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode'], '_internal_mode': vi_cmd_data['_internal_mode']}]
+        # TODO: Rename to factor in *every*.
+        vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode']}]
         vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['post_every_motion'] = ['_vi_b_post_every_motion', {'mode': vi_cmd_data['mode'], '_internal_mode': vi_cmd_data['_internal_mode']}]
-        # vi_cmd_data['post_every_motion'] = ['dont_stay_on_eol_backward',]
-        # vi_cmd_data['post_motion'] = [['extend_to_minimal_width',],]
+        vi_cmd_data['post_every_motion'] = ['_vi_b_post_every_motion', {'mode': vi_cmd_data['mode']}]
 
     return vi_cmd_data
 
@@ -364,29 +367,47 @@ def vi_e(vi_cmd_data):
     # NORMAL mode movement:
     #   ST does what Vim does (TODO: always?).
     #
-    # _MODE_INTERNAL_VISUAL
+    # _MODE_INTERNAL_NORMAL
     #
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'word_ends', 'forward': True}
     vi_cmd_data['__reorient_caret'] = True
 
-    # TODO: Seems like we're mixing modes here.
-    if (vi_cmd_data['_internal_mode'] == _MODE_INTERNAL_VISUAL or
-        vi_cmd_data['mode'] == MODE_NORMAL):
-            vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode'], '_internal_mode': vi_cmd_data['_internal_mode']}]
-            vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode'], '_internal_mode': vi_cmd_data['_internal_mode']}]
+    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
+        vi_cmd_data['motion']['args']['extend'] = True
+        vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
+        vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
+
+    elif vi_cmd_data['mode'] == MODE_NORMAL:
+        vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
+        vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
 
     elif vi_cmd_data['mode'] == MODE_VISUAL:
         vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode'], '_internal_mode': vi_cmd_data['_internal_mode']}]
-        vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode'], '_internal_mode': vi_cmd_data['_internal_mode']}]
+        vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
+        vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
+
+    return vi_cmd_data
+
+
+def vi_octothorp(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = 'vi_octothorp'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['count'] = 1
+
+    return vi_cmd_data
+
+
+def vi_star(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = 'vi_star'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
 
     return vi_cmd_data
 
 
 def vi_f(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_find_in_line_inclusive'
-    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_input'], '_internal_mode': vi_cmd_data['_internal_mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
@@ -394,7 +415,7 @@ def vi_f(vi_cmd_data):
 
 def vi_t(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_find_in_line_exclusive'
-    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_input'], '_internal_mode': vi_cmd_data['_internal_mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
@@ -402,7 +423,7 @@ def vi_t(vi_cmd_data):
 
 def vi_big_t(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_reverse_find_in_line_exclusive'
-    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_input'], '_internal_mode': vi_cmd_data['_internal_mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
@@ -410,15 +431,16 @@ def vi_big_t(vi_cmd_data):
 
 def vi_big_f(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_reverse_find_in_line_inclusive'
-    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_input'], '_internal_mode': vi_cmd_data['_internal_mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
 
 
+# TODO: Rename this one to vi_i_text_object for clarity?
 def vi_i(vi_cmd_data):
     vi_cmd_data['motion']['command'] = '_vi_select_text_object'
-    vi_cmd_data['motion']['args'] = {'text_object': vi_cmd_data['user_input'], '_internal_mode': vi_cmd_data['_internal_mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['motion']['args'] = {'text_object': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data

@@ -2,7 +2,7 @@ import sublime
 import sublime_plugin
 
 from Vintageous.vi.constants import regions_transformer
-from Vintageous.vi.constants import MODE_VISUAL, MODE_NORMAL, _MODE_INTERNAL_VISUAL
+from Vintageous.vi.constants import MODE_VISUAL, MODE_NORMAL, _MODE_INTERNAL_NORMAL
 from Vintageous.state import VintageState
 
 
@@ -29,7 +29,7 @@ class ViMoveToHardBol(sublime_plugin.TextCommand):
 # FIXME: Only find exact char counts. Vim ignores the command when the count is larger than the
 # number of instances of the sought character.
 class ViFindInLineInclusive(sublime_plugin.TextCommand):
-    def run(self, edit, extend=False, character=None, _internal_mode=None, count=1):
+    def run(self, edit, extend=False, character=None, mode=None, count=1):
         def f(view, s):
             offset = s.b + 1 - view.line(s.b).a
             a, eol = s.b + 1, view.line(s.b).b
@@ -51,7 +51,7 @@ class ViFindInLineInclusive(sublime_plugin.TextCommand):
                 pt = view.line(s.b).a + final_offset
 
                 state = VintageState(view)
-                if state.mode == MODE_VISUAL or _internal_mode == _MODE_INTERNAL_VISUAL:
+                if state.mode == MODE_VISUAL or mode == _MODE_INTERNAL_NORMAL:
                     return sublime.Region(s.a, pt + 1)
 
                 return sublime.Region(pt, pt)
@@ -64,7 +64,7 @@ class ViFindInLineInclusive(sublime_plugin.TextCommand):
 # FIXME: Only find exact char counts. Vim ignores the command when the count is larger than the
 # number of instances of the sought character.
 class ViReverseFindInLineInclusive(sublime_plugin.TextCommand):
-    def run(self, edit, extend=False, character=None, _internal_mode=None, count=1):
+    def run(self, edit, extend=False, character=None, mode=None, count=1):
         def f(view, s):
             line_text = view.substr(sublime.Region(view.line(s.b).a, s.b))
             offset = 0
@@ -86,7 +86,7 @@ class ViReverseFindInLineInclusive(sublime_plugin.TextCommand):
                 pt = view.line(s.b).a + final_offset
 
                 state = VintageState(view)
-                if state.mode == MODE_VISUAL or _internal_mode == _MODE_INTERNAL_VISUAL:
+                if state.mode == MODE_VISUAL or mode == _MODE_INTERNAL_NORMAL:
                     return sublime.Region(s.a, pt)
 
                 return sublime.Region(pt, pt)
@@ -100,7 +100,7 @@ class ViFindInLineExclusive(sublime_plugin.TextCommand):
     """Contrary to *f*, *t* does not look past the caret's position, so if ``character`` is under
        the caret, nothing happens.
     """
-    def run(self, edit, extend=False, character=None, _internal_mode=None, count=1):
+    def run(self, edit, extend=False, character=None, mode=None, count=1):
         def f(view, s):
             offset = s.b + 1 - view.line(s.b).a
             a, eol = s.b + 1, view.line(s.b).b
@@ -121,12 +121,8 @@ class ViFindInLineExclusive(sublime_plugin.TextCommand):
             if final_offset > -1:
                 pt = view.line(s.b).a + final_offset
 
-                # TODO: Handling modes via global state seems to be the right thing to do. Perhaps
-                # _MODE_INTERNAL_VISUAL could become a first-class mode. We know anyway that it's
-                # equivalent to MODE_NORMAL, so the necessary post processing can alway be done
-                # to ensure that we end up in MODE_NORMAL after the command.
                 state = VintageState(view)
-                if state.mode == MODE_VISUAL or _internal_mode == _MODE_INTERNAL_VISUAL:
+                if state.mode == MODE_VISUAL or mode == _MODE_INTERNAL_NORMAL:
                     return sublime.Region(s.a, pt)
 
                 return sublime.Region(pt - 1, pt - 1)
@@ -140,7 +136,7 @@ class ViReverseFindInLineExclusive(sublime_plugin.TextCommand):
     """Contrary to *F*, *T* does not look past the caret's position, so if ``character`` is right
        before the caret, nothing happens.
     """
-    def run(self, edit, extend=False, character=None, _internal_mode=None, count=1):
+    def run(self, edit, extend=False, character=None, mode=None, count=1):
         def f(view, s):
             line_text = view.substr(sublime.Region(view.line(s.b).a, s.b))
             a, b = view.line(s.b).a, s.b
@@ -161,7 +157,7 @@ class ViReverseFindInLineExclusive(sublime_plugin.TextCommand):
                 pt = view.line(s.b).a + final_offset
 
                 state = VintageState(view)
-                if state.mode == MODE_VISUAL or _internal_mode == _MODE_INTERNAL_VISUAL:
+                if state.mode == MODE_VISUAL or mode == _MODE_INTERNAL_NORMAL:
                     return sublime.Region(s.a, pt + 1)
 
                 return sublime.Region(pt + 1, pt + 1)
@@ -245,3 +241,36 @@ class ViBigM(sublime_plugin.TextCommand):
         self.view.sel().clear()
         self.view.sel().add(sublime.Region(target, target))
         self.view.show(target)
+
+
+class ViStar(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, count=1, extend=False):
+        state = VintageState(self.view)
+        def f(view, s):
+            # TODO: make sure we swallow any leading white space.
+            query = view.substr(view.word(s.end()))
+            
+            if mode == _MODE_INTERNAL_NORMAL:
+                match = view.find(query, view.word(s.end()).end(), sublime.LITERAL)
+            else:
+                match = view.find(query, view.word(s).end(), sublime.LITERAL)
+
+            if match:
+                if mode == _MODE_INTERNAL_NORMAL:
+                    return sublime.Region(s.a, match.begin())
+                elif state.mode == MODE_VISUAL:
+                    return sublime.Region(s.a, match.begin())
+                elif state.mode == MODE_NORMAL:
+                    return sublime.Region(match.begin(), match.begin())
+            return s
+
+        regions_transformer(self.view, f)
+
+
+class ViOctothorp(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, count=1, extend=False):
+        state = VintageState(self.view)
+        def f(view, s):
+            return s
+
+        regions_transformer(self.view, f)

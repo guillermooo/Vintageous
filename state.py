@@ -5,7 +5,7 @@ from Vintageous.vi import motions
 from Vintageous.vi import actions
 from Vintageous.vi.constants import (MODE_INSERT, MODE_NORMAL, MODE_VISUAL,
                          MODE_VISUAL_LINE, MODE_NORMAL_INSERT,
-                         _MODE_INTERNAL_VISUAL)
+                         _MODE_INTERNAL_NORMAL)
 from Vintageous.vi.constants import mode_to_str
 from Vintageous.vi.constants import digraphs
 from Vintageous.vi.constants import DIGRAPH_MOTION
@@ -206,8 +206,6 @@ class VintageState(object):
             # explicit "wait for next command name" status, like gU, gu, etc. This property helps
             # with that.
             'is_digraph_start': False,
-            # See constants.py for a detailed explanation.
-            '_internal_mode': None,
             # User input, such as arguments to the t and f commands.
             # TODO: Try to unify user-input collection (both for registers and this kind of
             # argument).
@@ -223,11 +221,10 @@ class VintageState(object):
             'cancel_action_if_motion_fails': False,
         }
 
-        # Make sure we run NORMAL mode actions in _MODE_INTERNAL_VISUAL mode.
+        # Make sure we run NORMAL mode actions in _MODE_INTERNAL_NORMAL mode.
         if self.mode in (MODE_VISUAL, MODE_VISUAL_LINE) or (self.motion and self.action):
             if self.mode not in (MODE_VISUAL, MODE_VISUAL_LINE):
-                vi_cmd_data['mode'] = MODE_VISUAL
-                vi_cmd_data['_internal_mode'] = _MODE_INTERNAL_VISUAL
+                vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
             else:
                 vi_cmd_data['mode'] = self.mode
 

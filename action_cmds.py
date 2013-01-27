@@ -4,7 +4,7 @@ import sublime_plugin
 from Vintageous.state import VintageState
 from Vintageous.state import IrreversibleTextCommand
 from Vintageous.vi import utils
-from Vintageous.vi.constants import MODE_NORMAL, _MODE_INTERNAL_VISUAL
+from Vintageous.vi.constants import MODE_NORMAL, _MODE_INTERNAL_NORMAL
 from Vintageous.vi.constants import regions_transformer
 
 
@@ -415,8 +415,7 @@ class _vi_zz(IrreversibleTextCommand):
                
 
 class _vi_r(sublime_plugin.TextCommand):
-    def run(self, edit, character=None, _internal_mode=None):
-        print("FOOBARS")
-        if _internal_mode == _MODE_INTERNAL_VISUAL:
+    def run(self, edit, character=None, mode=None):
+        if mode == _MODE_INTERNAL_NORMAL:
             for s in self.view.sel():
                 self.view.replace(edit, s, character * s.size())

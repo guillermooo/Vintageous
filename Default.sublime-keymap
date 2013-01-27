@@ -38,6 +38,9 @@
 	{ "keys": ["M"], "command": "set_motion", "args": {"motion": "vi_big_m"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["L"], "command": "set_motion", "args": {"motion": "vi_big_l"}, "context": [{"key": "setting.command_mode"}] },
 
+	{ "keys": ["*"], "command": "set_motion", "args": {"motion": "vi_star"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["#"], "command": "set_motion", "args": {"motion": "vi_octothorp"}, "context": [{"key": "setting.command_mode"}] },
+
 	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_enter_visual_mode"}, "context": [{"key": "vi_mode_normal"}] },
 	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_enter_normal_mode"}, "context": [{"key": "vi_mode_visual"}] },
 	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_enter_visual_mode"}, "context": [{"key": "vi_mode_visual_line"}] },

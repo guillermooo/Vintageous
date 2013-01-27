@@ -3,7 +3,7 @@ import sublime_plugin
 
 from Vintageous.state import VintageState
 from Vintageous.vi import utils
-from Vintageous.vi.constants import MODE_NORMAL, MODE_VISUAL_LINE, MODE_VISUAL, _MODE_INTERNAL_VISUAL
+from Vintageous.vi.constants import MODE_NORMAL, MODE_VISUAL_LINE, MODE_VISUAL, _MODE_INTERNAL_NORMAL
 from Vintageous.vi.constants import regions_transformer
 from Vintageous.run import ViExecutionState
 
@@ -61,7 +61,7 @@ class CollapseToBegin(sublime_plugin.TextCommand):
 
 
 class ReorientCaret(sublime_plugin.TextCommand):
-    def run(self, edit, forward=True, mode=None, _internal_mode=None):
+    def run(self, edit, forward=True, mode=None):
         sels = list(self.view.sel())
         self.view.sel().clear()
 
@@ -138,11 +138,13 @@ class VisualClipEndToBol(sublime_plugin.TextCommand):
 
 
 class _vi_l_post_every_motion(sublime_plugin.TextCommand):
-    def run(self, edit, _internal_mode=None, **kwargs):
+    # Receives several extra arguments (we don't use).
+    def run(self, edit, mode=None, **kwargs):
         def f(view, s):
             state = VintageState(view)
 
-            if _internal_mode == _MODE_INTERNAL_VISUAL:
+            # TODO: mode should be always stored in VintageState.
+            if mode == _MODE_INTERNAL_NORMAL:
                 if (not s.empty() and view.substr(s.b - 1) == '\n'):
                     return sublime.Region(s.b - 1, s.b - 1)
                 return s
@@ -206,31 +208,17 @@ class VisualShrinkEndOneChar(sublime_plugin.TextCommand):
 
 
 class VisualExtendToFullLine(sublime_plugin.TextCommand):
-    def run(self, edit, _internal_mode=None):
+    def run(self, edit):
         def f(view, s):
-            if _internal_mode == _MODE_INTERNAL_VISUAL:
-                if s.a <= s.b:
-                    if view.substr(s.b - 1) == '\n' and view.line(s.b - 1).empty():
-                        return s
-                    elif view.line(s.b).a != s.b:
-                        return sublime.Region(self.view.full_line(s.b - 1).b,
-                                              self.view.line(s.a).a)
-                    else:
-                        return sublime.Region(self.view.full_line(s.b).b,
-                                              self.view.line(s.a).a)
-                else:
-                    return sublime.Region(self.view.full_line(s.a - 1).b,
-                                          self.view.line(s.b).a)
-            else:
-                return self.view.full_line(s)
+            return self.view.full_line(s)
 
         regions_transformer(self.view, f)
 
 
 class _vi_dd_pre_motion(sublime_plugin.TextCommand):
-    def run(self, edit, _internal_mode=None):
+    def run(self, edit, mode=None):
         def f(view, s):
-            if _internal_mode == _MODE_INTERNAL_VISUAL:
+            if mode == _MODE_INTERNAL_NORMAL:
                 current_line = view.line(s.b)
                 return sublime.Region(current_line.a, current_line.a)
             return s
@@ -239,7 +227,7 @@ class _vi_dd_pre_motion(sublime_plugin.TextCommand):
 
 
 class _vi_dd_post_motion(sublime_plugin.TextCommand):
-    def run(self, edit, _internal_mode=None):
+    def run(self, edit, mode=None):
         def f(view, s):
             if view.substr(s.b - 1) != '\n':
                 return sublime.Region(s.a, view.full_line(s.b).b)
@@ -257,27 +245,6 @@ class VisualExtendToLine(sublime_plugin.TextCommand):
 
         for s in sels:
             new_sels.append(self.view.line(s))
-
-        for s in new_sels:
-            self.view.sel().add(s)
-
-
-class ViReorientCaret(sublime_plugin.TextCommand):
-    # XXX: Dead code.
-    def run(self, edit, mode=None, _internal_mode=None):
-        if mode != MODE_VISUAL_LINE:
-            return
-
-        sels = list(self.view.sel())
-        self.view.sel().clear()
-
-        new_sels = []
-
-        for s in sels:
-            if s.a <= s.b:
-                new_sels.append(self.view.full_line(s))
-            else:
-                new_sels.append(self.view.full_line(s))
 
         for s in new_sels:
             self.view.sel().add(s)
@@ -420,7 +387,7 @@ class _vi_w_pre_every_motion(sublime_plugin.TextCommand):
 
 
 class _d_w_post_every_motion(sublime_plugin.TextCommand):
-    """Assumes we are in _MODE_INTERNAL_VISUAL.
+    """Assumes we are in _MODE_INTERNAL_NORMAL.
 
         Use only for *d* when deleting WORDS.
 
@@ -551,12 +518,11 @@ class _vi_e_post_every_motion(sublime_plugin.TextCommand):
 
         Works in ANYMODE (except VISUALLINE).
     """
-    def run(self, edit, current_iteration=None, total_iterations=None,
-            mode=None, _internal_mode=None):
+    def run(self, edit, current_iteration=None, total_iterations=None, mode=None):
         def f(view, s):
             is_last_iteration = (current_iteration == total_iterations - 1)
 
-            if _internal_mode == _MODE_INTERNAL_VISUAL:
+            if mode == _MODE_INTERNAL_NORMAL:
                     # If we're at BOL one LINE down; move to NEXTWORD WORDEND inclusive.
                     if utils.is_at_bol(self.view, s):
                         next = utils.next_non_white_space_char(self.view, s.b, white_space='\t \n')
@@ -597,14 +563,14 @@ class _vi_e_pre_motion(sublime_plugin.TextCommand):
 
         Works in ANYMODE (except VISUALLINE).
     """
-    def run(self, edit, mode, _internal_mode):
+    def run(self, edit, mode):
         def f(view, s):
             if mode == MODE_NORMAL:
                     # What to do if we are not on a white space character...
                     if view.substr(s.b) not in '\t ':
                         # Advance one so that the caret moves as expected instead of remaining on
                         # the same word when the motion executes.
-                        if not utils._is_on_eol(view, s, mode, _internal_mode):
+                        if not utils._is_on_eol(view, s, mode):
                                 return sublime.Region(s.a + 1, s.b + 1)
                         else:
                             return s
@@ -621,7 +587,8 @@ class _vi_e_pre_motion(sublime_plugin.TextCommand):
 class _vi_b_pre_motion(sublime_plugin.TextCommand):
     """Use only for vi_b.
     """
-    def run(self, edit, mode, _internal_mode, current_iteration, total_iterations):
+    # TODO: _MODE_INTERNAL_NORMAL is suspiciously mssing here.
+    def run(self, edit, mode, current_iteration, total_iterations):
         def f(view, s):
             delta = 1
             if mode == MODE_VISUAL:
@@ -686,7 +653,7 @@ class _vi_b_pre_motion(sublime_plugin.TextCommand):
 class _vi_b_post_every_motion(sublime_plugin.TextCommand):
     """Use only with for vi_b.
     """
-    def run(self, edit, mode, _internal_mode, current_iteration, total_iterations):
+    def run(self, edit, mode, current_iteration, total_iterations):
         def f(view, s):
             if mode == MODE_VISUAL:
                 # Vim selects the FIRSTCHAR of NEXTWORD when moving backward in VISUAL mode.
@@ -699,12 +666,12 @@ class _vi_b_post_every_motion(sublime_plugin.TextCommand):
 
 
 class _vi_underscore_pre_motion(sublime_plugin.TextCommand):
-    def run(self, edit, mode=None, _internal_mode=None):
+    def run(self, edit, mode=None):
         def f(view, s):
             if mode == MODE_NORMAL:
                 line = view.line(s.b)
                 return sublime.Region(line.a, line.a)
-            elif _internal_mode == _MODE_INTERNAL_VISUAL:
+            elif mode == _MODE_INTERNAL_NORMAL:
                 return sublime.Region(view.line(s.b).a, view.full_line(s.b).b)
             elif mode == MODE_VISUAL:
                 # TODO: This is sloppy. We're reorienting the caret here. We need to use the
@@ -717,7 +684,8 @@ class _vi_underscore_pre_motion(sublime_plugin.TextCommand):
 
 
 class _vi_underscore_post_motion(sublime_plugin.TextCommand):
-    def run(self, edit, mode=None, _internal_mode=None, extend=False):
+    def run(self, edit, mode=None):
+        state = VintageState(self.view)
         def f(view, s):
             if mode == MODE_NORMAL:
                 pt = utils.next_non_white_space_char(view, s.b)
@@ -726,7 +694,7 @@ class _vi_underscore_post_motion(sublime_plugin.TextCommand):
                 line = view.line(s.b)
                 pt = utils.next_non_white_space_char(view, line.a)
                 return sublime.Region(s.a, pt)
-            elif _internal_mode == _MODE_INTERNAL_VISUAL:
+            elif mode == _MODE_INTERNAL_NORMAL:
                 if not s.empty() and view.substr(s.b - 1) == '\n':
                     return s
                 else:
@@ -738,7 +706,7 @@ class _vi_underscore_post_motion(sublime_plugin.TextCommand):
 
 
 class _vi_j_pre_motion(sublime_plugin.TextCommand):
-    # Assume NORMAL_MODE / _MODE_INTERNAL_VISUAL
+    # Assume NORMAL_MODE / _MODE_INTERNAL_NORMAL
     # This code is probably duplicated.
     def run(self, edit):
         def f(view, s):
@@ -752,7 +720,7 @@ class _vi_j_pre_motion(sublime_plugin.TextCommand):
 
 
 class _vi_j_post_motion(sublime_plugin.TextCommand):
-    # Assume NORMAL_MODE / _MODE_INTERNAL_VISUAL
+    # Assume NORMAL_MODE / _MODE_INTERNAL_NORMAL
     # This code is probably duplicated.
     def run(self, edit):
         def f(view, s):
@@ -764,7 +732,7 @@ class _vi_j_post_motion(sublime_plugin.TextCommand):
 
 
 class _vi_k_pre_motion(sublime_plugin.TextCommand):
-    # Assume NORMAL_MODE / _MODE_INTERNAL_VISUAL
+    # Assume NORMAL_MODE / _MODE_INTERNAL_NORMAL
     # This code is probably duplicated.
     def run(self, edit):
         def f(view, s):
@@ -819,11 +787,11 @@ class _vi_select_text_object(sublime_plugin.TextCommand):
 
         return start
 
-    def run(self, edit, text_object=None, _internal_mode=None, count=1, extend=False):
+    def run(self, edit, text_object=None, mode=None, count=1, extend=False):
         def f(view, s):
             # TODO: Vim seems to swallow the delimiters if you give this command a count, which is
             #       a pretty weird behavior.
-            if _internal_mode == _MODE_INTERNAL_VISUAL:
+            if mode == _MODE_INTERNAL_NORMAL:
 
                 if text_object in self.PAIRS:
                     delim_a, delim_b = self.PAIRS[text_object]
@@ -866,8 +834,8 @@ class _vi_select_text_object(sublime_plugin.TextCommand):
 
 
 class _vi_yy_pre_motion(sublime_plugin.TextCommand):
-    # Assume NORMAL_MODE / _MODE_INTERNAL_VISUAL
-    def run(self, edit, _internal_mode=None):
+    # Assume NORMAL_MODE / _MODE_INTERNAL_NORMAL
+    def run(self, edit, mode=None):
         def f(view, s):
             line = view.line(s.b)
             return sublime.Region(line.a, line.b + 1)
@@ -876,8 +844,8 @@ class _vi_yy_pre_motion(sublime_plugin.TextCommand):
 
 
 class _vi_yy_post_motion(sublime_plugin.TextCommand):
-    # Assume NORMAL_MODE / _MODE_INTERNAL_VISUAL
-    def run(self, edit, _internal_mode=None):
+    # Assume NORMAL_MODE / _MODE_INTERNAL_NORMAL
+    def run(self, edit):
         def f(view, s):
             line = view.line(s.b - 1)
             return sublime.Region(s.a, line.b + 1)
@@ -886,8 +854,8 @@ class _vi_yy_post_motion(sublime_plugin.TextCommand):
 
 
 class _vi_move_caret_to_first_non_white_space_character(sublime_plugin.TextCommand):
-    # Assume NORMAL_MODE / _MODE_INTERNAL_VISUAL
-    def run(self, edit, _internal_mode=None):
+    # Assume NORMAL_MODE / _MODE_INTERNAL_NORMAL
+    def run(self, edit):
         def f(view, s):
             line = view.line(s.b - 1)
             pt = utils.next_non_white_space_char(view, line.a)

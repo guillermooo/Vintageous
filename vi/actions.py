@@ -3,7 +3,7 @@
 
 
 from Vintageous.vi import motions
-from Vintageous.vi.constants import MODE_VISUAL, _MODE_INTERNAL_VISUAL
+from Vintageous.vi.constants import MODE_VISUAL, _MODE_INTERNAL_NORMAL
 
 
 def vi_enter_visual_mode(vi_cmd_data):
@@ -119,7 +119,7 @@ def vi_a(vi_cmd_data):
 
 def vi_s(vi_cmd_data):
     if vi_cmd_data['mode'] != MODE_VISUAL:
-        vi_cmd_data['_internal_mode'] = _MODE_INTERNAL_VISUAL
+        vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
         vi_cmd_data['motion']['command'] = 'move'
         vi_cmd_data['motion']['args'] = {'by': 'characters', 'extend': True, 'forward': True}
 
@@ -133,8 +133,7 @@ def vi_s(vi_cmd_data):
     return vi_cmd_data
 
 def vi_c(vi_cmd_data):
-    # XXX: This is wrong; mode cannot equal _MODE_INTERNAL_VISUAL (that's an _internal_mode).
-    vi_cmd_data['mode'] = _MODE_INTERNAL_VISUAL
+    vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
     vi_cmd_data['can_yank'] = True
     vi_cmd_data['cancel_action_if_motion_fails'] = True
 
@@ -164,12 +163,12 @@ def vi_big_c(vi_cmd_data):
     # No count: CHARACTERWISE + EXCLUSIVE
     # Count: LINEWISE + EXCLUSIVE
 
-    vi_cmd_data['mode'] = _MODE_INTERNAL_VISUAL
+    vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
     vi_cmd_data['can_yank'] = True
 
     if vi_cmd_data['count'] == 1:
         vi_cmd_data['motion']['command'] = 'move_to'
-        vi_cmd_data['motion']['args'] = {'to': 'eol'}
+        vi_cmd_data['motion']['args'] = {'to': 'eol', 'extend': True}
 
         vi_cmd_data['motion_required'] = False
         vi_cmd_data['action']['command'] = 'right_delete'
@@ -180,7 +179,7 @@ def vi_big_c(vi_cmd_data):
         # Avoid C'ing one line too many.
         vi_cmd_data['count'] = vi_cmd_data['count'] - 1
         vi_cmd_data['motion']['command'] = 'move'
-        vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': True}
+        vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': True, 'extend': True}
         vi_cmd_data['post_motion'] = [['extend_to_minimal_width',], ['visual_extend_to_line',]]
 
         vi_cmd_data['motion_required'] = False
@@ -197,7 +196,7 @@ def vi_big_s(vi_cmd_data):
     # No count: CHARACTERWISE + EXCLUSIVE
     # Count: LINEWISE + EXCLUSIVE
 
-    vi_cmd_data['mode'] = _MODE_INTERNAL_VISUAL
+    vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
     vi_cmd_data['can_yank'] = True
     vi_cmd_data['yanks_linewise'] = True
 
@@ -244,7 +243,7 @@ def vi_big_x(vi_cmd_data):
     # TODO: Commands that specify a motion as well as an action should have a way of inspecting
     # the current operation mode. Perhaps a dummy_motion command could be introduced to enable
     # this.
-    vi_cmd_data['_internal_mode'] = _MODE_INTERNAL_VISUAL
+    vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
     vi_cmd_data['can_yank'] = True
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': False, 'extend': True}
@@ -272,18 +271,18 @@ def vi_big_p(vi_cmd_data):
 
 
 def vi_dd(vi_cmd_data):
-    # Assume _MODE_INTERNAL_VISUAL. Can't be issued in any other mode.
-    vi_cmd_data['_internal_mode'] = _MODE_INTERNAL_VISUAL
+    # Assume _MODE_INTERNAL_NORMAL. Can't be issued in any other mode.
+    vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
     vi_cmd_data['can_yank'] = True
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'lines', 'extend': True, 'forward': True}
     vi_cmd_data['motion_required'] = False
-    vi_cmd_data['pre_motion'] = ['_vi_dd_pre_motion', {'_internal_mode': vi_cmd_data['_internal_mode']}]
-    vi_cmd_data['post_motion'] = [['_vi_dd_post_motion', {'_internal_mode': vi_cmd_data['_internal_mode']}],]
+    vi_cmd_data['pre_motion'] = ['_vi_dd_pre_motion', {'mode': vi_cmd_data['mode']}]
+    vi_cmd_data['post_motion'] = [['_vi_dd_post_motion', {'mode': vi_cmd_data['mode']}],]
     vi_cmd_data['action']['command'] = 'left_delete'
     vi_cmd_data['action']['args'] = {}
-    # TODO: Doesn't seem necessary, as we always end up with empty selections.
-    # vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+    # TODO: Is this necessary? Does it work as expected?
+    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
 
@@ -323,7 +322,7 @@ def vi_y(vi_cmd_data):
 def vi_yy(vi_cmd_data):
     # Assume NORMALMODE.
     # FIXME: Cannot copy (or maybe pasting is the problem) one empty line only.
-    vi_cmd_data['_internal_mode'] = _MODE_INTERNAL_VISUAL
+    vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
     vi_cmd_data['motion_required'] = False
 
     vi_cmd_data['pre_motion'] = ['_vi_yy_pre_motion',]
@@ -331,7 +330,7 @@ def vi_yy(vi_cmd_data):
     vi_cmd_data['motion']['args'] = {'by': 'lines', 'extend': True, 'forward': True}
     # TODO: yy should leave the caret where it found it. As a temporary solution, we'll leave it
     # at BOL, which is the lesser evil between that and HEOL.
-    vi_cmd_data['post_motion'] = [['_vi_yy_post_motion', {'_internal_mode': vi_cmd_data['_internal_mode']}],]
+    vi_cmd_data['post_motion'] = [['_vi_yy_post_motion',],]
 
     vi_cmd_data['count'] = vi_cmd_data['count'] - 1
     vi_cmd_data['can_yank'] = True
@@ -339,7 +338,7 @@ def vi_yy(vi_cmd_data):
     # The yanked text will be put in the clipboard if needed. This command shouldn't do any action.
     vi_cmd_data['action']['command'] = 'no_op'
     vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['_vi_move_caret_to_first_non_white_space_character', {'_internal_mode': vi_cmd_data['_internal_mode']}]
+    vi_cmd_data['post_action'] = ['_vi_move_caret_to_first_non_white_space_character',]
 
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
@@ -396,8 +395,6 @@ def vi_z_enter(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = '_vi_z_enter'
     vi_cmd_data['action']['args'] = {}
-    # vi_cmd_data['post_action'] = ['collapse_to_begin',]
-    # vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
 
@@ -406,8 +403,6 @@ def vi_zz(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = '_vi_zz'
     vi_cmd_data['action']['args'] = {}
-    # vi_cmd_data['post_action'] = ['collapse_to_begin',]
-    # vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
 
@@ -416,14 +411,12 @@ def vi_z_minus(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = '_vi_z_minus'
     vi_cmd_data['action']['args'] = {}
-    # vi_cmd_data['post_action'] = ['collapse_to_begin',]
-    # vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
 
 
 def vi_double_lambda(vi_cmd_data):
-    # Assume _MODE_INTERNAL_VISUAL.
+    # Assume _MODE_INTERNAL_NORMAL.
     if vi_cmd_data['count'] > 1:
         vi_cmd_data['count'] = vi_cmd_data['count'] - 1
         vi_cmd_data['motion']['command'] = 'move'
@@ -439,7 +432,7 @@ def vi_double_lambda(vi_cmd_data):
 
 
 def vi_double_antilambda(vi_cmd_data):
-    # Assume _MODE_INTERNAL_VISUAL.
+    # Assume _MODE_INTERNAL_NORMAL.
     if vi_cmd_data['count'] > 1:
         vi_cmd_data['count'] = vi_cmd_data['count'] - 1
         vi_cmd_data['motion']['command'] = 'move'
@@ -456,7 +449,7 @@ def vi_double_antilambda(vi_cmd_data):
 
 def vi_r(vi_cmd_data):
     if vi_cmd_data['mode'] != MODE_VISUAL:
-        vi_cmd_data['_internal_mode'] = _MODE_INTERNAL_VISUAL
+        vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
 
     # TODO: If count > len(line), r should abort. We'd need _p_post_every_motion hook and tell
     # ViRun to cancel if selections didn't change.
@@ -464,7 +457,7 @@ def vi_r(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'characters', 'extend': True, 'forward': True} 
     vi_cmd_data['action']['command'] = '_vi_r'
-    vi_cmd_data['action']['args'] = {'character': vi_cmd_data['user_input'], '_internal_mode': vi_cmd_data['_internal_mode']}
+    vi_cmd_data['action']['args'] = {'character': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode']}
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
     
     return vi_cmd_data
