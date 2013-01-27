@@ -8,133 +8,91 @@ from Vintageous.vi.constants import regions_transformer
 from Vintageous.run import ViExecutionState
 
 
-# XXX: This is a very bad name. Better: ConvertSelectionsToVisualMode
 class ExtendToMinimalWidth(sublime_plugin.TextCommand):
     def run(self, edit):
-        sels = list(self.view.sel())
-        self.view.sel().clear()
-
-        new_sels = []
-        for s in sels:
+        def f(view, s):
             if s.empty():
-                new_sels.append(sublime.Region(s.a, s.b + 1))
+                return sublime.Region(s.a, s.b + 1)
             else:
-                new_sels.append(s)
-                
-        for s in new_sels:
-            self.view.sel().add(s)
+                return s
+
+        regions_transformer(self.view, f)
 
 
 class CollapseToDirection(sublime_plugin.TextCommand):
     def run(self, edit):
-        sels = list(self.view.sel())
-        self.view.sel().clear()
-
-        new_sels = []
-        for s in sels:
+        def f(view, s):
             if not s.empty():
                 if s.a < s.b:
-                    new_sels.append(sublime.Region(s.b - 1, s.b - 1))
+                    return sublime.Region(s.b - 1, s.b - 1)
                 else:
-                    new_sels.append(sublime.Region(s.b, s.b))
+                    return sublime.Region(s.b, s.b)
             else:
-                new_sels.append(s)
+                return s
 
-        for s in new_sels:
-            self.view.sel().add(s)
+        regions_transformer(self.view, f)
 
 
 class CollapseToBegin(sublime_plugin.TextCommand):
     def run(self, edit):
-        sels = list(self.view.sel())
-        self.view.sel().clear()
+        def f(view, s):
+            for s in sels:
+                if not s.empty():
+                    return sublime.Region(s.a, s.a)
+                else:
+                    return s
 
-        new_sels = []
-        for s in sels:
-            if not s.empty():
-                new_sels.append(sublime.Region(s.a, s.a))
-            else:
-                new_sels.append(s)
-
-        for s in new_sels:
-            self.view.sel().add(s)
+        regions_transformer(self.view, f)
 
 
 class ReorientCaret(sublime_plugin.TextCommand):
     def run(self, edit, forward=True, mode=None):
-        sels = list(self.view.sel())
-        self.view.sel().clear()
-
-        new_sels = []
-        for s in sels:
+        def f(view, s):
             if mode != MODE_VISUAL_LINE:
                 if s.end() - s.begin() == 1:
                     if forward:
                         if s.b < s.a:
-                            new_sels.append(sublime.Region(s.b, s.a))
+                            return sublime.Region(s.b, s.a)
                         else:
-                            new_sels.append(s)
+                            return s
                     else:
                         if s.b > s.a:
-                            new_sels.append(sublime.Region(s.b, s.a))
+                            return sublime.Region(s.b, s.a)
                         else:
-                            new_sels.append(s)
+                            return s
                 else:
-                    new_sels.append(s)
+                    return s
 
             else:
                 if forward:
                     if self.view.full_line(s.b).a == s.b and self.view.full_line(s.b).b == s.a:
-                        new_sels.append(sublime.Region(s.b, s.a))
+                        return sublime.Region(s.b, s.a)
                     else:
-                        new_sels.append(s)
+                        return s
                 elif self.view.full_line(s.b - 1).a == s.a and self.view.full_line(s.b - 1).b == s.b:
                     r = sublime.Region(self.view.full_line(s.a).b, s.a)
-                    new_sels.append(r)
+                    return r
                 else:
-                    new_sels.append(s)
+                    return s
 
-        for s in new_sels:
-            self.view.sel().add(s)
+        regions_transformer(self.view, f)
 
 
 class VisualClipEndToEol(sublime_plugin.TextCommand):
     def run(self, edit):
-        sels = list(self.view.sel())
-        self.view.sel().clear()
-
-        new_sels = []
-        for s in sels:
+        def f(view, s):
             if s.a < s.b:
                 # going forward
                 if utils.is_at_hard_eol(self.view, s) and \
                    not utils.visual_is_on_empty_line_forward(self.view, s):
-                        new_sels.append(utils.back_end_one_char(s))
+                        return utils.back_end_one_char(s)
                 else:
-                    new_sels.append(s)
+                    return s
             else:
                 # Moving down by lines.
-                new_sels.append(s)
+                return s
 
-        for s in new_sels:
-            self.view.sel().add(s)
-
-
-class VisualClipEndToBol(sublime_plugin.TextCommand):
-    def run(self, edit):
-        sels = list(self.view.sel())
-        self.view.sel().clear()
-
-        new_sels = []
-
-        for s in sels:
-            if utils.is_at_eol(self.view, s):
-                w_sels.append(utils.forward_end_one_char(s))
-            else:
-                new_sels.append(s)
-
-        for s in new_sels:
-            self.view.sel().add(s)
+        regions_transformer(self.view, f)
 
 
 class _vi_l_post_every_motion(sublime_plugin.TextCommand):
@@ -169,42 +127,27 @@ class _vi_l_post_every_motion(sublime_plugin.TextCommand):
 
 class VisualDontOvershootLineLeft(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
-        sels = list(self.view.sel())
-        self.view.sel().clear()
-
-        new_sels = []
-
-        for s in sels:
-            if (s.a > s.b and
-                utils.is_at_eol(self.view, s) and
-                not s.b == 0):
-                    new_sels.append(utils.forward_end_one_char(s))
-            elif (s.a < s.b and
-                  utils.is_at_hard_eol(self.view, s)):
-                    new_sels.append(sublime.Region(s.a, s.b + 1))
+        def f(view, s):
+            if (s.a > s.b and utils.is_at_eol(self.view, s) and not s.b == 0):
+                    return utils.forward_end_one_char(s)
+            elif (s.a < s.b and utils.is_at_hard_eol(self.view, s)):
+                    return sublime.Region(s.a, s.b + 1)
             else:
-                new_sels.append(s)
+                return s
 
-        for s in new_sels:
-            self.view.sel().add(s)
+        regions_transformer(self.view, f)
 
 
 class VisualShrinkEndOneChar(sublime_plugin.TextCommand):
     def run(self, edit):
-        sels = list(self.view.sel())
-        self.view.sel().clear()
-
-        new_sels = []
-
-        for s in sels:
+        def f(view, s):
             if (s.a < s.b and not utils.visual_is_on_empty_line_forward(self.view, s) and
                not (utils.visual_is_end_at_bol(self.view, s))):
-                    new_sels.append(utils.back_end_one_char(s))
+                    return utils.back_end_one_char(s)
             else:
-                new_sels.append(s)
+                return s
 
-        for s in new_sels:
-            self.view.sel().add(s)
+        regions_transformer(self.view, f)
 
 
 class VisualExtendToFullLine(sublime_plugin.TextCommand):
@@ -238,63 +181,30 @@ class _vi_dd_post_motion(sublime_plugin.TextCommand):
 
 class VisualExtendToLine(sublime_plugin.TextCommand):
     def run(self, edit):
-        sels = list(self.view.sel())
-        self.view.sel().clear()
+        def f(view, s):
+            return self.view.line(s)
 
-        new_sels = []
-
-        for s in sels:
-            new_sels.append(self.view.line(s))
-
-        for s in new_sels:
-            self.view.sel().add(s)
-
-
-class VisualExtendToBol(sublime_plugin.TextCommand):
-    def run(self, edit, mode=None):
-        if mode != MODE_VISUAL_LINE:
-            return
-
-        sels = list(self.view.sel())
-        self.view.sel().clear()
-
-        new_sels = []
-
-        for s in sels:
-            if s.a < s.b and (self.view.line(s.a) == self.view.line(s.b)):
-                r = sublime.Region(self.view.full_line(s.b).b, s.a)
-                new_sels.append(r)
-            else:
-                new_sels.append(s)
-
-        for s in new_sels:
-            self.view.sel().add(s)
+        regions_transformer(self.view, f)
 
 
 class VisualExtendEndToHardEnd(sublime_plugin.TextCommand):
     def run(self, edit, mode=None):
-        sels = list(self.view.sel())
-        self.view.sel().clear()
-
-        new_sels = []
-
-        for s in sels:
+        def f(view, s):
             if s.a < s.b:
                 # TODO: Wait until regions can compare themselves neatly.
                 if (self.view.line(s.b).a == self.view.line(s.b -1).a and
                     self.view.line(s.b).b == self.view.line(s.b -1).b):
-                    new_sels.append(sublime.Region(s.a, self.view.full_line(s.b).b))
+                    return sublime.Region(s.a, self.view.full_line(s.b).b)
                 else:
-                    new_sels.append(s)
+                    return s
             else:
                 if self.view.line(s.b).a != s.b:
                     r = sublime.Region(s.a, self.view.full_line(s.b).a)
-                    new_sels.append(r)
+                    return r
                 else:
-                    new_sels.append(s)
+                    return s
 
-        for s in new_sels:
-            self.view.sel().add(s)
+        regions_transformer(self.view, f)
 
 
 class _vi_w_post_every_motion(sublime_plugin.TextCommand):
@@ -433,19 +343,13 @@ class _d_w_post_every_motion(sublime_plugin.TextCommand):
 
 class _back_one_if_on_hard_eol(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
-        sels = list(self.view.sel())
-        self.view.sel().clear()
-
-        new_sels = []
-        for s in sels:
-            if (s.a < s.b and
-                self.view.full_line(s.b - 1).b == s.b):
-                    new_sels.append(sublime.Region(s.a, s.b - 1))
+        def f(view, s):
+            if (s.a < s.b and self.view.full_line(s.b - 1).b == s.b):
+                    return sublime.Region(s.a, s.b - 1)
             else:
-                new_sels.append(s)
+                return s
 
-        for s in new_sels:
-            self.view.sel().add(s)
+        regions_transformer(self.view, f)
 
 
 class _extend_b_to_hard_eol(sublime_plugin.TextCommand):
@@ -494,20 +398,15 @@ class _pre_every_dollar(sublime_plugin.TextCommand):
 
 class _extend_a_to_bol_if_leading_white_space(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
-        sels = list(self.view.sel())
-        self.view.sel().clear()
-
-        new_sels = []
-        for s in sels:
+        def f(view, s):
             if (s.a <= s.b and
                 self.view.substr(sublime.Region(self.view.line(s.a).a, s.a)).isspace()):
                     bol = self.view.line(s.a).a
-                    new_sels.append(sublime.Region(bol, s.b))
+                    return sublime.Region(bol, s.b)
             else:
-                new_sels.append(s)
+                return s
 
-        for s in new_sels:
-            self.view.sel().add(s)
+        regions_transformer(self.view, f)
 
 
 class _vi_e_post_every_motion(sublime_plugin.TextCommand):
