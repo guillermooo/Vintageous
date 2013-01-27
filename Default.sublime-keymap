@@ -46,6 +46,7 @@
 	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_enter_visual_mode"}, "context": [{"key": "vi_mode_visual_line"}] },
 
 	{ "keys": ["V"], "command": "set_action", "args": {"action": "vi_enter_visual_line_mode"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["V"], "command": "set_action", "args": {"action": "vi_enter_normal_mode"}, "context": [{"key": "vi_mode_visual_line"}] },
 
 
 	{ "keys": ["1"], "command": "vi_push_digit", "args": {"digit": "1"}, "context": [{"key": "vi_mode_can_push_digit"}, {"key": "setting.command_mode"}] },

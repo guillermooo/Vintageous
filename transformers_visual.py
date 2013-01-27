@@ -36,11 +36,10 @@ class CollapseToDirection(sublime_plugin.TextCommand):
 class CollapseToBegin(sublime_plugin.TextCommand):
     def run(self, edit):
         def f(view, s):
-            for s in sels:
-                if not s.empty():
-                    return sublime.Region(s.a, s.a)
-                else:
-                    return s
+            if not s.empty():
+                return sublime.Region(s.a, s.a)
+            else:
+                return s
 
         regions_transformer(self.view, f)
 
@@ -153,7 +152,13 @@ class VisualShrinkEndOneChar(sublime_plugin.TextCommand):
 class VisualExtendToFullLine(sublime_plugin.TextCommand):
     def run(self, edit):
         def f(view, s):
-            return self.view.full_line(s)
+            if s.size() > 0:
+                if view.full_line(s.b - 1).b == s.b:
+                    return self.view.full_line(sublime.Region(s.a, s.b - 1))
+                else:
+                    return self.view.full_line(s)
+            else:
+                return self.view.full_line(s)
 
         regions_transformer(self.view, f)
 

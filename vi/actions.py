@@ -22,6 +22,7 @@ def vi_enter_normal_mode(vi_cmd_data):
 
 def vi_enter_visual_line_mode(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
+    # TODO: This seems to be duplicated during this command's full run.
     vi_cmd_data['action']['command'] = 'vi_enter_visual_line_mode'
     vi_cmd_data['action']['args'] = {}
     vi_cmd_data['post_action'] = ['visual_extend_to_full_line',]
