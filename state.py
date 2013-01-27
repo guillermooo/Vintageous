@@ -224,6 +224,7 @@ class VintageState(object):
         # Make sure we run NORMAL mode actions in _MODE_INTERNAL_NORMAL mode.
         if self.mode in (MODE_VISUAL, MODE_VISUAL_LINE) or (self.motion and self.action):
             if self.mode not in (MODE_VISUAL, MODE_VISUAL_LINE):
+                self.mode = _MODE_INTERNAL_NORMAL
                 vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
             else:
                 vi_cmd_data['mode'] = self.mode
