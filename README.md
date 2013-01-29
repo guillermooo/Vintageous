@@ -25,6 +25,8 @@ Install
 To install a package in Sublime Text 3, put the *.sublime-package* file inside
 the *Installed Packages* folder, located under the data directory.
 
+You must disable (*ignore*) Vintage to avoid conflicts with Vintageous.
+
 
 Development Version
 -------------------
