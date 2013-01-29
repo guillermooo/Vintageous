@@ -25,7 +25,7 @@ Install
 To install a package in Sublime Text 3, put the *.sublime-package* file inside
 the *Installed Packages* folder, located under the data directory.
 
-You must disable (*ignore*) Vintage to avoid conflicts with Vintageous.
+You must disable (or *ignore*, in Sublime Text parlance) Vintage to avoid conflicts with Vintageous.
 
 
 Development Version
@@ -34,8 +34,8 @@ Development Version
 To use this development version, you should:
 
 1. ensure the built-in Vintage package is in the ``ignored_packages`` list, as it is by default
-2. zip the contents of this repository and add the extension *.sublime-package* to the archive
-3. copy the *.sublime-package* file to the *Installed Packages* folder, located under Sublime Text's data folder
+2. zip the content of this repository and add the extension *.sublime-package* to the archive
+3. copy the *.sublime-package* file to the *Installed Packages* folder, located under Sublime Text's data directory
 
 
 Documentation
