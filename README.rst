@@ -12,14 +12,14 @@
 
 Vintageous is a rewrite of Vintage_ with the aim to make it more similar to Vim.
 
-.. _Python: http://www.sublimetext.com/docs/2/vintage.html
+.. _Vintage: http://www.sublimetext.com/docs/2/vintage.html
 
 Download
 ========
 
 The `current build`_ of Vintageous is updated frequently.
 
-.. current build: https://bitbucket.org/guillermooo/vintageous/downloads/Vintageous.sublime-package
+.. _current build: https://bitbucket.org/guillermooo/vintageous/downloads/Vintageous.sublime-package
 
 
 Install
