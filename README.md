@@ -11,7 +11,7 @@ Overview
 
 Vintageous is a rewrite of [Vintage](http://www.sublimetext.com/docs/2/vintage.html) with the aim to make it more similar to Vim.
 
-Many inspiration has been drawn from initial efforts by [dlo](https://github.com/dlo)
+Many inspiration has been drawn from initial efforts by [dlo](https://github.com/dlo).
 
 Download
 --------
