@@ -227,14 +227,16 @@ def vi_big_s(vi_cmd_data):
 
 
 def vi_x(vi_cmd_data):
-    vi_cmd_data['mode'] = MODE_VISUAL
-    vi_cmd_data = motions.vi_l(vi_cmd_data)
-
     vi_cmd_data['can_yank'] = True
-
     vi_cmd_data['motion_required'] = False
+
+    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
+        vi_cmd_data['motion']['command'] = 'move'
+        vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': True, 'extend':True}
+
     vi_cmd_data['action']['command'] = 'right_delete'
     vi_cmd_data['action']['args'] = {}
+
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
