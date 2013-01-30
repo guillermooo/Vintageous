@@ -246,13 +246,18 @@ def vi_big_x(vi_cmd_data):
     # TODO: Commands that specify a motion as well as an action should have a way of inspecting
     # the current operation mode. Perhaps a dummy_motion command could be introduced to enable
     # this.
-    vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
     vi_cmd_data['can_yank'] = True
-    vi_cmd_data['motion']['command'] = 'move'
-    vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': False, 'extend': True}
+    vi_cmd_data['motion_required'] = False
+
+    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
+        vi_cmd_data['motion']['command'] = 'move'
+        vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': False, 'extend':True}
+
+    # TODO: This is wrong for VISUALMODE. In VISUALMODE, X in Vim deletes linewise.
     vi_cmd_data['action']['command'] = 'left_delete'
     vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['motion_required'] = False
+
+    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
 
