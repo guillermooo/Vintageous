@@ -267,6 +267,10 @@ def vi_p(vi_cmd_data):
     vi_cmd_data['action']['command'] = 'vi_paste'
     vi_cmd_data['action']['args'] = {'count': vi_cmd_data['count'], 'register': vi_cmd_data['register']}
 
+    if vi_cmd_data['mode'] == MODE_VISUAL:
+        vi_cmd_data['post_action'] = ['collapse_to_begin',]
+        vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+
     return vi_cmd_data
 
 
@@ -274,6 +278,10 @@ def vi_big_p(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = 'vi_paste_before'
     vi_cmd_data['action']['args'] = {'count': vi_cmd_data['count'], 'register': vi_cmd_data['register']}
+
+    if vi_cmd_data['mode'] == MODE_VISUAL:
+        vi_cmd_data['post_action'] = ['collapse_to_begin',]
+        vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
 

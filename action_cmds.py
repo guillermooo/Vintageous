@@ -4,7 +4,7 @@ import sublime_plugin
 from Vintageous.state import VintageState
 from Vintageous.state import IrreversibleTextCommand
 from Vintageous.vi import utils
-from Vintageous.vi.constants import MODE_NORMAL, _MODE_INTERNAL_NORMAL
+from Vintageous.vi.constants import MODE_NORMAL, _MODE_INTERNAL_NORMAL, MODE_VISUAL, MODE_VISUAL_LINE
 from Vintageous.vi.constants import regions_transformer
 
 
@@ -85,11 +85,11 @@ class ViPaste(sublime_plugin.TextCommand):
             text = self.prepare_fragment(text)
             if text.startswith('\n'):
                 if utils.is_at_eol(self.view, s) or utils.is_at_bol(self.view, s):
-                    self.paste_all(edit, self.view.line(s.b).b, text, count)
+                    self.paste_all(edit, s, self.view.line(s.b).b, text, count)
                 else:
-                    self.paste_all(edit, self.view.line(s.b - 1).b, text, count)
+                    self.paste_all(edit, s, self.view.line(s.b - 1).b, text, count)
             else:
-                self.paste_all(edit, s.b + offset + 1, text, count)
+                self.paste_all(edit, s, s.b + offset + 1, text, count)
                 offset += len(text) * count
 
     def prepare_fragment(self, text):
@@ -97,9 +97,20 @@ class ViPaste(sublime_plugin.TextCommand):
             text = '\n' + text[0:-1]
         return text
 
-    def paste_all(self, edit, at, text, count):
-        for x in range(count):
-            self.view.insert(edit, at, text)
+    # TODO: Improve this signature.
+    def paste_all(self, edit, sel, at, text, count):
+        state = VintageState(self.view)
+        if state.mode not in (MODE_VISUAL, MODE_VISUAL_LINE):
+            for x in range(count):
+                self.view.insert(edit, at, text)
+        else:
+            if text.startswith('\n'):
+                text = text * count
+                if not text.endswith('\n'):
+                    text = text + '\n'
+            else:
+                text = text * count
+            self.view.replace(edit, sel, text)
 
 
 class ViPasteBefore(sublime_plugin.TextCommand):
@@ -123,16 +134,28 @@ class ViPasteBefore(sublime_plugin.TextCommand):
         for s, text in sel_frag:
             if text.endswith('\n'):
                 if utils.is_at_eol(self.view, s) or utils.is_at_bol(self.view, s):
-                    self.paste_all(edit, self.view.line(s.b).a, text, count)
+                    self.paste_all(edit, s, self.view.line(s.b).a, text, count)
                 else:
-                    self.paste_all(edit, self.view.line(s.b - 1).a, text, count)
+                    self.paste_all(edit, s, self.view.line(s.b - 1).a, text, count)
             else:
-                self.paste_all(edit, s.b + offset, text, count)
+                self.paste_all(edit, s, s.b + offset, text, count)
                 offset += len(text) * count
 
-    def paste_all(self, edit, at, text, count):
-        for x in range(count):
-            self.view.insert(edit, at, text)
+    def paste_all(self, edit, sel, at, text, count):
+        # for x in range(count):
+        #     self.view.insert(edit, at, text)
+        state = VintageState(self.view)
+        if state.mode not in (MODE_VISUAL, MODE_VISUAL_LINE):
+            for x in range(count):
+                self.view.insert(edit, at, text)
+        else:
+            if text.endswith('\n'):
+                text = text * count
+                if not text.startswith('\n'):
+                    text = '\n' + text
+            else:
+                text = text * count
+            self.view.replace(edit, sel, text)
 
 
 class ViEnterNormalMode(sublime_plugin.TextCommand):
