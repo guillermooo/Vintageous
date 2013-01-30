@@ -444,7 +444,7 @@ class _vi_undo(IrreversibleTextCommand):
         # We define our own transformer here because we want to handle undo as a special case.
         # TODO: I don't know if it needs to be an special case in reality.
         def f(view, s):
-            return sublime.Region(s.b, s.b)
+            return sublime.Region(s.a, s.a)
 
         self.view.run_command('undo')
         
