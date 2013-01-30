@@ -45,4 +45,4 @@ Documentation
 
 * [Vintage Mode Overview](http://www.sublimetext.com/docs/3/vintage.html)
 * [API Reference](http://www.sublimetext.com/docs/3/api_reference.html)
-* [Key Bindings](http://sublimetext.info/docs/en/customization/key_bindings.html)
+* [Key Bindings](http://docs.sublimetext.info/en/latest/customization/key_bindings.html)
