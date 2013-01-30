@@ -419,3 +419,41 @@ class _vi_r(sublime_plugin.TextCommand):
         if mode == _MODE_INTERNAL_NORMAL:
             for s in self.view.sel():
                 self.view.replace(edit, s, character * s.size())
+
+
+class _vi_undo(IrreversibleTextCommand):
+    """Once the latest vi command has been undone, we might be left with non-empty selections.
+    This is due to the fact that Vintageous defines selections in a separate step to the actual
+    command running. For example, v,e,d,u would undo the deletion operation and restore the
+    selection that v,e had created.
+
+    Assuming that after an undo we're back in normal mode, we can take for granted that any leftover
+    selections must be destroyed. I cannot think of any situation where Vim would have to restore
+    selections after *u*, but it may well happen under certain circumstances I'm not aware of.
+
+    Note 1: We are also relying on Sublime Text to restore the v or V selections existing at the
+    time the edit command was run. This seems to be safe, but we're blindly relying on it.
+
+    Note 2: Vim knows the position the caret was in before creating the visual selection. In
+    Sublime Text we lose that information (at least it doesn't seem to be straightforward to
+    obtain).
+    """
+    # TODO: It must be possible store or retrieve the actual position of the caret before the
+    # visual selection performed by the user.
+    def run(self):
+        # We define our own transformer here because we want to handle undo as a special case.
+        # TODO: I don't know if it needs to be an special case in reality.
+        def f(view, s):
+            return sublime.Region(s.b, s.b)
+
+        self.view.run_command('undo')
+        
+        regions_transformer(self.view, f)
+        # !! HACK !! /////////////////////////////////////////////////////////
+        # This is a hack to work around an issue in Sublime Text:
+        # When undoing in normal mode, Sublime Text seems to prime a move by chars
+        # forward that has never been requested by the user or Vintageous.
+        # As far as I can tell, Vintageous isn't at fault here, but it seems weird
+        # to think that Sublime Text is wrong.
+        self.view.run_command('move', {'by': 'characters', 'forward': False})
+        # ////////////////////////////////////////////////////////////////////

@@ -70,7 +70,7 @@
 	{ "keys": ["."], "command": "repeat", "context": [{"key": "setting.command_mode"}]},
 
 	// u only undoes in NORMALMODE.
-	{ "keys": ["u"], "command": "undo", "context": [{"key": "vi_mode_normal"}] },
+	{ "keys": ["u"], "command": "_vi_undo", "context": [{"key": "vi_mode_normal"}] },
 
 	{ "keys": ["d"], "command": "set_action", "args": {"action": "vi_d"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["s"], "command": "set_action", "args": {"action": "vi_s"}, "context": [{"key": "setting.command_mode"}] },
