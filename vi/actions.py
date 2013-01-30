@@ -498,3 +498,37 @@ def vi_big_j(vi_cmd_data):
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
+
+
+def vi_big_u(vi_cmd_data):
+    # XXX: Assume MODE_VISUAL or MODE_VISUAL_LINE
+    # TODO: Is this required for a visual operation?
+    vi_cmd_data['motion_required'] = False
+
+    vi_cmd_data['motion']['command'] = 'no_op'
+    vi_cmd_data['motion']['args'] = {}
+
+    vi_cmd_data['action']['command'] = 'upper_case'
+    vi_cmd_data['action']['args'] = {}
+    
+    vi_cmd_data['post_action'] = ['collapse_to_begin',]
+    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+
+    return vi_cmd_data
+
+
+def vi_u(vi_cmd_data):
+    # XXX: Assume MODE_VISUAL or MODE_VISUAL_LINE
+    # TODO: Is this required for a visual operation?
+    vi_cmd_data['motion_required'] = False
+
+    vi_cmd_data['motion']['command'] = 'no_op'
+    vi_cmd_data['motion']['args'] = {}
+
+    vi_cmd_data['action']['command'] = 'lower_case'
+    vi_cmd_data['action']['args'] = {}
+    
+    vi_cmd_data['post_action'] = ['collapse_to_begin',]
+    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+
+    return vi_cmd_data

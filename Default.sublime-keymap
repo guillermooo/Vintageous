@@ -69,7 +69,8 @@
 	// { "keys": ["."], "command": "repeat", "context": [{"key": "setting.command_mode"}, {"key": "vi_state_expecting_register", "operand": false}, {"key": "vi_state_expecting_user_input", "operand": false}] },
 	{ "keys": ["."], "command": "repeat", "context": [{"key": "setting.command_mode"}]},
 
-	{ "keys": ["u"], "command": "undo", "context": [{"key": "setting.command_mode"}] },
+	// u only undoes in NORMALMODE.
+	{ "keys": ["u"], "command": "undo", "context": [{"key": "vi_mode_normal"}] },
 
 	{ "keys": ["d"], "command": "set_action", "args": {"action": "vi_d"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["s"], "command": "set_action", "args": {"action": "vi_s"}, "context": [{"key": "setting.command_mode"}] },
@@ -94,6 +95,9 @@
 
 	{ "keys": ["U"], "command": "set_action", "args": {"action": "vi_g_big_u"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 	{ "keys": ["u"], "command": "set_action", "args": {"action": "vi_g_u"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
+
+	{ "keys": ["U"], "command": "set_action", "args": {"action": "vi_big_u"}, "context": [{"key": "vi_mode_visual_any"}] },
+	{ "keys": ["u"], "command": "set_action", "args": {"action": "vi_u"}, "context": [{"key": "vi_mode_visual_any"}] },
 
 	// This is a fake action that allows zz to be issued.
 	{ "keys": ["z"], "command": "set_action", "args": {"action": "vi_z_action"}, "context": [{"key": "setting.command_mode"}] },
