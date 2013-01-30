@@ -219,6 +219,10 @@ class VintageState(object):
             # Some actions must be cancelled if the selections didn't change after the motion.
             # Others, on the contrary, must always go ahead.
             'cancel_action_if_motion_fails': False,
+            # Some commands that don't take motions need to be repeated, but currently ViRun only
+            # repeats the motion, so tell global state to repeat the action. An example would be
+            # the J command.
+            '_repeat_action': False
         }
 
         # Make sure we run NORMAL mode actions in _MODE_INTERNAL_NORMAL mode.

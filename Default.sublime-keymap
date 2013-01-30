@@ -27,6 +27,7 @@
 
 	{ "keys": ["$"], "command": "set_motion", "args": {"motion": "vi_dollar"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["_"], "command": "set_motion", "args": {"motion": "vi_underscore"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["^"], "command": "set_motion", "args": {"motion": "vi_underscore"}, "context": [{"key": "setting.command_mode"}] },
 
 	{ "keys": ["I"], "command": "set_action", "args": {"action": "vi_big_i"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["A"], "command": "set_action", "args": {"action": "vi_big_a"}, "context": [{"key": "setting.command_mode"}] },
@@ -78,6 +79,8 @@
 
 	{ "keys": ["o"], "command": "set_action", "args": {"action": "vi_o"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["O"], "command": "set_action", "args": {"action": "vi_big_o"}, "context": [{"key": "setting.command_mode"}] },
+
+	{ "keys": ["J"], "command": "set_action", "args": {"action": "vi_big_j"}, "context": [{"key": "setting.command_mode"}] },
 
 	// This is a fake action that allows gg to be issued.
 	{ "keys": ["g"], "command": "set_action", "args": {"action": "vi_g_action"}, "context": [{"key": "setting.command_mode"}] },

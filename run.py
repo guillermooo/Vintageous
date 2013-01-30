@@ -61,6 +61,10 @@ class ViRunCommand(sublime_plugin.TextCommand):
             self.do_follow_up_mode(vi_cmd_data)
 
     def do_whole_motion(self, vi_cmd_data):
+        # If the action must be repeated, then the count cannot apply here; exit early.
+        if vi_cmd_data['_repeat_action']:
+            return
+
         self.do_pre_motion(vi_cmd_data)
 
         count = vi_cmd_data['count']
@@ -170,7 +174,15 @@ class ViRunCommand(sublime_plugin.TextCommand):
 
             cmd = vi_cmd_data['action']['command']
             args = vi_cmd_data['action']['args']
-            self.view.run_command(cmd, args)
+
+            # This should happen rarely, but some actions that don't take a motion apply the count
+            # to the action.
+            i = 1
+            if vi_cmd_data['_repeat_action']:
+                i = vi_cmd_data['count']
+
+            for t in range(i):
+                self.view.run_command(cmd, args)
 
     def get_selected_text(self, vi_cmd_data):
         fragments = [self.view.substr(r) for r in list(self.view.sel())]
