@@ -11,6 +11,12 @@ from Vintageous.run import ViExecutionState
 class ExtendToMinimalWidth(sublime_plugin.TextCommand):
     def run(self, edit):
         def f(view, s):
+            # TODO: This will confuse users, but otherwise they will be even more confused, because
+            # the caret will disappear until they press h, l, etc.
+            # Alternatively, we could abort the mode change?
+            if view.size() == 0:
+                return s
+
             if s.empty():
                 return sublime.Region(s.a, s.b + 1)
             else:
