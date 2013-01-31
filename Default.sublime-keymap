@@ -144,6 +144,7 @@
 	// Twofold process: First set the motion, then collect user input and run global state.
 	// Text objects like di".
 	{ "keys": ["i"], "command": "vi_i", "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_action"}] },
+	{ "keys": ["i"], "command": "vi_i", "context": [{"key": "vi_mode_visual"},] },
 
 	{ "keys": ["r"], "command": "vi_r", "context": [{"key": "vi_mode_normal"}, {"key": "vi_mode_normal"}] },
 	

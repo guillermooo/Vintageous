@@ -738,6 +738,38 @@ class _vi_select_text_object(sublime_plugin.TextCommand):
                     rhs = self.find_next(view, lhs + 1, delim_b)
                     return sublime.Region(lhs + 1, rhs)
 
+            if mode == MODE_VISUAL:
+                # TODO: This class needs refactoring to reduce duplication.
+
+                if text_object in self.PAIRS:
+                    delim_a, delim_b = self.PAIRS[text_object]
+                else:
+                    return s
+
+
+                text = view.substr(view.line(s.b))
+                line = view.line(s.b)
+                text_before_sel = view.substr(sublime.Region(line.a, s.begin()))
+                text_after_sel = view.substr(sublime.Region(s.end(), line.b))
+
+                # Exit early if we don't have a pair of delimiters in the line.
+                if delim_a == delim_b:
+                    if len(text.split(delim_a)) < 2:
+                        return s
+                else:
+                    if not ((delim_a in text and delim_b in text) and
+                             text.index(delim_b) > text.index(delim_a)):
+                                return s
+
+                # Continue only if the selection is between delimiters.
+                if not (delim_b in text_after_sel and delim_a in text_before_sel):
+                    return s
+
+                lhs = s.begin()
+                lhs = self.find_previous(view, lhs, delim_a)
+                rhs = self.find_next(view, s.end(), delim_b)
+                return sublime.Region(lhs + 1, rhs)
+
             return s
 
         regions_transformer(self.view, f)
