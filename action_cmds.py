@@ -480,12 +480,13 @@ class _vi_undo(IrreversibleTextCommand):
 
         self.view.run_command('undo')
         
-        regions_transformer(self.view, f)
-        # !! HACK !! /////////////////////////////////////////////////////////
-        # This is a hack to work around an issue in Sublime Text:
-        # When undoing in normal mode, Sublime Text seems to prime a move by chars
-        # forward that has never been requested by the user or Vintageous.
-        # As far as I can tell, Vintageous isn't at fault here, but it seems weird
-        # to think that Sublime Text is wrong.
-        self.view.run_command('move', {'by': 'characters', 'forward': False})
-        # ////////////////////////////////////////////////////////////////////
+        if self.view.has_non_empty_selection_region():
+            regions_transformer(self.view, f)
+            # !! HACK !! /////////////////////////////////////////////////////////
+            # This is a hack to work around an issue in Sublime Text:
+            # When undoing in normal mode, Sublime Text seems to prime a move by chars
+            # forward that has never been requested by the user or Vintageous.
+            # As far as I can tell, Vintageous isn't at fault here, but it seems weird
+            # to think that Sublime Text is wrong.
+            self.view.run_command('move', {'by': 'characters', 'forward': False})
+            # ////////////////////////////////////////////////////////////////////
