@@ -89,7 +89,11 @@ class ViPaste(sublime_plugin.TextCommand):
                 else:
                     self.paste_all(edit, s, self.view.line(s.b - 1).b, text, count)
             else:
-                self.paste_all(edit, s, s.b + offset + 1, text, count)
+                # XXX: Refactor this whole class. It's getting out of hand. 
+                if self.view.substr(s.b) == '\n':
+                    self.paste_all(edit, s, s.b + offset, text, count)
+                else:
+                    self.paste_all(edit, s, s.b + offset + 1, text, count)
                 offset += len(text) * count
 
     def prepare_fragment(self, text):
@@ -101,6 +105,7 @@ class ViPaste(sublime_plugin.TextCommand):
     def paste_all(self, edit, sel, at, text, count):
         state = VintageState(self.view)
         if state.mode not in (MODE_VISUAL, MODE_VISUAL_LINE):
+            # TODO: generate string first, then insert?
             for x in range(count):
                 self.view.insert(edit, at, text)
         else:
