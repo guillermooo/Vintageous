@@ -21,7 +21,8 @@ class VintageSettings(object):
 
     def __init__(self, view=None):
         self.view = view
-        if view and not isinstance(self.view.settings().get('vintage'), dict):
+
+        if view is not None and not isinstance(self.view.settings().get('vintage'), dict):
             self.view.settings().set('vintage', dict())
 
     def __get__(self, instance, owner):
