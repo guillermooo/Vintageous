@@ -3,7 +3,7 @@
 
 
 from Vintageous.vi import motions
-from Vintageous.vi.constants import MODE_VISUAL, _MODE_INTERNAL_NORMAL
+from Vintageous.vi.constants import MODE_VISUAL, _MODE_INTERNAL_NORMAL, MODE_VISUAL_LINE
 
 
 def vi_enter_visual_mode(vi_cmd_data):
@@ -227,12 +227,17 @@ def vi_big_s(vi_cmd_data):
 
 
 def vi_x(vi_cmd_data):
+    if vi_cmd_data['mode'] not in (MODE_VISUAL, MODE_VISUAL_LINE):
+        vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
+        vi_cmd_data['cancel_action_if_motion_fails'] = True
+        
     vi_cmd_data['can_yank'] = True
     vi_cmd_data['motion_required'] = False
 
     if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
         vi_cmd_data['motion']['command'] = 'move'
         vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': True, 'extend':True}
+        vi_cmd_data['post_motion'] = [['_vi_x_post_motion',],]
 
     vi_cmd_data['action']['command'] = 'right_delete'
     vi_cmd_data['action']['args'] = {}
