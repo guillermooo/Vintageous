@@ -184,6 +184,8 @@ class _vi_dd_post_motion(sublime_plugin.TextCommand):
     def run(self, edit, mode=None):
         def f(view, s):
             if view.substr(s.b - 1) != '\n':
+                if s == view.full_line(view.size()):
+                    return sublime.Region(s.a - 1, view.size())
                 return sublime.Region(s.a, view.full_line(s.b).b)
             return s
 
@@ -288,7 +290,7 @@ class _vi_w_pre_every_motion(sublime_plugin.TextCommand):
             state = VintageState(view)
             if state.mode == MODE_VISUAL:
                 if not utils.is_region_reversed(view, s):
-                    
+
                     if (view.line(s.b - 1).empty() and
                         view.substr(s.b) not in (' \t') and
                         not view.line(s.b).empty()):
