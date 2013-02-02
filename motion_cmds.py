@@ -259,11 +259,7 @@ class ViBigM(sublime_plugin.TextCommand):
 
 class ViStar(sublime_plugin.TextCommand):
     def run(self, edit, mode=None, count=1, extend=False):
-        state = VintageState(self.view)
         def f(view, s):
-            # TODO: make sure we swallow any leading white space.
-            query = view.substr(view.word(s.end()))
-
             if mode == _MODE_INTERNAL_NORMAL:
                 match = view.find(query, view.word(s.end()).end(), sublime.LITERAL)
             else:
@@ -277,6 +273,12 @@ class ViStar(sublime_plugin.TextCommand):
                 elif state.mode == MODE_NORMAL:
                     return sublime.Region(match.begin(), match.begin())
             return s
+
+        state = VintageState(self.view)
+        # TODO: make sure we swallow any leading white space.
+        query = self.view.substr(self.view.word(self.view.sel()[0].end()))
+        if query:
+            state.last_buffer_search = query
 
         regions_transformer(self.view, f)
 
@@ -329,9 +331,13 @@ class _vi_forward_slash(sublime_plugin.TextCommand):
         if search_string is None:
             return
 
-        # TODO: Implement count.
         # Start searching from the current selection's end.
-        match = self.view.find(search_string, self.view.sel()[0].b)
+        # TODO: We make sure to skip at least one word so most of the time the current word doesn't
+        # match the search string and we can search ahead, but this is quite sloppy.
+        current_sel = self.view.sel()[0]
+        current_sel = current_sel if not current_sel.empty() else self.view.word(current_sel.b)
+
+        match = self.view.find(search_string, current_sel.b)
         for x in range(count - 1):
             match = self.view.find(search_string, match.b)
             if match is None:
