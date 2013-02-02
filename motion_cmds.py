@@ -260,10 +260,14 @@ class ViBigM(sublime_plugin.TextCommand):
 class ViStar(sublime_plugin.TextCommand):
     def run(self, edit, mode=None, count=1, extend=False):
         def f(view, s):
+
+            pattern = r'\b{0}\b'.format(query)
+            flags = sublime.IGNORECASE
+
             if mode == _MODE_INTERNAL_NORMAL:
-                match = view.find(query, view.word(s.end()).end(), sublime.LITERAL)
+                match = view.find(pattern, view.word(s.end()).end(), flags)
             else:
-                match = view.find(query, view.word(s).end(), sublime.LITERAL)
+                match = view.find(pattern, view.word(s).end(), flags)
 
             if match:
                 if mode == _MODE_INTERNAL_NORMAL:
@@ -337,6 +341,7 @@ class _vi_forward_slash(sublime_plugin.TextCommand):
         current_sel = self.view.sel()[0]
         current_sel = current_sel if not current_sel.empty() else self.view.word(current_sel.b)
 
+        # FIXME: What should we do here? Case-sensitive or case-insensitive search? Configurable?
         match = self.view.find(search_string, current_sel.b)
         for x in range(count - 1):
             match = self.view.find(search_string, match.b)
