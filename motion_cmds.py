@@ -3,7 +3,7 @@ import sublime_plugin
 
 from Vintageous.vi.constants import regions_transformer
 from Vintageous.vi.constants import MODE_VISUAL, MODE_NORMAL, _MODE_INTERNAL_NORMAL
-from Vintageous.state import VintageState
+from Vintageous.state import VintageState, IrreversibleTextCommand
 
 
 class ViMoveToHardBol(sublime_plugin.TextCommand):
@@ -249,7 +249,7 @@ class ViStar(sublime_plugin.TextCommand):
         def f(view, s):
             # TODO: make sure we swallow any leading white space.
             query = view.substr(view.word(s.end()))
-            
+
             if mode == _MODE_INTERNAL_NORMAL:
                 match = view.find(query, view.word(s.end()).end(), sublime.LITERAL)
             else:
@@ -272,5 +272,58 @@ class ViOctothorp(sublime_plugin.TextCommand):
         state = VintageState(self.view)
         def f(view, s):
             return s
+
+        regions_transformer(self.view, f)
+
+
+class ViBufferSearch(IrreversibleTextCommand):
+    def run(self):
+        state = VintageState(self.view)
+        state.motion = 'vi_forward_slash'
+
+        self.view.window().show_input_panel('', '', self.on_done, None, self.on_cancel)
+
+    def on_done(self, s):
+        state = VintageState(self.view)
+        state.user_input = s
+        state.last_buffer_search = s
+        state.run()
+
+    def on_cancel(self):
+        state = VintageState(self.view)
+        state.reset()
+
+
+class _vi_forward_slash(sublime_plugin.TextCommand):
+    def run(self, edit, search_string, mode=None, count=1, extend=False):
+        def f(view, s):
+            if mode == MODE_VISUAL:
+                if s.b < match.a:
+                    return sublime.Region(s.a, match.a)
+
+            elif mode == _MODE_INTERNAL_NORMAL:
+                if s.b < match.a:
+                    return sublime.Region(s.a, match.a)
+
+            elif mode == MODE_NORMAL:
+                if s.b < match.a:
+                    return sublime.Region(match.a, match.a)
+
+            return s
+
+        # This happens when we attempt to repeat the search and there's no search term stored yet.
+        if search_string is None:
+            return
+
+        # TODO: Implement count.
+        # Start searching from the current selection's end.
+        match = self.view.find(search_string, self.view.sel()[0].b)
+        for x in range(count - 1):
+            match = self.view.find(search_string, match.b)
+            if match is None:
+                return
+
+        if match is None:
+            return
 
         regions_transformer(self.view, f)

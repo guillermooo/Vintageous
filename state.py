@@ -172,6 +172,15 @@ class VintageState(object):
         self.settings.vi['user_input'] = value
         self.expecting_user_input = False
 
+    @property
+    def last_buffer_search(self):
+        return self.settings.vi['last_buffer_search'] or None
+
+    @last_buffer_search.setter
+    def last_buffer_search(self, value):
+        self.settings.vi['last_buffer_search'] = value
+        self.expecting_user_input = False
+
     def parse_motion(self):
         # TODO: Encapsulate this in a class?
         #
@@ -222,7 +231,9 @@ class VintageState(object):
             # Some commands that don't take motions need to be repeated, but currently ViRun only
             # repeats the motion, so tell global state to repeat the action. An example would be
             # the J command.
-            '_repeat_action': False
+            '_repeat_action': False,
+            # Search string used last to find text in the buffer.
+            'last_buffer_search': self.last_buffer_search
         }
 
         # Make sure we run NORMAL mode actions in _MODE_INTERNAL_NORMAL mode.
@@ -348,15 +359,15 @@ class VintageStateTracker(sublime_plugin.EventListener):
         # TODO: This context should encompass any state in which the next input character will be
         #       consumed as user-provided input. However, it seems simpler to unify data collection
         #       in one single context to begin with and get rid of this.
-        # 
+        #
         # This context signals when we're expecting the user to provide an arbirtrary char as
         # input for an incomplete command. It helps to disable some key bindings in this event.
-        # 
+        #
         # TODO: Note that offending key bindings seem to always be sequences suchs as ["'", "'"].
         #       We should try to never use them to avoid timeout weirdness and let double commands
         #       use Vintageous' own system for composite commands instead. If sequences exist now,
         #       it's because they seemed easier as a first implementation.
-        # 
+        #
         elif key == 'vi_state_next_character_is_user_input':
             if operator == sublime.OP_EQUAL:
                 if operand == True:

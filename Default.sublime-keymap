@@ -141,6 +141,10 @@
 	{ "keys": ["F"], "command": "vi_big_f", "context": [{"key": "vi_mode_normal"}] },
 	{ "keys": ["F"], "command": "vi_big_f", "context": [{"key": "vi_mode_visual"}] },
 
+	{ "keys": ["/"], "command": "vi_buffer_search", "context": [{"key": "setting.command_mode"}] },
+
+	{ "keys": ["n"], "command": "set_motion", "args": {"motion": "vi_n"}, "context": [{"key": "setting.command_mode"}] },
+
 	// Twofold process: First set the motion, then collect user input and run global state.
 	// Text objects like di".
 	{ "keys": ["i"], "command": "vi_i", "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_action"}] },
