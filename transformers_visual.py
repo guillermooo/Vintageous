@@ -831,3 +831,19 @@ class _vi_big_x_post_every_motion(sublime_plugin.TextCommand):
             return s
 
         regions_transformer(self.view, f)
+
+
+class _vi_big_x_motion(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None):
+        def f(view, s):
+            if mode == MODE_VISUAL:
+                if s.a < s.b:
+                    a = view.line(s.a).a
+                    b = view.full_line(s.b - 1).b
+                else:
+                    a = view.full_line(s.a - 1).b
+                    b = view.full_line(s.b).a
+                return sublime.Region(a, b)
+            return s
+
+        regions_transformer(self.view, f)

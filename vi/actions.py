@@ -263,6 +263,10 @@ def vi_big_x(vi_cmd_data):
         vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': False, 'extend':True}
         vi_cmd_data['post_every_motion'] = ['_vi_big_x_post_every_motion', {'mode': vi_cmd_data['mode']}]
 
+    elif vi_cmd_data['mode'] == MODE_VISUAL:
+        vi_cmd_data['motion']['command'] = '_vi_big_x_motion'
+        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
+
     # TODO: This is wrong for VISUALMODE. In VISUALMODE, X in Vim deletes linewise.
     vi_cmd_data['action']['command'] = 'left_delete'
     vi_cmd_data['action']['args'] = {}
