@@ -230,14 +230,14 @@ def vi_x(vi_cmd_data):
     if vi_cmd_data['mode'] not in (MODE_VISUAL, MODE_VISUAL_LINE):
         vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
         vi_cmd_data['cancel_action_if_motion_fails'] = True
-        
+
     vi_cmd_data['can_yank'] = True
     vi_cmd_data['motion_required'] = False
 
     if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
         vi_cmd_data['motion']['command'] = 'move'
         vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': True, 'extend':True}
-        vi_cmd_data['post_motion'] = [['_vi_x_post_motion',],]
+        vi_cmd_data['post_every_motion'] = ['_vi_x_post_every_motion', {'mode': vi_cmd_data['mode']}]
 
     vi_cmd_data['action']['command'] = 'right_delete'
     vi_cmd_data['action']['args'] = {}
@@ -254,9 +254,14 @@ def vi_big_x(vi_cmd_data):
     vi_cmd_data['can_yank'] = True
     vi_cmd_data['motion_required'] = False
 
+    if vi_cmd_data['mode'] not in (MODE_VISUAL, MODE_VISUAL_LINE):
+        vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
+        vi_cmd_data['cancel_action_if_motion_fails'] = True
+
     if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
         vi_cmd_data['motion']['command'] = 'move'
         vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': False, 'extend':True}
+        vi_cmd_data['post_every_motion'] = ['_vi_big_x_post_every_motion', {'mode': vi_cmd_data['mode']}]
 
     # TODO: This is wrong for VISUALMODE. In VISUALMODE, X in Vim deletes linewise.
     vi_cmd_data['action']['command'] = 'left_delete'
@@ -477,11 +482,11 @@ def vi_r(vi_cmd_data):
     # ViRun to cancel if selections didn't change.
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['motion']['command'] = 'move'
-    vi_cmd_data['motion']['args'] = {'by': 'characters', 'extend': True, 'forward': True} 
+    vi_cmd_data['motion']['args'] = {'by': 'characters', 'extend': True, 'forward': True}
     vi_cmd_data['action']['command'] = '_vi_r'
     vi_cmd_data['action']['args'] = {'character': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode']}
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
-    
+
     return vi_cmd_data
 
 
@@ -531,7 +536,7 @@ def vi_big_u(vi_cmd_data):
 
     vi_cmd_data['action']['command'] = 'upper_case'
     vi_cmd_data['action']['args'] = {}
-    
+
     vi_cmd_data['post_action'] = ['collapse_to_begin',]
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
@@ -548,7 +553,7 @@ def vi_u(vi_cmd_data):
 
     vi_cmd_data['action']['command'] = 'lower_case'
     vi_cmd_data['action']['args'] = {}
-    
+
     vi_cmd_data['post_action'] = ['collapse_to_begin',]
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 

@@ -808,14 +808,26 @@ class _vi_move_caret_to_first_non_white_space_character(sublime_plugin.TextComma
         regions_transformer(self.view, f)
 
 
-class _vi_x_post_motion(sublime_plugin.TextCommand):
+class _vi_x_post_every_motion(sublime_plugin.TextCommand):
     # Assume NORMAL_MODE / _MODE_INTERNAL_NORMAL
-    def run(self, edit):
+    def run(self, edit, mode=None, current_iteration=None, total_iterations=None):
         def f(view, s):
             if view.substr(s.b - 1) == '\n':
                 # FIXME: Actually, we should go back to the first \n; we may have run over
                 # multiple ones.
                 return sublime.Region(s.a, s.b - 1)
+            return s
+
+        regions_transformer(self.view, f)
+
+
+class _vi_big_x_post_every_motion(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, current_iteration=None, total_iterations=None):
+        def f(view, s):
+            if mode == _MODE_INTERNAL_NORMAL:
+                if view.substr(s.b) == '\n':
+                    return sublime.Region(s.b + 1, s.b + 1)
+
             return s
 
         regions_transformer(self.view, f)
