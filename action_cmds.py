@@ -78,7 +78,7 @@ class ViPaste(sublime_plugin.TextCommand):
         if len(sels) == len(fragments):
             sel_frag = zip(sels, fragments)
         else:
-            sel_frag = zip(sels, [fragments[0],] * len(sels)) 
+            sel_frag = zip(sels, [fragments[0],] * len(sels))
 
         offset = 0
         for s, text in sel_frag:
@@ -89,7 +89,7 @@ class ViPaste(sublime_plugin.TextCommand):
                 else:
                     self.paste_all(edit, s, self.view.line(s.b - 1).b, text, count)
             else:
-                # XXX: Refactor this whole class. It's getting out of hand. 
+                # XXX: Refactor this whole class. It's getting out of hand.
                 if self.view.substr(s.b) == '\n':
                     self.paste_all(edit, s, s.b + offset, text, count)
                 else:
@@ -133,7 +133,7 @@ class ViPasteBefore(sublime_plugin.TextCommand):
         if len(sels) == len(fragments):
             sel_frag = zip(sels, fragments)
         else:
-            sel_frag = zip(sels, [fragments[0],] * len(sels)) 
+            sel_frag = zip(sels, [fragments[0],] * len(sels))
 
         offset = 0
         for s, text in sel_frag:
@@ -318,6 +318,7 @@ class ViF(sublime_plugin.TextCommand):
             state.motion = 'vi_f'
             state.expecting_user_input = True
         else:
+            # FIXME: Dead code?
             state.user_input = character
             state.expecting_user_input= False
             state.run()
@@ -412,7 +413,7 @@ class _vi_z_enter(IrreversibleTextCommand):
         topmost_visible_row, _ = self.view.rowcol(self.view.visible_region().a)
 
         self.view.run_command('scroll_lines', {'amount': (topmost_visible_row - current_row)})
-        
+
 class _vi_z_minus(IrreversibleTextCommand):
     def __init__(self, view):
         IrreversibleTextCommand.__init__(self, view)
@@ -440,7 +441,7 @@ class _vi_zz(IrreversibleTextCommand):
         middle_row = (topmost_visible_row + bottommost_visible_row) / 2
 
         self.view.run_command('scroll_lines', {'amount': (middle_row - current_row)})
-               
+
 
 class _vi_r(sublime_plugin.TextCommand):
     def run(self, edit, character=None, mode=None):
@@ -479,7 +480,7 @@ class _vi_undo(IrreversibleTextCommand):
                 return sublime.Region(s.a, s.a)
 
         self.view.run_command('undo')
-        
+
         if self.view.has_non_empty_selection_region():
             regions_transformer(self.view, f)
             # !! HACK !! /////////////////////////////////////////////////////////

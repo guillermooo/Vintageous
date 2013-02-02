@@ -181,6 +181,15 @@ class VintageState(object):
         self.settings.vi['last_buffer_search'] = value
         self.expecting_user_input = False
 
+    @property
+    def last_character_search(self):
+        return self.settings.vi['last_character_search'] or None
+
+    @last_character_search.setter
+    def last_character_search(self, value):
+        self.settings.vi['last_character_search'] = value
+        self.expecting_user_input = False
+
     def parse_motion(self):
         # TODO: Encapsulate this in a class?
         #
@@ -232,8 +241,10 @@ class VintageState(object):
             # repeats the motion, so tell global state to repeat the action. An example would be
             # the J command.
             '_repeat_action': False,
-            # Search string used last to find text in the buffer.
-            'last_buffer_search': self.last_buffer_search
+            # Search string used last to find text in the buffer (like the / command).
+            'last_buffer_search': self.last_buffer_search,
+            # Search character used last to find text in the line (like the f command).
+            'last_character_search': self.last_character_search
         }
 
         # Make sure we run NORMAL mode actions in _MODE_INTERNAL_NORMAL mode.

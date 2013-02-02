@@ -58,6 +58,13 @@ class ViFindInLineInclusive(sublime_plugin.TextCommand):
 
             return s
 
+        # TODO: Give feedback to the user that the search failed?
+        if character is None:
+            return
+        else:
+            state = VintageState(self.view)
+            state.last_character_search = character
+
         regions_transformer(self.view, f)
 
 
@@ -128,6 +135,13 @@ class ViFindInLineExclusive(sublime_plugin.TextCommand):
                 return sublime.Region(pt - 1, pt - 1)
 
             return s
+
+        # TODO: Give feedback to the user that the search failed?
+        if character is None:
+            return
+        else:
+            state = VintageState(self.view)
+            state.last_character_search = character
 
         regions_transformer(self.view, f)
 

@@ -129,6 +129,14 @@
 	// TODO: Is the following key binding needed?
 	{ "keys": ["<character>"], "command": "vi_f", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_user_input"}] },
 
+	// Repeats f
+	{ "keys": [","], "command": "set_motion", "args":{"motion": "vi_comma"}, "context": [{"key": "vi_mode_normal"}] },
+	{ "keys": [","], "command": "set_motion", "args":{"motion": "vi_comma"}, "context": [{"key": "vi_mode_visual"}] },
+
+	// Repeats f backward
+	{ "keys": [";"], "command": "set_motion", "args":{"motion": "vi_semicolon"}, "context": [{"key": "vi_mode_normal"}] },
+	{ "keys": [";"], "command": "set_motion", "args":{"motion": "vi_semicolon"}, "context": [{"key": "vi_mode_visual"}] },
+
 	// Twofold process: First set the motion, then collect user input and run global state.
 	{ "keys": ["t"], "command": "vi_t", "context": [{"key": "vi_mode_normal"}] },
 	{ "keys": ["t"], "command": "vi_t", "context": [{"key": "vi_mode_visual"}] },
