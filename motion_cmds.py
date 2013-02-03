@@ -298,13 +298,13 @@ class ViOctothorp(sublime_plugin.TextCommand):
 
 class ViBufferSearch(IrreversibleTextCommand):
     def run(self):
-        state = VintageState(self.view)
-        state.motion = 'vi_forward_slash'
-
         self.view.window().show_input_panel('', '', self.on_done, None, self.on_cancel)
 
     def on_done(self, s):
+        # FIXME: Sublime Text seems to reset settings between the .run() call above and this
+        # .on_done() method. An issue has been filed about this. Awaiting response.
         state = VintageState(self.view)
+        state.motion = 'vi_forward_slash'
         state.user_input = s
         state.last_buffer_search = s
         state.run()
@@ -343,12 +343,12 @@ class _vi_forward_slash(sublime_plugin.TextCommand):
 
         # FIXME: What should we do here? Case-sensitive or case-insensitive search? Configurable?
         match = self.view.find(search_string, current_sel.b)
+        if match is None:
+            return
+
         for x in range(count - 1):
             match = self.view.find(search_string, match.b)
             if match is None:
                 return
-
-        if match is None:
-            return
 
         regions_transformer(self.view, f)

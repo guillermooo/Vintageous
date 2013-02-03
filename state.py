@@ -302,6 +302,8 @@ class VintageState(object):
         """Examines the current state and decides whether to actually run the action/motion.
         """
 
+        print("AAA", self.motion)
+
         # Action + motion, like in "3dj".
         if self.action and self.motion:
             vi_cmd_data = self.parse_motion()
