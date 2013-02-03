@@ -15,6 +15,24 @@ from Vintageous.vi.registers import Registers
 from Vintageous.vi import registers
 
 
+def _init_vintageous(view):
+    # Operate only on actual views.
+    if (not getattr(view, 'settings') or
+            view.settings().get('is_widget')):
+        return
+
+    state = VintageState(view)
+    if state.mode not in (MODE_VISUAL, _MODE_INTERNAL_NORMAL,
+                          MODE_VISUAL_LINE):
+        state.reset()
+        state.enter_normal_mode()
+
+
+def plugin_loaded():
+    view = sublime.active_window().active_view()
+    _init_vintageous(view)
+
+
 def unload_handler():
     for w in sublime.windows():
         for v in w.views():
@@ -339,6 +357,12 @@ class VintageState(object):
 
 
 class VintageStateTracker(sublime_plugin.EventListener):
+    def on_load(self, view):
+        _init_vintageous(view)
+
+    def on_activated(self, view):
+        _init_vintageous(view)
+
     def on_query_context(self, view, key, operator, operand, match_all):
         vintage_state = VintageState(view)
 
