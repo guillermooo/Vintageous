@@ -660,7 +660,7 @@ class _vi_k_pre_motion(sublime_plugin.TextCommand):
 class _vi_select_text_object(sublime_plugin.TextCommand):
     PAIRS = {
         '"': ('"', '"'),
-        "'": ("'", '"'),
+        "'": ("'", "'"),
         "`": ("`", "`"),
         "(": ("(", ")"),
         ")": ("(", ")"),
@@ -699,7 +699,7 @@ class _vi_select_text_object(sublime_plugin.TextCommand):
 
         return start
 
-    def run(self, edit, text_object=None, mode=None, count=1, extend=False):
+    def run(self, edit, text_object=None, mode=None, count=1, extend=False, inclusive=False):
         def f(view, s):
             # TODO: Vim seems to swallow the delimiters if you give this command a count, which is
             #       a pretty weird behavior.
@@ -732,13 +732,20 @@ class _vi_select_text_object(sublime_plugin.TextCommand):
                     lhs = s.b if view.line(s.b).a == s.b else s.b - 1
                     lhs = self.find_next(view, lhs, delim_a)
                     rhs = self.find_next(view, lhs + 1, delim_b)
-                    return sublime.Region(lhs + 1, rhs)
+
+                    if not inclusive:
+                        return sublime.Region(lhs + 1, rhs)
+                    else:
+                        return sublime.Region(lhs, rhs + 1)
 
                 else:
                     lhs = s.b if view.line(s.b).a == s.b else s.b - 1
                     lhs = self.find_previous(view, lhs, delim_a)
                     rhs = self.find_next(view, lhs + 1, delim_b)
-                    return sublime.Region(lhs + 1, rhs)
+                    if not inclusive:
+                        return sublime.Region(lhs + 1, rhs)
+                    else:
+                        return sublime.Region(lhs, rhs + 1)
 
             if mode == MODE_VISUAL:
                 # TODO: This class needs refactoring to reduce duplication.
@@ -770,7 +777,10 @@ class _vi_select_text_object(sublime_plugin.TextCommand):
                 lhs = s.begin()
                 lhs = self.find_previous(view, lhs, delim_a)
                 rhs = self.find_next(view, s.end(), delim_b)
-                return sublime.Region(lhs + 1, rhs)
+                if not inclusive:
+                    return sublime.Region(lhs + 1, rhs)
+                else:
+                    return sublime.Region(lhs, rhs + 1)
 
             return s
 

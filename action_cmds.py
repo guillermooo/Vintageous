@@ -371,9 +371,12 @@ class ViI(IrreversibleTextCommand):
     def __init__(self, view):
         IrreversibleTextCommand.__init__(self, view)
 
-    def run(self):
+    def run(self, inclusive=False):
         state = VintageState(self.view)
-        state.motion = 'vi_i'
+        if not inclusive:
+            state.motion = 'vi_inclusive_text_object'
+        else:
+            state.motion = 'vi_exclusive_text_object'
         state.expecting_user_input = True
 
 

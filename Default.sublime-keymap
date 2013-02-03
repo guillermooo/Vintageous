@@ -161,8 +161,15 @@
 
 	// Twofold process: First set the motion, then collect user input and run global state.
 	// Text objects like di".
-	{ "keys": ["i"], "command": "vi_i", "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_action"}] },
-	{ "keys": ["i"], "command": "vi_i", "context": [{"key": "vi_mode_visual"},] },
+	// TODO: This naming is utterly confusing: There's a vi_i function and a ViI command. Change this.
+	{ "keys": ["i"], "command": "vi_i", "args": {"inclusive": false}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_action"}] },
+	{ "keys": ["i"], "command": "vi_i", "args": {"inclusive": false}, "context": [{"key": "vi_mode_visual"},] },
+
+	// Twofold process: First set the motion, then collect user input and run global state.
+	// Text objects like da".
+	// TODO: This naming is utterly confusing: There's a vi_a function and a ViA command. Change this.
+	{ "keys": ["a"], "command": "vi_i", "args": {"inclusive": true}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_action"}] },
+	{ "keys": ["a"], "command": "vi_i", "args": {"inclusive": true}, "context": [{"key": "vi_mode_visual"},] },
 
 	{ "keys": ["r"], "command": "vi_r", "context": [{"key": "vi_mode_normal"}, {"key": "vi_mode_normal"}] },
 	
