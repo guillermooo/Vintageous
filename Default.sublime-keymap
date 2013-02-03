@@ -16,10 +16,20 @@
 	{ "keys": ["j"], "command": "set_motion", "args": {"motion": "vi_j"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["k"], "command": "set_motion", "args": {"motion": "vi_k"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["l"], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "setting.command_mode"}] },
+	
+	{ "keys": ["down"], "command": "set_motion", "args": {"motion": "vi_j"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["up"], "command": "set_motion", "args": {"motion": "vi_k"}, "context": [{"key": "setting.command_mode"}] },
+
+	{ "keys": ["left"], "command": "set_motion", "args": {"motion": "vi_h"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["right"], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "setting.command_mode"}] },
 
 	// ST won't allow cursor movement while full lines are selected, so disable these.
 	{ "keys": ["h"], "command": "vi_no_op", "context": [{"key": "vi_mode_visual_line"}] },
 	{ "keys": ["l"], "command": "vi_no_op", "context": [{"key": "vi_mode_visual_line"}] },
+
+	// ST won't allow cursor movement while full lines are selected, so disable these.
+	{ "keys": ["left"], "command": "vi_no_op", "context": [{"key": "vi_mode_visual_line"}] },
+	{ "keys": ["right"], "command": "vi_no_op", "context": [{"key": "vi_mode_visual_line"}] },
 
 	{ "keys": ["w"], "command": "set_motion", "args": {"motion": "vi_w"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["e"], "command": "set_motion", "args": {"motion": "vi_e"}, "context": [{"key": "setting.command_mode"}] },
