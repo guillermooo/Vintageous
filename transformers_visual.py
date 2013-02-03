@@ -185,7 +185,7 @@ class _vi_dd_post_motion(sublime_plugin.TextCommand):
         def f(view, s):
             if view.substr(s.b - 1) != '\n':
                 if s == view.full_line(view.size()):
-                    return sublime.Region(s.a - 1, view.size())
+                    return sublime.Region(max(s.a - 1, 0), view.size())
                 return sublime.Region(s.a, view.full_line(s.b).b)
             return s
 
