@@ -440,7 +440,7 @@ def vi_big_f(vi_cmd_data):
 # TODO: Unify handling of text objects in one function. Perhaps add state.args to merge with vi_cmd_data['motion']['args']
 def vi_inclusive_text_object(vi_cmd_data):
     vi_cmd_data['motion']['command'] = '_vi_select_text_object'
-    vi_cmd_data['motion']['args'] = {'text_object': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['motion']['args'] = {'text_object': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'inclusive': True}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
@@ -449,7 +449,7 @@ def vi_inclusive_text_object(vi_cmd_data):
 # TODO: Unify handling of text objects in one function. Perhaps add state.args to merge with vi_cmd_data['motion']['args']
 def vi_exclusive_text_object(vi_cmd_data):
     vi_cmd_data['motion']['command'] = '_vi_select_text_object'
-    vi_cmd_data['motion']['args'] = {'text_object': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'inclusive': True}
+    vi_cmd_data['motion']['args'] = {'text_object': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'inclusive': False}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data

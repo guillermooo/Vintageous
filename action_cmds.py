@@ -373,7 +373,7 @@ class ViI(IrreversibleTextCommand):
 
     def run(self, inclusive=False):
         state = VintageState(self.view)
-        if not inclusive:
+        if inclusive:
             state.motion = 'vi_inclusive_text_object'
         else:
             state.motion = 'vi_exclusive_text_object'
