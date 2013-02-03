@@ -183,9 +183,10 @@ class _vi_dd_pre_motion(sublime_plugin.TextCommand):
 class _vi_dd_post_motion(sublime_plugin.TextCommand):
     def run(self, edit, mode=None):
         def f(view, s):
+            if view.full_line(s.b - 1).b == view.size():
+                return sublime.Region(max(s.a - 1, 0), view.size())
+                
             if view.substr(s.b - 1) != '\n':
-                if s == view.full_line(view.size()):
-                    return sublime.Region(max(s.a - 1, 0), view.size())
                 return sublime.Region(s.a, view.full_line(s.b).b)
             return s
 
