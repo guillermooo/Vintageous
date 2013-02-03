@@ -494,3 +494,70 @@ def vi_semicolon(vi_cmd_data):
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
+
+
+def vi_big_w(vi_cmd_data):
+    vi_cmd_data['__reorient_caret'] = True
+    vi_cmd_data['motion']['command'] = 'move'
+    vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_begin': True, 'empty_line': True, 'separators': '', 'forward': True}
+    vi_cmd_data['post_every_motion'] = ['_vi_w_post_every_motion',]
+
+    if vi_cmd_data['mode'] == MODE_VISUAL:
+        vi_cmd_data['pre_every_motion'] = ['_vi_w_pre_every_motion',]
+        vi_cmd_data['motion']['args']['extend'] = True
+        vi_cmd_data['post_every_motion'] = ['_vi_w_post_every_motion',]
+
+    # In _MODE_INTERNAL_NORMAL, things seem to work as in Vim except for a few corner cases.
+    # The two modes are similar enough, but the fact everyhing's working more or less as expected
+    # is quite by coincidence.
+    # XXX: Add specific code for _MODE_INTERNAL_NORMAL.
+
+    return vi_cmd_data
+
+
+def vi_big_e(vi_cmd_data):
+    # NORMAL mode movement:
+    #   ST does what Vim does (TODO: always?).
+    #
+    # _MODE_INTERNAL_NORMAL
+    #
+    vi_cmd_data['motion']['command'] = 'move'
+    vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_end': True, 'empty_line': True, 'separators': '', 'forward': True}
+    vi_cmd_data['__reorient_caret'] = True
+
+    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
+        vi_cmd_data['motion']['args']['extend'] = True
+        vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
+        vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
+
+    elif vi_cmd_data['mode'] == MODE_NORMAL:
+        vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
+        vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
+
+    elif vi_cmd_data['mode'] == MODE_VISUAL:
+        vi_cmd_data['motion']['args']['extend'] = True
+        vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
+        vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
+
+    return vi_cmd_data
+
+
+def vi_big_b(vi_cmd_data):
+    vi_cmd_data['__reorient_caret'] = True
+    vi_cmd_data['motion']['command'] = 'move'
+    vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_begin': True, 'empty_line': True, 'separators': '', 'forward': False} 
+
+    if vi_cmd_data['mode'] == MODE_NORMAL:
+        vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode'],}]
+        vi_cmd_data['post_every_motion'] = ['dont_stay_on_eol_backward',]
+    elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
+        vi_cmd_data['motion']['args']['extend'] = True
+        vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode'],}]
+        vi_cmd_data['post_every_motion'] = ['dont_stay_on_eol_backward',]
+    elif vi_cmd_data['mode'] == MODE_VISUAL:
+        # TODO: Rename to factor in *every*.
+        vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode']}]
+        vi_cmd_data['motion']['args']['extend'] = True
+        vi_cmd_data['post_every_motion'] = ['_vi_b_post_every_motion', {'mode': vi_cmd_data['mode']}]
+
+    return vi_cmd_data

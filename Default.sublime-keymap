@@ -25,6 +25,10 @@
 	{ "keys": ["e"], "command": "set_motion", "args": {"motion": "vi_e"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["b"], "command": "set_motion", "args": {"motion": "vi_b"}, "context": [{"key": "setting.command_mode"}] },
 
+	{ "keys": ["W"], "command": "set_motion", "args": {"motion": "vi_big_w"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["E"], "command": "set_motion", "args": {"motion": "vi_big_e"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["B"], "command": "set_motion", "args": {"motion": "vi_big_b"}, "context": [{"key": "setting.command_mode"}] },
+
 	{ "keys": ["$"], "command": "set_motion", "args": {"motion": "vi_dollar"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["_"], "command": "set_motion", "args": {"motion": "vi_underscore"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["^"], "command": "set_motion", "args": {"motion": "vi_underscore"}, "context": [{"key": "setting.command_mode"}] },
