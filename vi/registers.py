@@ -68,7 +68,7 @@ class Registers(object):
         # We actually need to check whether the option is set to a bool; could
         # be any JSON type.
         if (name == REG_SYS_CLIPBOARD_1 or
-            self.settings.view['vintage_use_sys_clipboard'] == True):
+            self.settings.view['vintageous_use_sys_clipboard'] == True):
                 # Make sure Sublime Text does the right thing in the presence of multiple
                 # selections.
                 if len(value) > 1:
@@ -125,12 +125,12 @@ class Registers(object):
             except AttributeError:
                 return ''
         elif name in REG_SYS_CLIPBOARD_ALL:
-            return sublime.get_clipboard()
+            return [sublime.get_clipboard()]
         elif name != REG_UNNAMED and name in REG_ALL:
             return
         # Special case lumped among these --user always wants the sys
         # clipboard.
-        elif name == REG_UNNAMED and self.settings.view['vintage_use_sys_clipboard'] == True:
+        elif name == REG_UNNAMED and self.settings.view['vintageous_use_sys_clipboard'] == True:
             return sublime.get_clipboard()
 
         # We requested an [a-z0-9"] register.

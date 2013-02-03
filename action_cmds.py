@@ -63,6 +63,7 @@ class _vi_big_i(sublime_plugin.TextCommand):
 
         regions_transformer(self.view, f)
 
+
 class ViPaste(sublime_plugin.TextCommand):
     def run(self, edit, register=None, count=1):
         state = VintageState(self.view)
