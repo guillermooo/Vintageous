@@ -116,6 +116,8 @@
 	{ "keys": ["x"], "command": "set_action", "args": {"action": "vi_x"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["X"], "command": "set_action", "args": {"action": "vi_big_x"}, "context": [{"key": "setting.command_mode"}] },
 
+	{ "keys": ["Y"], "command": "set_action", "args": {"action": "vi_yy"}, "context": [{"key": "setting.command_mode"}] },
+
 	{ "keys": ["p"], "command": "set_action", "args": {"action": "vi_p"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["P"], "command": "set_action", "args": {"action": "vi_big_p"}, "context": [{"key": "setting.command_mode"}] },
 
