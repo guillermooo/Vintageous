@@ -40,25 +40,6 @@ class DontStayOnEolBackward(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
-class DontOvershootLineRight(sublime_plugin.TextCommand):
-    def run(self, edit, **kwargs):
-        def f(view, s):
-            if view.size() == 0:
-                return s
-
-            if is_on_empty_line(self.view, s):
-                return back_one_char(s)
-
-            if is_at_eol(self.view, s):
-                return back_one_char(s)
-            elif is_at_bol(self.view, s):
-                return back_one_char(s)
-            else:
-                return s
-
-        regions_transformer(self.view, f)
-
-
 class DontOvershootLineLeft(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
         def f(view, s):

@@ -100,36 +100,6 @@ class VisualClipEndToEol(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
-class _vi_l_post_every_motion(sublime_plugin.TextCommand):
-    # Receives several extra arguments (we don't use).
-    def run(self, edit, mode=None, **kwargs):
-        def f(view, s):
-            state = VintageState(view)
-
-            # TODO: mode should be always stored in VintageState.
-            if mode == _MODE_INTERNAL_NORMAL:
-                if (not s.empty() and view.substr(s.b - 1) == '\n'):
-                    return sublime.Region(s.b - 1, s.b - 1)
-                return s
-
-            elif state.mode == MODE_VISUAL:
-                if (not utils.is_region_reversed(view, s) and
-                    (utils.visual_is_end_at_bol(view, s) or
-                     utils.visual_is_on_empty_line_forward(view, s)) and
-                     not s.b == view.size()):
-                        return utils.back_end_one_char(s)
-                # Reversed selection. We are at BOL one LINE down, so go back one CHARACTER.
-                elif (utils.is_region_reversed(view, s) and
-                      not utils.is_same_line(view, s.b - 1, s.b)):
-                            return utils.back_end_one_char(s)
-                else:
-                    return s
-
-            return s
-
-        regions_transformer(self.view, f)
-
-
 class VisualDontOvershootLineLeft(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
         def f(view, s):
@@ -857,4 +827,42 @@ class _vi_big_x_motion(sublime_plugin.TextCommand):
                 return sublime.Region(a, b)
             return s
 
+        regions_transformer(self.view, f)
+
+
+class _vi_l_motion(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, count=None, extend=False):
+        def f(view, s):
+            # XXX: Revise this whole class.
+            if mode in (MODE_NORMAL, _MODE_INTERNAL_NORMAL):
+                x_limit = view.line(s.b).b - s.b
+            elif mode == MODE_VISUAL:
+                if s.a > s.b and view.substr(s.a - 1) == '\n' and count >= (s.size()):
+                    return sublime.Region(s.a - 1, s.a)
+
+                if s.a < s.b and view.substr(s.b - 1) == '\n':
+                    return s
+                x_limit = view.full_line(s.b).b - s.b
+            else:
+                return s
+
+            offset = min(count, x_limit)
+
+            if mode == MODE_NORMAL:
+                target = (s.b + offset)
+                if view.substr(target) == '\n' and not view.line(s.b).empty():
+                    target -= 1
+                return sublime.Region(target, target)
+            elif mode == _MODE_INTERNAL_NORMAL:
+                return sublime.Region(s.a, s.b + offset)
+            elif mode == MODE_VISUAL:
+                a = s.a
+                if s.a > s.b and count >= (s.a - s.b):
+                    a = a - 1
+                    offset += 1
+
+                return sublime.Region(a, s.b + offset)
+
+            return s
+            
         regions_transformer(self.view, f)

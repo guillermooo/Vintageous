@@ -203,21 +203,10 @@ def vi_underscore(vi_cmd_data):
 
 def vi_l(vi_cmd_data):
     vi_cmd_data['__reorient_caret'] = True
-    vi_cmd_data['motion']['command'] = 'move'
-    vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': True}
+    vi_cmd_data['motion']['command'] = '_vi_l_motion'
+    vi_cmd_data['motion']['args'] = {'count': vi_cmd_data['count'], 'mode': vi_cmd_data['mode']}
 
-    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['post_every_motion'] = ['_vi_l_post_every_motion', {'mode': vi_cmd_data['mode']}]
-    # EXCLUSIVE
-    # v2l
-    # Can move onto the new line character.
-    elif vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['post_every_motion'] = ['_vi_l_post_every_motion',]
-    # Cannot move onto the new line character.
-    else:
-        vi_cmd_data['post_every_motion'] = ['dont_overshoot_line_right',]
+    vi_cmd_data['count'] = 1
 
     return vi_cmd_data
 
