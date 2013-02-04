@@ -343,12 +343,14 @@ class _vi_forward_slash(sublime_plugin.TextCommand):
 
         # FIXME: What should we do here? Case-sensitive or case-insensitive search? Configurable?
         match = self.view.find(search_string, current_sel.b)
-        if match is None:
+        # XXX: Temporary fix until .find() gets fixed.
+        if match.b < 0:
             return
 
         for x in range(count - 1):
             match = self.view.find(search_string, match.b)
-            if match is None:
+            # XXX: Temporary fix until .find() gets fixed.
+            if match.b < 0:
                 return
 
         regions_transformer(self.view, f)
