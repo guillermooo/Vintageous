@@ -355,6 +355,7 @@ def vi_yy(vi_cmd_data):
     # FIXME: Cannot copy (or maybe pasting is the problem) one empty line only.
     vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
     vi_cmd_data['motion_required'] = False
+    vi_cmd_data['restore_original_carets'] = True
 
     vi_cmd_data['pre_motion'] = ['_vi_yy_pre_motion',]
     vi_cmd_data['motion']['command'] = 'move'
@@ -369,7 +370,6 @@ def vi_yy(vi_cmd_data):
     # The yanked text will be put in the clipboard if needed. This command shouldn't do any action.
     vi_cmd_data['action']['command'] = 'no_op'
     vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['collapse_to_begin',]
 
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 

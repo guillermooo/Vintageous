@@ -38,6 +38,9 @@ class ViRunCommand(sublime_plugin.TextCommand):
         print("Data in ViRunCommand:", vi_cmd_data)
 
         try:
+            if vi_cmd_data['restore_original_carets']:
+                self.save_caret_pos()
+
             # XXX: Fix this. When should we run the motion exactly?
             if vi_cmd_data['action']:
                 if ((vi_cmd_data['motion']) or
@@ -59,6 +62,10 @@ class ViRunCommand(sublime_plugin.TextCommand):
         finally:
             self.do_post_action(vi_cmd_data)
             self.do_follow_up_mode(vi_cmd_data)
+
+
+    def save_caret_pos(self):
+        self.old_sels = list(self.view.sel())
 
     def do_whole_motion(self, vi_cmd_data):
         # If the action must be repeated, then the count cannot apply here; exit early.
@@ -114,6 +121,12 @@ class ViRunCommand(sublime_plugin.TextCommand):
                 vi_cmd_data['count'] = vi_cmd_data['count'] - 1
 
     def do_follow_up_mode(self, vi_cmd_data):
+        if vi_cmd_data['restore_original_carets'] == True:
+            self.view.sel().clear()
+            for s in self.old_sels:
+                # XXX: If the buffer has changed, this won't work well.
+                self.view.sel().add(s)
+
         if vi_cmd_data['follow_up_mode']:
             self.view.run_command(vi_cmd_data['follow_up_mode'])
 

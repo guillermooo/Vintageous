@@ -262,7 +262,9 @@ class VintageState(object):
             # Search string used last to find text in the buffer (like the / command).
             'last_buffer_search': self.last_buffer_search,
             # Search character used last to find text in the line (like the f command).
-            'last_character_search': self.last_character_search
+            'last_character_search': self.last_character_search,
+            # Whether we want to save the original selections to restore them after the command.
+            'restore_original_carets': False,
         }
 
         # Make sure we run NORMAL mode actions in _MODE_INTERNAL_NORMAL mode.
