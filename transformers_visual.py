@@ -833,35 +833,29 @@ class _vi_big_x_motion(sublime_plugin.TextCommand):
 class _vi_l_motion(sublime_plugin.TextCommand):
     def run(self, edit, mode=None, count=None, extend=False):
         def f(view, s):
-            # XXX: Revise this whole class.
-            if mode in (MODE_NORMAL, _MODE_INTERNAL_NORMAL):
-                x_limit = view.line(s.b).b - s.b
-            elif mode == MODE_VISUAL:
-                if s.a > s.b and view.substr(s.a - 1) == '\n' and count >= (s.size()):
-                    return sublime.Region(s.a - 1, s.a)
-
-                if s.a < s.b and view.substr(s.b - 1) == '\n':
-                    return s
-                x_limit = view.full_line(s.b).b - s.b
-            else:
-                return s
-
-            offset = min(count, x_limit)
-
             if mode == MODE_NORMAL:
-                target = (s.b + offset)
-                if view.substr(target) == '\n' and not view.line(s.b).empty():
-                    target -= 1
-                return sublime.Region(target, target)
-            elif mode == _MODE_INTERNAL_NORMAL:
-                return sublime.Region(s.a, s.b + offset)
-            elif mode == MODE_VISUAL:
-                a = s.a
-                if s.a > s.b and count >= (s.a - s.b):
-                    a = a - 1
-                    offset += 1
+                x_limit = min(view.line(s.b).b - 1, s.b + count)
+                return sublime.Region(x_limit, x_limit)
 
-                return sublime.Region(a, s.b + offset)
+            if mode == _MODE_INTERNAL_NORMAL:
+                x_limit = min(view.line(s.b).b - 1, s.b + count)
+                return sublime.Region(s.a, x_limit)
+
+            if mode == MODE_VISUAL:
+                if s.a < s.b:
+                    x_limit = min(view.full_line(s.b - 1).b, s.b + count)
+                    return sublime.Region(s.a, x_limit)
+
+                if s.a > s.b:
+                    x_limit = min(view.full_line(s.b).b - 1, s.b + count)
+                    if view.substr(s.b) == '\n':
+                        return s
+
+                    if view.line(s.a) == view.line(s.b) and count >= s.size():
+                        x_limit = min(view.line(s.b).b, s.b + count + 1)
+                        return sublime.Region(s.a - 1, x_limit)
+
+                    return sublime.Region(s.a, x_limit)
 
             return s
             

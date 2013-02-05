@@ -202,10 +202,8 @@ def vi_underscore(vi_cmd_data):
 
 
 def vi_l(vi_cmd_data):
-    vi_cmd_data['__reorient_caret'] = True
     vi_cmd_data['motion']['command'] = '_vi_l_motion'
     vi_cmd_data['motion']['args'] = {'count': vi_cmd_data['count'], 'mode': vi_cmd_data['mode']}
-
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
