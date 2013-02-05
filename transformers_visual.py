@@ -866,3 +866,33 @@ class _vi_l_motion(sublime_plugin.TextCommand):
             return s
             
         regions_transformer(self.view, f)
+
+
+class _vi_h_motion(sublime_plugin.TextCommand):
+    def run(self, edit, count=None, extend=False, mode=None):
+        def f(view, s):
+            if mode == _MODE_INTERNAL_NORMAL:
+                x_limit = max(view.line(s.b).a, s.b - count)
+                return sublime.Region(s.a, x_limit)
+
+            elif mode == MODE_VISUAL:
+                if s.a < s.b:
+                    x_limit = max(view.line(s.b - 1).a + 1, s.b - count)
+                    if view.line(s.a) == view.line(s.b - 1) and count >= s.size():
+                        x_limit = max(view.line(s.b - 1).a, s.b - count - 1)
+                        return sublime.Region(s.a + 1, x_limit)
+                    return sublime.Region(s.a, x_limit)
+
+                if s.a > s.b:
+                    x_limit = max(view.line(s.b).a, s.b - count)
+                    return sublime.Region(s.a, x_limit)
+
+            elif mode == MODE_NORMAL:
+                x_limit = max(view.line(s.b).a, s.b - count)
+                return sublime.Region(x_limit, x_limit)
+
+            # XXX: We should never reach this.
+            return s
+
+        
+        regions_transformer(self.view, f)

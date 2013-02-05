@@ -212,15 +212,9 @@ def vi_l(vi_cmd_data):
 
 
 def vi_h(vi_cmd_data):
-    vi_cmd_data['__reorient_caret'] = True
-    vi_cmd_data['motion']['command'] = 'move'
-    vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': False}
-
-    if vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['post_every_motion'] = ['visual_dont_overshoot_line_left',]
-    else:
-        vi_cmd_data['post_every_motion'] = ['dont_overshoot_line_left',]
+    vi_cmd_data['motion']['command'] = '_vi_h_motion'
+    vi_cmd_data['motion']['args'] = {'count': vi_cmd_data['count'], 'mode': vi_cmd_data['mode']}
+    vi_cmd_data['count'] = 1
 
     return vi_cmd_data
 
