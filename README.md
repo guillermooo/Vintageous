@@ -9,9 +9,8 @@ Overview
 
 **Vintageous** is a vi editing package for Sublime Text 3.
 
-Vintageous is a rewrite of [Vintage](http://www.sublimetext.com/docs/2/vintage.html) with the aim to make it more similar to Vim.
-
-The new design is heavily inspired in previous work by [dlo](https://github.com/dlo).
+Vintageous is a rewrite of [Vintage](http://www.sublimetext.com/docs/2/vintage.html) with the aim to make
+it more similar to Vim. The new design is heavily inspired in previous work by [dlo](https://github.com/dlo).
 
 Download
 --------
