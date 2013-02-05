@@ -109,6 +109,7 @@
 
 	{ "keys": ["U"], "command": "set_action", "args": {"action": "vi_g_big_u"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 	{ "keys": ["u"], "command": "set_action", "args": {"action": "vi_g_u"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
+	{ "keys": ["q"], "command": "set_action", "args": {"action": "vi_g_q"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 
 	{ "keys": ["U"], "command": "set_action", "args": {"action": "vi_big_u"}, "context": [{"key": "vi_mode_visual_any"}] },
 	{ "keys": ["u"], "command": "set_action", "args": {"action": "vi_u"}, "context": [{"key": "vi_mode_visual_any"}] },
