@@ -369,7 +369,7 @@ def vi_yy(vi_cmd_data):
     # The yanked text will be put in the clipboard if needed. This command shouldn't do any action.
     vi_cmd_data['action']['command'] = 'no_op'
     vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['_vi_move_caret_to_first_non_white_space_character',]
+    vi_cmd_data['post_action'] = ['collapse_to_begin',]
 
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
