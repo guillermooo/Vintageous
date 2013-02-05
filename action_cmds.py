@@ -107,6 +107,8 @@ class ViPaste(sublime_plugin.TextCommand):
         state = VintageState(self.view)
         if state.mode not in (MODE_VISUAL, MODE_VISUAL_LINE):
             # TODO: generate string first, then insert?
+            # Make sure we can paste at EOF.
+            at = at if at <= self.view.size() else self.view.size()
             for x in range(count):
                 self.view.insert(edit, at, text)
         else:
