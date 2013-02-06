@@ -1,6 +1,8 @@
 import sublime
 import os
 
+import itertools
+
 
 REG_UNNAMED = '"'
 REG_SMALL_DELETE = '-'
@@ -105,11 +107,12 @@ class Registers(object):
         assert len(name) == 1, "Register names must be 1 char long."
         assert ord(name) in range(ord('A'), ord('Z') + 1), "Can only append to A-Z registers."
 
-        existing = _REGISTER_DATA.get(name.lower(), '')
-        new_value = existing + value
-        _REGISTER_DATA[name.lower()] = new_value
-        self._set_default_register(new_value)
-        self._maybe_set_sys_clipboard(name, new_value)
+        existing_values = _REGISTER_DATA.get(name.lower(), '')
+        new_values = itertools.zip_longest(existing_values, value, fillvalue='')
+        new_values = [(prefix + suffix) for (prefix, suffix) in new_values]
+        _REGISTER_DATA[name.lower()] = new_values
+        self._set_default_register(new_values)
+        self._maybe_set_sys_clipboard(name, new_values)
 
     def get(self, name=REG_UNNAMED):
         # We accept integers or strings a register names.
