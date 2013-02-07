@@ -834,11 +834,12 @@ class _vi_l_motion(sublime_plugin.TextCommand):
     def run(self, edit, mode=None, count=None, extend=False):
         def f(view, s):
             if mode == MODE_NORMAL:
-                x_limit = min(view.line(s.b).b - 1, s.b + count)
+                x_limit = min(view.line(s.b).b, s.b + count, view.size())
                 return sublime.Region(x_limit, x_limit)
 
             if mode == _MODE_INTERNAL_NORMAL:
-                x_limit = min(view.line(s.b).b - 1, s.b + count)
+                x_limit = min(view.line(s.b).b, s.b + count)
+                x_limit = max(0, x_limit)
                 return sublime.Region(s.a, x_limit)
 
             if mode == MODE_VISUAL:
