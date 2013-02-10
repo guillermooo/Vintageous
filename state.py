@@ -291,7 +291,6 @@ class VintageState(object):
             if self.view.sel():
                 xpos = self.view.sel()[0].b - self.view.line(self.view.sel()[0].b).a
             self.xpos = xpos
-            print("XPOS IS NONE...")
             vi_cmd_data['xpos'] = xpos
 
         # Make sure we run NORMAL mode actions in _MODE_INTERNAL_NORMAL mode.

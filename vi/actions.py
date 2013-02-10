@@ -49,10 +49,10 @@ def vi_d(vi_cmd_data):
     vi_cmd_data['motion_required'] = True
     forward = vi_cmd_data['motion'].get('args') and vi_cmd_data['motion']['args'].get('forward')
     # FIXME: Should not delete new line characters.
-    vi_cmd_data['action']['command'] = 'xright_delete' if forward else 'xleft_delete'
+    vi_cmd_data['action']['command'] = 'right_delete' if forward else 'left_delete'
     vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['xdont_stay_on_eol_backward',]
-    vi_cmd_data['follow_up_mode'] = 'xvi_enter_normal_mode'
+    vi_cmd_data['post_action'] = ['dont_stay_on_eol_backward',]
+    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     # If we're deleting by words, make sure we don't delete the entire line
     # when deleting the last character from the last word on the line.
