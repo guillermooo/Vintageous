@@ -511,6 +511,9 @@ def vi_lambda(vi_cmd_data):
     vi_cmd_data['post_action'] = ['collapse_to_begin',]
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
+    if vi_cmd_data['mode'] in (MODE_VISUAL, MODE_VISUAL_LINE):
+        vi_cmd_data['_repeat_action'] = True
+
     return vi_cmd_data
 
 
@@ -520,6 +523,9 @@ def vi_antilambda(vi_cmd_data):
     vi_cmd_data['action']['args'] = {}
     vi_cmd_data['post_action'] = ['collapse_to_begin',]
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+    
+    if vi_cmd_data['mode'] in (MODE_VISUAL, MODE_VISUAL_LINE):
+        vi_cmd_data['_repeat_action'] = True
 
     return vi_cmd_data
 
