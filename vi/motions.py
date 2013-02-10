@@ -255,24 +255,11 @@ def vi_j(vi_cmd_data):
     if vi_cmd_data['count'] > 5:
         vi_cmd_data['is_jump'] = True
 
-    vi_cmd_data['__reorient_caret'] = True
-    vi_cmd_data['motion']['command'] = 'move'
-    vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': True}
-
-    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['pre_motion'] = ['_vi_j_pre_motion',]
-        vi_cmd_data['post_motion'] = [['_vi_j_post_motion',],]
-    elif vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['post_motion'] = [['visual_clip_end_to_eol',],]
-        # This takes care of ST extending the end by one character.
-        vi_cmd_data['reposition_caret'] = ['visual_shrink_end_one_char',]
-    elif vi_cmd_data['mode'] == MODE_VISUAL_LINE:
-        vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['post_motion'] = [['visual_extend_end_to_hard_end', {'mode': MODE_VISUAL_LINE}],]
-    else:
-        vi_cmd_data['post_motion'] = [['clip_end_to_line',],]
+    vi_cmd_data['must_update_xpos'] = False
+    
+    vi_cmd_data['motion']['command'] = '_vi_j_motion'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'xpos': vi_cmd_data['xpos']}
+    vi_cmd_data['count'] = 1
 
     return vi_cmd_data
 
@@ -281,26 +268,11 @@ def vi_k(vi_cmd_data):
     if vi_cmd_data['count'] > 5:
         vi_cmd_data['is_jump'] = True
 
-    vi_cmd_data['__reorient_caret'] = True
-    vi_cmd_data['motion']['command'] = 'move'
-    vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': False}
+    vi_cmd_data['must_update_xpos'] = False
 
-    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['pre_motion'] = ['_vi_k_pre_motion',]
-    elif vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-        # This takes care of ST extending the end by one character.
-        vi_cmd_data['reposition_caret'] = ['visual_shrink_end_one_char',]
-        vi_cmd_data['post_motion'] = [['visual_clip_end_to_eol',],]
-    elif vi_cmd_data['mode'] == MODE_VISUAL_LINE:
-        vi_cmd_data['motion']['args']['extend'] = True
-        if vi_cmd_data['motion']['args'].get('forward'):
-            pass
-        else:
-            vi_cmd_data['post_motion'] = [['visual_extend_end_to_hard_end', {'mode': MODE_VISUAL_LINE}],]
-    else:
-        vi_cmd_data['post_motion'] = [['clip_end_to_line',],]
+    vi_cmd_data['motion']['command'] = '_vi_k_motion'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'xpos': vi_cmd_data['xpos']}
+    vi_cmd_data['count'] = 1
 
     return vi_cmd_data
 

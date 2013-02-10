@@ -208,6 +208,15 @@ class VintageState(object):
         self.settings.vi['last_character_search'] = value
         self.expecting_user_input = False
 
+    @property
+    def xpos(self):
+        xpos = self.settings.vi['xpos']
+        return xpos if isinstance(xpos, int) else None
+
+    @xpos.setter
+    def xpos(self, value):
+        self.settings.vi['xpos'] = value
+
     def parse_motion(self):
         # TODO: Encapsulate this in a class?
         #
@@ -265,7 +274,25 @@ class VintageState(object):
             'last_character_search': self.last_character_search,
             # Whether we want to save the original selections to restore them after the command.
             'restore_original_carets': False,
+            # We keep track of the caret's x position so vertical motions like j, k can restore it
+            # as needed. This item must not ever be reset. All horizontal motions must update it.
+            # Vertical motions must adjust the selections .b end to factor in this data.
+            'xpos': self.xpos,
+            # Indicates whether xpos needs to be updated. Only vertical motions j and k need not
+            # update xpos.
+            'must_update_xpos': True,        
+            # Whether we should make sure to show the first selection.
+            'scroll_into_view': True,
         }
+
+        # Happens at initialization.
+        if vi_cmd_data['xpos'] is None:
+            xpos = 0
+            if self.view.sel():
+                xpos = self.view.sel()[0].b - self.view.line(self.view.sel()[0].b).a
+            self.xpos = xpos
+            print("XPOS IS NONE...")
+            vi_cmd_data['xpos'] = xpos
 
         # Make sure we run NORMAL mode actions in _MODE_INTERNAL_NORMAL mode.
         if self.mode in (MODE_VISUAL, MODE_VISUAL_LINE) or (self.motion and self.action):

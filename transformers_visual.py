@@ -856,7 +856,7 @@ class _vi_l_motion(sublime_plugin.TextCommand):
                         return s
 
                     if view.line(s.a) == view.line(s.b) and count >= s.size():
-                        x_limit = min(view.line(s.b).b, s.b + count + 1)
+                        x_limit = min(view.full_line(s.b).b, s.b + count + 1)
                         return sublime.Region(s.a - 1, x_limit)
 
                     return sublime.Region(s.a, x_limit)
@@ -891,6 +891,178 @@ class _vi_h_motion(sublime_plugin.TextCommand):
 
             # XXX: We should never reach this.
             return s
-
         
+        regions_transformer(self.view, f)
+
+
+class _vi_j_motion(sublime_plugin.TextCommand):
+    def run(self, edit, count=None, extend=False, mode=None, xpos=0):
+        def f(view, s):
+            if mode == MODE_NORMAL:
+                current_row = view.rowcol(s.b)[0]
+                target_row = min(current_row + count, view.rowcol(view.size())[0])
+                target_pt = view.text_point(target_row, 0)
+
+                if view.line(target_pt).empty():
+                    return sublime.Region(target_pt, target_pt)
+
+                target_pt = min(target_pt + xpos, view.line(target_pt).b - 1)
+                return sublime.Region(target_pt, target_pt)
+
+            if mode == _MODE_INTERNAL_NORMAL:
+                current_row = view.rowcol(s.b)[0]
+                target_row = min(current_row + count, view.rowcol(view.size())[0])
+                target_pt = view.text_point(target_row, 0)
+                return sublime.Region(view.line(s.a).a, view.full_line(target_pt).b)
+
+            if mode == MODE_VISUAL:
+                exact_position = s.b - 1 if (s.a < s.b) else s.b
+                current_row = view.rowcol(exact_position)[0]
+                target_row = min(current_row + count, view.rowcol(view.size())[0])
+                target_pt = view.text_point(target_row, 0)
+                is_long_enough = view.full_line(target_pt).size() > xpos
+
+                # We're crossing over to the other side of .a; we need to modify .a.
+                crosses_a = False
+                if (s.a > s.b) and (view.rowcol(s.a)[0] < target_row):
+                    crosses_a = True
+
+                if view.line(s.begin()) == view.line(s.end() - 1):
+                    if s.a > s.b:
+                        if is_long_enough:
+                            return sublime.Region(s.a - 1, view.text_point(target_row, xpos) + 1)
+                        else:
+                            return sublime.Region(s.a - 1, view.full_line(target_pt).b)
+
+                # Returning to the same line...
+                if not crosses_a and abs(view.rowcol(s.begin())[0] - view.rowcol(s.end())[0]) == 1:
+                    if s.a > s.b:
+                        if is_long_enough:
+                            if view.rowcol(s.a - 1)[1] <= view.rowcol(s.b)[1]:
+                                return sublime.Region(s.a - 1, view.text_point(target_row, xpos) + 1)
+
+                if is_long_enough:
+                    if s.a < s.b:
+                        return sublime.Region(s.a, view.text_point(target_row, xpos) + 1)
+                    elif s.a > s.b:
+                        start = s.a if not crosses_a else s.a - 1
+                        end = view.text_point(target_row, xpos)
+                        if crosses_a and xpos == 0:
+                            end += 1
+                        return sublime.Region(start, end)
+                else:
+                    if s.a < s.b:
+                        return sublime.Region(s.a, view.full_line(target_pt).b)
+                    elif s.a > s.b:
+                        end = view.full_line(target_pt).b
+                        end = end - 1 if not crosses_a else end
+                        return sublime.Region(s.a, end)
+
+            if mode == MODE_VISUAL_LINE:
+                if s.a < s.b:
+                    current_row = view.rowcol(s.b - 1)[0]
+                    target_row = min(current_row + count, view.rowcol(view.size())[0])
+
+                    target_pt = view.text_point(target_row, 0)
+                    return sublime.Region(s.a, view.full_line(target_pt).b)
+
+                elif s.a > s.b:
+                    current_row = view.rowcol(s.b)[0]
+                    target_row = min(current_row + count, view.rowcol(view.size())[0])
+                    target_pt = view.text_point(target_row, 0)
+
+                    if target_row > view.rowcol(s.a - 1)[0]:
+                        return sublime.Region(view.line(s.a - 1).a, view.full_line(target_pt).b)
+
+                    return sublime.Region(s.a, view.full_line(target_pt).a)
+
+            return s
+
+        regions_transformer(self.view, f)
+
+
+class _vi_k_motion(sublime_plugin.TextCommand):
+    def run(self, edit, count=None, extend=False, mode=None, xpos=0):
+        def f(view, s):
+            if mode == MODE_NORMAL:
+                current_row = view.rowcol(s.b)[0]
+                target_row = min(current_row - count, view.rowcol(view.size())[0])
+                target_pt = view.text_point(target_row, 0)
+
+                if view.line(target_pt).empty():
+                    return sublime.Region(target_pt, target_pt)
+                    
+                target_pt = min(target_pt + xpos, view.line(target_pt).b - 1)
+                return sublime.Region(target_pt, target_pt)
+
+            if mode == _MODE_INTERNAL_NORMAL:
+                current_row = view.rowcol(s.b)[0]
+                target_row = min(current_row - count, view.rowcol(view.size())[0])
+                target_pt = view.text_point(target_row, 0)
+                return sublime.Region(view.full_line(s.a).b, view.line(target_pt).a)
+
+            if mode == MODE_VISUAL:
+                exact_position = s.b - 1 if (s.a < s.b) else s.b
+                current_row = view.rowcol(exact_position)[0]
+                target_row = max(current_row - count, 0)
+                target_pt = view.text_point(target_row, 0)
+                is_long_enough = view.full_line(target_pt).size() > xpos
+
+                # We're crossing over to the other side of .a; we need to modify .a.
+                crosses_a = False
+                if (s.a < s.b) and (view.rowcol(s.a)[0] > target_row):
+                    crosses_a = True
+
+                if view.line(s.begin()) == view.line(s.end() - 1):
+                    if s.a < s.b:
+                        if is_long_enough:
+                            return sublime.Region(s.a + 1, view.text_point(target_row, xpos))
+                        else:
+                            return sublime.Region(s.a + 1, view.line(target_pt).b)
+
+                # Returning to the same line...
+                if not crosses_a and abs(view.rowcol(s.begin())[0] - view.rowcol(s.end() - 1)[0]) == 1:
+                    if s.a < s.b:
+                        if is_long_enough:
+                            if view.rowcol(s.a)[1] <= view.rowcol(s.b - 1)[1]:
+                                return sublime.Region(s.a, view.text_point(target_row, xpos) + 1)
+                            else:
+                                r = sublime.Region(s.a + 1, view.text_point(target_row, xpos))
+                                return r
+
+                if is_long_enough:
+                    if s.a < s.b:
+                        offset = 0
+                        if xpos == 0 and not crosses_a:
+                            offset = 1
+                        start = s.a if not crosses_a else s.a + 1
+                        return sublime.Region(start, view.text_point(target_row, xpos + offset))
+                    elif s.a > s.b:
+                        return sublime.Region(s.a, view.text_point(target_row, xpos))
+                else:
+                    if s.a < s.b:
+                        end = view.full_line(target_pt).b
+                        end = end if not crosses_a else end - 1
+                        return sublime.Region(s.a, end)
+                    elif s.a > s.b:
+                        return sublime.Region(s.a, view.line(target_pt).b)
+
+            if mode == MODE_VISUAL_LINE:
+                if s.a < s.b:
+                    current_row = view.rowcol(s.b - 1)[0]
+                    target_row = min(current_row - count, view.rowcol(view.size())[0])
+                    target_pt = view.text_point(target_row, 0)
+
+                    if target_row < view.rowcol(s.begin())[0]:
+                        return sublime.Region(view.full_line(s.a).b, view.full_line(target_pt).a)
+
+                    return sublime.Region(s.a, view.full_line(target_pt).b)
+
+                elif s.a > s.b:
+                    current_row = view.rowcol(s.b)[0]
+                    target_row = max(current_row - count, 0)
+                    target_pt = view.text_point(target_row, 0)
+
+                    return sublime.Region(s.a, view.full_line(target_pt).a)
+                    
         regions_transformer(self.view, f)
