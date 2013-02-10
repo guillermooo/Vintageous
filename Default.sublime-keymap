@@ -184,11 +184,12 @@
 
 	{ "keys": ["r"], "command": "vi_r", "context": [{"key": "vi_mode_normal"}, {"key": "vi_mode_normal"}] },
 	
-	// Collects user input for commands such as t, f, T, F.
-	{ "keys": ["<character>"], "command": "collect_user_input", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_user_input"}] },
-
 	{ "keys": [">"], "command": "set_action", "args": {"action": "vi_lambda"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["<"], "command": "set_action", "args": {"action": "vi_antilambda"}, "context": [{"key": "setting.command_mode"}] },
+
+	// Collects user input for commands such as t, f, T, F.
+	// XXX: Seems to need to come after every other key binding so it will catch every character. Investigate this.
+	{ "keys": ["<character>"], "command": "collect_user_input", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_user_input"}] },
 
 	{ "keys": ["'", "'"], "command": "set_motion", "args": {"motion": "vi_double_single_quote"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_state_next_character_is_user_input", "operand": false}] }
 ]
