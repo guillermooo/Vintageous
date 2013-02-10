@@ -71,16 +71,12 @@ class ViRunCommand(sublime_plugin.TextCommand):
                 if state.mode == MODE_VISUAL:
                     if first_sel.a < first_sel.b:
                         xpos = self.view.rowcol(first_sel.b - 1)[1]
-                        print("XPOS A", xpos)
                     elif first_sel.a > first_sel.b:
                         xpos = self.view.rowcol(first_sel.b)[1]
-                        print("XPOS B", xpos)
 
                 elif state.mode == MODE_NORMAL:
                     xpos = self.view.rowcol(first_sel.b)[1]
-                    print("XPOS C", xpos)
 
-                print("XPOS:", xpos)
                 state.xpos = xpos
 
             if vi_cmd_data['scroll_into_view']:
