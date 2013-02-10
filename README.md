@@ -12,7 +12,7 @@ Overview
 Vintageous is a rewrite of [Vintage](http://www.sublimetext.com/docs/2/vintage.html) with the aim to make
 it more similar to Vim. The new design is heavily inspired in previous work by [dlo](https://github.com/dlo).
 
-For a complementary **command-line mode**, see [Vintageous](https://github.com/guillermooo/VintageousEx).
+For a complementary **command-line mode**, see [VintageousEx](https://github.com/guillermooo/VintageousEx).
 
 Download
 --------
