@@ -407,9 +407,6 @@ class VintageStateTracker(sublime_plugin.EventListener):
     def on_load(self, view):
         _init_vintageous(view)
 
-    # def on_activated(self, view):
-        # _init_vintageous(view)
-
     def on_query_context(self, view, key, operator, operand, match_all):
         vintage_state = VintageState(view)
 
