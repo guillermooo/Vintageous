@@ -1,6 +1,8 @@
 import sublime
 import sublime_plugin
 
+import threading
+
 from Vintageous.vi import motions
 from Vintageous.vi import actions
 from Vintageous.vi.constants import (MODE_INSERT, MODE_NORMAL, MODE_VISUAL,
@@ -132,6 +134,10 @@ class VintageState(object):
     def enter_normal_mode(self):
         self.settings.view['command_mode'] = True
         self.settings.view['inverse_caret_state'] = True
+        # Make sure xpos is up to date when we return to normal mode. Insert mode does not affect
+        # xpos.
+        # XXX: Why is insert mode resetting xpos? xpos should never be reset?
+        self.xpos = None if not self.view.sel() else self.view.rowcol(self.view.sel()[0].b)[1]
         self.mode = MODE_NORMAL
 
     def enter_visual_line_mode(self):
@@ -300,6 +306,7 @@ class VintageState(object):
         if vi_cmd_data['xpos'] is None:
             xpos = 0
             if self.view.sel():
+                # XXX: Improvee this with .rowcol()
                 xpos = self.view.sel()[0].b - self.view.line(self.view.sel()[0].b).a
             self.xpos = xpos
             vi_cmd_data['xpos'] = xpos
@@ -400,8 +407,8 @@ class VintageStateTracker(sublime_plugin.EventListener):
     def on_load(self, view):
         _init_vintageous(view)
 
-    def on_activated(self, view):
-        _init_vintageous(view)
+    # def on_activated(self, view):
+        # _init_vintageous(view)
 
     def on_query_context(self, view, key, operator, operand, match_all):
         vintage_state = VintageState(view)
@@ -538,6 +545,27 @@ class VintageStateTracker(sublime_plugin.EventListener):
                 if operand is False:
                     return (is_console or is_widget)
         return False
+
+
+class ViFocusRestorerEvent(sublime_plugin.EventListener):
+    def __init__(self):
+        self.timer = None
+
+    def action(self):
+        self.timer = None
+
+    def on_activated(self, view):
+        if self.timer:
+            # Switching to a view; enter normal mode.
+            self.timer.cancel()
+            _init_vintageous(view)
+        else:
+            # Switching back from another application. Ignore.
+            pass
+
+    def on_deactivated(self, view):
+        self.timer = threading.Timer(0.25, self.action)
+        self.timer.start()
 
 
 class IrreversibleTextCommand(sublime_plugin.TextCommand):
