@@ -556,7 +556,7 @@ class ViFocusRestorerEvent(sublime_plugin.EventListener):
 
     def on_activated(self, view):
         if self.timer:
-            # Switching to a view; enter normal mode.
+            # Switching to a different view; enter normal mode.
             self.timer.cancel()
             _init_vintageous(view)
         else:
