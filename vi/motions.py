@@ -442,7 +442,7 @@ def vi_n(vi_cmd_data):
     return vi_cmd_data
 
 
-def vi_comma(vi_cmd_data):
+def vi_semicolon(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_find_in_line_inclusive'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'character': vi_cmd_data['last_character_search']}
     vi_cmd_data['count'] = 1
@@ -450,7 +450,7 @@ def vi_comma(vi_cmd_data):
     return vi_cmd_data
 
 
-def vi_semicolon(vi_cmd_data):
+def vi_comma(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_reverse_find_in_line_inclusive'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'character': vi_cmd_data['last_character_search']}
     vi_cmd_data['count'] = 1
