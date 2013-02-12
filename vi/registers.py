@@ -10,6 +10,7 @@ REG_BLACK_HOLE = '_'
 REG_LAST_INSERTED_TEXT = '.'
 REG_FILE_NAME = '%'
 REG_ALT_FILE_NAME = '#'
+REG_EXPRESSION = '='
 REG_SYS_CLIPBOARD_1 = '*'
 REG_SYS_CLIPBOARD_2 = '+'
 REG_SYS_CLIPBOARD_ALL = (REG_SYS_CLIPBOARD_1, REG_SYS_CLIPBOARD_2)
@@ -92,7 +93,8 @@ class Registers(object):
         # Special registers and invalid registers won't be set.
         if (not (name.isalpha() or name.isdigit() or
                  name.isupper() or name == REG_UNNAMED or
-                 name == REG_SYS_CLIPBOARD_1)):
+                 name == REG_SYS_CLIPBOARD_1 or
+                 name == REG_EXPRESSION)):
                     # Vim fails silently.
                     # raise Exception("Can only set a-z and 0-9 registers.")
                     return None
@@ -135,6 +137,13 @@ class Registers(object):
         # clipboard.
         elif name == REG_UNNAMED and self.settings.view['vintageous_use_sys_clipboard'] == True:
             return sublime.get_clipboard()
+
+        # If the expression register holds a value and we're requesting the unnamed register,
+        # return the expression register and clear it aftwerwards.
+        elif name == REG_UNNAMED and _REGISTER_DATA.get(REG_EXPRESSION, ''):
+            value = _REGISTER_DATA[REG_EXPRESSION]
+            _REGISTER_DATA[REG_EXPRESSION] = ''
+            return value
 
         # We requested an [a-z0-9"] register.
         try:

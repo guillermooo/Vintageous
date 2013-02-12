@@ -5,6 +5,7 @@ from Vintageous.state import VintageState
 from Vintageous.state import IrreversibleTextCommand
 from Vintageous.vi import utils
 from Vintageous.vi.constants import MODE_NORMAL, _MODE_INTERNAL_NORMAL, MODE_VISUAL, MODE_VISUAL_LINE
+from Vintageous.vi.registers import REG_EXPRESSION
 from Vintageous.vi.constants import regions_transformer
 
 
@@ -299,8 +300,31 @@ class SetRegister(sublime_plugin.TextCommand):
         if character is None:
             state.expecting_register = True
         else:
-            state.register = character
-            state.expecting_register = False
+            if character not in (REG_EXPRESSION,):
+                state.register = character
+                state.expecting_register = False
+            else:
+                self.view.run_command('vi_expression_register')
+
+
+class ViExpressionRegister(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.view.window().show_input_panel('', '', self.on_done, None, self.on_cancel)
+
+    def on_done(self, s):
+        state = VintageState(self.view)
+        try:
+            # TODO: We need to sort out the values received and sent to registers. When pasting,
+            # we assume a list... This should be encapsulated in Registers.
+            state.registers[REG_EXPRESSION] = [str(eval(s, None, None)),]
+        except:
+            sublime.status_message("Vintageous: Invalid expression.")
+            self.on_cancel()
+
+    def on_cancel(self):
+        state = VintageState(self.view)
+        state.reset()
+
 
 class ViR(sublime_plugin.TextCommand):
     def run(self, edit, character=None):
