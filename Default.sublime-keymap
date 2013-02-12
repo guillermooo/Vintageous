@@ -114,11 +114,6 @@
 	{ "keys": ["U"], "command": "set_action", "args": {"action": "vi_big_u"}, "context": [{"key": "vi_mode_visual_any"}] },
 	{ "keys": ["u"], "command": "set_action", "args": {"action": "vi_u"}, "context": [{"key": "vi_mode_visual_any"}] },
 
-	// This is a fake action that allows zz to be issued.
-	{ "keys": ["z"], "command": "set_action", "args": {"action": "vi_z_action"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["enter"], "command": "set_action", "args": {"action": "vi_z_enter"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
-	{ "keys": ["-"], "command": "set_action", "args": {"action": "vi_z_minus"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
-	{ "keys": ["z"], "command": "set_action", "args": {"action": "vi_zz"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 
 	// These come after the ones above so we don't need extra context checks.
 	{ "keys": ["o"], "command": "set_action", "args": {"action": "vi_visual_o"}, "context": [{"key": "vi_mode_visual_any"}] },
@@ -155,8 +150,8 @@
 	{ "keys": [";"], "command": "set_motion", "args":{"motion": "vi_semicolon"}, "context": [{"key": "vi_mode_visual"}] },
 
 	// Twofold process: First set the motion, then collect user input and run global state.
-	{ "keys": ["t"], "command": "vi_t", "context": [{"key": "vi_mode_normal"}] },
-	{ "keys": ["t"], "command": "vi_t", "context": [{"key": "vi_mode_visual"}] },
+	{ "keys": ["t"], "command": "vi_t", "context": [{"key": "vi_mode_normal"},] },
+	{ "keys": ["t"], "command": "vi_t", "context": [{"key": "vi_mode_visual"},] },
 
 	// Twofold process: First set the motion, then collect user input and run global state.
 	{ "keys": ["T"], "command": "vi_big_t", "context": [{"key": "vi_mode_normal"}] },
@@ -186,6 +181,15 @@
 	
 	{ "keys": [">"], "command": "set_action", "args": {"action": "vi_lambda"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["<"], "command": "set_action", "args": {"action": "vi_antilambda"}, "context": [{"key": "setting.command_mode"}] },
+
+	// This is a fake action that allows zz to be issued.
+	// Ordering matters: To avoid conflicts with t and possibly other key bindings with less restrictive contexts, place these after them.
+	{ "keys": ["z"], "command": "set_action", "args": {"action": "vi_z_action"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["enter"], "command": "set_action", "args": {"action": "vi_z_enter"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
+	{ "keys": ["-"], "command": "set_action", "args": {"action": "vi_z_minus"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
+	{ "keys": ["z"], "command": "set_action", "args": {"action": "vi_zz"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
+	{ "keys": ["b"], "command": "set_action", "args": {"action": "vi_z_minus"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
+	{ "keys": ["t"], "command": "set_action", "args": {"action": "vi_z_enter"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 
 	// Collects user input for commands such as t, f, T, F.
 	// XXX: Seems to need to come after every other key binding so it will catch every character. Investigate this.
