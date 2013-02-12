@@ -99,8 +99,10 @@ class Registers(object):
                     # raise Exception("Can only set a-z and 0-9 registers.")
                     return None
         _REGISTER_DATA[name] = value
-        self._set_default_register(value)
-        self._maybe_set_sys_clipboard(name, value)
+
+        if not name in (REG_EXPRESSION,):
+            self._set_default_register(value)
+            self._maybe_set_sys_clipboard(name, value)
 
     def append_to(self, name, value):
         """
@@ -137,6 +139,13 @@ class Registers(object):
         # clipboard.
         elif name == REG_UNNAMED and self.settings.view['vintageous_use_sys_clipboard'] == True:
             return sublime.get_clipboard()
+
+        # If the expression register holds a value and we're requesting the unnamed register,
+        # return the expression register and clear it aftwerwards.
+        elif name == REG_UNNAMED and _REGISTER_DATA.get(REG_EXPRESSION, ''):
+            value = _REGISTER_DATA[REG_EXPRESSION]
+            _REGISTER_DATA[REG_EXPRESSION] = ''
+            return value
 
         # If the expression register holds a value and we're requesting the unnamed register,
         # return the expression register and clear it aftwerwards.

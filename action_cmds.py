@@ -74,6 +74,12 @@ class ViPaste(sublime_plugin.TextCommand):
         else:
             # TODO: There should be a simpler way of getting the unnamed register's content.
             fragments = state.registers['"']
+            if not fragments:
+                print("Vintageous: Nothing in register \".")
+                # XXX: This won't ever be printed because it will be overwritten by other status
+                # messages printed right after this one.
+                sublime.status_message("Vintageous: Nothing in register \".")
+                return
 
         sels = list(self.view.sel())
 
