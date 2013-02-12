@@ -36,6 +36,9 @@ def new_vi_cmd_data(state):
         'action': {},
         'post_action': None,
         'count': state.count,
+        # Helps to disambiguate between invocations that behave differently depending on whether
+        # the user provided a count or not (for example, %).
+        '_user_provided_count': state.user_provided_count,
         'pre_every_motion': None,
         'post_every_motion': None,
         # This is the only hook that takes a list of commands to execute.
@@ -231,10 +234,22 @@ class VintageState(object):
 
     @property
     def count(self):
+        """Computes and returns the final count, defaulting to 1 if the user
+           didn't provide one.
+        """
         motion_count = self.motion_digits and int(''.join(self.motion_digits)) or 1
         action_count = self.action_digits and int(''.join(self.action_digits)) or 1
 
         return (motion_count * action_count)
+
+    @property
+    def user_provided_count(self):
+        """Returns the actual count provided by the user, which may be `None`.
+        """
+        if not (self.motion_digits or self.action_digits):
+            return None
+
+        return self.count
 
     @property
     def register(self):

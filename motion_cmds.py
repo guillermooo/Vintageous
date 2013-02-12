@@ -202,6 +202,9 @@ class ViGoToLine(sublime_plugin.TextCommand):
 class ViPercent(sublime_plugin.TextCommand):
     def run(self, edit, extend=False, percent=None):
         if percent == None:
+            # TODO: 'move_to brackets' isn't as useful as the Vim command. Reimplement our own.
+            # TODO: Implement visual counterparts.
+            self.view.run_command('move_to', {'to': 'brackets'})
             return
 
         row = self.view.rowcol(self.view.size())[0] * (percent / 100)
