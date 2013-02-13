@@ -43,9 +43,12 @@ class ViRunCommand(sublime_plugin.TextCommand):
 
             # XXX: Fix this. When should we run the motion exactly?
             if vi_cmd_data['action']:
+                # If no motion is present, we know we just have to run the action (like ctrl+w, v).
                 if ((vi_cmd_data['motion']) or
                     (vi_cmd_data['motion_required'] and
                      not view.has_non_empty_selection_region())):
+                        # XXX: This is line doesn't make sense for _MODE_INTERNAL_NORMAL. There should
+                        # be no pre-existing selection.
                         self.enter_visual_mode(vi_cmd_data)
                         self.do_whole_motion(vi_cmd_data)
 

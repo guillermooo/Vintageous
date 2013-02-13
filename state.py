@@ -355,6 +355,8 @@ class VintageState(object):
         # the user can run actions on selections created outside of Vintageous.
         # This seems to work well.
         if (self.view.has_non_empty_selection_region() and
+            # XXX: This check is pretty useless, because we abort early in .run() anyway.
+            # Logically, it makes sense, however.
             not vi_cmd_data['is_digraph_start']):
                 vi_cmd_data['motion_required'] = False
 
@@ -369,7 +371,14 @@ class VintageState(object):
             vi_cmd_data = self.parse_motion()
             vi_cmd_data = self.parse_action(vi_cmd_data)
 
-            self.view.run_command('vi_run', vi_cmd_data)
+            if not vi_cmd_data['is_digraph_start']:
+                self.view.run_command('vi_run', vi_cmd_data)
+            else:
+                # If we have a digraph start, the global data is in an invalid state because we
+                # are still missing the complete digraph. Abort and clean up.
+                if self.mode != MODE_NORMAL:
+                    self.enter_normal_mode()
+
             self.reset()
 
         # Motion only, like in "3j".
@@ -379,8 +388,13 @@ class VintageState(object):
 
         # Action only, like in "d" or "esc". Some actions can be executed without a motion.
         elif self.action:
+            
             vi_cmd_data = self.parse_motion()
             vi_cmd_data = self.parse_action(vi_cmd_data)
+            
+            if vi_cmd_data['is_digraph_start']:
+                # We know we are not ready.
+                return
 
             # In cases like gg, we might receive the motion here, so check for that.
             if self.motion and not self.action:
