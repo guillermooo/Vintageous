@@ -436,6 +436,15 @@ def vi_z_enter(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = '_vi_z_enter'
     vi_cmd_data['action']['args'] = {}
+    vi_cmd_data['post_action'] = ['_vi_move_caret_to_first_non_white_space_character',]
+
+    return vi_cmd_data
+
+
+def vi_z_t(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['action']['command'] = '_vi_z_enter'
+    vi_cmd_data['action']['args'] = {}
 
     return vi_cmd_data
 
@@ -449,6 +458,15 @@ def vi_zz(vi_cmd_data):
 
 
 def vi_z_minus(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['action']['command'] = '_vi_z_minus'
+    vi_cmd_data['action']['args'] = {}
+    vi_cmd_data['post_action'] = ['_vi_move_caret_to_first_non_white_space_character',]
+
+    return vi_cmd_data
+
+def vi_z_b(vi_cmd_data):
+    # Identical to vi_z_minus except the caret should remain untouched.
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = '_vi_z_minus'
     vi_cmd_data['action']['args'] = {}
