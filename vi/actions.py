@@ -597,3 +597,28 @@ def vi_u(vi_cmd_data):
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
+
+
+def vi_ctrl_w_action(vi_cmd_data):
+    """This doesn't do anything by itself, but tells global state to wait for a second action that
+       completes this one.
+    """
+    vi_cmd_data['motion_required'] = True
+    # Let global state know we still need a second action to complete this one.
+    vi_cmd_data['is_digraph_start'] = True
+    vi_cmd_data['action']['command'] = 'no_op'
+    vi_cmd_data['action']['args'] = {}
+
+    return vi_cmd_data
+
+
+def vi_ctrl_w_v(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+
+    vi_cmd_data['motion']['command'] = 'no_op'
+    vi_cmd_data['motion']['args'] = {}
+
+    vi_cmd_data['action']['command'] = '_vi_ctrl_w_v_action'
+    vi_cmd_data['action']['args'] = {}
+
+    return vi_cmd_data

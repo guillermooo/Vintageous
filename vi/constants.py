@@ -32,6 +32,8 @@ digraphs = {
     ('vi_z_action', 'vi_z_b'): ('vi_z_b', DIGRAPH_ACTION),
     ('vi_z_action', 'vi_zz'): ('vi_zz', DIGRAPH_ACTION),
 
+    ('vi_ctrl_w_action', 'vi_ctrl_w_v'): ('vi_ctrl_w_v', DIGRAPH_ACTION),
+
     ('vi_g_action', 'vi_gg'): ('vi_gg', DIGRAPH_MOTION),
     # XXX: I don't think the following is needed.
     ('vi_f_first_step', 'vi_set_user_input'): ('vi_f', DIGRAPH_MOTION),
@@ -39,7 +41,7 @@ digraphs = {
 
 
 # Actions that cannot run on their own --they require a qualifier.
-INCOMPLETE_ACTIONS = ('vi_g_action', 'vi_z_action')
+INCOMPLETE_ACTIONS = ('vi_g_action', 'vi_z_action', 'vi_ctrl_w_action')
 
 
 # TODO: This does not belong here.

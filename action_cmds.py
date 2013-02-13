@@ -527,3 +527,8 @@ class _vi_undo(IrreversibleTextCommand):
             # to think that Sublime Text is wrong.
             self.view.run_command('move', {'by': 'characters', 'forward': False})
             # ////////////////////////////////////////////////////////////////////
+
+
+class _vi_ctrl_w_v_action(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.view.window().run_command('new_pane', {})
