@@ -442,6 +442,7 @@ def vi_z_enter(vi_cmd_data):
 
 
 def vi_z_t(vi_cmd_data):
+    # Identical to vi_z_enter except the caret should remain untouched.
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = '_vi_z_enter'
     vi_cmd_data['action']['args'] = {}
