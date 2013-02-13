@@ -1,3 +1,5 @@
+param([switch]$IncludeTests)
+
 $script:thisDir = split-path $MyInvocation.MyCommand.Path -parent
 
 $mainDir = resolve-path (join-path $thisDir "..")
@@ -9,9 +11,15 @@ $includeFiles = @(
         "*.sublime-keymap"
     )
 
+
 $includeDirs = @(
         "vi"
     )
+
+
+if ($IncludeTests) {
+    $includeDirs += @("tests")    
+}
 
 
 if (test-path $distDir) {remove-item $distDir -recurse -force}

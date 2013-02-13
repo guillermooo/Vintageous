@@ -1,4 +1,4 @@
-& ".\bin\MakeRelease.ps1"
+& ".\bin\MakeRelease.ps1" -IncludeTests
 
 $targetDir = resolve-path "~\Utilities\Sublime Text 3\Data\Installed Packages"
 
