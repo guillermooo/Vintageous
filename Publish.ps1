@@ -11,4 +11,5 @@ remove-item "dist/*" -exclude "*.sublime-package" -recurse
 
 if ($Release -and (! $DontUpload)) {
 	start-process "https://bitbucket.org/guillermooo/vintageous/downloads"
+	(get-location).path | clip.exe
 }
