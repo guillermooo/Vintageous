@@ -460,7 +460,10 @@ class _vi_z_minus(IrreversibleTextCommand):
 
         bottommost_visible_row, _ = self.view.rowcol(self.view.visible_region().b)
 
-        self.view.run_command('scroll_lines', {'amount': (bottommost_visible_row - current_row)})
+        number_of_lines = bottommost_visible_row - current_row
+
+        if number_of_lines > 1:
+            self.view.run_command('scroll_lines', {'amount': number_of_lines})
 
 
 class _vi_zz(IrreversibleTextCommand):
