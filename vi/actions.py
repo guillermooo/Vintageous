@@ -312,7 +312,7 @@ def vi_dd(vi_cmd_data):
     vi_cmd_data['post_motion'] = [['_vi_dd_post_motion', {'mode': vi_cmd_data['mode']}],]
     vi_cmd_data['action']['command'] = 'left_delete'
     vi_cmd_data['action']['args'] = {}
-    # TODO: Is this necessary? Does it work as expected?
+    vi_cmd_data['post_action'] = ['_vi_move_caret_to_first_non_white_space_character',]
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data

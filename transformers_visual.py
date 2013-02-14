@@ -782,7 +782,7 @@ class _vi_move_caret_to_first_non_white_space_character(sublime_plugin.TextComma
     # Assume NORMAL_MODE / _MODE_INTERNAL_NORMAL
     def run(self, edit):
         def f(view, s):
-            line = view.line(s.b - 1)
+            line = view.line(s.b)
             pt = utils.next_non_white_space_char(view, line.a)
             return sublime.Region(pt, pt)
 
