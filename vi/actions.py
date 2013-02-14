@@ -51,6 +51,8 @@ def vi_d(vi_cmd_data):
     # FIXME: Should not delete new line characters.
     vi_cmd_data['action']['command'] = 'right_delete' if forward else 'left_delete'
     vi_cmd_data['action']['args'] = {}
+    # FIXME: dj must leave the caret at the first non-whitespace character. Either let commands
+    # specify multiple post_action hooks or implement a custom one for vi_d to factor this in.
     vi_cmd_data['post_action'] = ['dont_stay_on_eol_backward',]
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
