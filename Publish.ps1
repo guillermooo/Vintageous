@@ -1,4 +1,6 @@
-& ".\bin\MakeRelease.ps1" -IncludeTests
+param([switch]$Release)
+
+& ".\bin\MakeRelease.ps1" -Release:$Release
 
 $targetDir = resolve-path "~\Utilities\Sublime Text 3\Data\Installed Packages"
 

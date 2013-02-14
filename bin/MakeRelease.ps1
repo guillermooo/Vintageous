@@ -1,4 +1,4 @@
-param([switch]$IncludeTests)
+param([switch]$Release)
 
 $script:thisDir = split-path $MyInvocation.MyCommand.Path -parent
 
@@ -8,18 +8,23 @@ $distDir = join-path $mainDir "dist"
 
 $includeFiles = @(
         "*.py",
-        "*.sublime-keymap"
+        "*.sublime-keymap",
+        "LICENSE.txt",
+        "README.md"
     )
 
+$excludeFiles = @(
+        "test_runner.py"
+    )
 
 $includeDirs = @(
-        "vi"
+        "vi",
+        "tests"
     )
 
-
-if ($IncludeTests) {
-    $includeDirs += @("tests")    
-}
+$excludeDirs = @(
+        "tests"
+    )
 
 
 if (test-path $distDir) {remove-item $distDir -recurse -force}
@@ -29,6 +34,11 @@ push-location $mainDir
 
     $includeFiles | foreach-object { get-childitem $_ } | foreach-object { copy-item $_ $distDir }
     copy-item $includeDirs $distDir -recurse
+
+    if ($Release) {
+        get-childitem "$distDir/*" -include $excludeFiles -recurse | remove-item
+        $excludeDirs | foreach-object { get-childitem $distDir -Attribute Directory -filter $_ } | remove-item -recurse
+    }
 
     push-location $distDir
         & "7z.exe" "a" "-r" "-tzip" "Vintageous.sublime-package" "."
