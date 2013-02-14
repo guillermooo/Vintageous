@@ -1,4 +1,4 @@
-param([switch]$Release)
+param([switch]$Release, [switch]$DontUpload)
 
 & ".\bin\MakeRelease.ps1" -Release:$Release
 
@@ -8,3 +8,7 @@ copy-item ".\dist\Vintageous.sublime-package" $targetDir -force
 
 # clean up so that we don't clutter ST's files and folders.
 remove-item "dist/*" -exclude "*.sublime-package" -recurse
+
+if ($Release -and (! $DontUpload)) {
+	start-process "https://bitbucket.org/guillermooo/vintageous/downloads"
+}
