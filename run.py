@@ -11,17 +11,21 @@ from Vintageous.vi.constants import (MODE_INSERT, MODE_NORMAL, MODE_VISUAL,
 from Vintageous.vi.constants import mode_to_str
 from Vintageous.vi.constants import digraphs
 from Vintageous.vi.settings import SettingsManager, VintageSettings, SublimeSettings
-from Vintageous.vi.registers import Registers
+from Vintageous.vi.registers import Registers, REG_UNNAMED
 from Vintageous.vi import registers
 from Vintageous.state import VintageState
 
 
 class ViExecutionState(object):
-    # Ideally, this class' state should be reset at the end of each command.
-    # Tehrefore, use it only to communicate between different hooks, like
-    # _whatever_pre_motion, _whatever_post_every_motion, etc.
-    # If state should change between different command invocations, make it
-    # store date in view.settings(), or there'll be conflicts.
+    """This class' state must be reset at the end of each command.
+
+       Tehrefore, use it only to communicate between different hooks, like _whatever_pre_motion,
+       _whatever_post_every_motion, etc.
+
+       If state was to change between different command invocations, there would be conflicts,
+       because data would be mutated globally for all views and expected to be local for each of
+       them using it.
+    """
     select_word_begin_from_empty_line = False
 
     @staticmethod
@@ -144,6 +148,8 @@ class ViRunCommand(sublime_plugin.TextCommand):
                 if args.get('by') == 'characters':
                     vi_cmd_data['count'] = vi_cmd_data['count'] - 1
 
+    # XXX: Change name to .do_coda() or .transition_to_text_mode() or something else that suggests
+    # something mode than barely changing the mode.
     def do_follow_up_mode(self, vi_cmd_data):
         if vi_cmd_data['restore_original_carets'] == True:
             self.view.sel().clear()
@@ -161,9 +167,9 @@ class ViRunCommand(sublime_plugin.TextCommand):
         self.view.run_command(cmd, args)
 
     def do_pre_every_motion(self, vi_cmd_data, current, total):
-        # XXX: This is slow. Make it faster.
-        # ST command classes used as 'pre_every_motion' hooks need to take
-        # two parameters: current_iteration and total_iterations.
+        """ST command classes used as 'pre_every_motion' hooks need to take
+           two parameters: `current_iteration` and `total_iterations`.
+        """
         if vi_cmd_data['pre_every_motion']:
             try:
                 cmd, args = vi_cmd_data['pre_every_motion']
@@ -175,9 +181,9 @@ class ViRunCommand(sublime_plugin.TextCommand):
             self.view.run_command(cmd, args)
 
     def do_post_every_motion(self, vi_cmd_data, current, total):
-        # XXX: This is slow. Make it faster.
-        # ST command classes used as 'post_every_motion' hooks need to take
-        # two parameters: current_iteration and total_iterations.
+        """ST command classes used as 'post_every_motion' hooks need to take
+           two parameters: `current_iteration` and `total_iterations`.
+        """
         if vi_cmd_data['post_every_motion']:
             try:
                 cmd, args = vi_cmd_data['post_every_motion']
@@ -206,18 +212,16 @@ class ViRunCommand(sublime_plugin.TextCommand):
                 if vi_cmd_data['register']:
                     state.registers[vi_cmd_data['register']] = self.get_selected_text(vi_cmd_data)
                 else:
-                    # TODO: Encapsulate this in registers.py.
-                    state.registers['"'] = self.get_selected_text(vi_cmd_data)
+                    # TODO: Encapsulate this in registers.py. We could have a
+                    # .yank() method there that knows about all the details.
+                    state.registers[REG_UNNAMED] = self.get_selected_text(vi_cmd_data)
 
             cmd = vi_cmd_data['action']['command']
             args = vi_cmd_data['action']['args']
 
-            # This should happen rarely, but some actions that don't take a motion apply the count
-            # to the action.
-            i = 1
-            if vi_cmd_data['_repeat_action']:
-                i = vi_cmd_data['count']
-
+            # Some actions that don't take a motion apply the count to the action. For example,
+            # > in visual mode.
+            i = vi_cmd_data['count'] if vi_cmd_data['_repeat_action'] else 1
             for t in range(i):
                 self.view.run_command(cmd, args)
 
