@@ -128,7 +128,7 @@ class Registers(object):
             return
         elif name == REG_FILE_NAME:
             try:
-                return [os.path.basename(self.view.file_name())]
+                return [self.view.file_name()]
             except AttributeError:
                 return ''
         elif name in REG_SYS_CLIPBOARD_ALL:
