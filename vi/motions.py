@@ -140,6 +140,7 @@ def vi_zero(vi_cmd_data):
         vi_cmd_data['motion']['args'] = {}
 
         if vi_cmd_data['mode'] == MODE_VISUAL:
+            vi_cmd_data['pre_motion'] = ['_vi_orient_selections_toward_begin',]
             vi_cmd_data['motion']['args']['extend'] = True
 
     else:
@@ -148,6 +149,7 @@ def vi_zero(vi_cmd_data):
         vi_cmd_data['count'] = vi_cmd_data['count'] - 1
 
         if vi_cmd_data['mode'] == MODE_VISUAL:
+            vi_cmd_data['pre_motion'] = ['_vi_orient_selections_toward_begin',]
             vi_cmd_data['motion']['args']['extend'] = True
 
         # TODO: Unify handling of the 'extend' argument. All VISUAL modes need it, so either include

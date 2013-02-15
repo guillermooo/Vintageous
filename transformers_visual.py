@@ -1066,3 +1066,11 @@ class _vi_k_motion(sublime_plugin.TextCommand):
                     return sublime.Region(s.a, view.full_line(target_pt).a)
                     
         regions_transformer(self.view, f)
+
+
+class _vi_orient_selections_toward_begin(sublime_plugin.TextCommand):
+    def run(self, edit):
+        def f(view, s):
+            return sublime.Region(s.begin() + 1, s.begin())
+
+        regions_transformer(self.view, f)
