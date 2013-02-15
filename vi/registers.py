@@ -128,7 +128,7 @@ class Registers(object):
             return
         elif name == REG_FILE_NAME:
             try:
-                return os.path.basename(self.view.file_name())
+                return [os.path.basename(self.view.file_name())]
             except AttributeError:
                 return ''
         elif name in REG_SYS_CLIPBOARD_ALL:
@@ -138,7 +138,7 @@ class Registers(object):
         # Special case lumped among these --user always wants the sys
         # clipboard.
         elif name == REG_UNNAMED and self.settings.view['vintageous_use_sys_clipboard'] == True:
-            return sublime.get_clipboard()
+            return [sublime.get_clipboard()]
 
         # If the expression register holds a value and we're requesting the unnamed register,
         # return the expression register and clear it aftwerwards.
@@ -161,6 +161,10 @@ class Registers(object):
         except KeyError:
             # sublime.status_message("Vintage.Next: E353 Nothing in register %s", name)
             pass
+
+    def to_dict(self):
+        # Stopgap solution until we sublass from dict
+        return {name: self.get(name) for name in REG_ALL}
 
     def __getitem__(self, key):
         return self.get(key)
