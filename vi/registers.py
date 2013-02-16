@@ -14,9 +14,13 @@ REG_EXPRESSION = '='
 REG_SYS_CLIPBOARD_1 = '*'
 REG_SYS_CLIPBOARD_2 = '+'
 REG_SYS_CLIPBOARD_ALL = (REG_SYS_CLIPBOARD_1, REG_SYS_CLIPBOARD_2)
-REG_ALL = (REG_UNNAMED, REG_SMALL_DELETE, REG_BLACK_HOLE,
+REG_VALID_NAMES = tuple("{0}".format(c) for c in "abcdfeghijklmnopqrstuvwxyz")
+REG_VALID_NUMBERS = tuple("{0}".format(c) for c in "0123456789")
+REG_SPECIAL = (REG_UNNAMED, REG_SMALL_DELETE, REG_BLACK_HOLE,
            REG_LAST_INSERTED_TEXT, REG_FILE_NAME, REG_ALT_FILE_NAME,
            REG_SYS_CLIPBOARD_1, REG_SYS_CLIPBOARD_2)
+REG_ALL = REG_SPECIAL + REG_VALID_NUMBERS + REG_VALID_NAMES
+
 # todo(guillermo): There are more.
 
 
@@ -133,19 +137,12 @@ class Registers(object):
                 return ''
         elif name in REG_SYS_CLIPBOARD_ALL:
             return [sublime.get_clipboard()]
-        elif name != REG_UNNAMED and name in REG_ALL:
+        elif name != REG_UNNAMED and name in REG_SPECIAL:
             return
         # Special case lumped among these --user always wants the sys
         # clipboard.
         elif name == REG_UNNAMED and self.settings.view['vintageous_use_sys_clipboard'] == True:
             return [sublime.get_clipboard()]
-
-        # If the expression register holds a value and we're requesting the unnamed register,
-        # return the expression register and clear it aftwerwards.
-        elif name == REG_UNNAMED and _REGISTER_DATA.get(REG_EXPRESSION, ''):
-            value = _REGISTER_DATA[REG_EXPRESSION]
-            _REGISTER_DATA[REG_EXPRESSION] = ''
-            return value
 
         # If the expression register holds a value and we're requesting the unnamed register,
         # return the expression register and clear it aftwerwards.
