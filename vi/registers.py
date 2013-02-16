@@ -14,7 +14,7 @@ REG_EXPRESSION = '='
 REG_SYS_CLIPBOARD_1 = '*'
 REG_SYS_CLIPBOARD_2 = '+'
 REG_SYS_CLIPBOARD_ALL = (REG_SYS_CLIPBOARD_1, REG_SYS_CLIPBOARD_2)
-REG_VALID_NAMES = tuple("{0}".format(c) for c in "abcdfeghijklmnopqrstuvwxyz")
+REG_VALID_NAMES = tuple("{0}".format(c) for c in "abcdefghijklmnopqrstuvwxyz")
 REG_VALID_NUMBERS = tuple("{0}".format(c) for c in "0123456789")
 REG_SPECIAL = (REG_UNNAMED, REG_SMALL_DELETE, REG_BLACK_HOLE,
            REG_LAST_INSERTED_TEXT, REG_FILE_NAME, REG_ALT_FILE_NAME,
@@ -36,8 +36,8 @@ class Registers(object):
     This class is meant to be used a descriptor.
 
         class VintageState(object):
+            registers = Registers()
             ...
-            self.registers = Registers()
 
         vstate = VintageState()
         vstate.registers["%"] # now vstate.registers has access to the
