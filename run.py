@@ -39,7 +39,7 @@ class ViExecutionState(object):
 
 class ViRunCommand(sublime_plugin.TextCommand):
     def run(self, edit, **vi_cmd_data):
-        print("Data in ViRunCommand:", vi_cmd_data)
+        self.debug("Data in ViRunCommand:", vi_cmd_data)
 
         try:
             if vi_cmd_data['restore_original_carets']:
@@ -163,7 +163,7 @@ class ViRunCommand(sublime_plugin.TextCommand):
     def do_motion(self, vi_cmd_data):
         cmd = vi_cmd_data['motion']['command']
         args = vi_cmd_data['motion']['args']
-        print("Motion command:", cmd, args)
+        self.debug("Vintageous: Motion command: ", cmd, args)
         self.view.run_command(cmd, args)
 
     def do_pre_every_motion(self, vi_cmd_data, current, total):
@@ -203,7 +203,7 @@ class ViRunCommand(sublime_plugin.TextCommand):
             self.view.run_command(*post_motion)
 
     def do_action(self, vi_cmd_data):
-        print("Action command:", vi_cmd_data['action'])
+        self.debug("Vintageous: Action command: ", vi_cmd_data['action'])
         if vi_cmd_data['action']:
 
             # Populate registers if we have to.
@@ -242,3 +242,8 @@ class ViRunCommand(sublime_plugin.TextCommand):
     def add_to_jump_list(self, vi_cmd_data):
         if vi_cmd_data['is_jump']:
             self.view.run_command('vi_add_to_jump_list')
+
+    def debug(self, *messages):
+        state = VintageState(self.view)
+        if state.settings.view['vintageous_verbose']:
+            print("Vintageous:", *messages)

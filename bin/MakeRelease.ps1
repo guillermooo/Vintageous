@@ -9,6 +9,7 @@ $distDir = join-path $mainDir "dist"
 $includeFiles = @(
         "*.py",
         "*.sublime-keymap",
+        "*.sublime-settings",
         "LICENSE.txt",
         "README.md"
     )
