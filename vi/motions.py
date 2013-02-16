@@ -521,7 +521,7 @@ def vi_big_b(vi_cmd_data):
         vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode'],}]
         vi_cmd_data['post_every_motion'] = ['dont_stay_on_eol_backward',]
     elif vi_cmd_data['mode'] == MODE_VISUAL:
-        # TODO: Rename to factor in *every*.
+        vi_cmd_data['pre_motion'] = ['_vi_orient_selections_toward_begin',]
         vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode']}]
         vi_cmd_data['motion']['args']['extend'] = True
         vi_cmd_data['post_every_motion'] = ['_vi_b_post_every_motion', {'mode': vi_cmd_data['mode']}]
