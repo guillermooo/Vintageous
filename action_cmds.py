@@ -209,6 +209,9 @@ class ViEnterInsertMode(sublime_plugin.TextCommand):
         state = VintageState(self.view)
         state.enter_insert_mode()
         self.view.run_command('collapse_to_direction')
+        # 5i and friends don't enter INSERTMODE through this command, so it's fine resetting here.
+        # We need to reset so that things like CTRL+R,ESC (INSERTMODE) cancel pending state.
+        state.reset()
 
 
 class ViEnterVisualMode(sublime_plugin.TextCommand):

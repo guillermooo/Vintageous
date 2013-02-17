@@ -16,6 +16,7 @@ from Vintageous.vi import constants
 from Vintageous.vi.settings import SettingsManager, VintageSettings, SublimeSettings
 from Vintageous.vi.registers import Registers
 from Vintageous.vi import registers
+from Vintageous.vi import utils
 
 
 def new_vi_cmd_data(state):
@@ -393,6 +394,7 @@ class VintageState(object):
                     # CTRL+r,j in INSERTMODE, which is an invalid sequence.
                     # !!! This could be simplified using parameters in .reset(), but then it
                     # wouldn't be obvious what was going on. Don't refactor. !!!
+                    utils.blink()
                     self.enter_insert_mode()
                 elif self.mode != MODE_NORMAL:
                     # Normally we'd go back to normal mode.
