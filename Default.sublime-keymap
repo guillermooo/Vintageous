@@ -197,9 +197,9 @@
 	{ "keys": ["ctrl+v"], "command": "set_action", "args": {"action": "vi_ctrl_w_v"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
 	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_ctrl_w_v"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
 
+	// TODO: Simplify the logic needed to make the expression register work in INSERTMODE.
 	{ "keys": ["ctrl+r"], "command": "set_action", "args": {"action": "vi_ctrl_r_action"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "setting.command_mode", "operator": "equal", "operand": false}]},
 	{ "keys": ["="], "command": "set_action", "args": {"action": "vi_ctrl_r_equals"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
-	// { "keys": ["ctrl+r", "<character>"], "command": "vi_route_chord", "args": {"prefix": "ctrl_r"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "setting.command_mode", "operator": "equal", "operand": false}]},
 
 	// Collects user input for commands such as t, f, T, F.
 	// XXX: Seems to need to come after every other key binding so it will catch every character. Investigate this.
