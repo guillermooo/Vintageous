@@ -4,7 +4,7 @@ import sublime_plugin
 from Vintageous.state import VintageState
 from Vintageous.state import IrreversibleTextCommand
 from Vintageous.vi import utils
-from Vintageous.vi.constants import MODE_NORMAL, _MODE_INTERNAL_NORMAL, MODE_VISUAL, MODE_VISUAL_LINE
+from Vintageous.vi.constants import MODE_NORMAL, _MODE_INTERNAL_NORMAL, MODE_VISUAL, MODE_VISUAL_LINE, MODE_INSERT
 from Vintageous.vi.registers import REG_EXPRESSION
 from Vintageous.vi.constants import regions_transformer
 
@@ -314,22 +314,27 @@ class SetRegister(sublime_plugin.TextCommand):
 
 
 class ViExpressionRegister(sublime_plugin.TextCommand):
-    def run(self, edit):
-        self.view.window().show_input_panel('', '', self.on_done, None, self.on_cancel)
+    def run(self, edit, insert=False, next_mode=None):
+        def on_done(s):
+            state = VintageState(self.view)
+            try:
+                rv = [str(eval(s, None, None)),]
+                if not insert:
+                    # TODO: We need to sort out the values received and sent to registers. When pasting,
+                    # we assume a list... This should be encapsulated in Registers.
+                    state.registers[REG_EXPRESSION] = rv
+                else:
+                    self.view.run_command('insert_snippet', {'contents': str(rv[0])})
+                    state.reset(next_mode=MODE_INSERT)
+            except:
+                sublime.status_message("Vintageous: Invalid expression.")
+                on_cancel()
 
-    def on_done(self, s):
-        state = VintageState(self.view)
-        try:
-            # TODO: We need to sort out the values received and sent to registers. When pasting,
-            # we assume a list... This should be encapsulated in Registers.
-            state.registers[REG_EXPRESSION] = [str(eval(s, None, None)),]
-        except:
-            sublime.status_message("Vintageous: Invalid expression.")
-            self.on_cancel()
+        def on_cancel():
+            state = VintageState(self.view)
+            state.reset(next_mode=MODE_INSERT)
 
-    def on_cancel(self):
-        state = VintageState(self.view)
-        state.reset()
+        self.view.window().show_input_panel('', '', on_done, None, on_cancel)
 
 
 class ViR(sublime_plugin.TextCommand):

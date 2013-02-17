@@ -33,6 +33,7 @@ digraphs = {
     ('vi_z_action', 'vi_zz'): ('vi_zz', DIGRAPH_ACTION),
 
     ('vi_ctrl_w_action', 'vi_ctrl_w_v'): ('vi_ctrl_w_v', DIGRAPH_ACTION),
+    ('vi_ctrl_r_action', 'vi_ctrl_r_equals'): ('vi_ctrl_r_equals', DIGRAPH_ACTION),
 
     ('vi_g_action', 'vi_gg'): ('vi_gg', DIGRAPH_MOTION),
     # XXX: I don't think the following is needed.
@@ -41,7 +42,9 @@ digraphs = {
 
 
 # Actions that cannot run on their own --they require a qualifier.
-INCOMPLETE_ACTIONS = ('vi_g_action', 'vi_z_action', 'vi_ctrl_w_action')
+INCOMPLETE_ACTIONS = ('vi_g_action', 'vi_z_action', 'vi_ctrl_w_action',
+                      'vi_ctrl_r_action')
+ACTIONS_EXITING_TO_INSERT_MODE = ('vi_ctrl_r_action',)
 
 
 # TODO: This does not belong here.

@@ -1,5 +1,6 @@
 [
 	// TODO: Bring all key bindings to enter normal mode under a single one.
+	{ "keys": ["escape"], "command": "vi_enter_insert_mode", "context": [{"key": "vi_must_exit_to_insert_mode"}, {"key": "vi_is_sublime_widget_or_console", "operand": false}] },
 	{ "keys": ["escape"], "command": "vi_enter_normal_mode_from_insert_mode", "context": [{"key": "setting.command_mode", "operand": false}, {"key": "vi_is_sublime_widget_or_console", "operand": false}] },
 	{ "keys": ["escape"], "command": "vi_enter_normal_mode", "context": [{"key": "vi_mode_visual_line", "operand": false}, {"key": "vi_is_sublime_widget_or_console", "operand": false}] },
 	{ "keys": ["escape"], "command": "vi_enter_normal_mode", "context": [{"key": "vi_mode_visual", "operand": false}, {"key": "vi_is_sublime_widget_or_console", "operand": false}] },
@@ -195,6 +196,10 @@
 	{ "keys": ["ctrl+w"], "command": "set_action", "args": {"action": "vi_ctrl_w_action"}, "context": [{"key": "setting.command_mode"}]},
 	{ "keys": ["ctrl+v"], "command": "set_action", "args": {"action": "vi_ctrl_w_v"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
 	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_ctrl_w_v"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
+
+	{ "keys": ["ctrl+r"], "command": "set_action", "args": {"action": "vi_ctrl_r_action"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "setting.command_mode", "operator": "equal", "operand": false}]},
+	{ "keys": ["="], "command": "set_action", "args": {"action": "vi_ctrl_r_equals"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
+	// { "keys": ["ctrl+r", "<character>"], "command": "vi_route_chord", "args": {"prefix": "ctrl_r"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "setting.command_mode", "operator": "equal", "operand": false}]},
 
 	// Collects user input for commands such as t, f, T, F.
 	// XXX: Seems to need to come after every other key binding so it will catch every character. Investigate this.

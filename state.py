@@ -11,6 +11,7 @@ from Vintageous.vi.constants import (MODE_INSERT, MODE_NORMAL, MODE_VISUAL,
 from Vintageous.vi.constants import mode_to_str
 from Vintageous.vi.constants import digraphs
 from Vintageous.vi.constants import DIGRAPH_MOTION
+from Vintageous.vi.constants import ACTIONS_EXITING_TO_INSERT_MODE
 from Vintageous.vi import constants
 from Vintageous.vi.settings import SettingsManager, VintageSettings, SublimeSettings
 from Vintageous.vi.registers import Registers
@@ -90,6 +91,17 @@ def new_vi_cmd_data(state):
         'must_update_xpos': True,        
         # Whether we should make sure to show the first selection.
         'scroll_into_view': True,
+        # If not None, the corresponding mode will be entered before runnig ViRun.
+        # It's basically used as a way to change to NORMALMODE and be able to capture further
+        # key strokes for INSERTMODE chords. Use sparingly.
+        # Used, for example, by CTRL+R,= in INSERTMODE.
+        '_change_mode_to': None,
+        # If not None, the corresponding mode will be entered during the full run of a command, in
+        # some cases. Used to know which mode to transition to after a failed composite command.
+        # Note this is mainly useful to exit from bad corrupted states; successful commands should
+        # instead specify their 'follow_up_mode' hook.
+        # For example, in INSERTMODE, Ctrl+R,j would cause VintageState to use this.
+        '_exit_mode': None,
     }
     
     return vi_cmd_data
@@ -376,7 +388,14 @@ class VintageState(object):
             else:
                 # If we have a digraph start, the global data is in an invalid state because we
                 # are still missing the complete digraph. Abort and clean up.
-                if self.mode != MODE_NORMAL:
+                if vi_cmd_data['_exit_mode'] == MODE_INSERT:
+                    # We've been requested to change to this mode. For example, we're looking at
+                    # CTRL+r,j in INSERTMODE, which is an invalid sequence.
+                    # !!! This could be simplified using parameters in .reset(), but then it
+                    # wouldn't be obvious what was going on. Don't refactor. !!!
+                    self.enter_insert_mode()
+                elif self.mode != MODE_NORMAL:
+                    # Normally we'd go back to normal mode.
                     self.enter_normal_mode()
 
             self.reset()
@@ -393,6 +412,9 @@ class VintageState(object):
             vi_cmd_data = self.parse_action(vi_cmd_data)
             
             if vi_cmd_data['is_digraph_start']:
+                if vi_cmd_data['_change_mode_to']:
+                    if vi_cmd_data['_change_mode_to'] == MODE_NORMAL:
+                        self.enter_normal_mode()
                 # We know we are not ready.
                 return
 
@@ -409,7 +431,7 @@ class VintageState(object):
 
         self.update_status()
 
-    def reset(self):
+    def reset(self, next_mode=None):
         self.motion = None
         self.action = None
         self.register = None
@@ -425,6 +447,11 @@ class VintageState(object):
 
         self.motion_digits = []
         self.action_digits = []
+
+        if next_mode == MODE_INSERT:
+            self.enter_insert_mode()
+        elif next_mode is not None:
+            print("Vintageous:", "Changing to some modes not implemented.")
 
     def update_status(self):
         mode_name = mode_to_str(self.mode) or ""
@@ -551,6 +578,22 @@ class VintageStateTracker(sublime_plugin.EventListener):
                 return value
             elif operator == sublime.OP_NOT_EQUAL:
                 return not value
+
+        elif key == "vi_use_ctrl_keys":
+            value = vintage_state.settings.view['vintageous_use_ctrl_keys']
+            if operator == sublime.OP_EQUAL:
+                return value == operand
+            elif operator == sublime.OP_NOT_EQUAL:
+                return value != operand
+
+        elif key == "vi_must_exit_to_insert_mode":
+            is_normal_mode = vintage_state.settings.view['command_mode']
+            is_exit_mode_insert = (vintage_state.action in ACTIONS_EXITING_TO_INSERT_MODE)
+            value = (is_normal_mode and is_exit_mode_insert)
+            if operator == sublime.OP_EQUAL:
+                return  value == operand
+            elif operator == sublime.OP_NOT_EQUAL:
+                return value != operand
 
         # Used to disable commands that enter normal mode. Input widgets should always operate in
         # insert mode (actually, they should be completely ignored by Vintageous at this stage).

@@ -3,7 +3,7 @@
 
 
 from Vintageous.vi import motions
-from Vintageous.vi.constants import MODE_VISUAL, _MODE_INTERNAL_NORMAL, MODE_VISUAL_LINE
+from Vintageous.vi.constants import MODE_VISUAL, _MODE_INTERNAL_NORMAL, MODE_VISUAL_LINE, MODE_NORMAL, MODE_INSERT
 
 
 def vi_enter_visual_mode(vi_cmd_data):
@@ -619,5 +619,29 @@ def vi_ctrl_w_v(vi_cmd_data):
 
     vi_cmd_data['action']['command'] = '_vi_ctrl_w_v_action'
     vi_cmd_data['action']['args'] = {}
+
+    return vi_cmd_data
+
+
+def vi_ctrl_r_action(vi_cmd_data):
+    """This doesn't do anything by itself, but tells global state to wait for a second action that
+       completes this one.
+    """
+    vi_cmd_data['_change_mode_to'] = MODE_NORMAL
+    vi_cmd_data['_exit_mode'] = MODE_INSERT
+    vi_cmd_data['motion_required'] = False
+    # Let global state know we still need a second action to complete this one.
+    vi_cmd_data['is_digraph_start'] = True
+    vi_cmd_data['action']['command'] = 'vi_enter_normal_mode'
+    vi_cmd_data['action']['args'] = {}
+
+    return vi_cmd_data
+
+
+def vi_ctrl_r_equals(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+
+    vi_cmd_data['action']['command'] = 'vi_expression_register'
+    vi_cmd_data['action']['args'] = {'insert': True, 'next_mode': MODE_INSERT}
 
     return vi_cmd_data

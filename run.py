@@ -237,6 +237,7 @@ class ViRunCommand(sublime_plugin.TextCommand):
 
     def do_post_action(self, vi_cmd_data):
         if vi_cmd_data['post_action']:
+            print("FOOBAR FOOBAR")
             self.view.run_command(*vi_cmd_data['post_action'])
 
     def add_to_jump_list(self, vi_cmd_data):
