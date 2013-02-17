@@ -908,12 +908,13 @@ class _vi_j_motion(sublime_plugin.TextCommand):
                 target_row = min(current_row + count, view.rowcol(view.size())[0])
                 target_pt = view.text_point(target_row, 0)
 
+                if current_row == view.rowcol(view.size())[0]:
+                    utils.blink()
+
                 if view.line(target_pt).empty():
                     return sublime.Region(target_pt, target_pt)
 
                 target_pt = min(target_pt + xpos, view.line(target_pt).b - 1)
-                if s.b == view.line(target_pt).b - 1:
-                    utils.blink()
                 return sublime.Region(target_pt, target_pt)
 
             if mode == _MODE_INTERNAL_NORMAL:
