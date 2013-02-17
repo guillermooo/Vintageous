@@ -17,6 +17,7 @@ from Vintageous.vi.settings import SettingsManager, VintageSettings, SublimeSett
 from Vintageous.vi.registers import Registers
 from Vintageous.vi import registers
 from Vintageous.vi import utils
+from Vintageous.vi.contexts import KeyContext
 
 
 def new_vi_cmd_data(state):
@@ -53,7 +54,7 @@ def new_vi_cmd_data(state):
         'yanks_linewise': False,
         # We set this to the user-supplied information.
         'register': state.register,
-        'mode': MODE_NORMAL,
+        'mode': state.mode,
         'reposition_caret': None,
         'follow_up_mode': None,
         # Some digraphs can be computed on their own, like cc and dd, but others require an
@@ -140,6 +141,7 @@ class VintageState(object):
 
     # Makes yank data globally accesible.
     registers = Registers()
+    contexts = KeyContext()
 
     def __init__(self, view):
         self.view = view
@@ -409,7 +411,6 @@ class VintageState(object):
 
         # Action only, like in "d" or "esc". Some actions can be executed without a motion.
         elif self.action:
-            
             vi_cmd_data = self.parse_motion()
             vi_cmd_data = self.parse_action(vi_cmd_data)
             
@@ -467,10 +468,13 @@ class VintageStateTracker(sublime_plugin.EventListener):
 
     def on_query_context(self, view, key, operator, operand, match_all):
         vintage_state = VintageState(view)
+        context = KeyContext(VintageState(view))
 
         # TODO: Move contexts to a separate file to reduce clutter.
+        if key == 'vi_must_change_mode':
+            return context.change_vi_mode(key, operator, operand, match_all)
 
-        if key == "vi_mode_can_push_digit":
+        elif key == "vi_mode_can_push_digit":
             motion_digits = not vintage_state.motion
             action_digits = vintage_state.motion
 
@@ -519,15 +523,34 @@ class VintageStateTracker(sublime_plugin.EventListener):
 
         elif key == 'vi_mode_normal':
             if operator == sublime.OP_EQUAL:
-                return vintage_state.mode == MODE_NORMAL
+                if operand == True:
+                    return vintage_state.mode == MODE_NORMAL
+                elif operand == False:
+                    return vintage_state.mode != MODE_NORMAL
+
             elif operator == sublime.OP_NOT_EQUAL:
-                return vintage_state.mode != MODE_NORMAL
+                if operand == True:
+                    return vintage_state.mode != MODE_NORMAL
+                elif operand == False:
+                    return vintage_state.mode == MODE_NORMAL
 
         elif key == 'vi_mode_visual':
             if operator == sublime.OP_EQUAL:
                 return vintage_state.mode == MODE_VISUAL
             elif operator == sublime.OP_NOT_EQUAL:
                 return vintage_state.mode != MODE_VISUAL
+
+        elif key == 'vi_mode_insert':
+            if operator == sublime.OP_EQUAL:
+                if operand == True:
+                    return vintage_state.mode == MODE_INSERT
+                elif operand == False:
+                    return vintage_state.mode != MODE_INSERT
+            elif operator == sublime.OP_NOT_EQUAL:
+                if operand == True:
+                    return vintage_state.mode != MODE_INSERT
+                elif operand == False:
+                    return vintage_state.mode == MODE_INSERT
 
         elif key == 'vi_mode_visual_line':
             if operator == sublime.OP_EQUAL:
@@ -615,6 +638,25 @@ class VintageStateTracker(sublime_plugin.EventListener):
 
                 if operand is False:
                     return (is_console or is_widget)
+
+        elif key == 'vi_is_buffer':
+            # !! The following check is based on an implementation detail of Sublime Text. !!
+            is_console = False if (getattr(view, 'settings') is not None) else True
+            is_widget = view.settings().get('is_widget')
+            if operator == sublime.OP_EQUAL:
+                if operand is True:
+                    return not (is_console or is_widget)
+
+                if operand is False:
+                    return (is_console or is_widget)
+
+            elif operator == sublime.OP_NOT_EQUAL:
+                if operand is True:
+                    return (is_console or is_widget)
+
+                if operand is False:
+                    return not (is_console or is_widget)
+
         return False
 
 
