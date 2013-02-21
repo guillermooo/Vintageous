@@ -132,16 +132,16 @@ def is_same_line(view, pt1, pt2):
     return (line_a.a == line_b.a) and (line_a.b == line_b.b)
 
 
-def blink(times=5, delay=55):
+def blink(times=4, delay=55):
     v = sublime.active_window().active_view()
     settings = v.settings()
     # Ensure we leave the setting as we found it.
-    times = times if (times % 2) else times + 1
+    times = times if (times % 2) == 0 else times + 1
 
     def do_blink():
         nonlocal times
-        settings.set('highlight_line', not settings.get('highlight_line'))
         if times > 0:
+            settings.set('highlight_line', not settings.get('highlight_line'))
             times -= 1
             sublime.set_timeout(do_blink, delay)
 
