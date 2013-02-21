@@ -281,8 +281,7 @@ def vi_big_x(vi_cmd_data):
 
     # TODO: This is wrong for VISUALMODE. In VISUALMODE, X in Vim deletes linewise.
     vi_cmd_data['action']['command'] = 'left_delete'
-    vi_cmd_data
-    ['action']['args'] = {}
+    vi_cmd_data['action']['args'] = {}
 
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 

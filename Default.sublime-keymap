@@ -71,7 +71,7 @@
 	{ "keys": ["9"], "command": "vi_push_digit", "args": {"digit": "9"}, "context": [{"key": "vi_mode_can_push_digit"}, {"key": "setting.command_mode"}] },
 	{ "keys": ["0"], "command": "vi_push_digit", "args": {"digit": "0"}, "context": [{"key": "vi_mode_can_push_digit"}, {"key": "setting.command_mode"}] },
 
-	{ "keys": ["0"], "command": "set_motion", "args": {"motion": "vi_zero"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_mode_cannot_push_0"}] },
+	{ "keys": ["0"], "command": "set_motion", "args": {"motion": "vi_zero"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_mode_cannot_push_zero"}] },
 
 	// ** Actions **
 
