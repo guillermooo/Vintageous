@@ -70,8 +70,8 @@ class ViRunCommand(sublime_plugin.TextCommand):
 
             if vi_cmd_data['must_update_xpos']:
                 state = VintageState(self.view)
-                first_sel = self.view.sel()[0]
 
+                first_sel = self.view.sel()[0]
                 xpos = 0
                 if state.mode == MODE_VISUAL:
                     if first_sel.a < first_sel.b:
@@ -88,6 +88,8 @@ class ViRunCommand(sublime_plugin.TextCommand):
                 # TODO: If moving by lines, scroll the minimum amount to display the new sels.
                 self.view.show(self.view.sel()[0])
 
+            state = VintageState(self.view)
+            state.reset(next_mode=vi_cmd_data['next_mode'])
 
     def save_caret_pos(self):
         self.old_sels = list(self.view.sel())

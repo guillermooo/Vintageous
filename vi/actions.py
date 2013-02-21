@@ -86,6 +86,7 @@ def vi_o(vi_cmd_data):
     vi_cmd_data['action']['command'] = 'run_macro_file'
     vi_cmd_data['action']['args'] = {'file': 'res://Packages/Default/Add Line.sublime-macro'}
     vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
+    vi_cmd_data['next_mode'] = MODE_INSERT
 
     return vi_cmd_data
 
@@ -95,6 +96,7 @@ def vi_big_o(vi_cmd_data):
     vi_cmd_data['action']['command'] = 'run_macro_file'
     vi_cmd_data['action']['args'] = {'file': 'res://Packages/Default/Add Line Before.sublime-macro'}
     vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
+    vi_cmd_data['next_mode'] = MODE_INSERT
 
     return vi_cmd_data
 
@@ -135,6 +137,7 @@ def vi_s(vi_cmd_data):
     vi_cmd_data['action']['command'] = 'right_delete'
     vi_cmd_data['action']['args'] = {}
     vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
+    vi_cmd_data['next_mode'] = MODE_INSERT
 
     return vi_cmd_data
 
@@ -147,6 +150,7 @@ def vi_c(vi_cmd_data):
     vi_cmd_data['action']['command'] = 'left_delete'
     vi_cmd_data['action']['args'] = {}
     vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
+    vi_cmd_data['next_mode'] = MODE_INSERT
 
     # If we're deleting by words, make sure we don't delete the entire line
     # when deleting the last character from the last word on the line.
@@ -180,6 +184,7 @@ def vi_big_c(vi_cmd_data):
         vi_cmd_data['action']['command'] = 'right_delete'
         vi_cmd_data['action']['args'] = {}
         vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
+        vi_cmd_data['next_mode'] = MODE_INSERT
 
     else:
         # Avoid C'ing one line too many.
@@ -192,6 +197,7 @@ def vi_big_c(vi_cmd_data):
         vi_cmd_data['action']['command'] = 'right_delete'
         vi_cmd_data['action']['args'] = {}
         vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
+        vi_cmd_data['next_mode'] = MODE_INSERT
 
     return vi_cmd_data
 
@@ -227,6 +233,7 @@ def vi_big_s(vi_cmd_data):
         vi_cmd_data['action']['command'] = 'right_delete'
         vi_cmd_data['action']['args'] = {}
         vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
+        vi_cmd_data['next_mode'] = MODE_INSERT
 
     return vi_cmd_data
 
@@ -274,7 +281,8 @@ def vi_big_x(vi_cmd_data):
 
     # TODO: This is wrong for VISUALMODE. In VISUALMODE, X in Vim deletes linewise.
     vi_cmd_data['action']['command'] = 'left_delete'
-    vi_cmd_data['action']['args'] = {}
+    vi_cmd_data
+    ['action']['args'] = {}
 
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
@@ -339,6 +347,7 @@ def vi_cc(vi_cmd_data):
     vi_cmd_data['action']['command'] = 'right_delete'
     vi_cmd_data['action']['args'] = {}
     vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
+    vi_cmd_data['next_mode'] = MODE_INSERT
 
     return vi_cmd_data
 

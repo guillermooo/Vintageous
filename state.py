@@ -105,6 +105,8 @@ def new_vi_cmd_data(state):
         # For example, in INSERTMODE, Ctrl+R,j would cause VintageState to use this.
         '_exit_mode': None,
         'must_blink_on_error': False,
+        # Mode to transition to on success.
+        'next_mode': MODE_NORMAL,
     }
     
     return vi_cmd_data
@@ -417,17 +419,16 @@ class VintageState(object):
                     # !!! This could be simplified using parameters in .reset(), but then it
                     # wouldn't be obvious what was going on. Don't refactor. !!!
                     utils.blink()
+                    self.reset()
                     self.enter_insert_mode()
                 elif self.mode != MODE_NORMAL:
                     # Normally we'd go back to normal mode.
                     self.enter_normal_mode()
-
-            self.reset()
+                    self.reset()
 
         # Motion only, like in "3j".
         elif self.motion:
             self.view.run_command('vi_run', self.parse_motion())
-            self.reset()
 
         # Action only, like in "d" or "esc". Some actions can be executed without a motion.
         elif self.action:
@@ -444,13 +445,11 @@ class VintageState(object):
             # In cases like gg, we might receive the motion here, so check for that.
             if self.motion and not self.action:
                 self.view.run_command('vi_run', self.parse_motion())
-                self.reset()
                 self.update_status()
                 return
 
             if not vi_cmd_data['motion_required']:
                 self.view.run_command('vi_run', vi_cmd_data)
-                self.reset()
 
         self.update_status()
 
