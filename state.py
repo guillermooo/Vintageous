@@ -18,98 +18,7 @@ from Vintageous.vi.registers import Registers
 from Vintageous.vi import registers
 from Vintageous.vi import utils
 from Vintageous.vi.contexts import KeyContext
-
-
-def new_vi_cmd_data(state):
-    # XXX: Make this a method of VintageState instead? It's too tightly coupled with it anyway.
-    """Returns a 'zeroed' vi_cmd_data instance.
-    """
-
-    # TODO: Encapsulate vi_cmd_data in a class?
-    #
-    # vi_cmd_data is a key data structure that drives the action/motion execution.
-    # Keys and values must be valid JSON data types, because the data structure ends up being an
-    # argument to an ST command.
-    vi_cmd_data = {
-        'pre_motion': None,
-        'motion': {},
-        # Whether the user needs to provide a motion. If there is no user-provided motion, a
-        # motion specified by an action could still be run before the action.
-        'motion_required': True,
-        'action': {},
-        'post_action': None,
-        'count': state.count,
-        # Helps to disambiguate between invocations that behave differently depending on whether
-        # the user provided a count or not (for example, %).
-        '_user_provided_count': state.user_provided_count,
-        'pre_every_motion': None,
-        'post_every_motion': None,
-        # This is the only hook that takes a list of commands to execute.
-        # Specify commands as a list of [command, args] elements (don't use tuples).
-        'post_motion': [],
-        # Set to True if the command must be able to populate the registers. This will cause
-        # Vintageous to propagate copied text to the unnamed register as needed.
-        'can_yank': False,
-        # Some commands operate CHARACTERWISE but always yank LINEWISE, so we need this.
-        'yanks_linewise': False,
-        # We set this to the user-supplied information.
-        'register': state.register,
-        'mode': state.mode,
-        'reposition_caret': None,
-        'follow_up_mode': None,
-        # Some digraphs can be computed on their own, like cc and dd, but others require an
-        # explicit "wait for next command name" status, like gU, gu, etc. This property helps
-        # with that.
-        'is_digraph_start': False,
-        # User input, such as arguments to the t and f commands.
-        # TODO: Try to unify user-input collection (both for registers and this kind of
-        # argument).
-        'user_input': state.user_input,
-        # TODO: Interim solution to avoid problems with this step. Many commands don't need
-        # this and it's causing quite some trouble. Let commands specify an explicit command
-        # to reorient the caret as occurs with other hooks.
-        '__reorient_caret': False,
-        # Whether the motion is considered a jump.
-        'is_jump': False,
-        # Some actions must be cancelled if the selections didn't change after the motion.
-        # Others, on the contrary, must always go ahead.
-        'cancel_action_if_motion_fails': False,
-        # Some commands that don't take motions need to be repeated, but currently ViRun only
-        # repeats the motion, so tell global state to repeat the action. An example would be
-        # the J command.
-        '_repeat_action': False,
-        # Search string used last to find text in the buffer (like the / command).
-        'last_buffer_search': state.last_buffer_search,
-        # Search character used last to find text in the line (like the f command).
-        'last_character_search': state.last_character_search,
-        # Whether we want to save the original selections to restore them after the command.
-        'restore_original_carets': False,
-        # We keep track of the caret's x position so vertical motions like j, k can restore it
-        # as needed. This item must not ever be reset. All horizontal motions must update it.
-        # Vertical motions must adjust the selections .b end to factor in this data.
-        'xpos': state.xpos,
-        # Indicates whether xpos needs to be updated. Only vertical motions j and k need not
-        # update xpos.
-        'must_update_xpos': True,        
-        # Whether we should make sure to show the first selection.
-        'scroll_into_view': True,
-        # If not None, the corresponding mode will be entered before runnig ViRun.
-        # It's basically used as a way to change to NORMALMODE and be able to capture further
-        # key strokes for INSERTMODE chords. Use sparingly.
-        # Used, for example, by CTRL+R,= in INSERTMODE.
-        '_change_mode_to': None,
-        # If not None, the corresponding mode will be entered during the full run of a command, in
-        # some cases. Used to know which mode to transition to after a failed composite command.
-        # Note this is mainly useful to exit from bad corrupted states; successful commands should
-        # instead specify their 'follow_up_mode' hook.
-        # For example, in INSERTMODE, Ctrl+R,j would cause VintageState to use this.
-        '_exit_mode': None,
-        'must_blink_on_error': False,
-        # Mode to transition to on success.
-        'next_mode': MODE_NORMAL,
-    }
-    
-    return vi_cmd_data
+from Vintageous.vi.cmd_data import CmdData
 
 
 def _init_vintageous(view):
@@ -342,7 +251,7 @@ class VintageState(object):
         self.settings.vi['xpos'] = value
 
     def parse_motion(self):
-        vi_cmd_data = new_vi_cmd_data(self)
+        vi_cmd_data = CmdData(self)
 
         # This should happen only at initialization.
         # XXX: This is effectively zeroing xpos. Shouldn't we move this into new_vi_cmd_data()?
