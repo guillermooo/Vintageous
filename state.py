@@ -104,6 +104,7 @@ def new_vi_cmd_data(state):
         # instead specify their 'follow_up_mode' hook.
         # For example, in INSERTMODE, Ctrl+R,j would cause VintageState to use this.
         '_exit_mode': None,
+        'must_blink_on_error': False,
     }
     
     return vi_cmd_data
@@ -141,7 +142,7 @@ class VintageState(object):
 
     # Makes yank data globally accesible.
     registers = Registers()
-    contexts = KeyContext()
+    context = KeyContext()
 
     def __init__(self, view):
         self.view = view
@@ -183,6 +184,15 @@ class VintageState(object):
         self.settings.vi['mode'] = value
 
     @property
+    def cancel_action(self):
+        # If we can't find a suitable action, we should cancel.
+        return self.settings.vi['cancel_action']
+
+    @cancel_action.setter
+    def cancel_action(self, value):
+        self.settings.vi['cancel_action'] = value
+
+    @property
     def action(self):
         return self.settings.vi['action']
 
@@ -202,7 +212,8 @@ class VintageState(object):
 
         # Avoid recursion. The .reset() method will try to set this property to None, not ''.
         if name == '':
-            self.reset()
+            # The chord is invalid, so notify that we need to cancel the command in .run().
+            self.cancel_action = True
             return
 
         self.settings.vi[target] = name
@@ -381,6 +392,15 @@ class VintageState(object):
         """Examines the current state and decides whether to actually run the action/motion.
         """
 
+        if self.cancel_action:
+            # TODO: add a .parse() method that includes boths steps?
+            vi_cmd_data = self.parse_motion()
+            vi_cmd_data = self.parse_action(vi_cmd_data)
+            if vi_cmd_data['must_blink_on_error']:
+                utils.blink()
+            self.reset(next_mode=vi_cmd_data['_exit_mode'])
+            return
+
         # Action + motion, like in "3dj".
         if self.action and self.motion:
             vi_cmd_data = self.parse_motion()
@@ -437,10 +457,12 @@ class VintageState(object):
     def reset(self, next_mode=None):
         self.motion = None
         self.action = None
+        
         self.register = None
         self.user_input = None
         self.expecting_register = False
         self.expecting_user_input = False
+        self.cancel_action = False
 
         # In MODE_NORMAL_INSERT, we temporarily exit NORMAL mode, but when we get back to
         # it, we need to know the repeat digits, so keep them. An example command for this case
@@ -468,11 +490,10 @@ class VintageStateTracker(sublime_plugin.EventListener):
 
     def on_query_context(self, view, key, operator, operand, match_all):
         vintage_state = VintageState(view)
-        context = KeyContext(VintageState(view))
 
         # TODO: Move contexts to a separate file to reduce clutter.
         if key == 'vi_must_change_mode':
-            return context.change_vi_mode(key, operator, operand, match_all)
+            return vintage_state.context.change_vi_mode(key, operator, operand, match_all)
 
         elif key == "vi_mode_can_push_digit":
             motion_digits = not vintage_state.motion

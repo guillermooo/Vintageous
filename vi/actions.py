@@ -3,7 +3,10 @@
 
 
 from Vintageous.vi import motions
-from Vintageous.vi.constants import MODE_VISUAL, _MODE_INTERNAL_NORMAL, MODE_VISUAL_LINE, MODE_NORMAL, MODE_INSERT, MODE_NORMAL_INSERT
+from Vintageous.vi.constants import (MODE_VISUAL, _MODE_INTERNAL_NORMAL,
+                                     MODE_VISUAL_LINE, MODE_NORMAL,
+                                     MODE_INSERT, MODE_NORMAL_INSERT,
+                                     ACTIONS_EXITING_TO_INSERT_MODE,)
 
 
 def vi_enter_visual_mode(vi_cmd_data):
@@ -628,6 +631,7 @@ def vi_ctrl_r_action(vi_cmd_data):
        completes this one.
     """
     vi_cmd_data['_change_mode_to'] = MODE_NORMAL
+    vi_cmd_data['must_blink_on_error'] = True
     vi_cmd_data['_exit_mode'] = MODE_INSERT
     vi_cmd_data['motion_required'] = False
     # Let global state know we still need a second action to complete this one.
@@ -664,6 +668,9 @@ def vi_esc(vi_cmd_data):
         vi_cmd_data['action']['args'] = {}
         vi_cmd_data['motion']['command'] = 'no_op'
         vi_cmd_data['motion']['args'] = {}
-
+    elif vi_cmd_data['mode'] == MODE_NORMAL:
+        # XXX: Is this here needed?
+        vi_cmd_data['action']['command'] = 'vi_enter_insert_mode'
+        vi_cmd_data['action']['args'] = {}
 
     return vi_cmd_data
