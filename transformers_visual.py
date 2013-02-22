@@ -497,7 +497,6 @@ class _vi_b_pre_motion(sublime_plugin.TextCommand):
 
             elif mode == MODE_VISUAL:
                 if utils.is_region_reversed(view, s):
-
                     if text_before_caret.isspace() or first_char_is_space:
                         pt = utils.previous_non_white_space_char(self.view, s.b - delta, white_space='\t ')
                         # PREVIOUSLINE empty; don't go past it.
@@ -528,6 +527,7 @@ class _vi_b_pre_motion(sublime_plugin.TextCommand):
                     elif (view.word(s.b - 1).a == s.b - 1) or not view.substr(s.b - 1).isalnum():
                         return sublime.Region(s.a, s.b - 1)
 
+            print("XXX XXX XXX")
             return s
 
         regions_transformer(self.view, f)
@@ -543,6 +543,7 @@ class _vi_b_post_every_motion(sublime_plugin.TextCommand):
                 if not utils.is_region_reversed(self.view, s):
                     return sublime.Region(s.a, s.b + 1)
 
+            print("FOO BAR FOO")
             return s
 
         regions_transformer(self.view, f)
@@ -1083,5 +1084,13 @@ class _vi_orient_selections_toward_begin(sublime_plugin.TextCommand):
     def run(self, edit):
         def f(view, s):
             return sublime.Region(s.begin() + 1, s.begin())
+
+        regions_transformer(self.view, f)
+
+# XXX: _vi_orient_selections_toward_begin and this one should be merged.
+class _vi_visual_orient_selections_toward_begin(sublime_plugin.TextCommand):
+    def run(self, edit):
+        def f(view, s):
+            return sublime.Region(s.end(), s.begin())
 
         regions_transformer(self.view, f)
