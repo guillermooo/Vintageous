@@ -73,6 +73,8 @@ class VintageState(object):
         if self.view.overwrite_status():
             self.view.set_overwrite_status(False)
 
+        self.view.run_command('glue_marked_undo_groups')
+
     def enter_visual_line_mode(self):
         self.mode = MODE_VISUAL_LINE
 
@@ -80,6 +82,7 @@ class VintageState(object):
         self.settings.view['command_mode'] = False
         self.settings.view['inverse_caret_state'] = False
         self.mode = MODE_INSERT
+        self.view.run_command('mark_undo_groups_for_gluing')
 
     def enter_visual_mode(self):
         self.mode = MODE_VISUAL

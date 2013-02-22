@@ -551,3 +551,12 @@ class _vi_undo(IrreversibleTextCommand):
 class _vi_ctrl_w_v_action(sublime_plugin.TextCommand):
     def run(self, edit):
         self.view.window().run_command('new_pane', {})
+
+
+class Sequence(sublime_plugin.TextCommand):
+    """Required so that mark_undo_groups_for_gluing and friends work.
+    """
+    def run(self, edit, commands):
+        for cmd, args in commands:
+            self.view.run_command(cmd, args)
+            
