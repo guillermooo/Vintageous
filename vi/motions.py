@@ -220,13 +220,10 @@ def vi_h(vi_cmd_data):
 
 
 def vi_big_h(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = 'vi_big_h'
+    vi_cmd_data['motion']['command'] = '_vi_big_h'
     # XXX: We subtract one, but vi_cmd_data should know when it's been set to a default value
     # or to an user-supplied one.
-    vi_cmd_data['motion']['args'] = {'count': vi_cmd_data['count'] - 1}
-
-    if vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['motion']['args']['extend'] = True
+    vi_cmd_data['motion']['args'] = {'count': vi_cmd_data['count'] - 1, 'mode': vi_cmd_data['mode']}
 
     return vi_cmd_data
 
@@ -235,20 +232,16 @@ def vi_big_l(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_big_l'
     # XXX: We subtract one, but vi_cmd_data should know when it's been set to a default value
     # or to an user-supplied one.
-    vi_cmd_data['motion']['args'] = {'count': vi_cmd_data['count'] - 1}
+    vi_cmd_data['motion']['args'] = {'count': vi_cmd_data['count'] - 1, 'mode': vi_cmd_data['mode']}
 
-    if vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['motion']['args']['extend'] = True
 
     return vi_cmd_data
 
 
 def vi_big_m(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_big_m'
-    vi_cmd_data['motion']['args'] = {}
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
 
-    if vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['motion']['args']['extend'] = True
 
     return vi_cmd_data
 
