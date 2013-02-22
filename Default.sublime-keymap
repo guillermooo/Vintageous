@@ -1,6 +1,8 @@
 [
 	{ "keys": ["escape"], "command": "set_action", "args": {"action": "vi_esc"}, "context": [{"key": "vi_must_change_mode"}, {"key": "vi_is_buffer"}] },
 
+	{ "keys": ["R"], "command": "set_action", "args": {"action": "vi_enter_replace_mode"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_is_buffer"}] },
+
 	{ "keys": ["i"], "command": "set_action", "args": {"action": "vi_enter_insert_mode"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_mode_visual_any", "operand": false}] },
 
 	// This allows insertions such as 5ifoobar\n<esc>. Macros help with this, but we should prevent the user from

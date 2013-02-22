@@ -11,6 +11,7 @@ MODE_NORMAL_INSERT = 1 << 4
 #
 # Note that for pure motions we still use plain NORMAL mode.
 _MODE_INTERNAL_NORMAL = 1 << 5
+MODE_REPLACE = 1 << 6
 
 
 DIGRAPH_ACTION = 1
@@ -59,6 +60,10 @@ def mode_to_str(mode):
         return "VISUAL LINE"
     elif mode == MODE_NORMAL_INSERT:
         return "INSERT"
+    elif mode == MODE_REPLACE:
+        # XXX: I'm not sure whether Vim prints to the status bar in this case, but since Sublime
+        # Text won't let us use a block cursor, let's give some feeback to the user.
+        return "REPLACE"
     return "<unknown>"
 
 

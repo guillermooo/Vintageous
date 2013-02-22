@@ -226,6 +226,14 @@ class ViEnterVisualLineMode(sublime_plugin.TextCommand):
         state = VintageState(self.view)
         state.enter_visual_line_mode()
 
+class ViEnterReplaceMode(sublime_plugin.TextCommand):
+    def run(self, edit):
+        state = VintageState(self.view)
+        state.enter_replace_mode()
+        # XXX: Shouldn't this be done from within VintageState?
+        self.view.run_command('collapse_to_direction')
+        state.reset()
+
 
 class SetAction(IrreversibleTextCommand):
     def __init__(self, view):

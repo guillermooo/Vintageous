@@ -7,7 +7,7 @@ from Vintageous.vi import motions
 from Vintageous.vi import actions
 from Vintageous.vi.constants import (MODE_INSERT, MODE_NORMAL, MODE_VISUAL,
                          MODE_VISUAL_LINE, MODE_NORMAL_INSERT,
-                         _MODE_INTERNAL_NORMAL)
+                         _MODE_INTERNAL_NORMAL, MODE_REPLACE)
 from Vintageous.vi.constants import mode_to_str
 from Vintageous.vi.constants import digraphs
 from Vintageous.vi.constants import DIGRAPH_MOTION
@@ -70,6 +70,9 @@ class VintageState(object):
         self.xpos = None if not self.view.sel() else self.view.rowcol(self.view.sel()[0].b)[1]
         self.mode = MODE_NORMAL
 
+        if self.view.overwrite_status():
+            self.view.set_overwrite_status(False)
+
     def enter_visual_line_mode(self):
         self.mode = MODE_VISUAL_LINE
 
@@ -85,6 +88,12 @@ class VintageState(object):
         self.mode = MODE_NORMAL_INSERT
         self.settings.view['command_mode'] = False
         self.settings.view['inverse_caret_state'] = False
+
+    def enter_replace_mode(self):
+        self.mode = MODE_REPLACE
+        self.settings.view['command_mode'] = False
+        self.settings.view['inverse_caret_state'] = False
+        self.view.set_overwrite_status(True)
 
     @property
     def mode(self):
