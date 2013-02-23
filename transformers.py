@@ -45,7 +45,7 @@ class _vi_d_post_action(sublime_plugin.TextCommand):
         def f(view, s):
             if is_at_eol(self.view, s) and not self.view.line(s.b).empty():
                 s = back_one_char(s)
-            s = next_non_white_space_char(self.view, s.b)
+            # s = next_non_white_space_char(self.view, s.b)
             return s
 
         regions_transformer(self.view, f)
