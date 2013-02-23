@@ -527,7 +527,6 @@ class _vi_b_pre_motion(sublime_plugin.TextCommand):
                     elif (view.word(s.b - 1).a == s.b - 1) or not view.substr(s.b - 1).isalnum():
                         return sublime.Region(s.a, s.b - 1)
 
-            print("XXX XXX XXX")
             return s
 
         regions_transformer(self.view, f)
@@ -543,7 +542,6 @@ class _vi_b_post_every_motion(sublime_plugin.TextCommand):
                 if not utils.is_region_reversed(self.view, s):
                     return sublime.Region(s.a, s.b + 1)
 
-            print("FOO BAR FOO")
             return s
 
         regions_transformer(self.view, f)

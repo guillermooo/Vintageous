@@ -276,7 +276,8 @@ class VintageState(object):
             vi_cmd_data['xpos'] = xpos
 
         # Make sure we run NORMAL mode actions in _MODE_INTERNAL_NORMAL mode.
-        # XXX: This is effectively zeroing xpos. Shouldn't we move this into new_vi_cmd_data()?
+        # Note that NORMALMODE actions without a motion are sill run in MODE_NORMAL.
+        # XXX: Is this correct; shouldn't all actions be run in _MODE_INTERNAL_NORMAL?
         if self.mode in (MODE_VISUAL, MODE_VISUAL_LINE) or (self.motion and self.action):
             if self.mode not in (MODE_VISUAL, MODE_VISUAL_LINE):
                 self.mode = _MODE_INTERNAL_NORMAL
@@ -396,7 +397,8 @@ class VintageState(object):
         if next_mode == MODE_INSERT:
             self.enter_insert_mode()
         elif next_mode is not None:
-            print("Vintageous:", "Changing to some modes not implemented.")
+            # XXX: We don't know yet of any case where a different mode is required.
+            pass
 
     def update_status(self):
         mode_name = mode_to_str(self.mode) or ""
