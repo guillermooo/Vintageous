@@ -67,9 +67,12 @@ class Registers(object):
         # This ensures that we can easiy access the active view.
         return Registers(instance.view, instance.settings)
 
-    def _set_default_register(self, value):
+    def _set_default_register(self, values):
+        assert isinstance(values, list)
+        # Coerce all values into strings.
+        values = [str(v) for v in values]
         # todo(guillermo): could be made a decorator.
-        _REGISTER_DATA[REG_UNNAMED] = value
+        _REGISTER_DATA[REG_UNNAMED] = values
 
     def _maybe_set_sys_clipboard(self, name, value):
         # We actually need to check whether the option is set to a bool; could
@@ -83,9 +86,14 @@ class Registers(object):
                 else:
                     sublime.set_clipboard(value[0])
 
-    def set(self, name, value):
+    def set(self, name, values):
         """
         Sets an a-z or 0-9 register.
+
+        In order to honor multiple selections in Sublime Text, we need to store register data as
+        lists, one per selection. The paste command will then make the final decision about what
+        to insert into the buffer when faced with unbalanced selection number / available
+        register data.
         """
         # We accept integers as register names.
         name = str(name)
@@ -93,6 +101,10 @@ class Registers(object):
 
         if name == REG_BLACK_HOLE:
             return
+
+        assert isinstance(values, list)
+        # Coerce all values into strings.
+        values = [str(v) for v in values]
 
         # Special registers and invalid registers won't be set.
         if (not (name.isalpha() or name.isdigit() or
@@ -102,21 +114,22 @@ class Registers(object):
                     # Vim fails silently.
                     # raise Exception("Can only set a-z and 0-9 registers.")
                     return None
-        _REGISTER_DATA[name] = value
+
+        _REGISTER_DATA[name] = values
 
         if not name in (REG_EXPRESSION,):
-            self._set_default_register(value)
-            self._maybe_set_sys_clipboard(name, value)
+            self._set_default_register(values)
+            self._maybe_set_sys_clipboard(name, values)
 
-    def append_to(self, name, value):
+    def append_to(self, name, suffixes):
         """
         Appends to an a-z register. `name` must be a capital in A-Z.
         """
         assert len(name) == 1, "Register names must be 1 char long."
-        assert ord(name) in range(ord('A'), ord('Z') + 1), "Can only append to A-Z registers."
+        assert name in "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "Can only append to A-Z registers."
 
         existing_values = _REGISTER_DATA.get(name.lower(), '')
-        new_values = itertools.zip_longest(existing_values, value, fillvalue='')
+        new_values = itertools.zip_longest(existing_values, suffixes, fillvalue='')
         new_values = [(prefix + suffix) for (prefix, suffix) in new_values]
         _REGISTER_DATA[name.lower()] = new_values
         self._set_default_register(new_values)

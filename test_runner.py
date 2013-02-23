@@ -24,6 +24,7 @@ class TestsState(object):
 
 test_suites = {
         'settings': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.settings.test_settings'],
+        'registers': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.vi.test_registers'],
 }
 
 
@@ -36,7 +37,6 @@ class PrintToBuffer(sublime_plugin.TextCommand):
 
 class ShowVintageExTestSuites(sublime_plugin.WindowCommand):
     def run(self):
-        print("HELLO WORLD")
         self.window.show_quick_panel(sorted(test_suites.keys()), self.run_suite)
 
     def run_suite(self, idx):
