@@ -10,5 +10,6 @@ if (& hg qseries) {
 	exit
 }
 
-& hg push bb
-& hg push git
+# Override .hg/hgrc
+& hg --config "alias.push=push" push bb
+& hg --config "alias.push=push" push git

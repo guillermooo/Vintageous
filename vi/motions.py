@@ -318,7 +318,7 @@ def vi_e(vi_cmd_data):
     # _MODE_INTERNAL_NORMAL
     #
     vi_cmd_data['motion']['command'] = 'move'
-    vi_cmd_data['motion']['args'] = {'by': 'word_ends', 'forward': True}
+    vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_end': True, 'punct_end': True, 'empty_line': False, 'forward': True}
     vi_cmd_data['__reorient_caret'] = True
 
     if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
