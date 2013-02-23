@@ -36,6 +36,7 @@ class PrintToBuffer(sublime_plugin.TextCommand):
 
 class ShowVintageExTestSuites(sublime_plugin.WindowCommand):
     def run(self):
+        print("HELLO WORLD")
         self.window.show_quick_panel(sorted(test_suites.keys()), self.run_suite)
 
     def run_suite(self, idx):

@@ -1,7 +1,8 @@
 import unittest
 
 from Vintageous.test_runner import TestsState
-from Vintageous.vi.settings import SublimeSettings, VintageSettings
+from Vintageous.vi.settings import (SublimeSettings, VintageSettings,
+								    SettingsManager,)
 
 
 class TestSublimeSettings(unittest.TestCase):
@@ -49,3 +50,19 @@ class TestVintageSettings(unittest.TestCase):
 	def testCanGetNonexistingKey(self):
 		self.assertEqual(self.setts['foo'], None)
 		
+
+class TestSettingsManager(unittest.TestCase):
+	def setUp(self):
+		TestsState.view.settings().erase('vintage')
+		self.settsman = SettingsManager(view=TestsState.view)
+
+	def testCanInitializeClass(self):
+		self.assertEqual(TestsState.view, self.settsman.v)
+
+	def testCanAccessViSsettings(self):
+		self.settsman.vi['foo'] = 100
+		self.assertEqual(self.settsman.vi['foo'], 100)
+
+	def testCanAccessViewSettings(self):
+		self.settsman.view['foo'] = 100
+		self.assertEqual(self.settsman.view['foo'], 100)
