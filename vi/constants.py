@@ -9,7 +9,8 @@ MODE_NORMAL_INSERT = 1 << 4
 # mode operations (involving an action, not only a motion) from VISUAL mode, we need to add an
 # additional mode for handling selections that won't interfere with the actual VISUAL mode.
 #
-# Note that for pure motions we still use plain NORMAL mode.
+# Note that for pure motions and pure actions we still use plain NORMAL mode.
+# XXX: Maybe running pure actions (no motion) should be done in _MODE_INTERNAL_NORMAL too instead.
 _MODE_INTERNAL_NORMAL = 1 << 5
 MODE_REPLACE = 1 << 6
 

@@ -571,16 +571,22 @@ def vi_antilambda(vi_cmd_data):
 
 
 def vi_big_j(vi_cmd_data):
-    # XXX: Assume _MODE_INTERNAL_NORMAL
+    # XXX: Still required so we'll end up in _MODE_INTERNAL_NORMAL. We should avoid this
+    # requirement.
+    if vi_cmd_data['mode'] != MODE_VISUAL:
+        vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
+
     vi_cmd_data['motion_required'] = False
-    vi_cmd_data['_repeat_action'] = True
 
-    vi_cmd_data['motion']['command'] = 'no_op'
-    vi_cmd_data['motion']['args'] = {}
-
-    vi_cmd_data['action']['command'] = 'join_lines'
-    vi_cmd_data['action']['args'] = {}
-    # vi_cmd_data['post_action'] = ['collapse_to_begin',]
+    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
+        vi_cmd_data['_repeat_action'] = True
+        vi_cmd_data['count'] = (vi_cmd_data['count'] - 1 or 1)
+        vi_cmd_data['action']['command'] = '_vi_big_j'
+        vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
+    else:
+        vi_cmd_data['action']['command'] = 'no_op'
+        vi_cmd_data['action']['args'] = {}
+        
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data

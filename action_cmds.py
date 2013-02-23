@@ -560,3 +560,33 @@ class Sequence(sublime_plugin.TextCommand):
         for cmd, args in commands:
             self.view.run_command(cmd, args)
             
+
+class _vi_big_j(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None):
+        def f(view, s):
+            if mode == _MODE_INTERNAL_NORMAL:
+                full_current_line = view.full_line(s.b)
+                target = full_current_line.b - 1
+                full_next_line = view.full_line(full_current_line.b)
+                two_lines = sublime.Region(full_current_line.a, full_next_line.b)
+
+                # Text without \n.
+                first_line_text = view.substr(view.line(full_current_line.a))
+                next_line_text = view.substr(full_next_line)
+
+                if len(next_line_text) > 1:
+                    next_line_text = next_line_text.lstrip()
+
+                sep = ''
+                if first_line_text and not first_line_text.endswith(' '):
+                    sep = ' '
+
+                view.replace(edit, two_lines, first_line_text + sep + next_line_text)
+
+                if first_line_text:
+                    return sublime.Region(target, target) 
+                return s
+            else:
+                return s
+
+        regions_transformer(self.view, f)
