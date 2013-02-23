@@ -173,7 +173,7 @@ class Registers(object):
             pass
 
     def to_dict(self):
-        # Stopgap solution until we sublass from dict
+        # XXX: Stopgap solution until we sublass from dict
         return {name: self.get(name) for name in REG_ALL}
 
     def __getitem__(self, key):

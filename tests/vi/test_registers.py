@@ -205,3 +205,26 @@ class TestCaseRegisters(unittest.TestCase):
     def testCanGetRegisterEvenIfRequestingItThroughACapitalLetter(self):
         registers._REGISTER_DATA['a'] = ['foo']
         self.assertEqual(self.regs.get('A'), ['foo'])
+
+    def testCanGetRegistersWithDictSyntax(self):
+        registers._REGISTER_DATA['a'] = ['foo']
+        self.assertEqual(self.regs.get('a'), self.regs['a'])
+
+    def testCanSetRegistersWithDictSyntax(self):
+        self.regs['a'] = ['100']
+        self.assertEqual(self.regs['a'], ['100'])
+
+    def testCanAppendToRegisteWithDictSyntax(self):
+        self.regs['a'] = ['100']
+        self.regs['A'] = ['100']
+        self.assertEqual(self.regs['a'], ['100100'])
+
+    def testCanConvertToDict(self):
+        self.regs['a'] = ['100']
+        self.regs['b'] = ['200']
+        values = {name: self.regs.get(name) for name in registers.REG_ALL}
+        values.update({'a': ['100'], 'b': ['200']})
+        self.assertEqual(self.regs.to_dict(), values)
+
+    def testGettingEmptyRegisterReturnsNone(self):
+        self.assertEqual(self.regs.get('a'), None)
