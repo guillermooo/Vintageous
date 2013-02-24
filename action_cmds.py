@@ -202,6 +202,7 @@ class ViEnterNormalModeFromInsertMode(sublime_plugin.TextCommand):
 
         state = VintageState(self.view)
         state.enter_normal_mode()
+        self.view.window().run_command('hide_auto_complete')
 
 
 class ViEnterInsertMode(sublime_plugin.TextCommand):
