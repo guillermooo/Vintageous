@@ -82,3 +82,11 @@ class CmdData(dict):
         self['must_blink_on_error'] = False
         # Mode to transition to on success.
         self['next_mode'] = MODE_NORMAL
+        # Command to modify the selection after the motion+command have run, and before
+        # follow_up_mode is run.
+        self['selection_modifier'] = None
+        # Related to selection_modifier. After modiying the selections, the new selections might
+        # still be aligned with xpos. This is the case with 3yk, for instance, where the linewise
+        # motion will leave .b at BOL, while Vim keeps the starting xpos. In this case, we need
+        # to request xpos to be readjusted.
+        self['align_with_xpos'] = False

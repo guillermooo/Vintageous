@@ -64,9 +64,10 @@ class ViRunCommand(sublime_plugin.TextCommand):
                 self.do_action(vi_cmd_data)
             else:
                 self.do_whole_motion(vi_cmd_data)
+
         finally:
+            # XXX: post_action should be run only if do_action succeeds (?).
             self.do_post_action(vi_cmd_data)
-            self.do_follow_up_mode(vi_cmd_data)
 
             if vi_cmd_data['must_update_xpos']:
                 state = VintageState(self.view)
@@ -83,6 +84,9 @@ class ViRunCommand(sublime_plugin.TextCommand):
                     xpos = self.view.rowcol(first_sel.b)[1]
 
                 state.xpos = xpos
+
+            self.do_modify_selections(vi_cmd_data)
+            self.do_follow_up_mode(vi_cmd_data)
 
             if vi_cmd_data['scroll_into_view']:
                 # TODO: If moving by lines, scroll the minimum amount to display the new sels.
@@ -161,6 +165,16 @@ class ViRunCommand(sublime_plugin.TextCommand):
 
         if vi_cmd_data['follow_up_mode']:
             self.view.run_command(vi_cmd_data['follow_up_mode'])
+
+    def do_modify_selections(self, vi_cmd_data):
+        # Gives command a chance to modify the selection after the motion/action. Useful for
+        # cases like 3yk, where we need to collapse to .b (== .begin()).
+        if vi_cmd_data['selection_modifier']:
+            self.view.run_command(*vi_cmd_data['selection_modifier'])
+
+        if vi_cmd_data['align_with_xpos']:
+            state = VintageState(self.view)
+            self.view.run_command('_align_b_with_xpos', {'xpos': state.xpos})
 
     def do_motion(self, vi_cmd_data):
         cmd = vi_cmd_data['motion']['command']

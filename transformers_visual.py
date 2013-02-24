@@ -39,11 +39,40 @@ class CollapseToDirection(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
-class CollapseToBegin(sublime_plugin.TextCommand):
+class CollapseToA(sublime_plugin.TextCommand):
     def run(self, edit):
         def f(view, s):
             if not s.empty():
                 return sublime.Region(s.a, s.a)
+            else:
+                return s
+
+        regions_transformer(self.view, f)
+
+
+class _align_b_with_xpos(sublime_plugin.TextCommand):
+    def run(self, edit, xpos=-1):
+        def f(view, s):
+            row, col = view.rowcol(s.b)
+            # We assume every time we need to adjust xpos it's because the old one is smaller.
+            if (s.a >= s.b) and col < xpos:
+                limit = view.line(s.b).size()
+                new_col = min(xpos + 1, limit)
+
+                return sublime.Region(s.a, view.text_point(row, new_col))
+            return s
+
+        if xpos < 0:
+            return
+
+        regions_transformer(self.view, f)
+
+
+class _vi_collapse_to_begin(sublime_plugin.TextCommand):
+    def run(self, edit):
+        def f(view, s):
+            if not s.empty():
+                return sublime.Region(s.begin(), s.begin())
             else:
                 return s
 

@@ -303,7 +303,7 @@ def vi_p(vi_cmd_data):
     vi_cmd_data['post_action'] = ['dont_stay_on_eol_backward',]
 
     if vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['post_action'] = ['collapse_to_begin', 'dont_stay_on_eol_backward']
+        vi_cmd_data['post_action'] = ['collapse_to_a', 'dont_stay_on_eol_backward']
         vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
@@ -315,7 +315,7 @@ def vi_big_p(vi_cmd_data):
     vi_cmd_data['action']['args'] = {'count': vi_cmd_data['count'], 'register': vi_cmd_data['register']}
 
     if vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['post_action'] = ['collapse_to_begin',]
+        vi_cmd_data['post_action'] = ['collapse_to_a',]
         vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
@@ -362,10 +362,16 @@ def vi_cc(vi_cmd_data):
 def vi_y(vi_cmd_data):
     vi_cmd_data['motion_required'] = True
     vi_cmd_data['can_yank'] = True
+    # vi_cmd_data['restore_original_carets'] = True
     # The yanked text will be put in the clipboard if needed. This command shouldn't do any action.
     vi_cmd_data['action']['command'] = 'no_op'
     vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['collapse_to_begin',]
+    vi_cmd_data['selection_modifier'] = ['_vi_collapse_to_begin',]
+    # For example, 3yk operates linewise in _MODE_INTERNAL_NORMAL. This will cause the carets to
+    # end up at BOL, so selection_modifier isn't enough to place them at the desirable point.
+    # XXX: Maybe selection_modifier and align_with_xpos can be simplified somehow: linewise
+    # commands in _MODE_INTERNAL_NORMAL probably behave the same?
+    vi_cmd_data['align_with_xpos'] = True
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
@@ -414,7 +420,7 @@ def vi_g_big_u(vi_cmd_data):
     vi_cmd_data['motion_required'] = True
     vi_cmd_data['action']['command'] = 'upper_case'
     vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['collapse_to_begin',]
+    vi_cmd_data['post_action'] = ['collapse_to_a',]
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
@@ -424,7 +430,7 @@ def vi_g_u(vi_cmd_data):
     vi_cmd_data['motion_required'] = True
     vi_cmd_data['action']['command'] = 'lower_case'
     vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['collapse_to_begin',]
+    vi_cmd_data['post_action'] = ['collapse_to_a',]
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
@@ -434,7 +440,7 @@ def vi_g_q(vi_cmd_data):
     vi_cmd_data['motion_required'] = True
     vi_cmd_data['action']['command'] = 'wrap_lines'
     vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['collapse_to_begin',]
+    vi_cmd_data['post_action'] = ['collapse_to_a',]
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
@@ -506,7 +512,7 @@ def vi_double_lambda(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = 'indent'
     vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['collapse_to_begin',]
+    vi_cmd_data['post_action'] = ['collapse_to_a',]
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
@@ -522,7 +528,7 @@ def vi_double_antilambda(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = 'unindent'
     vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['collapse_to_begin',]
+    vi_cmd_data['post_action'] = ['collapse_to_a',]
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
@@ -548,7 +554,7 @@ def vi_lambda(vi_cmd_data):
     vi_cmd_data['motion_required'] = True
     vi_cmd_data['action']['command'] = 'indent'
     vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['collapse_to_begin',]
+    vi_cmd_data['post_action'] = ['collapse_to_a',]
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     if vi_cmd_data['mode'] in (MODE_VISUAL, MODE_VISUAL_LINE):
@@ -561,7 +567,7 @@ def vi_antilambda(vi_cmd_data):
     vi_cmd_data['motion_required'] = True
     vi_cmd_data['action']['command'] = 'unindent'
     vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['collapse_to_begin',]
+    vi_cmd_data['post_action'] = ['collapse_to_a',]
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
     
     if vi_cmd_data['mode'] in (MODE_VISUAL, MODE_VISUAL_LINE):
@@ -603,7 +609,7 @@ def vi_big_u(vi_cmd_data):
     vi_cmd_data['action']['command'] = 'upper_case'
     vi_cmd_data['action']['args'] = {}
 
-    vi_cmd_data['post_action'] = ['collapse_to_begin',]
+    vi_cmd_data['post_action'] = ['collapse_to_a',]
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
@@ -620,7 +626,7 @@ def vi_u(vi_cmd_data):
     vi_cmd_data['action']['command'] = 'lower_case'
     vi_cmd_data['action']['args'] = {}
 
-    vi_cmd_data['post_action'] = ['collapse_to_begin',]
+    vi_cmd_data['post_action'] = ['collapse_to_a',]
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
