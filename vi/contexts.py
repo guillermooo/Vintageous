@@ -93,6 +93,14 @@ class KeyContext(object):
         value = self.state.mode == MODE_NORMAL
         return self._check(value, operator, operand, match_all)
 
+    def vi_mode_normal_or_visual(self, key, operator, operand, match_all):
+        # XXX: This context is used to disable some keys for VISUALLINE.
+        # However, this is hiding some problems in visual transformers that might not be dealing
+        # correctly with VISUALLINE.
+        normal = self.vi_mode_normal(key, operator, operand, match_all)
+        visual = self.vi_mode_visual(key, operator, operand, match_all)
+        return self._check((normal or visual), operator, operand, match_all)
+
     def vi_state_next_character_is_user_input(self, key, operator, operand, match_all):
         value = (self.state.expecting_user_input or
                  self.state.expecting_register)

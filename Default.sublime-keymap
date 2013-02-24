@@ -10,10 +10,10 @@
 	{ "keys": ["i"], "command": "vi_enter_normal_insert_mode", "context": [{"key": "setting.command_mode"}, {"key": "vi_has_motion_count"}] },
 	{ "keys": ["a"], "command": "set_action", "args": {"action": "vi_a"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_mode_visual_any", "operand": false}] },
 
-	{ "keys": ["h"], "command": "set_motion", "args": {"motion": "vi_h"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["h"], "command": "set_motion", "args": {"motion": "vi_h"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["j"], "command": "set_motion", "args": {"motion": "vi_j"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["k"], "command": "set_motion", "args": {"motion": "vi_k"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["l"], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["l"], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 	
 	{ "keys": ["down"], "command": "set_motion", "args": {"motion": "vi_j"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["up"], "command": "set_motion", "args": {"motion": "vi_k"}, "context": [{"key": "setting.command_mode"}] },
@@ -22,20 +22,16 @@
 	{ "keys": ["right"], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "setting.command_mode"}] },
 
 	// ST won't allow cursor movement while full lines are selected, so disable these.
-	{ "keys": ["h"], "command": "vi_no_op", "context": [{"key": "vi_mode_visual_line"}] },
-	{ "keys": ["l"], "command": "vi_no_op", "context": [{"key": "vi_mode_visual_line"}] },
-
-	// ST won't allow cursor movement while full lines are selected, so disable these.
 	{ "keys": ["left"], "command": "vi_no_op", "context": [{"key": "vi_mode_visual_line"}] },
 	{ "keys": ["right"], "command": "vi_no_op", "context": [{"key": "vi_mode_visual_line"}] },
 
-	{ "keys": ["w"], "command": "set_motion", "args": {"motion": "vi_w"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["e"], "command": "set_motion", "args": {"motion": "vi_e"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["b"], "command": "set_motion", "args": {"motion": "vi_b"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["w"], "command": "set_motion", "args": {"motion": "vi_w"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["e"], "command": "set_motion", "args": {"motion": "vi_e"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["b"], "command": "set_motion", "args": {"motion": "vi_b"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 
-	{ "keys": ["W"], "command": "set_motion", "args": {"motion": "vi_big_w"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["E"], "command": "set_motion", "args": {"motion": "vi_big_e"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["B"], "command": "set_motion", "args": {"motion": "vi_big_b"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["W"], "command": "set_motion", "args": {"motion": "vi_big_w"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["E"], "command": "set_motion", "args": {"motion": "vi_big_e"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["B"], "command": "set_motion", "args": {"motion": "vi_big_b"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 
 	{ "keys": ["$"], "command": "set_motion", "args": {"motion": "vi_dollar"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["_"], "command": "set_motion", "args": {"motion": "vi_underscore"}, "context": [{"key": "setting.command_mode"}] },
