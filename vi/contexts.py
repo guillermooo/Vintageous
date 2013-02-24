@@ -2,6 +2,7 @@ import sublime
 
 from Vintageous.vi.constants import MODE_NORMAL, MODE_NORMAL_INSERT, MODE_INSERT, ACTIONS_EXITING_TO_INSERT_MODE, MODE_VISUAL_LINE, MODE_VISUAL
 from Vintageous.vi import constants
+from Vintageous.vi import utils
 
 
 class KeyContext(object):
@@ -110,6 +111,21 @@ class KeyContext(object):
         action_digits = self.state.motion
         value = motion_digits or action_digits
         return self._check(value, operator, operand, match_all)
+
+    def vi_can_enter_any_visual_mode(self, key, operator, operand, match_all):
+        sels = self.state.view.sel()
+        rv = True
+        for sel in sels:
+            # We're assuming we are in normal mode.
+            if sel.b == self.state.view.size() and self.state.view.line(sel.b).empty():
+                rv = False
+                break
+
+        if not rv:
+            print("Vintageous: Can't enter visual mode at EOF if last line is empty.")
+            utils.blink()
+
+        return self._check(rv, operator, operand, match_all)
 
     def check(self, key, operator, operand, match_all):
         func = getattr(self, key, None)

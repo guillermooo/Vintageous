@@ -54,11 +54,12 @@
 	{ "keys": ["*"], "command": "set_motion", "args": {"motion": "vi_star"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["#"], "command": "set_motion", "args": {"motion": "vi_octothorp"}, "context": [{"key": "setting.command_mode"}] },
 
-	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_enter_visual_mode"}, "context": [{"key": "vi_mode_normal"}] },
+	// TODO: Do the same as for ESC and fold all v commands into a single one.
+	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_enter_visual_mode"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_can_enter_any_visual_mode"}] },
 	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_enter_normal_mode"}, "context": [{"key": "vi_mode_visual"}] },
 	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_enter_visual_mode"}, "context": [{"key": "vi_mode_visual_line"}] },
 
-	{ "keys": ["V"], "command": "set_action", "args": {"action": "vi_enter_visual_line_mode"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["V"], "command": "set_action", "args": {"action": "vi_enter_visual_line_mode"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_can_enter_any_visual_mode"}] },
 	{ "keys": ["V"], "command": "set_action", "args": {"action": "vi_enter_normal_mode"}, "context": [{"key": "vi_mode_visual_line"}] },
 
 
