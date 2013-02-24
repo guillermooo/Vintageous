@@ -1127,8 +1127,9 @@ class _vi_adjust_carets(sublime_plugin.TextCommand):
     def run(self, edit, mode=None):
         def f(view, s):
             if mode == MODE_NORMAL:
-                if not view.line(s.b).empty() and view.substr(s.b) == '\n':
-                    return sublime.Region(s.b - 1, s.b - 1)
+                if  ((view.substr(s.b) == '\n' or s.b == view.size())
+                     and not view.line(s.b).empty()):
+                        return sublime.Region(s.b - 1, s.b - 1)
             return s
 
         regions_transformer(self.view, f)
