@@ -32,7 +32,7 @@ class TestCaseRegistersConstants(unittest.TestCase):
 
     def testSysClipboard1ConstantValue(self):
         self.assertEqual(registers.REG_SYS_CLIPBOARD_1, '*')
-        
+
     def testSysClipboard2ConstantValue(self):
         self.assertEqual(registers.REG_SYS_CLIPBOARD_2, '+')
 
@@ -75,7 +75,7 @@ class TestCaseRegisters(unittest.TestCase):
         TestsState.view.settings().erase('vintageous_use_sys_clipboard')
         self.regs = Registers(view=TestsState.view,
                               settings=SettingsManager(view=TestsState.view))
-        
+
     def testCanInitializeClass(self):
         self.assertEqual(self.regs.view, TestsState.view)
         self.assertTrue(getattr(self.regs, 'settings'))
@@ -148,7 +148,7 @@ class TestCaseRegisters(unittest.TestCase):
     def testCanAppendToMultipleBalancedValues(self):
         self.regs.set('a', ['foo', 'bar'])
         self.regs.append_to('A', ['fizz', 'buzz'])
-        self.assertEqual(registers._REGISTER_DATA['a'], ['foofizz', 'barbuzz']) 
+        self.assertEqual(registers._REGISTER_DATA['a'], ['foofizz', 'barbuzz'])
 
     def testCanAppendToMultipleValuesMoreExistingValues(self):
         self.regs.set('a', ['foo', 'bar'])

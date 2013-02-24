@@ -238,7 +238,7 @@ class _vi_big_h(sublime_plugin.TextCommand):
         row += count + 1
 
         target = self.view.text_point(row, 0)
-        
+
         regions_transformer(self.view, f)
         self.view.show(target)
 
@@ -268,7 +268,7 @@ class ViBigL(sublime_plugin.TextCommand):
         # XXXX: Subtract 1 so that Sublime Text won't attempt to scroll the line into view, which
         # would be quite annoying.
         target = self.view.text_point(row - 1, 0)
-        
+
         regions_transformer(self.view, f)
         self.view.show(target)
 
@@ -297,7 +297,7 @@ class ViBigM(sublime_plugin.TextCommand):
         row = ((row_a + row_b) / 2)
 
         target = self.view.text_point(row, 0)
-        
+
         regions_transformer(self.view, f)
         self.view.show(target)
 

@@ -356,7 +356,7 @@ class VintageState(object):
         elif self.action:
             vi_cmd_data = self.parse_motion()
             vi_cmd_data = self.parse_action(vi_cmd_data)
-            
+
             if vi_cmd_data['is_digraph_start']:
                 if vi_cmd_data['_change_mode_to']:
                     if vi_cmd_data['_change_mode_to'] == MODE_NORMAL:
@@ -378,7 +378,7 @@ class VintageState(object):
     def reset(self, next_mode=None):
         self.motion = None
         self.action = None
-        
+
         self.register = None
         self.user_input = None
         self.expecting_register = False

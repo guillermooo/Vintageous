@@ -569,7 +569,7 @@ def vi_antilambda(vi_cmd_data):
     vi_cmd_data['action']['args'] = {}
     vi_cmd_data['post_action'] = ['collapse_to_a',]
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
-    
+
     if vi_cmd_data['mode'] in (MODE_VISUAL, MODE_VISUAL_LINE):
         vi_cmd_data['_repeat_action'] = True
 
@@ -592,7 +592,7 @@ def vi_big_j(vi_cmd_data):
     else:
         vi_cmd_data['action']['command'] = 'no_op'
         vi_cmd_data['action']['args'] = {}
-        
+
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
@@ -685,12 +685,12 @@ def vi_esc(vi_cmd_data):
         vi_cmd_data['action']['command'] = 'vi_run_normal_insert_mode_actions'
         vi_cmd_data['action']['args'] = {}
         vi_cmd_data['motion']['command'] = 'no_op'
-        vi_cmd_data['motion']['args'] = {}        
+        vi_cmd_data['motion']['args'] = {}
     if vi_cmd_data['mode'] in (MODE_INSERT, MODE_REPLACE,):
         vi_cmd_data['action']['command'] = 'vi_enter_normal_mode_from_insert_mode'
         vi_cmd_data['action']['args'] = {}
         vi_cmd_data['motion']['command'] = 'no_op'
-        vi_cmd_data['motion']['args'] = {}        
+        vi_cmd_data['motion']['args'] = {}
     elif vi_cmd_data['mode'] in (MODE_VISUAL, MODE_VISUAL_LINE,):
         vi_cmd_data['action']['command'] = 'vi_enter_normal_mode'
         vi_cmd_data['action']['args'] = {}

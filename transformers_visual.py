@@ -184,7 +184,7 @@ class _vi_dd_post_motion(sublime_plugin.TextCommand):
         def f(view, s):
             if view.full_line(s.b - 1).b == view.size():
                 return sublime.Region(max(s.a - 1, 0), view.size())
-                
+
             if view.substr(s.b - 1) != '\n':
                 return sublime.Region(s.a, view.full_line(s.b).b)
             return s
@@ -865,7 +865,7 @@ class _vi_l_motion(sublime_plugin.TextCommand):
                 if view.line(s.b).empty():
                     utils.blink()
                     return s
-                    
+
                 x_limit = min(view.line(s.b).b - 1, s.b + count, view.size())
                 if s.b == x_limit:
                     utils.blink()
@@ -893,7 +893,7 @@ class _vi_l_motion(sublime_plugin.TextCommand):
                     return sublime.Region(s.a, x_limit)
 
             return s
-            
+
         regions_transformer(self.view, f)
 
 
@@ -924,7 +924,7 @@ class _vi_h_motion(sublime_plugin.TextCommand):
 
             # XXX: We should never reach this.
             return s
-        
+
         regions_transformer(self.view, f)
 
 
@@ -1030,7 +1030,7 @@ class _vi_k_motion(sublime_plugin.TextCommand):
 
                 if view.line(target_pt).empty():
                     return sublime.Region(target_pt, target_pt)
-                    
+
                 target_pt = min(target_pt + xpos, view.line(target_pt).b - 1)
                 return sublime.Region(target_pt, target_pt)
 
@@ -1103,7 +1103,7 @@ class _vi_k_motion(sublime_plugin.TextCommand):
                     target_pt = view.text_point(target_row, 0)
 
                     return sublime.Region(s.a, view.full_line(target_pt).a)
-                    
+
         regions_transformer(self.view, f)
 
 

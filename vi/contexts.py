@@ -69,7 +69,7 @@ class KeyContext(object):
         if operator == sublime.OP_EQUAL:
             value = not (self.state.motion_digits or
                              self.state.action_digits)
-                
+
         return self._check(value, operator, operand, match_all)
 
     def vi_mode_visual_any(self, key, operator, operand, match_all):

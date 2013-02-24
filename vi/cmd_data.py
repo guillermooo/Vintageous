@@ -65,7 +65,7 @@ class CmdData(dict):
         self['xpos'] = state.xpos
         # Indicates whether xpos needs to be updated. Only vertical motions j and k need not
         # update xpos.
-        self['must_update_xpos'] = True,       
+        self['must_update_xpos'] = True,
         # Whether we should make sure to show the first selection.
         self['scroll_into_view'] = True
         # If not None, the corresponding mode will be entered before runnig ViRun.

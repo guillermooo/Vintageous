@@ -49,7 +49,7 @@ class TestVintageSettings(unittest.TestCase):
 
 	def testCanGetNonexistingKey(self):
 		self.assertEqual(self.setts['foo'], None)
-		
+
 
 class TestSettingsManager(unittest.TestCase):
 	def setUp(self):

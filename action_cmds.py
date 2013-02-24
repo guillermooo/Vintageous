@@ -563,7 +563,7 @@ class Sequence(sublime_plugin.TextCommand):
     def run(self, edit, commands):
         for cmd, args in commands:
             self.view.run_command(cmd, args)
-            
+
 
 class _vi_big_j(sublime_plugin.TextCommand):
     def run(self, edit, mode=None):
@@ -588,7 +588,7 @@ class _vi_big_j(sublime_plugin.TextCommand):
                 view.replace(edit, two_lines, first_line_text + sep + next_line_text)
 
                 if first_line_text:
-                    return sublime.Region(target, target) 
+                    return sublime.Region(target, target)
                 return s
             else:
                 return s

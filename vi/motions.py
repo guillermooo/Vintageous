@@ -234,14 +234,12 @@ def vi_big_l(vi_cmd_data):
     # or to an user-supplied one.
     vi_cmd_data['motion']['args'] = {'count': vi_cmd_data['count'] - 1, 'mode': vi_cmd_data['mode']}
 
-
     return vi_cmd_data
 
 
 def vi_big_m(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_big_m'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
-
 
     return vi_cmd_data
 
@@ -251,7 +249,7 @@ def vi_j(vi_cmd_data):
         vi_cmd_data['is_jump'] = True
 
     vi_cmd_data['must_update_xpos'] = False
-    
+
     vi_cmd_data['motion']['command'] = '_vi_j_motion'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'xpos': vi_cmd_data['xpos']}
     vi_cmd_data['count'] = 1
@@ -504,7 +502,7 @@ def vi_big_e(vi_cmd_data):
 def vi_big_b(vi_cmd_data):
     vi_cmd_data['__reorient_caret'] = True
     vi_cmd_data['motion']['command'] = 'move'
-    vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_begin': True, 'empty_line': True, 'separators': '', 'forward': False} 
+    vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_begin': True, 'empty_line': True, 'separators': '', 'forward': False}
 
     if vi_cmd_data['mode'] == MODE_NORMAL:
         vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode'],}]
