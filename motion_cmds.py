@@ -4,6 +4,7 @@ import sublime_plugin
 from Vintageous.vi.constants import regions_transformer
 from Vintageous.vi.constants import MODE_VISUAL, MODE_NORMAL, _MODE_INTERNAL_NORMAL
 from Vintageous.state import VintageState, IrreversibleTextCommand
+from Vintageous.vi import utils
 
 
 class ViMoveToHardBol(sublime_plugin.TextCommand):
@@ -227,7 +228,8 @@ class _vi_big_h(sublime_plugin.TextCommand):
             elif mode == _MODE_INTERNAL_NORMAL:
                 return sublime.Region(s.a + 1, target)
             elif mode == MODE_VISUAL:
-                return sublime.Region(s.a + 1, target)
+                new_target = utils.next_non_white_space_char(view, target)
+                return sublime.Region(s.a + 1, new_target)
             else:
                 return s
 
@@ -252,8 +254,10 @@ class ViBigL(sublime_plugin.TextCommand):
                 return sublime.Region(s.a, target)
             elif mode == MODE_VISUAL:
                 if s.b >= target:
-                    return sublime.Region(s.a + 1, target)
-                return sublime.Region(s.a, target)
+                    new_target = utils.next_non_white_space_char(view, target)
+                    return sublime.Region(s.a + 1, new_target)
+                new_target = utils.next_non_white_space_char(view, target)
+                return sublime.Region(s.a, new_target + 1)
             else:
                 return s
 
@@ -261,7 +265,9 @@ class ViBigL(sublime_plugin.TextCommand):
         row, _ = self.view.rowcol(r.b)
         row -= count + 1
 
-        target = self.view.text_point(row, 0)
+        # XXXX: Subtract 1 so that Sublime Text won't attempt to scroll the line into view, which
+        # would be quite annoying.
+        target = self.view.text_point(row - 1, 0)
         
         regions_transformer(self.view, f)
         self.view.show(target)
@@ -278,8 +284,10 @@ class ViBigM(sublime_plugin.TextCommand):
                 return sublime.Region(s.a, target)
             elif mode == MODE_VISUAL:
                 if s.b >= target:
-                    return sublime.Region(s.a + 1, target)
-                return sublime.Region(s.a, target)
+                    new_target = utils.next_non_white_space_char(view, target)
+                    return sublime.Region(s.a + 1, new_target)
+                new_target = utils.next_non_white_space_char(view, target)
+                return sublime.Region(s.a, new_target + 1)
             else:
                 return s
 
