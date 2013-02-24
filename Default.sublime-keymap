@@ -18,12 +18,8 @@
 	{ "keys": ["down"], "command": "set_motion", "args": {"motion": "vi_j"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["up"], "command": "set_motion", "args": {"motion": "vi_k"}, "context": [{"key": "setting.command_mode"}] },
 
-	{ "keys": ["left"], "command": "set_motion", "args": {"motion": "vi_h"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["right"], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "setting.command_mode"}] },
-
-	// ST won't allow cursor movement while full lines are selected, so disable these.
-	{ "keys": ["left"], "command": "vi_no_op", "context": [{"key": "vi_mode_visual_line"}] },
-	{ "keys": ["right"], "command": "vi_no_op", "context": [{"key": "vi_mode_visual_line"}] },
+	{ "keys": ["left"], "command": "set_motion", "args": {"motion": "vi_h"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["right"], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "vi_mode_normal_or_visual"}] }, 
 
 	{ "keys": ["w"], "command": "set_motion", "args": {"motion": "vi_w"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["e"], "command": "set_motion", "args": {"motion": "vi_e"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
@@ -33,9 +29,9 @@
 	{ "keys": ["E"], "command": "set_motion", "args": {"motion": "vi_big_e"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["B"], "command": "set_motion", "args": {"motion": "vi_big_b"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 
-	{ "keys": ["$"], "command": "set_motion", "args": {"motion": "vi_dollar"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["_"], "command": "set_motion", "args": {"motion": "vi_underscore"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["^"], "command": "set_motion", "args": {"motion": "vi_underscore"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["$"], "command": "set_motion", "args": {"motion": "vi_dollar"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["_"], "command": "set_motion", "args": {"motion": "vi_underscore"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["^"], "command": "set_motion", "args": {"motion": "vi_underscore"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 
 	{ "keys": ["I"], "command": "set_action", "args": {"action": "vi_big_i"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["A"], "command": "set_action", "args": {"action": "vi_big_a"}, "context": [{"key": "setting.command_mode"}] },
@@ -43,6 +39,7 @@
 	{ "keys": ["G"], "command": "set_motion", "args": {"motion": "vi_big_g"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["%"], "command": "set_motion", "args": {"motion": "vi_percent"}, "context": [{"key": "setting.command_mode"}] },
 
+	// TODO: They don't work in VISUALLINEMODE.
 	{ "keys": ["H"], "command": "set_motion", "args": {"motion": "vi_big_h"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["M"], "command": "set_motion", "args": {"motion": "vi_big_m"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["L"], "command": "set_motion", "args": {"motion": "vi_big_l"}, "context": [{"key": "setting.command_mode"}] },

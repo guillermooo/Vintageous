@@ -3,22 +3,28 @@ import sublime_plugin
 
 import threading
 
-from Vintageous.vi import motions
 from Vintageous.vi import actions
-from Vintageous.vi.constants import (MODE_INSERT, MODE_NORMAL, MODE_VISUAL,
-                         MODE_VISUAL_LINE, MODE_NORMAL_INSERT,
-                         _MODE_INTERNAL_NORMAL, MODE_REPLACE)
-from Vintageous.vi.constants import mode_to_str
-from Vintageous.vi.constants import digraphs
-from Vintageous.vi.constants import DIGRAPH_MOTION
-from Vintageous.vi.constants import ACTIONS_EXITING_TO_INSERT_MODE
 from Vintageous.vi import constants
-from Vintageous.vi.settings import SettingsManager, VintageSettings, SublimeSettings
-from Vintageous.vi.registers import Registers
+from Vintageous.vi import motions
 from Vintageous.vi import registers
 from Vintageous.vi import utils
-from Vintageous.vi.contexts import KeyContext
 from Vintageous.vi.cmd_data import CmdData
+from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
+from Vintageous.vi.constants import ACTIONS_EXITING_TO_INSERT_MODE
+from Vintageous.vi.constants import DIGRAPH_MOTION
+from Vintageous.vi.constants import digraphs
+from Vintageous.vi.constants import MODE_INSERT
+from Vintageous.vi.constants import MODE_NORMAL
+from Vintageous.vi.constants import MODE_NORMAL_INSERT
+from Vintageous.vi.constants import MODE_REPLACE
+from Vintageous.vi.constants import mode_to_str
+from Vintageous.vi.constants import MODE_VISUAL
+from Vintageous.vi.constants import MODE_VISUAL_LINE
+from Vintageous.vi.contexts import KeyContext
+from Vintageous.vi.registers import Registers
+from Vintageous.vi.settings import SettingsManager
+from Vintageous.vi.settings import SublimeSettings
+from Vintageous.vi.settings import VintageSettings
 
 
 def _init_vintageous(view):
