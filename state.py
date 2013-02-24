@@ -40,7 +40,6 @@ def _init_vintageous(view):
 
     state.reset()
 
-
 def plugin_loaded():
     view = sublime.active_window().active_view()
     _init_vintageous(view)
@@ -416,6 +415,12 @@ class VintageState(object):
 class VintageStateTracker(sublime_plugin.EventListener):
     def on_load(self, view):
         _init_vintageous(view)
+
+    def on_post_save(self, view):
+        # Make sure that the carets are within valid bounds. This is for example a concern when
+        # `trim_trailing_white_space_on_save` is set to true.
+        state = VintageState(view)
+        view.run_command('_vi_adjust_carets', {'mode': state.mode})
 
     def on_query_context(self, view, key, operator, operand, match_all):
         vintage_state = VintageState(view)

@@ -1121,3 +1121,14 @@ class _vi_visual_orient_selections_toward_begin(sublime_plugin.TextCommand):
             return sublime.Region(s.end(), s.begin())
 
         regions_transformer(self.view, f)
+
+
+class _vi_adjust_carets(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None):
+        def f(view, s):
+            if mode == MODE_NORMAL:
+                if view.substr(s.b) == '\n':
+                    return sublime.Region(s.b - 1, s.b - 1)
+            return s
+
+        regions_transformer(self.view, f)
