@@ -28,10 +28,17 @@ def _init_vintageous(view):
         return
 
     state = VintageState(view)
-    if state.mode not in (MODE_VISUAL, _MODE_INTERNAL_NORMAL,
-                          MODE_VISUAL_LINE):
-        state.reset()
+    if state.mode in (MODE_VISUAL, MODE_VISUAL_LINE):
+        view.run_command('enter_normal_mode')
+    elif state.mode in (MODE_INSERT, MODE_REPLACE):
+        view.run_command('vi_enter_normal_mode_from_insert_mode')
+    elif state.mode == MODE_NORMAL_INSERT:
+        view.run_command('vi_run_normal_insert_mode_actions')
+    else:
+        # XXX: When is this run? Only at startup?
         state.enter_normal_mode()
+
+    state.reset()
 
 
 def plugin_loaded():
