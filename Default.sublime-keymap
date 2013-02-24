@@ -83,6 +83,8 @@
 
 	// u only undoes in NORMALMODE.
 	{ "keys": ["u"], "command": "_vi_undo", "context": [{"key": "vi_mode_normal"}] },
+	// TODO: implement counts for redo and make it go through all the normal machinery.
+	{ "keys": ["ctrl+shift+r"], "command": "redo", "context": [{"key": "vi_mode_normal"}, {"key": "vi_use_ctrl_keys"}] },
 
 	{ "keys": ["d"], "command": "set_action", "args": {"action": "vi_d"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["s"], "command": "set_action", "args": {"action": "vi_s"}, "context": [{"key": "setting.command_mode"}] },

@@ -547,6 +547,10 @@ class _vi_undo(IrreversibleTextCommand):
             self.view.run_command('move', {'by': 'characters', 'forward': False})
             # ////////////////////////////////////////////////////////////////////
 
+# class _vi_redo(IrreversibleTextCommand):
+#     def run(self):
+#         self.view.run_command('redo')
+
 
 class _vi_ctrl_w_v_action(sublime_plugin.TextCommand):
     def run(self, edit):
