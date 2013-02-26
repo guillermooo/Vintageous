@@ -282,20 +282,22 @@ class VintageState(object):
         if vi_cmd_data['xpos'] is None:
             xpos = 0
             if self.view.sel():
-                # XXX: Improvee this with .rowcol()
-                xpos = self.view.sel()[0].b - self.view.line(self.view.sel()[0].b).a
+                xpos = self.view.rowcol(self.view.sel()[0].b)
             self.xpos = xpos
             vi_cmd_data['xpos'] = xpos
 
-        # Make sure we run NORMAL mode actions in _MODE_INTERNAL_NORMAL mode.
-        # Note that NORMALMODE actions without a motion are sill run in MODE_NORMAL.
-        # XXX: Is this correct; shouldn't all actions be run in _MODE_INTERNAL_NORMAL?
-        if self.mode in (MODE_VISUAL, MODE_VISUAL_LINE) or (self.motion and self.action):
-            if self.mode not in (MODE_VISUAL, MODE_VISUAL_LINE):
-                self.mode = _MODE_INTERNAL_NORMAL
-                vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
-            else:
-                vi_cmd_data['mode'] = self.mode
+        # Make sure we run NORMAL mode actions taking motions in _MODE_INTERNAL_NORMAL mode.
+        #
+        # Note that for NORMALMODE actions not taking any motion (like J) the mode isn't changed.
+        # These are resposible for setting the mode to whichever they need.
+        # XXX: Can we improve this and unify mode handling for all types of actions?
+        if ((self.mode in (MODE_VISUAL, MODE_VISUAL_LINE)) or
+            (self.motion and self.action) or
+            (self.action and self.mode == MODE_NORMAL)):
+                if self.mode not in (MODE_VISUAL, MODE_VISUAL_LINE):
+                    vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
+                else:
+                    vi_cmd_data['mode'] = self.mode
 
         motion = self.motion
         motion_func = None

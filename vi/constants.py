@@ -6,11 +6,14 @@ MODE_VISUAL_LINE = 1 << 3
 MODE_NORMAL_INSERT = 1 << 4
 # Vintageous always runs actions based on selections. Some Vim commands, however, behave
 # differently depending on whether the current mode is NORMAL or VISUAL. To differentiate NORMAL
-# mode operations (involving an action, not only a motion) from VISUAL mode, we need to add an
-# additional mode for handling selections that won't interfere with the actual VISUAL mode.
+# mode operations (involving only an action, or a motion plus an action) from VISUAL mode, we
+# need to add an additional mode for handling selections that won't interfere with the actual
+# VISUAL mode.
 #
-# Note that for pure motions and pure actions we still use plain NORMAL mode.
-# XXX: Maybe running pure actions (no motion) should be done in _MODE_INTERNAL_NORMAL too instead.
+# This is _MODE_INTERNAL_NORMAL's job. We consider _MODE_INTERNAL_NORMAL a pseudomode, because
+# global state's .mode property should never set to it, yet it's set in vi_cmd_data often.
+#
+# Note that for pure motions we still use plain NORMAL mode.
 _MODE_INTERNAL_NORMAL = 1 << 5
 MODE_REPLACE = 1 << 6
 

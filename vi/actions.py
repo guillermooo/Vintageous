@@ -137,8 +137,7 @@ def vi_a(vi_cmd_data):
 
 
 def vi_s(vi_cmd_data):
-    if vi_cmd_data['mode'] != MODE_VISUAL:
-        vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
+    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
         vi_cmd_data['motion']['command'] = 'move'
         vi_cmd_data['motion']['args'] = {'by': 'characters', 'extend': True, 'forward': True}
 
@@ -153,7 +152,6 @@ def vi_s(vi_cmd_data):
     return vi_cmd_data
 
 def vi_c(vi_cmd_data):
-    vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
     vi_cmd_data['can_yank'] = True
     vi_cmd_data['cancel_action_if_motion_fails'] = True
 
@@ -184,7 +182,6 @@ def vi_big_c(vi_cmd_data):
     # No count: CHARACTERWISE + EXCLUSIVE
     # Count: LINEWISE + EXCLUSIVE
 
-    vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
     vi_cmd_data['can_yank'] = True
 
     if vi_cmd_data['count'] == 1:
@@ -219,7 +216,6 @@ def vi_big_s(vi_cmd_data):
     # No count: CHARACTERWISE + EXCLUSIVE
     # Count: LINEWISE + EXCLUSIVE
 
-    vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
     vi_cmd_data['can_yank'] = True
     vi_cmd_data['yanks_linewise'] = True
 
@@ -250,14 +246,11 @@ def vi_big_s(vi_cmd_data):
 
 
 def vi_x(vi_cmd_data):
-    if vi_cmd_data['mode'] not in (MODE_VISUAL, MODE_VISUAL_LINE):
-        vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
-        vi_cmd_data['cancel_action_if_motion_fails'] = True
-
     vi_cmd_data['can_yank'] = True
     vi_cmd_data['motion_required'] = False
 
     if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
+        vi_cmd_data['cancel_action_if_motion_fails'] = True
         vi_cmd_data['motion']['command'] = 'move'
         vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': True, 'extend':True}
         vi_cmd_data['post_every_motion'] = ['_vi_x_post_every_motion', {'mode': vi_cmd_data['mode']}]
@@ -277,11 +270,8 @@ def vi_big_x(vi_cmd_data):
     vi_cmd_data['can_yank'] = True
     vi_cmd_data['motion_required'] = False
 
-    if vi_cmd_data['mode'] not in (MODE_VISUAL, MODE_VISUAL_LINE):
-        vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
-        vi_cmd_data['cancel_action_if_motion_fails'] = True
-
     if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
+        vi_cmd_data['cancel_action_if_motion_fails'] = True
         vi_cmd_data['motion']['command'] = 'move'
         vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': False, 'extend':True}
         vi_cmd_data['post_every_motion'] = ['_vi_big_x_post_every_motion', {'mode': vi_cmd_data['mode']}]
@@ -326,7 +316,6 @@ def vi_big_p(vi_cmd_data):
 
 def vi_dd(vi_cmd_data):
     # Assume _MODE_INTERNAL_NORMAL. Can't be issued in any other mode.
-    vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
     vi_cmd_data['can_yank'] = True
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'lines', 'extend': True, 'forward': True}
@@ -538,9 +527,6 @@ def vi_double_antilambda(vi_cmd_data):
 
 
 def vi_r(vi_cmd_data):
-    if vi_cmd_data['mode'] != MODE_VISUAL:
-        vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
-
     # TODO: If count > len(line), r should abort. We'd need _p_post_every_motion hook and tell
     # ViRun to cancel if selections didn't change.
     vi_cmd_data['motion_required'] = False
@@ -580,11 +566,6 @@ def vi_antilambda(vi_cmd_data):
 
 
 def vi_big_j(vi_cmd_data):
-    # XXX: Still required so we'll end up in _MODE_INTERNAL_NORMAL. We should avoid this
-    # requirement.
-    if vi_cmd_data['mode'] != MODE_VISUAL:
-        vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
-
     vi_cmd_data['motion_required'] = False
 
     if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
