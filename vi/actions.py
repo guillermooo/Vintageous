@@ -3,11 +3,14 @@
 
 
 from Vintageous.vi import motions
-from Vintageous.vi.constants import (MODE_VISUAL, _MODE_INTERNAL_NORMAL,
-                                     MODE_VISUAL_LINE, MODE_NORMAL,
-                                     MODE_INSERT, MODE_NORMAL_INSERT,
-                                     ACTIONS_EXITING_TO_INSERT_MODE,
-                                     MODE_REPLACE,)
+from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
+from Vintageous.vi.constants import ACTIONS_EXITING_TO_INSERT_MODE
+from Vintageous.vi.constants import MODE_INSERT
+from Vintageous.vi.constants import MODE_NORMAL
+from Vintageous.vi.constants import MODE_NORMAL_INSERT
+from Vintageous.vi.constants import MODE_REPLACE
+from Vintageous.vi.constants import MODE_VISUAL
+from Vintageous.vi.constants import MODE_VISUAL_LINE
 
 
 def vi_enter_visual_mode(vi_cmd_data):

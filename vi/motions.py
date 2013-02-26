@@ -1,5 +1,7 @@
-from Vintageous.vi.constants import (MODE_NORMAL, MODE_VISUAL, MODE_VISUAL_LINE,
-                          _MODE_INTERNAL_NORMAL)
+from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
+from Vintageous.vi.constants import MODE_NORMAL
+from Vintageous.vi.constants import MODE_VISUAL
+from Vintageous.vi.constants import MODE_VISUAL_LINE
 
 
 # $

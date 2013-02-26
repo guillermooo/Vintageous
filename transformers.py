@@ -1,10 +1,15 @@
 import sublime
 import sublime_plugin
 
-from Vintageous.vi.utils import (is_at_eol, is_at_hard_eol, is_at_bol,
-                      back_one_char, forward_one_char, is_line_empty,
-                      is_on_empty_line, next_non_white_space_char)
 from Vintageous.vi.constants import regions_transformer
+from Vintageous.vi.utils import back_one_char
+from Vintageous.vi.utils import forward_one_char
+from Vintageous.vi.utils import is_at_bol
+from Vintageous.vi.utils import is_at_eol
+from Vintageous.vi.utils import is_at_hard_eol
+from Vintageous.vi.utils import is_line_empty
+from Vintageous.vi.utils import is_on_empty_line
+from Vintageous.vi.utils import next_non_white_space_char
 
 
 class ClipEndToLine(sublime_plugin.TextCommand):

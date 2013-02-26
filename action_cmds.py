@@ -1,12 +1,16 @@
 import sublime
 import sublime_plugin
 
-from Vintageous.state import VintageState
 from Vintageous.state import IrreversibleTextCommand
+from Vintageous.state import VintageState
 from Vintageous.vi import utils
-from Vintageous.vi.constants import MODE_NORMAL, _MODE_INTERNAL_NORMAL, MODE_VISUAL, MODE_VISUAL_LINE, MODE_INSERT
-from Vintageous.vi.registers import REG_EXPRESSION
+from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
+from Vintageous.vi.constants import MODE_INSERT
+from Vintageous.vi.constants import MODE_NORMAL
+from Vintageous.vi.constants import MODE_VISUAL
+from Vintageous.vi.constants import MODE_VISUAL_LINE
 from Vintageous.vi.constants import regions_transformer
+from Vintageous.vi.registers import REG_EXPRESSION
 
 
 class ViEditAtEol(sublime_plugin.TextCommand):

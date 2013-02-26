@@ -1,11 +1,14 @@
 import sublime
 import sublime_plugin
 
+from Vintageous.run import ViExecutionState
 from Vintageous.state import VintageState
 from Vintageous.vi import utils
-from Vintageous.vi.constants import MODE_NORMAL, MODE_VISUAL_LINE, MODE_VISUAL, _MODE_INTERNAL_NORMAL
+from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
+from Vintageous.vi.constants import MODE_NORMAL
+from Vintageous.vi.constants import MODE_VISUAL
+from Vintageous.vi.constants import MODE_VISUAL_LINE
 from Vintageous.vi.constants import regions_transformer
-from Vintageous.run import ViExecutionState
 
 
 class ExtendToMinimalWidth(sublime_plugin.TextCommand):
