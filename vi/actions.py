@@ -34,6 +34,9 @@ def vi_enter_visual_line_mode(vi_cmd_data):
 
 
 def vi_enter_insert_mode(vi_cmd_data):
+    # It's not too important to set this attribute, since vi_enter_normal_mode and co. will always
+    # update xpos on their own, but it's confusing to let vi_enter_insert_mode set xpos to 0.
+    vi_cmd_data['must_update_xpos'] = False
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = 'vi_enter_insert_mode'
     vi_cmd_data['action']['args'] = {}
