@@ -287,10 +287,6 @@ class VintageState(object):
             vi_cmd_data['xpos'] = xpos
 
         # Make sure we run NORMAL mode actions taking motions in _MODE_INTERNAL_NORMAL mode.
-        #
-        # Note that for NORMALMODE actions not taking any motion (like J) the mode isn't changed.
-        # These are resposible for setting the mode to whichever they need.
-        # XXX: Can we improve this and unify mode handling for all types of actions?
         if ((self.mode in (MODE_VISUAL, MODE_VISUAL_LINE)) or
             (self.motion and self.action) or
             (self.action and self.mode == MODE_NORMAL)):
