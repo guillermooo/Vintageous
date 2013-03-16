@@ -10,6 +10,7 @@ from Vintageous.vi.constants import (MODE_INSERT, MODE_NORMAL, MODE_VISUAL,
                          _MODE_INTERNAL_NORMAL)
 from Vintageous.vi.constants import mode_to_str
 from Vintageous.vi.constants import digraphs
+from Vintageous.vi.constants import MODE_COMMAND_MAP
 from Vintageous.vi.settings import SettingsManager, VintageSettings, SublimeSettings
 from Vintageous.vi.registers import Registers, REG_UNNAMED
 from Vintageous.vi import registers
@@ -93,7 +94,8 @@ class ViRunCommand(sublime_plugin.TextCommand):
                 self.view.show(self.view.sel()[0])
 
             state = VintageState(self.view)
-            state.reset(next_mode=vi_cmd_data['next_mode'])
+            # state.reset(next_mode=vi_cmd_data['next_mode'])
+            state.reset()
 
     def save_caret_pos(self):
         self.old_sels = list(self.view.sel())
@@ -168,8 +170,25 @@ class ViRunCommand(sublime_plugin.TextCommand):
                 # XXX: If the buffer has changed, this won't work well.
                 self.view.sel().add(s)
 
-        if vi_cmd_data['follow_up_mode']:
-            self.view.run_command(vi_cmd_data['follow_up_mode'])
+        # Make sure to override follow_up_mode when repeating a command via '.'. At the end of the
+        # run of a command, .next_mode will be reset to NORMALMODE. Therefore, MODE_COMMAND_MAP may
+        # contain no valid action, effectively skipping follow_up_mode.
+        #
+        # For example, when running ce a first time, we want to end up in INSERTMODE (.next_mode
+        # will be MODE_INSERT and follow_up_mode will be 'vi_enter_insert_mode'), whereas when
+        # repeating this command with '.', we want to end up in NORMALMODE (.next_mode will be
+        # MODE_NORMAL in this case, and follow_up_mode will be ignored).
+        #
+        # XXX: An alternative and perhaps cleaner implementation of this would be to override
+        # the undo command so that it grabs the latest command + args, modifies the args so that
+        # the follow_up_mode is 'vi_enter_normal_mode' and runs everything through vi_run.
+        follow_up = vi_cmd_data['follow_up_mode']
+        next_mode = VintageState(self.view).next_mode
+        try:
+            if follow_up and (follow_up in MODE_COMMAND_MAP[next_mode]):
+                self.view.run_command(vi_cmd_data['follow_up_mode'])
+        except KeyError:
+            pass
 
     def do_modify_selections(self, vi_cmd_data):
         # Gives command a chance to modify the selection after the motion/action. Useful for
@@ -188,7 +207,6 @@ class ViRunCommand(sublime_plugin.TextCommand):
         self.view.run_command(cmd, args)
 
     def do_last_motion(self, vi_cmd_data):
-        print("XXX XX XXX")
         self.view.run_command(*vi_cmd_data['last_motion'])
 
     def do_pre_every_motion(self, vi_cmd_data, current, total):

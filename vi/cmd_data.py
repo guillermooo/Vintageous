@@ -79,6 +79,7 @@ class CmdData(dict):
         # instead specify their 'follow_up_mode' hook.
         # For example, in INSERTMODE, Ctrl+r,j would cause VintageState to use this.
         self['_exit_mode'] = None
+        self['_exit_mode_command'] = None
         self['must_blink_on_error'] = False
         # Mode to transition to on success.
         self['next_mode'] = MODE_NORMAL

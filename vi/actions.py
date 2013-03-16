@@ -648,6 +648,7 @@ def vi_ctrl_r_action(vi_cmd_data):
     vi_cmd_data['_change_mode_to'] = MODE_NORMAL
     vi_cmd_data['must_blink_on_error'] = True
     vi_cmd_data['_exit_mode'] = MODE_INSERT
+    vi_cmd_data['_exit_mode_command'] = 'vi_enter_insert_mode'
     vi_cmd_data['motion_required'] = False
     # Let global state know we still need a second action to complete this one.
     vi_cmd_data['is_digraph_start'] = True

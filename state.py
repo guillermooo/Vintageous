@@ -274,6 +274,15 @@ class VintageState(object):
     def xpos(self, value):
         self.settings.vi['xpos'] = value
 
+    @property
+    def next_mode(self):
+        next_mode = self.settings.vi['next_mode'] or MODE_NORMAL
+        return next_mode
+
+    @next_mode.setter
+    def next_mode(self, value):
+        self.settings.vi['next_mode'] = value
+
     def parse_motion(self):
         vi_cmd_data = CmdData(self)
 
@@ -332,13 +341,22 @@ class VintageState(object):
             vi_cmd_data = self.parse_action(vi_cmd_data)
             if vi_cmd_data['must_blink_on_error']:
                 utils.blink()
-            self.reset(next_mode=vi_cmd_data['_exit_mode'])
+            # Modify the data that determines the mode we'll end up in when the command finishes.
+            self.next_mode = vi_cmd_data['_exit_mode']
+            # Since we are exiting early, ensure we leave the selections as the commands wants them.
+            if vi_cmd_data['_exit_mode_command']:
+                self.view.run_command(vi_cmd_data['_exit_mode_command'])
+            self.reset()
             return
 
         # Action + motion, like in "3dj".
         if self.action and self.motion:
             vi_cmd_data = self.parse_motion()
             vi_cmd_data = self.parse_action(vi_cmd_data)
+
+            if 'next_mode' in vi_cmd_data:
+                self.next_mode = vi_cmd_data['next_mode']
+                del vi_cmd_data['next_mode']
 
             if not vi_cmd_data['is_digraph_start']:
                 self.view.run_command('vi_run', vi_cmd_data)
@@ -358,14 +376,19 @@ class VintageState(object):
                     self.enter_normal_mode()
                     self.reset()
 
-        # Motion only, like in "3j".
+        # Motion only, like in '3j'.
         elif self.motion:
-            self.view.run_command('vi_run', self.parse_motion())
+            vi_cmd_data = self.parse_motion()
+            self.view.run_command('vi_run', vi_cmd_data)
 
         # Action only, like in "d" or "esc". Some actions can be executed without a motion.
         elif self.action:
             vi_cmd_data = self.parse_motion()
             vi_cmd_data = self.parse_action(vi_cmd_data)
+
+            if 'next_mode' in vi_cmd_data:
+                self.next_mode = vi_cmd_data['next_mode']
+                del vi_cmd_data['next_mode']
 
             if vi_cmd_data['is_digraph_start']:
                 if vi_cmd_data['_change_mode_to']:
@@ -409,6 +432,8 @@ class VintageState(object):
         elif next_mode is not None:
             # XXX: We don't know yet of any case where a different mode is required.
             pass
+
+        self.next_mode = MODE_NORMAL
 
     def update_status(self):
         mode_name = mode_to_str(self.mode) or ""
