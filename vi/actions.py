@@ -667,6 +667,26 @@ def vi_ctrl_r_equals(vi_cmd_data):
     return vi_cmd_data
 
 
+def vi_ctrl_a(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+
+    vi_cmd_data['action']['command'] = '_vi_ctrl_a'
+    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['count'] = 1
+
+    return vi_cmd_data
+
+
+def vi_ctrl_x(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+
+    vi_cmd_data['action']['command'] = '_vi_ctrl_x'
+    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['count'] = 1
+
+    return vi_cmd_data
+
+
 def vi_esc(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
     if vi_cmd_data['mode'] == MODE_NORMAL_INSERT:

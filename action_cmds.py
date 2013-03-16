@@ -599,3 +599,51 @@ class _vi_big_j(sublime_plugin.TextCommand):
                 return s
 
         regions_transformer(self.view, f)
+
+
+class _vi_ctrl_a(sublime_plugin.TextCommand):
+    def run(self, edit, count=1, mode=None):
+        def f(view, s):
+            if mode == _MODE_INTERNAL_NORMAL:
+                word = view.word(s.a)
+                new_digit = int(view.substr(word)) + count
+                view.replace(edit, word, str(new_digit))
+
+            return s
+
+        if mode != _MODE_INTERNAL_NORMAL:
+            return
+
+        # TODO: Deal with octal, hex notations.
+        # TODO: Improve detection of numbers.
+        # TODO: Find the next numeric word in the line if none is found under the caret.
+        words = [self.view.substr(self.view.word(s)) for s in self.view.sel()]
+        if not all([w.isdigit() for w in words]):
+            utils.blink()
+            return
+
+        regions_transformer(self.view, f)
+
+
+class _vi_ctrl_x(sublime_plugin.TextCommand):
+    def run(self, edit, count=1, mode=None):
+        def f(view, s):
+            if mode == _MODE_INTERNAL_NORMAL:
+                word = view.word(s.a)
+                new_digit = int(view.substr(word)) - count
+                view.replace(edit, word, str(new_digit))
+
+            return s
+
+        if mode != _MODE_INTERNAL_NORMAL:
+            return
+
+        # TODO: Deal with octal, hex notations.
+        # TODO: Improve detection of numbers.
+        # TODO: Find the next numeric word in the line if none is found under the caret.
+        words = [self.view.substr(self.view.word(s)) for s in self.view.sel()]
+        if not all([w.isdigit() for w in words]):
+            utils.blink()
+            return
+
+        regions_transformer(self.view, f)
