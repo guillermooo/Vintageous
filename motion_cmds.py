@@ -5,6 +5,7 @@ from Vintageous.vi.constants import regions_transformer
 from Vintageous.vi.constants import MODE_VISUAL, MODE_NORMAL, _MODE_INTERNAL_NORMAL
 from Vintageous.state import VintageState, IrreversibleTextCommand
 from Vintageous.vi import utils
+from Vintageous.vi.search import reverse_search
 
 
 class ViMoveToHardBol(sublime_plugin.TextCommand):
@@ -303,7 +304,7 @@ class ViBigM(sublime_plugin.TextCommand):
 
 
 class ViStar(sublime_plugin.TextCommand):
-    def run(self, edit, mode=None, count=1, extend=False):
+    def run(self, edit, mode=None, extend=False):
         def f(view, s):
 
             pattern = r'\b{0}\b'.format(query)
@@ -333,10 +334,33 @@ class ViStar(sublime_plugin.TextCommand):
 
 
 class ViOctothorp(sublime_plugin.TextCommand):
-    def run(self, edit, mode=None, count=1, extend=False):
-        state = VintageState(self.view)
+    def run(self, edit, mode=None, extend=False):
         def f(view, s):
+
+            pattern = r'\b{0}\b'.format(query)
+            flags = sublime.IGNORECASE
+
+            if mode == _MODE_INTERNAL_NORMAL:
+                match = reverse_search(view, pattern, 0, current_sel.a, flags)
+            else:
+                match = reverse_search(view, pattern, 0, current_sel.a, flags)
+
+            if match:
+                if mode == _MODE_INTERNAL_NORMAL:
+                    return sublime.Region(s.b, match.begin())
+                elif state.mode == MODE_VISUAL:
+                    return sublime.Region(s.b, match.begin())
+                elif state.mode == MODE_NORMAL:
+                    return sublime.Region(match.begin(), match.begin())
             return s
+
+        state = VintageState(self.view)
+        # TODO: make sure we swallow any leading white space.
+        query = self.view.substr(self.view.word(self.view.sel()[0].end()))
+        if query:
+            state.last_buffer_search = query
+
+        current_sel = self.view.sel()[0]
 
         regions_transformer(self.view, f)
 
@@ -350,6 +374,24 @@ class ViBufferSearch(IrreversibleTextCommand):
         # .on_done() method. An issue has been filed about this. Awaiting response.
         state = VintageState(self.view)
         state.motion = 'vi_forward_slash'
+        state.user_input = s
+        state.last_buffer_search = s
+        state.run()
+
+    def on_cancel(self):
+        state = VintageState(self.view)
+        state.reset()
+
+
+class ViBufferReverseSearch(IrreversibleTextCommand):
+    def run(self):
+        self.view.window().show_input_panel('', '', self.on_done, None, self.on_cancel)
+
+    def on_done(self, s):
+        # FIXME: Sublime Text seems to reset settings between the .run() call above and this
+        # .on_done() method. An issue has been filed about this. Awaiting response.
+        state = VintageState(self.view)
+        state.motion = 'vi_question_mark'
         state.user_input = s
         state.last_buffer_search = s
         state.run()
@@ -396,6 +438,45 @@ class _vi_forward_slash(sublime_plugin.TextCommand):
             match = self.view.find(search_string, match.b)
             # XXX: Temporary fix until .find() gets fixed.
             if match.b < 0:
+                return
+
+        regions_transformer(self.view, f)
+
+
+class _vi_question_mark(sublime_plugin.TextCommand):
+    def run(self, edit, search_string, mode=None, count=1, extend=False):
+        def f(view, s):
+            # FIXME: Readjust carets if we searched for '\n'.
+            if mode == MODE_VISUAL:
+                if s.b > found.a:
+                    return sublime.Region(s.end(), found.a)
+
+            elif mode == _MODE_INTERNAL_NORMAL:
+                if s.b > found.a:
+                    return sublime.Region(s.end(), found.a)
+
+            elif mode == MODE_NORMAL:
+                if s.b > found.a:
+                    return sublime.Region(found.a, found.a)
+
+            return s
+
+        # This happens when we attempt to repeat the search and there's no search term stored yet.
+        if search_string is None:
+            return
+
+        current_sel = self.view.sel()[0]
+        # FIXME: What should we do here? Case-sensitive or case-insensitive search? Configurable?
+        found = reverse_search(self.view, search_string, 0, current_sel.a)
+        if not found:
+            print("Vintageous: Pattern not found.")
+            return
+
+        for x in range(count - 1):
+            match = reverse_search(self.view, search_string, 0, found.a)
+            # XXX: Temporary fix until .find() gets fixed.
+            if not found:
+                print("Vintageous: Pattern not found.")
                 return
 
         regions_transformer(self.view, f)

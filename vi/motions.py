@@ -339,15 +339,14 @@ def vi_e(vi_cmd_data):
 
 def vi_octothorp(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_octothorp'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    vi_cmd_data['count'] = 1
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
 
     return vi_cmd_data
 
 
 def vi_star(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_star'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
 
     return vi_cmd_data
 
@@ -424,6 +423,14 @@ def vi_double_single_quote(vi_cmd_data):
 
 def vi_forward_slash(vi_cmd_data):
     vi_cmd_data['motion']['command'] = '_vi_forward_slash'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'search_string': vi_cmd_data['user_input']}
+    vi_cmd_data['count'] = 1
+
+    return vi_cmd_data
+
+
+def vi_question_mark(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = '_vi_question_mark'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'search_string': vi_cmd_data['user_input']}
     vi_cmd_data['count'] = 1
 

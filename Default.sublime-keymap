@@ -156,6 +156,7 @@
 	{ "keys": ["F"], "command": "vi_big_f", "context": [{"key": "vi_mode_visual"}] },
 
 	{ "keys": ["/"], "command": "vi_buffer_search", "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["?"], "command": "vi_buffer_reverse_search", "context": [{"key": "setting.command_mode"}] },
 
 	{ "keys": ["n"], "command": "set_motion", "args": {"motion": "vi_n"}, "context": [{"key": "setting.command_mode"}] },
 
