@@ -2,7 +2,7 @@ from Vintageous.vi.constants import MODE_NORMAL
 
 
 class CmdData(dict):
-    # vi_cmd_data is a key data structure that drives the action/motion execution.
+    # CmdData is a key data structure that drives the action/motion execution.
     # Keys and values must be valid JSON data types, because the data structure ends up being an
     # argument to an ST command.
     def __init__(self, state):
@@ -74,10 +74,10 @@ class CmdData(dict):
         # Used, for example, by CTRL+R,= in INSERTMODE.
         self['_change_mode_to'] = None
         # If not None, the corresponding mode will be entered during the full run of a command, in
-        # some cases. Used to know which mode to transition to after a failed composite command.
-        # Note this is mainly useful to exit from bad corrupted states; successful commands should
+        # some cases. Used to determine which mode to transition to after a failed composite command.
+        # Note: This is mainly useful to exit from bad corrupted states; successful commands should
         # instead specify their 'follow_up_mode' hook.
-        # For example, in INSERTMODE, Ctrl+R,j would cause VintageState to use this.
+        # For example, in INSERTMODE, Ctrl+r,j would cause VintageState to use this.
         self['_exit_mode'] = None
         self['must_blink_on_error'] = False
         # Mode to transition to on success.
@@ -91,5 +91,7 @@ class CmdData(dict):
         # to request xpos to be readjusted.
         self['align_with_xpos'] = False
         # Overrides the last iteration of a motion. Helps avoid swallowing the new line character
-        # in commands like dw.
+        # in commands like dw. The difference between this hook and 'post_every_motion' (which
+        # knows about the last iteration) is that 'last_motion' is able to override the current
+        # motion command.
         self['last_motion'] = None
