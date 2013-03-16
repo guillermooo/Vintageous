@@ -90,3 +90,6 @@ class CmdData(dict):
         # motion will leave .b at BOL, while Vim keeps the starting xpos. In this case, we need
         # to request xpos to be readjusted.
         self['align_with_xpos'] = False
+        # Overrides the last iteration of a motion. Helps avoid swallowing the new line character
+        # in commands like dw.
+        self['last_motion'] = None

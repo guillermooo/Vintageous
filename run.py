@@ -109,8 +109,13 @@ class ViRunCommand(sublime_plugin.TextCommand):
         for x in range(count):
             self.reorient_caret(vi_cmd_data)
             self.do_pre_every_motion(vi_cmd_data, x, count)
-            self.do_motion(vi_cmd_data)
-            self.do_post_every_motion(vi_cmd_data, x, count)
+
+            if x != count - 1 or not vi_cmd_data['last_motion']:
+                self.do_motion(vi_cmd_data)
+                self.do_post_every_motion(vi_cmd_data, x, count)
+            else:
+                self.do_last_motion(vi_cmd_data)
+
 
         self.do_post_motion(vi_cmd_data)
         self.reposition_caret(vi_cmd_data)
@@ -181,6 +186,10 @@ class ViRunCommand(sublime_plugin.TextCommand):
         args = vi_cmd_data['motion']['args']
         self.debug("Vintageous: Motion command: ", cmd, args)
         self.view.run_command(cmd, args)
+
+    def do_last_motion(self, vi_cmd_data):
+        print("XXX XX XXX")
+        self.view.run_command(*vi_cmd_data['last_motion'])
 
     def do_pre_every_motion(self, vi_cmd_data, current, total):
         """ST command classes used as 'pre_every_motion' hooks need to take

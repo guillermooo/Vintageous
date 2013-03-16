@@ -223,6 +223,25 @@ class VisualExtendEndToHardEnd(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
+class _vi_w_last_motion(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, extend=False):
+        def f(view, s):
+            if mode == _MODE_INTERNAL_NORMAL:
+                if s.a <= s.b:
+                    if view.substr(s.b) != '\n':
+                        end = view.word(s.b).b
+                        end = utils.next_non_white_space_char(view, end, white_space='\t ')
+                        if end == s.b:
+                            end = view.expand_by_class(s.b, sublime.CLASS_PUNCTUATION_END).b
+                        return sublime.Region(s.a, end)
+
+                    elif view.line(s.b).empty():
+                        return sublime.Region(s.a, s.b + 1)
+            return s
+
+        regions_transformer(self.view, f)
+
+
 class _vi_w_post_every_motion(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
         def f(view, s):
@@ -281,6 +300,11 @@ class _vi_w_post_every_motion(sublime_plugin.TextCommand):
                         # FIXME: Don't swallow empty lines.
                         pt = utils.next_non_white_space_char(view, s.b, white_space='\t \n')
                         return sublime.Region(s.a, pt)
+
+            if state.mode == _MODE_INTERNAL_NORMAL:
+                if current_iteration == total_iterations:
+                    if view.substr(s.b - 1) == '\n' and not view.line(s.b - 1).empty():
+                        return sublime.Region(s.a, s.b - 1)
 
             return s
 
