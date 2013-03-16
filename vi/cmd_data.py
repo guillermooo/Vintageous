@@ -3,12 +3,12 @@ from Vintageous.vi.constants import MODE_NORMAL
 
 class CmdData(dict):
     # CmdData is a key data structure that drives the action/motion execution.
-    # Keys and values must be valid JSON data types, because the data structure ends up being an
-    # argument to an ST command.
+    # Keys and values must be valid JSON data types, because the whole data structure ends up
+    # being an argument to a Sublime Text command.
     def __init__(self, state):
         self['pre_motion'] = None
         self['motion'] = {}
-        # Whether the user needs to provide a motion. If there is no user-provided motion, a
+        # Whether the user needs to provide a motion. If there was no user-provided motion, a
         # motion specified by an action could still be run before the action.
         self['motion_required'] = True
         self['action'] = {}
@@ -20,9 +20,9 @@ class CmdData(dict):
         self['pre_every_motion'] = None
         self['post_every_motion'] = None
         # This is the only hook that takes a list of commands to execute.
-        # Specify commands as a list of [command, args] elements (don't use tuples).
+        # Specify commands as a list of [command, args] elements (but don't use tuples).
         self['post_motion'] = []
-        # Set to True if the command must be able to populate the registers. This will cause
+        # Set to True if the command must populate the registers. This will cause
         # Vintageous to propagate copied text to the unnamed register as needed.
         self['can_yank'] = False
         # Some commands operate CHARACTERWISE but always yank LINEWISE, so we need this.
@@ -65,7 +65,7 @@ class CmdData(dict):
         self['xpos'] = state.xpos
         # Indicates whether xpos needs to be updated. Only vertical motions j and k need not
         # update xpos.
-        self['must_update_xpos'] = True,
+        self['must_update_xpos'] = True
         # Whether we should make sure to show the first selection.
         self['scroll_into_view'] = True
         # If not None, the corresponding mode will be entered before runnig ViRun.
