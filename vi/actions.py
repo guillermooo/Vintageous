@@ -232,6 +232,7 @@ def vi_big_s(vi_cmd_data):
         vi_cmd_data['action']['command'] = 'right_delete'
         vi_cmd_data['action']['args'] = {}
         vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
+        vi_cmd_data['next_mode'] = MODE_INSERT
     else:
         # Avoid S'ing one line too many.
         vi_cmd_data['count'] = vi_cmd_data['count'] - 1
