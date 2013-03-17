@@ -374,8 +374,14 @@ class ViBufferSearch(IrreversibleTextCommand):
         # .on_done() method. An issue has been filed about this. Awaiting response.
         state = VintageState(self.view)
         state.motion = 'vi_forward_slash'
+
         state.user_input = s
-        state.last_buffer_search = s
+        # Equivalent to /<CR>, which must repeat the last search.
+        if s == '':
+            state.user_input = state.last_buffer_search
+
+        if s != '':
+            state.last_buffer_search = s
         state.run()
 
     def on_cancel(self):
@@ -392,8 +398,14 @@ class ViBufferReverseSearch(IrreversibleTextCommand):
         # .on_done() method. An issue has been filed about this. Awaiting response.
         state = VintageState(self.view)
         state.motion = 'vi_question_mark'
+
         state.user_input = s
-        state.last_buffer_search = s
+        # Equivalent to ?<CR>, which must repeat the last search.
+        if s == '':
+            state.user_input = state.last_buffer_search
+
+        if s != '':
+            state.last_buffer_search = s
         state.run()
 
     def on_cancel(self):
