@@ -693,6 +693,8 @@ class _vi_select_text_object(sublime_plugin.TextCommand):
         # XXX: Does Vim really allow this one?
         "[": ("[", "]"),
         "]": ("[", "]"),
+        "{": ("{", "}"),
+        "}": ("{", "}"),
     }
 
     # XXX: Move to utils.
