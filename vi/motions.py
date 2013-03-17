@@ -444,6 +444,13 @@ def vi_n(vi_cmd_data):
 
     return vi_cmd_data
 
+def vi_big_n(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = '_vi_question_mark'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'search_string': vi_cmd_data['last_buffer_search']}
+    vi_cmd_data['count'] = 1
+
+    return vi_cmd_data
+
 
 def vi_semicolon(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_find_in_line_inclusive'

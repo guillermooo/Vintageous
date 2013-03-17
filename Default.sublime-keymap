@@ -159,6 +159,7 @@
 	{ "keys": ["?"], "command": "vi_buffer_reverse_search", "context": [{"key": "setting.command_mode"}] },
 
 	{ "keys": ["n"], "command": "set_motion", "args": {"motion": "vi_n"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["N"], "command": "set_motion", "args": {"motion": "vi_big_n"}, "context": [{"key": "setting.command_mode"}] },
 
 	// Twofold process: First set the motion, then collect user input and run global state.
 	// Text objects like di".

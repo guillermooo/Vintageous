@@ -473,7 +473,7 @@ class _vi_question_mark(sublime_plugin.TextCommand):
             return
 
         for x in range(count - 1):
-            match = reverse_search(self.view, search_string, 0, found.a)
+            found = reverse_search(self.view, search_string, 0, found.a)
             # XXX: Temporary fix until .find() gets fixed.
             if not found:
                 print("Vintageous: Pattern not found.")
