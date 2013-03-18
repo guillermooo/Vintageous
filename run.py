@@ -3,18 +3,23 @@ import sublime_plugin
 
 import pprint
 
-from Vintageous.vi import motions
-from Vintageous.vi import actions
-from Vintageous.vi.constants import (MODE_INSERT, MODE_NORMAL, MODE_VISUAL,
-                         MODE_VISUAL_LINE, MODE_NORMAL_INSERT,
-                         _MODE_INTERNAL_NORMAL)
-from Vintageous.vi.constants import mode_to_str
-from Vintageous.vi.constants import digraphs
-from Vintageous.vi.constants import MODE_COMMAND_MAP
-from Vintageous.vi.settings import SettingsManager, VintageSettings, SublimeSettings
-from Vintageous.vi.registers import Registers, REG_UNNAMED
-from Vintageous.vi import registers
 from Vintageous.state import VintageState
+from Vintageous.vi import actions
+from Vintageous.vi import motions
+from Vintageous.vi import registers
+from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
+from Vintageous.vi.constants import digraphs
+from Vintageous.vi.constants import MODE_INSERT
+from Vintageous.vi.constants import MODE_NORMAL
+from Vintageous.vi.constants import MODE_NORMAL_INSERT
+from Vintageous.vi.constants import mode_to_str
+from Vintageous.vi.constants import MODE_VISUAL
+from Vintageous.vi.constants import MODE_VISUAL_LINE
+from Vintageous.vi.registers import REG_UNNAMED
+from Vintageous.vi.registers import Registers
+from Vintageous.vi.settings import SettingsManager
+from Vintageous.vi.settings import SublimeSettings
+from Vintageous.vi.settings import VintageSettings
 
 
 class ViExecutionState(object):
@@ -39,6 +44,9 @@ class ViExecutionState(object):
 
 
 class ViRunCommand(sublime_plugin.TextCommand):
+    """Evaluates a full vim command. Everything that happens inside .run() will be left in the
+       undo stack so that the "." command works as expected.
+    """
     def run(self, edit, **vi_cmd_data):
         self.debug("Data in ViRunCommand:", vi_cmd_data)
 
@@ -56,7 +64,7 @@ class ViRunCommand(sublime_plugin.TextCommand):
                         self.do_whole_motion(vi_cmd_data)
 
                 # The motion didn't change the selections: abort action if so required.
-                # TODO: What to do with .post_action() and .do_follow_up_mode() in this event?
+                # TODO: What to do with .post_action() and .restore_original_carets_if_needed() in this event?
                 if (vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL and
                     all([v.empty() for v in self.view.sel()]) and
                     vi_cmd_data['cancel_action_if_motion_fails']):
@@ -87,15 +95,20 @@ class ViRunCommand(sublime_plugin.TextCommand):
                 state.xpos = xpos
 
             self.do_modify_selections(vi_cmd_data)
-            self.do_follow_up_mode(vi_cmd_data)
+            self.restore_original_carets_if_needed(vi_cmd_data)
 
             if vi_cmd_data['scroll_into_view']:
                 # TODO: If moving by lines, scroll the minimum amount to display the new sels.
                 self.view.show(self.view.sel()[0])
 
+            # We cannot run (maybe_)mark_undo_groups_for_gluing/glue_marked_undo_groups commands
+            # within a command meant to be subsumed in the group to be glued. It won't work. So
+            # let's save the data we need to transtion to the next mode, which will be taken care
+            # of later by VintageState.reset().
+            # XXX: This code can probably be moved to VintageState.run().
             state = VintageState(self.view)
-            # state.reset(next_mode=vi_cmd_data['next_mode'])
-            state.reset()
+            state.next_mode = vi_cmd_data['next_mode']
+            state.next_mode_command = vi_cmd_data['follow_up_mode']
 
     def save_caret_pos(self):
         self.old_sels = list(self.view.sel())
@@ -161,34 +174,12 @@ class ViRunCommand(sublime_plugin.TextCommand):
                 if args.get('by') == 'characters':
                     vi_cmd_data['count'] = vi_cmd_data['count'] - 1
 
-    # XXX: Change name to .do_coda() or .transition_to_text_mode() or something else that suggests
-    # something mode than barely changing the mode.
-    def do_follow_up_mode(self, vi_cmd_data):
+    def restore_original_carets_if_needed(self, vi_cmd_data):
         if vi_cmd_data['restore_original_carets'] == True:
             self.view.sel().clear()
             for s in self.old_sels:
                 # XXX: If the buffer has changed, this won't work well.
                 self.view.sel().add(s)
-
-        # Make sure to override follow_up_mode when repeating a command via '.'. At the end of the
-        # run of a command, .next_mode will be reset to NORMALMODE. Therefore, MODE_COMMAND_MAP may
-        # contain no valid action, effectively skipping follow_up_mode.
-        #
-        # For example, when running ce a first time, we want to end up in INSERTMODE (.next_mode
-        # will be MODE_INSERT and follow_up_mode will be 'vi_enter_insert_mode'), whereas when
-        # repeating this command with '.', we want to end up in NORMALMODE (.next_mode will be
-        # MODE_NORMAL in this case, and follow_up_mode will be ignored).
-        #
-        # XXX: An alternative and perhaps cleaner implementation of this would be to override
-        # the undo command so that it grabs the latest command + args, modifies the args so that
-        # the follow_up_mode is 'vi_enter_normal_mode' and runs everything through vi_run.
-        follow_up = vi_cmd_data['follow_up_mode']
-        next_mode = VintageState(self.view).next_mode
-        try:
-            if follow_up and (follow_up in MODE_COMMAND_MAP[next_mode]):
-                self.view.run_command(vi_cmd_data['follow_up_mode'])
-        except KeyError:
-            pass
 
     def do_modify_selections(self, vi_cmd_data):
         # Gives command a chance to modify the selection after the motion/action. Useful for

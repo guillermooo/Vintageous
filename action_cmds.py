@@ -182,7 +182,6 @@ class ViEnterNormalMode(sublime_plugin.TextCommand):
         state = VintageState(self.view)
         self.view.run_command('collapse_to_direction')
         self.view.run_command('dont_stay_on_eol_backward')
-        state.reset()
         state.enter_normal_mode()
 
 
@@ -214,9 +213,6 @@ class ViEnterInsertMode(sublime_plugin.TextCommand):
         state = VintageState(self.view)
         state.enter_insert_mode()
         self.view.run_command('collapse_to_direction')
-        # 5i and friends don't enter INSERTMODE through this command, so it's fine resetting here.
-        # We need to reset so that things like CTRL+R,ESC (INSERTMODE) cancel pending state.
-        state.reset()
 
 
 class ViEnterVisualMode(sublime_plugin.TextCommand):
@@ -231,11 +227,11 @@ class ViEnterVisualLineMode(sublime_plugin.TextCommand):
         state = VintageState(self.view)
         state.enter_visual_line_mode()
 
+
 class ViEnterReplaceMode(sublime_plugin.TextCommand):
     def run(self, edit):
         state = VintageState(self.view)
         state.enter_replace_mode()
-        # XXX: Shouldn't this be done from within VintageState?
         self.view.run_command('collapse_to_direction')
         state.reset()
 
@@ -295,6 +291,7 @@ class ViEnterNormalInsertMode(sublime_plugin.TextCommand):
         state = VintageState(self.view)
         state.enter_normal_insert_mode()
 
+        # FIXME: We should glue undo groups here instead of using a macro.
         self.view.run_command('toggle_record_macro')
         # ...User types text...
 
@@ -382,6 +379,7 @@ class ViT(IrreversibleTextCommand):
     def __init__(self, view):
         IrreversibleTextCommand.__init__(self, view)
 
+    # XXX: Compare to ViBigF.
     def run(self, character=None):
         state = VintageState(self.view)
         if character is None:
@@ -397,13 +395,11 @@ class ViBigT(IrreversibleTextCommand):
     def __init__(self, view):
         IrreversibleTextCommand.__init__(self, view)
 
-    # XXX: Delete argument when it isn't needed any more.
+    # XXX: Compare to ViBigF.
     def run(self, character=None):
         state = VintageState(self.view)
         if character is None:
             state.motion = 'vi_big_t'
-            # XXX: Maybe we should simply use ["t", "<character>"] in the key map and be done
-            # with this.
             state.expecting_user_input = True
         else:
             state.user_input = character
@@ -415,11 +411,11 @@ class ViBigF(IrreversibleTextCommand):
     def __init__(self, view):
         IrreversibleTextCommand.__init__(self, view)
 
-    # XXX: Delete argument when it isn't needed any more.
     def run(self):
         state = VintageState(self.view)
         state.motion = 'vi_big_f'
         state.expecting_user_input = True
+
 
 class ViI(IrreversibleTextCommand):
     def __init__(self, view):
@@ -445,20 +441,6 @@ class CollectUserInput(IrreversibleTextCommand):
         state.run()
 
 
-class _repeat_command(IrreversibleTextCommand):
-    """Repeats a Sublime Text command.
-    """
-    def __init__(self, view):
-        IrreversibleTextCommand.__init__(self, view)
-
-    def run(self, command=None, command_args={}, times=0):
-        if command == None:
-            return
-
-        for i in range(times):
-            self.view.run_command(command, command_args)
-
-
 class _vi_z_enter(IrreversibleTextCommand):
     def __init__(self, view):
         IrreversibleTextCommand.__init__(self, view)
@@ -470,6 +452,7 @@ class _vi_z_enter(IrreversibleTextCommand):
         topmost_visible_row, _ = self.view.rowcol(self.view.visible_region().a)
 
         self.view.run_command('scroll_lines', {'amount': (topmost_visible_row - current_row)})
+
 
 class _vi_z_minus(IrreversibleTextCommand):
     def __init__(self, view):
@@ -552,9 +535,19 @@ class _vi_undo(IrreversibleTextCommand):
             self.view.run_command('move', {'by': 'characters', 'forward': False})
             # ////////////////////////////////////////////////////////////////////
 
-# class _vi_redo(IrreversibleTextCommand):
-#     def run(self):
-#         self.view.run_command('redo')
+
+class _vi_repeat(IrreversibleTextCommand):
+    def run(self):
+        # Retrieve last modifying command.
+        cmd, args, times = self.view.command_history(0, True)
+        if cmd != 'vi_run':
+            # TODO: What happens when we have a 'sequence' command?
+            self.view.run_command('repeat')
+            return
+
+        args['next_mode'] = MODE_NORMAL
+        args['follow_up_mode'] = 'vi_enter_normal_mode'
+        self.view.run_command(cmd, args)
 
 
 class _vi_ctrl_w_v_action(sublime_plugin.TextCommand):
@@ -568,6 +561,12 @@ class Sequence(sublime_plugin.TextCommand):
     def run(self, edit, commands):
         for cmd, args in commands:
             self.view.run_command(cmd, args)
+
+        # XXX: Sequence is a special case in that it doesn't run through vi_run, so we need to
+        # ensure the next mode is correct. Maybe we can improve this by making it more similar to
+        # regular commands?
+        state = VintageState(self.view)
+        state.enter_normal_mode()
 
 
 class _vi_big_j(sublime_plugin.TextCommand):

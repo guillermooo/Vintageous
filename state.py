@@ -89,15 +89,17 @@ class VintageState(object):
 
     def enter_visual_line_mode(self):
         self.mode = MODE_VISUAL_LINE
+        self.view.run_command('maybe_mark_undo_groups_for_gluing')
 
     def enter_insert_mode(self):
         self.settings.view['command_mode'] = False
         self.settings.view['inverse_caret_state'] = False
         self.mode = MODE_INSERT
-        self.view.run_command('mark_undo_groups_for_gluing')
+        self.view.run_command('maybe_mark_undo_groups_for_gluing')
 
     def enter_visual_mode(self):
         self.mode = MODE_VISUAL
+        self.view.run_command('maybe_mark_undo_groups_for_gluing')
 
     def enter_normal_insert_mode(self):
         self.mode = MODE_NORMAL_INSERT
@@ -283,6 +285,15 @@ class VintageState(object):
     def next_mode(self, value):
         self.settings.vi['next_mode'] = value
 
+    @property
+    def next_mode_command(self):
+        next_mode_command = self.settings.vi['next_mode_command']
+        return next_mode_command
+
+    @next_mode_command.setter
+    def next_mode_command(self, value):
+        self.settings.vi['next_mode_command'] = value
+
     def parse_motion(self):
         vi_cmd_data = CmdData(self)
 
@@ -354,12 +365,9 @@ class VintageState(object):
             vi_cmd_data = self.parse_motion()
             vi_cmd_data = self.parse_action(vi_cmd_data)
 
-            if 'next_mode' in vi_cmd_data:
-                self.next_mode = vi_cmd_data['next_mode']
-                del vi_cmd_data['next_mode']
-
             if not vi_cmd_data['is_digraph_start']:
                 self.view.run_command('vi_run', vi_cmd_data)
+                self.reset()
             else:
                 # If we have a digraph start, the global data is in an invalid state because we
                 # are still missing the complete digraph. Abort and clean up.
@@ -380,31 +388,32 @@ class VintageState(object):
         elif self.motion:
             vi_cmd_data = self.parse_motion()
             self.view.run_command('vi_run', vi_cmd_data)
+            self.reset()
 
         # Action only, like in "d" or "esc". Some actions can be executed without a motion.
         elif self.action:
             vi_cmd_data = self.parse_motion()
             vi_cmd_data = self.parse_action(vi_cmd_data)
 
-            if 'next_mode' in vi_cmd_data:
-                self.next_mode = vi_cmd_data['next_mode']
-                del vi_cmd_data['next_mode']
-
             if vi_cmd_data['is_digraph_start']:
                 if vi_cmd_data['_change_mode_to']:
+                    # XXX: When does this happen? Why are we only interested in MODE_NORMAL?
                     if vi_cmd_data['_change_mode_to'] == MODE_NORMAL:
                         self.enter_normal_mode()
                 # We know we are not ready.
                 return
 
             # In cases like gg, we might receive the motion here, so check for that.
+            # XXX: The above doesn't seem to be true. When is this path reached?
             if self.motion and not self.action:
                 self.view.run_command('vi_run', self.parse_motion())
                 self.update_status()
+                self.reset()
                 return
 
             if not vi_cmd_data['motion_required']:
                 self.view.run_command('vi_run', vi_cmd_data)
+                self.reset()
 
         self.update_status()
 
@@ -427,13 +436,19 @@ class VintageState(object):
         self.motion_digits = []
         self.action_digits = []
 
-        if next_mode == MODE_INSERT:
+        if self.next_mode == MODE_INSERT:
+            # XXX: Is this redundant?
             self.enter_insert_mode()
-        elif next_mode is not None:
-            # XXX: We don't know yet of any case where a different mode is required.
+            if self.next_mode_command:
+                self.view.run_command(self.next_mode_command)
+        elif self.next_mode == MODE_NORMAL:
+            if self.next_mode_command:
+                self.view.run_command(self.next_mode_command)
+        else:
             pass
 
         self.next_mode = MODE_NORMAL
+        self.next_mode_command = None
 
     def update_status(self):
         mode_name = mode_to_str(self.mode) or ""
