@@ -547,3 +547,17 @@ def vi_left_brace(vi_cmd_data):
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
 
     return vi_cmd_data
+
+
+def vi_right_parenthesis(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = '_vi_right_parenthesis'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
+
+    return vi_cmd_data
+
+
+def vi_left_parenthesis(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = '_vi_left_parenthesis'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
+
+    return vi_cmd_data

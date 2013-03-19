@@ -532,3 +532,59 @@ class _vi_left_brace(sublime_plugin.TextCommand):
             return s
 
         regions_transformer(self.view, f)
+
+
+class _vi_right_parenthesis(sublime_plugin.TextCommand):
+    def find_next_sentence_end(self, r):
+        sen = r
+        while True:
+            sen = self.view.expand_by_class(sen, sublime.CLASS_LINE_END)
+            if sen.b == self.view.size() or self.view.substr(sen.b - 1) == '.':
+                return sen
+
+    def run(self, edit, mode=None, extend=False):
+
+        def f(view, s):
+            # TODO: must skip empty paragraphs.
+            sen = self.find_next_sentence_end(s)
+
+            if mode == MODE_NORMAL:
+                return sublime.Region(sen.b + 1, sen.b + 1)
+
+            elif mode == MODE_VISUAL:
+                return sublime.Region(s.a, sen.b + 1)
+
+            elif mode == _MODE_INTERNAL_NORMAL:
+                return sublime.Region(s.a, sen.b)
+
+            return s
+
+        regions_transformer(self.view, f)
+
+
+class _vi_left_parenthesis(sublime_plugin.TextCommand):
+    def find_previous_sentence_end(self, r):
+        sen = r
+        while True:
+            sen = self.view.expand_by_class(sen, sublime.CLASS_LINE_END)
+            if sen.a <= 0 or self.view.substr(sen.begin() - 1) in ('.', '\n'):
+                return sen
+
+    def run(self, edit, mode=None, extend=False):
+
+        def f(view, s):
+            # TODO: must skip empty paragraphs.
+            sen = self.find_previous_sentence_end(s)
+
+            if mode == MODE_NORMAL:
+                return sublime.Region(sen.a + 1, sen.a + 1)
+
+            elif mode == MODE_VISUAL:
+                return sublime.Region(s.a + 1, sen.a +  1)
+
+            elif mode == _MODE_INTERNAL_NORMAL:
+                return sublime.Region(s.a, sen.a + 1)
+
+            return s
+
+        regions_transformer(self.view, f)
