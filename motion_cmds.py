@@ -492,3 +492,43 @@ class _vi_question_mark(sublime_plugin.TextCommand):
                 return
 
         regions_transformer(self.view, f)
+
+
+class _vi_right_brace(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, extend=False):
+        def f(view, s):
+            # TODO: must skip empty paragraphs.
+            par_as_region = view.expand_by_class(s, sublime.CLASS_EMPTY_LINE)
+
+            if mode == MODE_NORMAL:
+                return sublime.Region(par_as_region.b, par_as_region.b)
+
+            elif mode == MODE_VISUAL:
+                return sublime.Region(s.a, par_as_region.b)
+
+            elif mode == _MODE_INTERNAL_NORMAL:
+                return sublime.Region(s.a, par_as_region.b - 1)
+
+            return s
+
+        regions_transformer(self.view, f)
+
+
+class _vi_left_brace(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, extend=False):
+        def f(view, s):
+            # TODO: must skip empty paragraphs.
+            par_as_region = view.expand_by_class(s, sublime.CLASS_EMPTY_LINE)
+
+            if mode == MODE_NORMAL:
+                return sublime.Region(par_as_region.a, par_as_region.a)
+
+            elif mode == MODE_VISUAL:
+                return sublime.Region(s.a + 1, par_as_region.a)
+
+            elif mode == _MODE_INTERNAL_NORMAL:
+                return sublime.Region(s.a, par_as_region.a)
+
+            return s
+
+        regions_transformer(self.view, f)
