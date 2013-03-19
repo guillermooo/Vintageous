@@ -501,7 +501,8 @@ class _vi_right_brace(sublime_plugin.TextCommand):
             par_as_region = view.expand_by_class(s, sublime.CLASS_EMPTY_LINE)
 
             if mode == MODE_NORMAL:
-                return sublime.Region(par_as_region.b, par_as_region.b)
+                return sublime.Region(min(par_as_region.b, view.size() - 1),
+                                      min(par_as_region.b, view.size() - 1))
 
             elif mode == MODE_VISUAL:
                 return sublime.Region(s.a, par_as_region.b)
@@ -549,7 +550,8 @@ class _vi_right_parenthesis(sublime_plugin.TextCommand):
             sen = self.find_next_sentence_end(s)
 
             if mode == MODE_NORMAL:
-                return sublime.Region(sen.b + 1, sen.b + 1)
+                target = min(sen.b + 1, view.size() - 1)
+                return sublime.Region(target, target)
 
             elif mode == MODE_VISUAL:
                 return sublime.Region(s.a, sen.b + 1)
