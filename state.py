@@ -363,6 +363,9 @@ class VintageState(object):
             vi_cmd_data = self.parse_action(vi_cmd_data)
 
             if not vi_cmd_data['is_digraph_start']:
+                # We are about to run an action, so let Sublime Text know we want all editing
+                # steps folded into a single sequence. "All editing steps" means slightly different
+                # things depending on the mode we are in.
                 self.view.run_command('maybe_mark_undo_groups_for_gluing')
                 self.view.run_command('vi_run', vi_cmd_data)
                 self.reset()
@@ -396,6 +399,7 @@ class VintageState(object):
             if vi_cmd_data['is_digraph_start']:
                 if vi_cmd_data['_change_mode_to']:
                     # XXX: When does this happen? Why are we only interested in MODE_NORMAL?
+                    # XXX In response to the above, this must be due to Ctrl+r.
                     if vi_cmd_data['_change_mode_to'] == MODE_NORMAL:
                         self.enter_normal_mode()
                 # We know we are not ready.
@@ -410,6 +414,9 @@ class VintageState(object):
                 return
 
             if not vi_cmd_data['motion_required']:
+                # We are about to run an action, so let Sublime Text know we want all editing
+                # steps folded into a single sequence. "All editing steps" means slightly different
+                # things depending on the mode we are in.
                 self.view.run_command('maybe_mark_undo_groups_for_gluing')
                 self.view.run_command('vi_run', vi_cmd_data)
                 self.reset()
