@@ -89,17 +89,17 @@ class VintageState(object):
 
     def enter_visual_line_mode(self):
         self.mode = MODE_VISUAL_LINE
-        self.view.run_command('maybe_mark_undo_groups_for_gluing')
+        # self.view.run_command('maybe_mark_undo_groups_for_gluing')
 
     def enter_insert_mode(self):
         self.settings.view['command_mode'] = False
         self.settings.view['inverse_caret_state'] = False
         self.mode = MODE_INSERT
-        self.view.run_command('maybe_mark_undo_groups_for_gluing')
+        # self.view.run_command('maybe_mark_undo_groups_for_gluing')
 
     def enter_visual_mode(self):
         self.mode = MODE_VISUAL
-        self.view.run_command('maybe_mark_undo_groups_for_gluing')
+        # self.view.run_command('maybe_mark_undo_groups_for_gluing')
 
     def enter_normal_insert_mode(self):
         self.mode = MODE_NORMAL_INSERT
@@ -366,6 +366,7 @@ class VintageState(object):
             vi_cmd_data = self.parse_action(vi_cmd_data)
 
             if not vi_cmd_data['is_digraph_start']:
+                self.view.run_command('maybe_mark_undo_groups_for_gluing')
                 self.view.run_command('vi_run', vi_cmd_data)
                 self.reset()
             else:
@@ -406,12 +407,14 @@ class VintageState(object):
             # In cases like gg, we might receive the motion here, so check for that.
             # XXX: The above doesn't seem to be true. When is this path reached?
             if self.motion and not self.action:
+                self.view.run_command('maybe_mark_undo_groups_for_gluing')
                 self.view.run_command('vi_run', self.parse_motion())
                 self.update_status()
                 self.reset()
                 return
 
             if not vi_cmd_data['motion_required']:
+                self.view.run_command('maybe_mark_undo_groups_for_gluing')
                 self.view.run_command('vi_run', vi_cmd_data)
                 self.reset()
 
