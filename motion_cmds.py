@@ -382,7 +382,7 @@ class ViBufferSearch(IrreversibleTextCommand):
 
         if s != '':
             state.last_buffer_search = s
-        state.run()
+        state.eval()
 
     def on_cancel(self):
         state = VintageState(self.view)
@@ -406,7 +406,7 @@ class ViBufferReverseSearch(IrreversibleTextCommand):
 
         if s != '':
             state.last_buffer_search = s
-        state.run()
+        state.eval()
 
     def on_cancel(self):
         state = VintageState(self.view)

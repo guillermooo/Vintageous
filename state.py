@@ -339,7 +339,7 @@ class VintageState(object):
 
         return vi_cmd_data
 
-    def run(self):
+    def eval(self):
         """Examines the current state and decides whether to actually run the action/motion.
         """
 

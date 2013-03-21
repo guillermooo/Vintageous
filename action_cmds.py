@@ -243,7 +243,7 @@ class SetAction(IrreversibleTextCommand):
     def run(self, action):
         state = VintageState(self.view)
         state.action = action
-        state.run()
+        state.eval()
 
 
 class SetMotion(IrreversibleTextCommand):
@@ -253,7 +253,7 @@ class SetMotion(IrreversibleTextCommand):
     def run(self, motion):
         state = VintageState(self.view)
         state.motion = motion
-        state.run()
+        state.eval()
 
 
 class SetComposite(sublime_plugin.TextCommand):
@@ -261,7 +261,7 @@ class SetComposite(sublime_plugin.TextCommand):
         state = VintageState(self.view)
         state.motion = motion
         state.action = action
-        state.run()
+        state.eval()
 
 
 class ViPushDigit(sublime_plugin.TextCommand):
@@ -359,7 +359,7 @@ class ViR(sublime_plugin.TextCommand):
         else:
             state.user_input = character
             state.expecting_user_input= False
-            state.run()
+            state.eval()
 
 
 class ViF(sublime_plugin.TextCommand):
@@ -372,7 +372,7 @@ class ViF(sublime_plugin.TextCommand):
             # FIXME: Dead code?
             state.user_input = character
             state.expecting_user_input= False
-            state.run()
+            state.eval()
 
 
 class ViT(IrreversibleTextCommand):
@@ -388,7 +388,7 @@ class ViT(IrreversibleTextCommand):
         else:
             state.user_input = character
             state.expecting_user_input= False
-            state.run()
+            state.eval()
 
 
 class ViBigT(IrreversibleTextCommand):
@@ -404,7 +404,7 @@ class ViBigT(IrreversibleTextCommand):
         else:
             state.user_input = character
             state.expecting_user_input= False
-            state.run()
+            state.eval()
 
 
 class ViBigF(IrreversibleTextCommand):
@@ -438,7 +438,7 @@ class CollectUserInput(IrreversibleTextCommand):
         state = VintageState(self.view)
         state.user_input = character
         state.expecting_user_input= False
-        state.run()
+        state.eval()
 
 
 class _vi_z_enter(IrreversibleTextCommand):
