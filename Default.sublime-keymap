@@ -33,8 +33,8 @@
 	{ "keys": ["_"], "command": "set_motion", "args": {"motion": "vi_underscore"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["^"], "command": "set_motion", "args": {"motion": "vi_underscore"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 
-	{ "keys": ["{"], "command": "set_motion", "args": {"motion": "vi_left_brace"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["}"], "command": "set_motion", "args": {"motion": "vi_right_brace"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["{"], "command": "set_motion", "args": {"motion": "vi_left_brace"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
+	{ "keys": ["}"], "command": "set_motion", "args": {"motion": "vi_right_brace"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
 
 	{ "keys": ["("], "command": "set_motion", "args": {"motion": "vi_left_parenthesis"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": [")"], "command": "set_motion", "args": {"motion": "vi_right_parenthesis"}, "context": [{"key": "vi_mode_normal_or_visual"}] },

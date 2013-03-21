@@ -3,6 +3,7 @@ import sublime_plugin
 
 from Vintageous.vi.constants import regions_transformer
 from Vintageous.vi.constants import MODE_VISUAL, MODE_NORMAL, _MODE_INTERNAL_NORMAL
+from Vintageous.vi.constants import MODE_VISUAL_LINE
 from Vintageous.state import VintageState, IrreversibleTextCommand
 from Vintageous.vi import utils
 from Vintageous.vi.search import reverse_search
@@ -498,17 +499,26 @@ class _vi_right_brace(sublime_plugin.TextCommand):
     def run(self, edit, mode=None, extend=False):
         def f(view, s):
             # TODO: must skip empty paragraphs.
-            par_as_region = view.expand_by_class(s, sublime.CLASS_EMPTY_LINE)
+            start = utils.next_non_white_space_char(view, s.b, white_space='\n \t')
+            par_as_region = view.expand_by_class(start, sublime.CLASS_EMPTY_LINE)
 
             if mode == MODE_NORMAL:
                 return sublime.Region(min(par_as_region.b, view.size() - 1),
                                       min(par_as_region.b, view.size() - 1))
 
             elif mode == MODE_VISUAL:
-                return sublime.Region(s.a, par_as_region.b)
+                return sublime.Region(s.a, par_as_region.b + 1)
 
             elif mode == _MODE_INTERNAL_NORMAL:
                 return sublime.Region(s.a, par_as_region.b - 1)
+
+            elif mode == MODE_VISUAL_LINE:
+                if s.a <= s.b:
+                    return sublime.Region(s.a, par_as_region.b + 1)
+                else:
+                    if par_as_region.b > s.a:
+                        return sublime.Region(view.line(s.a - 1).a, par_as_region.b + 1)
+                    return sublime.Region(s.a, par_as_region.b)
 
             return s
 
@@ -519,7 +529,8 @@ class _vi_left_brace(sublime_plugin.TextCommand):
     def run(self, edit, mode=None, extend=False):
         def f(view, s):
             # TODO: must skip empty paragraphs.
-            par_as_region = view.expand_by_class(s, sublime.CLASS_EMPTY_LINE)
+            start = utils.previous_non_white_space_char(view, s.b - 1, white_space='\n \t')
+            par_as_region = view.expand_by_class(start, sublime.CLASS_EMPTY_LINE)
 
             if mode == MODE_NORMAL:
                 return sublime.Region(par_as_region.a, par_as_region.a)
@@ -529,6 +540,14 @@ class _vi_left_brace(sublime_plugin.TextCommand):
 
             elif mode == _MODE_INTERNAL_NORMAL:
                 return sublime.Region(s.a, par_as_region.a)
+
+            elif mode == MODE_VISUAL_LINE:
+                if s.a <= s.b:
+                    if par_as_region.a < s.a:
+                        return sublime.Region(view.full_line(s.a).b, par_as_region.a)
+                    return sublime.Region(s.a, par_as_region.a + 1)
+                else:
+                    return sublime.Region(s.a, par_as_region.a)
 
             return s
 

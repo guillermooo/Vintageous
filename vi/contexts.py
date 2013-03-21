@@ -101,6 +101,11 @@ class KeyContext(object):
         visual = self.vi_mode_visual(key, operator, operand, match_all)
         return self._check((normal or visual), operator, operand, match_all)
 
+    def vi_mode_normal_or_any_visual(self, key, operator, operand, match_all):
+        normal_or_visual = self.vi_mode_normal_or_visual(key, operator, operand, match_all)
+        visual_line = self.vi_mode_visual_line(key, operator, operand, match_all)
+        return self._check((normal_or_visual or visual_line), operator, operand, match_all)
+
     def vi_state_next_character_is_user_input(self, key, operator, operand, match_all):
         value = (self.state.expecting_user_input or
                  self.state.expecting_register)
