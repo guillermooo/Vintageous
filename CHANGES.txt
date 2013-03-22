@@ -1,2 +1,7 @@
+0.5.1
+	- Improve W motion at EOL.
+	- Implement gd, GD (goto definition).
+	- Implement Ctrl+o, Ctrl+i (jumplist navigation).
+	
 0.5
 	- Use version numbers.
