@@ -275,9 +275,8 @@ def vi_k(vi_cmd_data):
 def vi_w(vi_cmd_data):
     vi_cmd_data['__reorient_caret'] = True
     vi_cmd_data['motion']['command'] = 'move'
-    # XXX There's also a 'clip_to_line' parameter.
+    # XXX What's clip_to_line doing?
     vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_begin': True, 'punct_begin': True, 'empty_line': True, 'forward': True, 'clip_to_line': True}
-    # vi_cmd_data['post_every_motion'] = ['_vi_w_post_every_motion',]
 
     if vi_cmd_data['mode'] == MODE_VISUAL:
         vi_cmd_data['pre_every_motion'] = ['_vi_w_pre_every_motion',]
@@ -286,10 +285,6 @@ def vi_w(vi_cmd_data):
 
     elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
         vi_cmd_data['last_motion'] = ['_vi_w_last_motion', {'mode': vi_cmd_data['mode']}]
-    # In _MODE_INTERNAL_NORMAL, things seem to work as in Vim except for a few corner cases.
-    # The two modes are similar enough, but the fact everyhing's working more or less as expected
-    # is quite by coincidence.
-    # XXX: Add specific code for _MODE_INTERNAL_NORMAL.
 
     return vi_cmd_data
 
@@ -479,10 +474,8 @@ def vi_big_w(vi_cmd_data):
         vi_cmd_data['motion']['args']['extend'] = True
         vi_cmd_data['post_every_motion'] = ['_vi_w_post_every_motion',]
 
-    # In _MODE_INTERNAL_NORMAL, things seem to work as in Vim except for a few corner cases.
-    # The two modes are similar enough, but the fact everyhing's working more or less as expected
-    # is quite by coincidence.
-    # XXX: Add specific code for _MODE_INTERNAL_NORMAL.
+    elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
+        vi_cmd_data['last_motion'] = ['_vi_big_w_last_motion', {'mode': vi_cmd_data['mode']}]
 
     return vi_cmd_data
 

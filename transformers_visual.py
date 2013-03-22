@@ -242,6 +242,25 @@ class _vi_w_last_motion(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
+class _vi_big_w_last_motion(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, extend=False):
+        def f(view, s):
+            if mode == _MODE_INTERNAL_NORMAL:
+                if s.a <= s.b:
+                    if view.substr(s.b) != '\n':
+                        end = view.word(s.b).b
+                        if view.classify(end) & sublime.CLASS_PUNCTUATION_START == sublime.CLASS_PUNCTUATION_START:
+                            end = view.expand_by_class(end, sublime.CLASS_PUNCTUATION_END).b
+                        end = utils.next_non_white_space_char(view, end, white_space='\t ')
+                        return sublime.Region(s.a, end)
+
+                    elif view.line(s.b).empty():
+                        return sublime.Region(s.a, s.b + 1)
+            return s
+
+        regions_transformer(self.view, f)
+
+
 class _vi_w_post_every_motion(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
         def f(view, s):
