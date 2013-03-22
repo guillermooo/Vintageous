@@ -657,7 +657,8 @@ class _vi_go_to_symbol(sublime_plugin.TextCommand):
             return
 
         if globally:
-            # Global symbol; simply open the file.
+            # Global symbol; simply open the file; not a motion.
+            # TODO: Perhaps must be a motion if the target file happens to be the current one?
             self.view.window().open_file(location[0] + ':' + ':'.join([str(x) for x in location[2]]), sublime.ENCODED_POSITION)
             return
 

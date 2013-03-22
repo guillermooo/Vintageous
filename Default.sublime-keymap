@@ -1,3 +1,9 @@
+//
+// Basic rule to add new key bindings:
+//
+// Given two identical 'keys', the last one wins, even if its context is less strict.
+//
+
 [
 	{ "keys": ["escape"], "command": "set_action", "args": {"action": "vi_esc"}, "context": [{"key": "vi_must_change_mode"}, {"key": "vi_is_buffer"}] },
 
@@ -85,6 +91,10 @@
 	{ "keys": ["u"], "command": "_vi_undo", "context": [{"key": "vi_mode_normal"}] },
 	// TODO: implement counts for redo and make it go through all the normal machinery.
 	{ "keys": ["ctrl+r"], "command": "redo", "context": [{"key": "vi_mode_normal"}, {"key": "vi_use_ctrl_keys"}] },
+
+	// TODO: Do we really want to use the built-in jump list? Do we have are own?
+	{ "keys": ["ctrl+o"], "command": "jump_back", "context": [{"key": "vi_mode_normal"}, {"key": "vi_use_ctrl_keys"}] },
+	{ "keys": ["ctrl+i"], "command": "jump_forward", "context": [{"key": "vi_mode_normal"}, {"key": "vi_use_ctrl_keys"}] },
 
 	{ "keys": ["d"], "command": "set_action", "args": {"action": "vi_d"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["s"], "command": "set_action", "args": {"action": "vi_s"}, "context": [{"key": "setting.command_mode"}] },
