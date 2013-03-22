@@ -41,6 +41,8 @@ digraphs = {
     ('vi_ctrl_r_action', 'vi_ctrl_r_equals'): ('vi_ctrl_r_equals', DIGRAPH_ACTION),
 
     ('vi_g_action', 'vi_gg'): ('vi_gg', DIGRAPH_MOTION),
+    ('vi_g_action', 'vi_g_d'): ('vi_g_d', DIGRAPH_MOTION),
+    ('vi_g_action', 'vi_g_big_d'): ('vi_g_big_d', DIGRAPH_MOTION),
     # XXX: I don't think the following is needed.
     ('vi_f_first_step', 'vi_set_user_input'): ('vi_f', DIGRAPH_MOTION),
 }

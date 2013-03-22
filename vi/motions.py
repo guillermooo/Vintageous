@@ -554,3 +554,19 @@ def vi_left_parenthesis(vi_cmd_data):
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
 
     return vi_cmd_data
+
+
+def vi_g_d(vi_cmd_data):
+    vi_cmd_data['is_jump'] = True
+    vi_cmd_data['motion']['command'] = '_vi_go_to_symbol'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
+
+    return vi_cmd_data
+
+
+def vi_g_big_d(vi_cmd_data):
+    vi_cmd_data['is_jump'] = True
+    vi_cmd_data['motion']['command'] = '_vi_go_to_symbol'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'globally': True}
+
+    return vi_cmd_data
