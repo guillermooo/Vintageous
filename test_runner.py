@@ -25,6 +25,7 @@ class TestsState(object):
 test_suites = {
         'settings': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.settings.test_settings'],
         'registers': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.vi.test_registers'],
+        'marks': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.vi.test_marks'],
 }
 
 
@@ -35,7 +36,7 @@ class PrintToBuffer(sublime_plugin.TextCommand):
         view.set_scratch(True)
 
 
-class ShowVintageExTestSuites(sublime_plugin.WindowCommand):
+class ShowVintageousTestSuites(sublime_plugin.WindowCommand):
     def run(self):
         self.window.show_quick_panel(sorted(test_suites.keys()), self.run_suite)
 

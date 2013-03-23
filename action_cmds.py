@@ -362,6 +362,58 @@ class ViR(sublime_plugin.TextCommand):
             state.eval()
 
 
+class ViM(sublime_plugin.TextCommand):
+    def run(self, edit, character=None):
+        state = VintageState(self.view)
+        state.action = 'vi_m'
+        state.expecting_user_input = True
+
+
+class _vi_m(sublime_plugin.TextCommand):
+    def run(self, edit, character=None):
+        state = VintageState(self.view)
+        state.marks.mark(character, self.view)
+
+
+class ViQuote(sublime_plugin.TextCommand):
+    def run(self, edit, character=None):
+        state = VintageState(self.view)
+        state.motion = 'vi_quote'
+        state.expecting_user_input = True
+
+
+class _vi_quote(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, character=None, extend=False):
+        def f(view, s):
+            if mode == MODE_VISUAL:
+                if s.a <= s.b:
+                    if address.b < s.b:
+                        return sublime.Region(s.a + 1, address.b)
+                    else:
+                        return sublime.Region(s.a, address.b)
+                else:
+                    return sublime.Region(s.a + 1, address.b)
+            elif mode == MODE_NORMAL:
+                return address
+            elif mode == _MODE_INTERNAL_NORMAL:
+                return sublime.Region(s.a, address.b)
+
+            return s
+
+        state = VintageState(self.view)
+        address = state.marks.mark_as_encoded_address(character)
+
+        if address is None:
+            return
+
+        if isinstance(address, str):
+            self.view.window().open_file(address, sublime.ENCODED_POSITION)
+            return
+
+        # This is a motion in a composite command.
+        regions_transformer(self.view, f)
+
+
 class ViF(sublime_plugin.TextCommand):
     def run(self, edit, character=None):
         state = VintageState(self.view)

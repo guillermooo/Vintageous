@@ -25,6 +25,7 @@ from Vintageous.vi.registers import Registers
 from Vintageous.vi.settings import SettingsManager
 from Vintageous.vi.settings import SublimeSettings
 from Vintageous.vi.settings import VintageSettings
+from Vintageous.vi.marks import Marks
 
 
 def _init_vintageous(view):
@@ -66,6 +67,7 @@ class VintageState(object):
     # Makes yank data globally accesible.
     registers = Registers()
     context = KeyContext()
+    marks = Marks()
 
     def __init__(self, view):
         self.view = view
@@ -455,6 +457,7 @@ class VintageState(object):
 
         self.next_mode = MODE_NORMAL
         self.next_mode_command = None
+
 
     def update_status(self):
         mode_name = mode_to_str(self.mode) or ""

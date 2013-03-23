@@ -154,6 +154,9 @@
 	// TODO: Is the following key binding needed?
 	{ "keys": ["<character>"], "command": "vi_f", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_user_input"}] },
 
+	{ "keys": ["m"], "command": "vi_m", "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["'"], "command": "vi_quote", "context": [{"key": "vi_mode_normal_or_visual"}] },
+
 	// Repeats f
 	{ "keys": [","], "command": "set_motion", "args":{"motion": "vi_comma"}, "context": [{"key": "vi_mode_normal"}] },
 	{ "keys": [","], "command": "set_motion", "args":{"motion": "vi_comma"}, "context": [{"key": "vi_mode_visual"}] },
@@ -222,5 +225,5 @@
 	// XXX: Seems to need to come after every other key binding so it will catch every character. Investigate this.
 	{ "keys": ["<character>"], "command": "collect_user_input", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_user_input"}] },
 
-	{ "keys": ["'", "'"], "command": "set_motion", "args": {"motion": "vi_double_single_quote"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_state_next_character_is_user_input", "operand": false}] }
+	// { "keys": ["'", "'"], "command": "set_motion", "args": {"motion": "vi_double_single_quote"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_state_next_character_is_user_input", "operand": false}] }
 ]

@@ -714,3 +714,11 @@ def vi_esc(vi_cmd_data):
         vi_cmd_data['action']['args'] = {}
 
     return vi_cmd_data
+
+def vi_m(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['action']['command'] = '_vi_m'
+    vi_cmd_data['action']['args'] = {'character': vi_cmd_data['user_input']}
+    vi_cmd_data['count'] = 1
+
+    return vi_cmd_data

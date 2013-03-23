@@ -570,3 +570,12 @@ def vi_g_big_d(vi_cmd_data):
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'globally': True}
 
     return vi_cmd_data
+
+
+def vi_quote(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = '_vi_quote'
+    print("HELLO FROM PARSE")
+    vi_cmd_data['motion']['args'] = {'character': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode']}
+    vi_cmd_data['count'] = 1
+
+    return vi_cmd_data
