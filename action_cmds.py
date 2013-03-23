@@ -372,7 +372,7 @@ class ViM(sublime_plugin.TextCommand):
 class _vi_m(sublime_plugin.TextCommand):
     def run(self, edit, character=None):
         state = VintageState(self.view)
-        state.marks.mark(character, self.view)
+        state.marks.add(character, self.view)
 
 
 class ViQuote(sublime_plugin.TextCommand):
@@ -401,7 +401,7 @@ class _vi_quote(sublime_plugin.TextCommand):
             return s
 
         state = VintageState(self.view)
-        address = state.marks.mark_as_encoded_address(character)
+        address = state.marks.get_as_encoded_address(character)
 
         if address is None:
             return

@@ -13,12 +13,12 @@ class Marks(object):
             return self
         return Marks(instance)
 
-    def mark(self, name, view):
+    def add(self, name, view):
         # TODO: support multiple selections
         win, view, rowcol = view.window(), view, view.rowcol(view.sel()[0].b)
         _MARKS[name] = win, view, rowcol
 
-    def mark_as_encoded_address(self, name):
+    def get_as_encoded_address(self, name):
         win, view, rowcol = _MARKS.get(name, (None,) * 3)
         if win:
             rowcol_part = ':'.join(str(i) for i in rowcol)
