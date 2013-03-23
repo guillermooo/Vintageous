@@ -1,6 +1,9 @@
+0.5.2
+	- Implement basic marks functionality.
+
 0.5.1
 	- Improve W motion at EOL.
-	- Implement gd, GD (goto definition).
+	- Implement gd, gD (goto definition).
 	- Implement Ctrl+o, Ctrl+i (jumplist navigation).
 	
 0.5
