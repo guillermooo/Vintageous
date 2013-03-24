@@ -23,6 +23,8 @@ class Marks(object):
         if win:
             rowcol_part = ':'.join(str(i) for i in rowcol)
             fname = view.file_name()
+            # TODO: Support unnamed files. Perhaps we can extend sublime text's encoded protocol to
+            # target unnamed views by id: ?999:10:20
             if not fname:
                 return None
 

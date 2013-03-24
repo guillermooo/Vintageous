@@ -722,3 +722,42 @@ def vi_m(vi_cmd_data):
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
+
+
+def vi_equals(vi_cmd_data):
+    vi_cmd_data['action']['command'] = 'reindent'
+    vi_cmd_data['action']['args'] = {}
+    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+
+    return vi_cmd_data
+
+
+def vi_equals_equals(vi_cmd_data):
+    # FIXME: Sloppy implementation. I don't even know what the 'reindent' built-in is supposed to
+    # do.
+
+    # Assume NORMALMODE.
+    vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['restore_original_carets'] = True
+
+    #////////////////////////////////////////////////////////////
+    # FIXME: This looks bad here, but it will probably work at a basic level.
+    # vi_cmd_data['pre_motion'] = ['_vi_yy_pre_motion',]
+    vi_cmd_data['motion']['command'] = 'move'
+    vi_cmd_data['motion']['args'] = {'by': 'lines', 'extend': True, 'forward': True}
+    # TODO: yy should leave the caret where it found it. As a temporary solution, we'll leave it
+    # at BOL, which is the lesser evil between that and HEOL.
+    # vi_cmd_data['post_motion'] = [['_vi_yy_post_motion',],]
+    #////////////////////////////////////////////////////////////
+
+    vi_cmd_data['count'] = vi_cmd_data['count'] - 1
+    vi_cmd_data['can_yank'] = True
+
+    # The yanked text will be put in the clipboard if needed. This command shouldn't do any action.
+    vi_cmd_data['action']['command'] = 'reindent'
+    vi_cmd_data['action']['args'] = {}
+
+    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+
+    return vi_cmd_data
