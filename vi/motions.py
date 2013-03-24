@@ -578,3 +578,28 @@ def vi_quote(vi_cmd_data):
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
+
+
+def vi_ctrl_f(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = 'move'
+    vi_cmd_data['motion']['args'] = {'by': 'pages', 'forward': True}
+
+    if vi_cmd_data['mode'] != MODE_NORMAL:
+        # TODO: Sublime Text seems to ignore the 'extend' param to Ctrl+d, so disable it.
+        # vi_cmd_data['motion']['args']['extend'] = True
+        vi_cmd_data['motion']['command'] = 'vi_no_op'
+        vi_cmd_data['motion']['args'] = {}
+
+    return vi_cmd_data
+
+def vi_ctrl_b(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = 'move'
+    vi_cmd_data['motion']['args'] = {'by': 'pages', 'forward': False}
+
+    if vi_cmd_data['mode'] != MODE_NORMAL:
+        # TODO: Sublime Text seems to ignore the 'extend' param to Ctrl+d, so disable it.
+        # vi_cmd_data['motion']['args']['extend'] = True
+        vi_cmd_data['motion']['command'] = 'vi_no_op'
+        vi_cmd_data['motion']['args'] = {}
+
+    return vi_cmd_data
