@@ -305,10 +305,14 @@ class ViBigM(sublime_plugin.TextCommand):
 
 
 class ViStar(sublime_plugin.TextCommand):
-    def run(self, edit, mode=None, extend=False):
+    def run(self, edit, mode=None, extend=False, exact_word=True):
         def f(view, s):
 
-            pattern = r'\b{0}\b'.format(query)
+            if exact_word:
+                pattern = r'\b{0}\b'.format(query)
+            else:
+                pattern = query
+
             flags = sublime.IGNORECASE
 
             if mode == _MODE_INTERNAL_NORMAL:
@@ -335,10 +339,14 @@ class ViStar(sublime_plugin.TextCommand):
 
 
 class ViOctothorp(sublime_plugin.TextCommand):
-    def run(self, edit, mode=None, extend=False):
+    def run(self, edit, mode=None, extend=False, exact_word=True):
         def f(view, s):
 
-            pattern = r'\b{0}\b'.format(query)
+            if exact_word:
+                pattern = r'\b{0}\b'.format(query)
+            else:
+                pattern = query
+
             flags = sublime.IGNORECASE
 
             if mode == _MODE_INTERNAL_NORMAL:

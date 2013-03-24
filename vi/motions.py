@@ -603,3 +603,17 @@ def vi_ctrl_b(vi_cmd_data):
         vi_cmd_data['motion']['args'] = {}
 
     return vi_cmd_data
+
+
+def vi_g_star(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = 'vi_star'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'exact_word': False}
+
+    return vi_cmd_data
+
+
+def vi_g_octothorp(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = 'vi_octothorp'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'exact_word': False}
+
+    return vi_cmd_data
