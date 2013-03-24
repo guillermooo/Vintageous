@@ -27,7 +27,7 @@ class Marks(object):
                 return None
 
             # Marks set in the same view as the current one are returned as regions. Marks in other
-            # views are returned as encoded addresses the Sublime Text understands.
+            # views are returned as encoded addresses that Sublime Text understands.
             if view and view.view_id == self.state.view.view_id:
                 return sublime.Region(view.text_point(*rowcol))
             else:

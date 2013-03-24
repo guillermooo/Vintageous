@@ -1,3 +1,8 @@
+0.5.2.3
+	- Implement =, ==.
+	- Implement Ctrl+f, Ctrl+b (page down, page up).
+	- Implement g*, g# (lax search under cursor).
+
 0.5.2.a
 	- Rename methods.
 
