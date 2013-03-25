@@ -600,6 +600,9 @@ class _vi_repeat(IrreversibleTextCommand):
         args['next_mode'] = MODE_NORMAL
         args['follow_up_mode'] = 'vi_enter_normal_mode'
         self.view.run_command(cmd, args)
+        # FIXME: Quick fix to improve "rx." leaving non-empty selections behind. The lines above
+        # *should* take care of that, though.
+        self.view.run_command('vi_enter_normal_mode')
 
 
 class _vi_ctrl_w_v_action(sublime_plugin.TextCommand):
