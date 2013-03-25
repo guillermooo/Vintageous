@@ -1,4 +1,9 @@
-0.5.2.3
+0.5.4
+	- Commands like rx. don't leave non-empty selections behind.
+	- Marks can be put in unnamed buffers.
+	- yy synthesizes new line character at EOF so p behaves linewise after that.	
+
+0.5.3
 	- Implement =, ==.
 	- Implement Ctrl+f, Ctrl+b (page down, page up).
 	- Implement g*, g# (lax search under cursor).
