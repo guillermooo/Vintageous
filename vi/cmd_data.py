@@ -96,3 +96,6 @@ class CmdData(dict):
         # knows about the last iteration) is that 'last_motion' is able to override the current
         # motion command.
         self['last_motion'] = None
+        # Needed, for example, by yy at EOF to ensure that we add a new line character to the
+        # last line when copied.
+        self['synthetize_new_line_at_eof'] = False

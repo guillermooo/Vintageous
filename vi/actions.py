@@ -383,6 +383,8 @@ def vi_yy(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['restore_original_carets'] = True
 
+    vi_cmd_data['synthetize_new_line_at_eof'] = True
+
     vi_cmd_data['pre_motion'] = ['_vi_yy_pre_motion',]
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'lines', 'extend': True, 'forward': True}

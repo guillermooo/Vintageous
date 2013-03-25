@@ -261,6 +261,14 @@ class ViRunCommand(sublime_plugin.TextCommand):
 
     def get_selected_text(self, vi_cmd_data):
         fragments = [self.view.substr(r) for r in list(self.view.sel())]
+
+        # Add new line at EOF, but don't add too many new lines.
+        if vi_cmd_data['synthetize_new_line_at_eof'] and not vi_cmd_data['yanks_linewise']:
+            if (not fragments[-1].endswith('\n') and
+                # XXX: It appears regions can end beyond the buffer's EOF (?).
+                self.view.sel()[-1].b >= self.view.size()):
+                    fragments[-1] += '\n'
+
         if fragments and vi_cmd_data['yanks_linewise']:
             for i, f in enumerate(fragments):
                 # When should we add a newline character?
