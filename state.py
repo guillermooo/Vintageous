@@ -477,10 +477,10 @@ class VintageState(object):
            Sublime Text will update the substitute command as you undo past the current one. The
            then previous latest modifying command becomes the new repeat command, and so on.
         """
-        cmd, args, _ = self.view.command_history(0, True)
+        cmd, args, times = self.view.command_history(0, True)
         if cmd == 'vi_run' and args['action']:
             try:
-                old_cmd, old_args, times = self.repeat_command
+                old_cmd, old_args, _ = self.repeat_command
                 if (cmd, args) == (old_cmd, old_args):
                     return
             except TypeError:
@@ -490,7 +490,7 @@ class VintageState(object):
 
         elif cmd == 'sequence':
             try:
-                old_cmd, old_args, times = self.repeat_command
+                old_cmd, old_args, _ = self.repeat_command
             except TypeError:
                 return
 
@@ -505,7 +505,7 @@ class VintageState(object):
 
         elif cmd != 'vi_run':
             try:
-                old_cmd, old_args, times = self.repeat_command
+                old_cmd, old_args, _ = self.repeat_command
                 if (cmd, args,) == (old_cmd, old_args):
                     return
             except TypeError:
