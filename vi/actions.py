@@ -523,7 +523,6 @@ def vi_double_lambda(vi_cmd_data):
 def vi_double_antilambda(vi_cmd_data):
     # Assume _MODE_INTERNAL_NORMAL.
     if vi_cmd_data['count'] > 1:
-        vi_cmd_data['count'] = vi_cmd_data['count'] - 1
         vi_cmd_data['motion']['command'] = 'move'
         vi_cmd_data['motion']['args'] = {'by': 'lines', 'extend': True, 'forward': True}
 
