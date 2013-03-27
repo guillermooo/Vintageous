@@ -1,3 +1,7 @@
+0.5.6
+	- Fix bug in 'repeat' code.
+	- << command understands counts == 2.
+	
 0.5.5
 	- Fix repeat command (.).
 	- Fix redo command (Ctrl+r).
