@@ -400,6 +400,7 @@ def vi_yy(vi_cmd_data):
     vi_cmd_data['action']['args'] = {}
 
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+    vi_cmd_data['_mark_groups_for_gluing'] = False
 
     return vi_cmd_data
 

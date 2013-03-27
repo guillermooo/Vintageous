@@ -377,7 +377,8 @@ class VintageState(object):
                 # We are about to run an action, so let Sublime Text know we want all editing
                 # steps folded into a single sequence. "All editing steps" means slightly different
                 # things depending on the mode we are in.
-                self.view.run_command('maybe_mark_undo_groups_for_gluing')
+                if vi_cmd_data['_mark_groups_for_gluing']:
+                    self.view.run_command('maybe_mark_undo_groups_for_gluing')
                 self.view.run_command('vi_run', vi_cmd_data)
                 self.reset()
             else:
@@ -428,7 +429,8 @@ class VintageState(object):
                 # We are about to run an action, so let Sublime Text know we want all editing
                 # steps folded into a single sequence. "All editing steps" means slightly different
                 # things depending on the mode we are in.
-                self.view.run_command('maybe_mark_undo_groups_for_gluing')
+                if vi_cmd_data['_mark_groups_for_gluing']:
+                    self.view.run_command('maybe_mark_undo_groups_for_gluing')
                 self.view.run_command('vi_run', vi_cmd_data)
                 self.reset()
 
@@ -478,7 +480,7 @@ class VintageState(object):
         cmd, args, _ = self.view.command_history(0, True)
         if cmd == 'vi_run' and args['action']:
             try:
-                old_cmd, old_args, _ = self.repeat_command
+                old_cmd, old_args, times = self.repeat_command
                 if (cmd, args) == (old_cmd, old_args):
                     return
             except TypeError:
@@ -488,7 +490,7 @@ class VintageState(object):
 
         elif cmd == 'sequence':
             try:
-                old_cmd, old_args, _ = self.repeat_command
+                old_cmd, old_args, times = self.repeat_command
             except TypeError:
                 return
 
@@ -503,7 +505,7 @@ class VintageState(object):
 
         elif cmd != 'vi_run':
             try:
-                old_cmd, old_args, _ = self.repeat_command
+                old_cmd, old_args, times = self.repeat_command
                 if (cmd, args,) == (old_cmd, old_args):
                     return
             except TypeError:
