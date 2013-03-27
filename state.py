@@ -293,6 +293,15 @@ class VintageState(object):
     def next_mode_command(self, value):
         self.settings.vi['next_mode_command'] = value
 
+    @property
+    def repeat_command(self):
+        rep = self.settings.vi['repeat_command']
+        return rep or None
+
+    @repeat_command.setter
+    def repeat_command(self, value):
+        self.settings.vi['repeat_command'] = value
+
     def parse_motion(self):
         vi_cmd_data = CmdData(self)
 
@@ -458,6 +467,49 @@ class VintageState(object):
         self.next_mode = MODE_NORMAL
         self.next_mode_command = None
 
+        self.update_repeat_command()
+
+    def update_repeat_command(self):
+        """Vintageous manages the repeat command on its own. Vim stores away the latest modifying
+           command as the repeat command, and does not wipe it when undoing. On the contrary,
+           Sublime Text will update the substitute command as you undo past the current one. The
+           then previous latest modifying command becomes the new repeat command, and so on.
+        """
+        cmd, args, _ = self.view.command_history(0, True)
+        if cmd == 'vi_run' and args['action']:
+            try:
+                old_cmd, old_args, _ = self.repeat_command
+                if (cmd, args) == (old_cmd, old_args):
+                    return
+            except TypeError:
+                pass
+
+            self.repeat_command = cmd, args, times
+
+        elif cmd == 'sequence':
+            try:
+                old_cmd, old_args, _ = self.repeat_command
+            except TypeError:
+                return
+
+            if old_cmd == 'sequence':
+                pairs = zip(old_args['commands'], args['commands'])
+                # Compare pairs of (cmd_name, args_dict).
+                update = [(old, new) for (old, new) in pairs if old != new]
+                if not update:
+                    return
+
+            self.repeat_command = cmd, args, times
+
+        elif cmd != 'vi_run':
+            try:
+                old_cmd, old_args, _ = self.repeat_command
+                if (cmd, args,) == (old_cmd, old_args):
+                    return
+            except TypeError:
+                return
+
+            self.repeat_command = cmd, args, times
 
     def update_status(self):
         mode_name = mode_to_str(self.mode) or ""

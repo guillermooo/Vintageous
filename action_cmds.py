@@ -589,19 +589,25 @@ class _vi_undo(IrreversibleTextCommand):
 
 
 class _vi_repeat(IrreversibleTextCommand):
+    """Vintageous manages the repeat operation on its own to ensure that we always use the latest
+       modifying command, instead of being tied to the undo stack (as Sublime Text is by default).
+    """
     def run(self):
-        # Retrieve last modifying command.
-        cmd, args, times = self.view.command_history(0, True)
-        if cmd != 'vi_run':
-            # TODO: What happens when we have a 'sequence' command?
-            self.view.run_command('repeat')
+        state = VintageState(self.view)
+        try:
+            cmd, args, _ = state.repeat_command
+        except TypeError:
             return
 
-        args['next_mode'] = MODE_NORMAL
-        args['follow_up_mode'] = 'vi_enter_normal_mode'
+        if cmd == 'vi_run':
+            args['next_mode'] = MODE_NORMAL
+            args['follow_up_mode'] = 'vi_enter_normal_mode'
+
+        # FIXME: What happens to 'sequence' commands? We need to modify the 'next_mode' there too.
+
         self.view.run_command(cmd, args)
-        # FIXME: Quick fix to improve "rx." leaving non-empty selections behind. The lines above
-        # *should* take care of that, though.
+        # XXX: Needed here? Maybe enter_... type commands should be IrreversibleCommands so we
+        # must/can call them whenever we need them withouth affecting the undo stack.
         self.view.run_command('vi_enter_normal_mode')
 
 
