@@ -1,3 +1,8 @@
+0.5.5
+	- Fix repeat command (.).
+	- Fix redo command (Ctrl+r).
+	- Reopen unnamed buffers only when they aren't the current buffer.
+	
 0.5.4
 	- Commands like rx. don't leave non-empty selections behind.
 	- Marks can be put in unnamed buffers.
