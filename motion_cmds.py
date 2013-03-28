@@ -423,6 +423,15 @@ class ViBufferReverseSearch(IrreversibleTextCommand):
 
 
 class _vi_forward_slash(sublime_plugin.TextCommand):
+    def hilite(self, pattern):
+        # TODO: Implement smartcase?
+        flags = sublime.IGNORECASE
+        regs = self.view.find_all(pattern, flags)
+        if not regs:
+            self.view.erase_regions('vi_search')
+            return
+        self.view.add_regions('vi_search', regs, 'comment', '', sublime.DRAW_NO_FILL)
+
     def run(self, edit, search_string, mode=None, count=1, extend=False):
         def f(view, s):
             if mode == MODE_VISUAL:
@@ -443,28 +452,34 @@ class _vi_forward_slash(sublime_plugin.TextCommand):
         if search_string is None:
             return
 
-        # Start searching from the current selection's end.
-        # TODO: We make sure to skip at least one word so most of the time the current word doesn't
-        # match the search string and we can search ahead, but this is quite sloppy.
+        # We want to start searching right after the current selection.
         current_sel = self.view.sel()[0]
-        current_sel = current_sel if not current_sel.empty() else self.view.word(current_sel.b)
+        start = current_sel.b if not current_sel.empty() else current_sel.b + 1
 
-        # FIXME: What should we do here? Case-sensitive or case-insensitive search? Configurable?
-        match = self.view.find(search_string, current_sel.b)
-        # XXX: Temporary fix until .find() gets fixed.
-        if match.b < 0:
+        # TODO: What should we do here? Case-sensitive or case-insensitive search? Configurable?
+        match = self.view.find(search_string, start)
+        if not match:
             return
 
         for x in range(count - 1):
             match = self.view.find(search_string, match.b)
-            # XXX: Temporary fix until .find() gets fixed.
-            if match.b < 0:
+            if not match:
                 return
 
         regions_transformer(self.view, f)
+        self.hilite(search_string)
 
 
 class _vi_question_mark(sublime_plugin.TextCommand):
+    def hilite(self, pattern):
+        # TODO: Implement smartcase?
+        flags = sublime.IGNORECASE
+        regs = self.view.find_all(pattern, flags)
+        if not regs:
+            self.view.erase_regions('vi_search')
+            return
+        self.view.add_regions('vi_search', regs, 'comment', '', sublime.DRAW_NO_FILL)
+
     def run(self, edit, search_string, mode=None, count=1, extend=False):
         def f(view, s):
             # FIXME: Readjust carets if we searched for '\n'.
@@ -501,6 +516,7 @@ class _vi_question_mark(sublime_plugin.TextCommand):
                 return
 
         regions_transformer(self.view, f)
+        self.hilite(search_string)
 
 
 class _vi_right_brace(sublime_plugin.TextCommand):

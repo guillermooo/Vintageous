@@ -87,6 +87,9 @@ class VintageState(object):
         if self.view.overwrite_status():
             self.view.set_overwrite_status(False)
 
+        # Hide outlined regions created by searching.
+        self.view.erase_regions('vi_search')
+
         self.view.run_command('glue_marked_undo_groups')
 
     def enter_visual_line_mode(self):

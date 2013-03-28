@@ -30,6 +30,11 @@ class KeyContext(object):
         if self.state.mode != MODE_NORMAL:
             return True
 
+        # XXX Actually, if we already are in normal mode, we still need to perform certain
+        # cleanup tasks, so let the command run anyway.
+        if self.state.view.get_regions('vi_search'):
+            return True
+
     def vi_is_buffer(self, key, operator, operand, match_all):
         # !! The following check is based on an implementation detail of Sublime Text. !!
         is_console = False if (getattr(self.state.view, 'settings') is not None) else True

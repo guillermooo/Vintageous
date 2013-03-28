@@ -710,10 +710,13 @@ def vi_esc(vi_cmd_data):
         vi_cmd_data['action']['args'] = {}
         vi_cmd_data['motion']['command'] = 'no_op'
         vi_cmd_data['motion']['args'] = {}
-    elif vi_cmd_data['mode'] == MODE_NORMAL:
-        # XXX: Is this here needed?
-        vi_cmd_data['action']['command'] = 'vi_enter_insert_mode'
+    elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
+        # We reach this branch, for instance, when we have 'vi_search' regions outlined from a
+        # previous search; we need to remove them.
+        vi_cmd_data['action']['command'] = 'vi_enter_normal_mode'
         vi_cmd_data['action']['args'] = {}
+        vi_cmd_data['motion']['command'] = 'no_op'
+        vi_cmd_data['motion']['args'] = {}
 
     return vi_cmd_data
 
