@@ -565,23 +565,34 @@ class _vi_left_brace(sublime_plugin.TextCommand):
 class _vi_right_parenthesis(sublime_plugin.TextCommand):
     def find_next_sentence_end(self, r):
         sen = r
+        non_ws = utils.next_non_white_space_char(self.view, sen.b, '\t \n')
+        sen = sublime.Region(non_ws, non_ws)
         while True:
-            sen = self.view.expand_by_class(sen, sublime.CLASS_LINE_END)
-            if sen.b == self.view.size() or self.view.substr(sen.b - 1) == '.':
-                return sen
+            sen = self.view.expand_by_class(sen, sublime.CLASS_PUNCTUATION_START |
+                                                 sublime.CLASS_LINE_END)
+            if (sen.b == self.view.size() or
+                self.view.substr(sublime.Region(sen.b, sen.b + 2)).endswith(('. ', '.\t')) or
+                self.view.substr(self.view.line(sen.b)).strip() == ''):
+                    if self.view.substr(sen.b) == '.':
+                        return sublime.Region(sen.a, sen.b + 1)
+                    else:
+                        if self.view.line(sen.b).empty():
+                            return sublime.Region(sen.a, sen.b)
+                        else:
+                            return self.view.full_line(sen.b)
 
     def run(self, edit, mode=None, extend=False):
-
         def f(view, s):
             # TODO: must skip empty paragraphs.
             sen = self.find_next_sentence_end(s)
 
             if mode == MODE_NORMAL:
-                target = min(sen.b + 1, view.size() - 1)
+                target = min(sen.b, view.size() - 1)
                 return sublime.Region(target, target)
 
             elif mode == MODE_VISUAL:
-                return sublime.Region(s.a, sen.b + 1)
+                # TODO: Must encompass new line char too?
+                return sublime.Region(s.a, sen.b)
 
             elif mode == _MODE_INTERNAL_NORMAL:
                 return sublime.Region(s.a, sen.b)
@@ -594,9 +605,13 @@ class _vi_right_parenthesis(sublime_plugin.TextCommand):
 class _vi_left_parenthesis(sublime_plugin.TextCommand):
     def find_previous_sentence_end(self, r):
         sen = r
+        pt = utils.previous_non_white_space_char(self.view, sen.a, white_space='\n \t')
+        sen = sublime.Region(pt, pt)
         while True:
-            sen = self.view.expand_by_class(sen, sublime.CLASS_LINE_END)
+            sen = self.view.expand_by_class(sen, sublime.CLASS_LINE_END | sublime.CLASS_PUNCTUATION_END)
             if sen.a <= 0 or self.view.substr(sen.begin() - 1) in ('.', '\n'):
+                if self.view.substr(sen.begin() - 1) == '.' and not self.view.substr(sen.begin()) == ' ':
+                    continue
                 return sen
 
     def run(self, edit, mode=None, extend=False):
@@ -606,7 +621,7 @@ class _vi_left_parenthesis(sublime_plugin.TextCommand):
             sen = self.find_previous_sentence_end(s)
 
             if mode == MODE_NORMAL:
-                return sublime.Region(sen.a + 1, sen.a + 1)
+                return sublime.Region(sen.a, sen.a)
 
             elif mode == MODE_VISUAL:
                 return sublime.Region(s.a + 1, sen.a +  1)
