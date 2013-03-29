@@ -595,6 +595,8 @@ class _vi_undo(IrreversibleTextCommand):
             self.view.run_command('move', {'by': 'characters', 'forward': False})
             # ////////////////////////////////////////////////////////////////////
 
+        VintageState(self.view).update_xpos()
+
 
 class _vi_repeat(IrreversibleTextCommand):
     """Vintageous manages the repeat operation on its own to ensure that we always use the latest

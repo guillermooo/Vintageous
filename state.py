@@ -502,7 +502,6 @@ class VintageState(object):
 
         self.next_mode_command = None
 
-
     def update_repeat_command(self):
         """Vintageous manages the repeat command on its own. Vim stores away the latest modifying
            command as the repeat command, and does not wipe it when undoing. On the contrary,
@@ -547,6 +546,22 @@ class VintageState(object):
                 return
 
             self.repeat_command = cmd, args, times
+
+    def update_xpos(self):
+        state = VintageState(self.view)
+
+        first_sel = self.view.sel()[0]
+        xpos = 0
+        if state.mode == MODE_VISUAL:
+            if first_sel.a < first_sel.b:
+                xpos = self.view.rowcol(first_sel.b - 1)[1]
+            elif first_sel.a > first_sel.b:
+                xpos = self.view.rowcol(first_sel.b)[1]
+
+        elif state.mode == MODE_NORMAL:
+            xpos = self.view.rowcol(first_sel.b)[1]
+
+        state.xpos = xpos
 
     def update_status(self):
         mode_name = mode_to_str(self.mode) or ""
