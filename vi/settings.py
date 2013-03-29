@@ -1,5 +1,6 @@
 WINDOW_SETTINGS = [
     'last_buffer_search',
+    'repeat_command',
 ]
 
 

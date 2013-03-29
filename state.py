@@ -484,6 +484,9 @@ class VintageState(object):
            then previous latest modifying command becomes the new repeat command, and so on.
         """
         cmd, args, times = self.view.command_history(0, True)
+        if not cmd:
+            return
+
         if cmd == 'vi_run' and args['action']:
             try:
                 old_cmd, old_args, _ = self.repeat_command
