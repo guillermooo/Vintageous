@@ -236,5 +236,6 @@
 	{ "keys": ["<character>"], "command": "collect_user_input", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_user_input"}] },
 
 	// TODO: Make this use the same mechanism as other digraph commands.
-	{ "keys": ["'", "'"], "command": "set_motion", "args": {"motion": "vi_double_single_quote"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_state_next_character_is_user_input", "operand": false}] }
+	// FIXME: Overrides marks.
+	// { "keys": ["'", "'"], "command": "set_motion", "args": {"motion": "vi_double_single_quote"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_state_next_character_is_user_input", "operand": false}] }
 ]
