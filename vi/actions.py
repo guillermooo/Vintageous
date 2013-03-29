@@ -300,10 +300,10 @@ def vi_p(vi_cmd_data):
     vi_cmd_data['post_action'] = ['dont_stay_on_eol_backward',]
 
     if vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['post_action'] = ['collapse_to_a', 'dont_stay_on_eol_backward']
+        vi_cmd_data['post_action'] = ['collapse_to_a',]
         vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
     elif vi_cmd_data['mode'] == MODE_VISUAL_LINE:
-        vi_cmd_data['post_action'] = ['collapse_to_a', 'dont_stay_on_eol_backward']
+        vi_cmd_data['post_action'] = ['collapse_to_a',]
         vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data

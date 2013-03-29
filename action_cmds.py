@@ -129,6 +129,11 @@ class ViPaste(sublime_plugin.TextCommand):
                     text = text + '\n'
             else:
                 text = text * count
+
+            if state.mode == MODE_VISUAL_LINE:
+                if text.startswith('\n'):
+                    text = text[1:]
+
             self.view.replace(edit, sel, text)
 
 
