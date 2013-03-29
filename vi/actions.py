@@ -737,6 +737,15 @@ def vi_equals(vi_cmd_data):
     return vi_cmd_data
 
 
+def vi_g_v(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['action']['command'] = '_vi_g_v'
+    vi_cmd_data['action']['args'] = {}
+    vi_cmd_data['follow_up_mode'] = 'vi_enter_visual_mode'
+
+    return vi_cmd_data
+
+
 def vi_equals_equals(vi_cmd_data):
     # FIXME: Sloppy implementation. I don't even know what the 'reindent' built-in is supposed to
     # do.

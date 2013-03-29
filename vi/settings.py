@@ -30,7 +30,7 @@ class VintageSettings(object):
         if view is not None and not isinstance(self.view.settings().get('vintage'), dict):
             self.view.settings().set('vintage', dict())
 
-        if view is not None and not isinstance(self.view.window().settings().get('vintage'), dict):
+        if view is not None and view.window() is not None and not isinstance(self.view.window().settings().get('vintage'), dict):
             self.view.window().settings().set('vintage', dict())
 
     def __get__(self, instance, owner):

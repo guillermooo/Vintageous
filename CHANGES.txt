@@ -1,6 +1,8 @@
 0.6.1
 	- Jumps integrate with Sublime Text's jump list.
 	- Basic implementation of '' command (jump back/forward from current position).
+	- Remember latest buffer search globally.
+	- Implement gv (recreate previous visual selection).
 
 0.6
 	- Improve () motions.

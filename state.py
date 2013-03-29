@@ -114,6 +114,9 @@ class VintageState(object):
         self.settings.view['inverse_caret_state'] = False
         self.view.set_overwrite_status(True)
 
+    def store_visual_selections(self):
+        self.view.add_regions('vi_visual_selections', list(self.view.sel()))
+
     @property
     def mode(self):
         return self.settings.vi['mode']

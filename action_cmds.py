@@ -180,6 +180,10 @@ class ViPasteBefore(sublime_plugin.TextCommand):
 class ViEnterNormalMode(sublime_plugin.TextCommand):
     def run(self, edit):
         state = VintageState(self.view)
+
+        if state.mode == MODE_VISUAL:
+            state.store_visual_selections()
+
         self.view.run_command('collapse_to_direction')
         self.view.run_command('dont_stay_on_eol_backward')
         state.enter_normal_mode()
@@ -707,3 +711,16 @@ class _vi_ctrl_x(sublime_plugin.TextCommand):
             return
 
         regions_transformer(self.view, f)
+
+
+class _vi_g_v(IrreversibleTextCommand):
+    def run(self):
+        # Assume normal mode.
+        # state = VintageState(self.view)
+        # state.enter_visual_mode()
+
+        regs = self.view.get_regions('vi_visual_selections')
+        if regs:
+            self.view.sel().clear()
+            for r in regs:
+                self.view.sel().add(r)

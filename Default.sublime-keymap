@@ -130,6 +130,7 @@
 	{ "keys": ["q"], "command": "set_action", "args": {"action": "vi_g_q"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 	{ "keys": ["*"], "command": "set_action", "args": {"action": "vi_g_star"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 	{ "keys": ["#"], "command": "set_action", "args": {"action": "vi_g_octothorp"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
+	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_g_v"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_incomplete_action"}] },
 
 	{ "keys": ["U"], "command": "set_action", "args": {"action": "vi_big_u"}, "context": [{"key": "vi_mode_visual_any"}] },
 	{ "keys": ["u"], "command": "set_action", "args": {"action": "vi_u"}, "context": [{"key": "vi_mode_visual_any"}] },
@@ -219,7 +220,8 @@
 	// Pane management
 	{ "keys": ["ctrl+w"], "command": "set_action", "args": {"action": "vi_ctrl_w_action"}, "context": [{"key": "setting.command_mode"}]},
 	{ "keys": ["ctrl+v"], "command": "set_action", "args": {"action": "vi_ctrl_w_v"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
-	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_ctrl_w_v"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
+	// FIXME: This one interferes with g,v, so disable this one for now. We need a notion of "keybinding namespace".
+	// { "keys": ["v"], "command": "set_action", "args": {"action": "vi_ctrl_w_v"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
 
 	// TODO: Simplify the logic needed to make the expression register work in INSERTMODE.
 	{ "keys": ["ctrl+r"], "command": "set_action", "args": {"action": "vi_ctrl_r_action"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "setting.command_mode", "operator": "equal", "operand": false}]},
@@ -227,6 +229,7 @@
 
 	{ "keys": ["ctrl+a"], "command": "set_action", "args": {"action": "vi_ctrl_a"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "setting.command_mode"}]},
 	{ "keys": ["ctrl+x"], "command": "set_action", "args": {"action": "vi_ctrl_x"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "setting.command_mode"}]},
+
 
 	// Collects user input for commands such as t, f, T, F.
 	// XXX: Seems to need to come after every other key binding so it will catch every character. Investigate this.
