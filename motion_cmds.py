@@ -7,6 +7,7 @@ from Vintageous.vi.constants import MODE_VISUAL_LINE
 from Vintageous.state import VintageState, IrreversibleTextCommand
 from Vintageous.vi import utils
 from Vintageous.vi.search import reverse_search
+from Vintageous.vi.search import find_in_range
 
 
 class ViMoveToHardBol(sublime_plugin.TextCommand):
@@ -34,32 +35,41 @@ class ViMoveToHardBol(sublime_plugin.TextCommand):
 class ViFindInLineInclusive(sublime_plugin.TextCommand):
     def run(self, edit, extend=False, character=None, mode=None, count=1):
         def f(view, s):
-            offset = s.b + 1 - view.line(s.b).a
-            a, eol = s.b + 1, view.line(s.b).b
-            final_offset = -1
+            eol = view.line(s.b).end()
+            if not s.empty():
+                eol = view.line(s.b - 1).end()
 
-            try:
-                for i in range(count):
-                    line_text = view.substr(sublime.Region(a, eol))
-                    match_in_line = line_text.index(character)
+            match = s
+            for i in range(count):
 
-                    final_offset = offset + match_in_line
+                # Define search range as 'rest of the line to the right'.
+                if state.mode != MODE_VISUAL:
+                    search_range = sublime.Region(min(match.b + 1, eol), eol)
+                else:
+                    search_range = sublime.Region(min(match.b, eol), eol)
 
-                    a = view.line(s.a).a + final_offset + 1
-                    offset += match_in_line + 1
-            except ValueError:
-                pass
+                match = find_in_range(view, character,
+                                            search_range.a,
+                                            search_range.b,
+                                            sublime.LITERAL)
 
-            if final_offset > -1:
-                pt = view.line(s.b).a + final_offset
+                # Count too high or simply no match; break.
+                if match is None:
+                    match = s
+                    break
 
-                state = VintageState(view)
-                if state.mode == MODE_VISUAL or mode == _MODE_INTERNAL_NORMAL:
-                    return sublime.Region(s.a, pt + 1)
+            if state.mode == MODE_VISUAL or mode == _MODE_INTERNAL_NORMAL:
+                if match == s:
+                    # FIXME: It won't blink because the current light can't be highlighted right
+                    # now (we are in command mode and there is a selection on the screen. Perhaps
+                    # we can make the gutter blink instead.)
+                    utils.blink()
+                return sublime.Region(s.a, match.b)
 
-                return sublime.Region(pt, pt)
+            if match == s:
+                utils.blink()
+            return sublime.Region(match.a, match.a)
 
-            return s
 
         # TODO: Give feedback to the user that the search failed?
         if character is None:
@@ -76,6 +86,7 @@ class ViFindInLineInclusive(sublime_plugin.TextCommand):
 class ViReverseFindInLineInclusive(sublime_plugin.TextCommand):
     def run(self, edit, extend=False, character=None, mode=None, count=1):
         def f(view, s):
+            # TODO: Refactor this mess.
             line_text = view.substr(sublime.Region(view.line(s.b).a, s.b))
             offset = 0
             a, b = view.line(s.b).a, s.b
@@ -97,11 +108,24 @@ class ViReverseFindInLineInclusive(sublime_plugin.TextCommand):
 
                 state = VintageState(view)
                 if state.mode == MODE_VISUAL or mode == _MODE_INTERNAL_NORMAL:
+                    if sublime.Region(s.b, pt) == s:
+                        utils.blink()
+                        return s
                     return sublime.Region(s.a, pt)
 
+                if pt == s.b:
+                    utils.blink()
+                    return s
                 return sublime.Region(pt, pt)
 
             return s
+
+
+        if character is None:
+            return
+        else:
+            state = VintageState(self.view)
+            state.last_character_search = character
 
         regions_transformer(self.view, f)
 
@@ -112,32 +136,43 @@ class ViFindInLineExclusive(sublime_plugin.TextCommand):
     """
     def run(self, edit, extend=False, character=None, mode=None, count=1):
         def f(view, s):
-            offset = s.b + 1 - view.line(s.b).a
-            a, eol = s.b + 1, view.line(s.b).b
-            final_offset = -1
+            eol = view.line(s.b).end()
+            if not s.empty():
+                eol = view.line(s.b - 1).end()
 
-            try:
-                for i in range(count):
-                    line_text = view.substr(sublime.Region(a, eol))
-                    match_in_line = line_text.index(character)
+            match = s
+            offset = 1 if count > 1 else 0
+            for i in range(count):
 
-                    final_offset = offset + match_in_line
+                # Define search range as 'rest of the line to the right'.
+                if state.mode != MODE_VISUAL:
+                    search_range = sublime.Region(min(match.b + 1 + offset, eol), eol)
+                else:
+                    search_range = sublime.Region(min(match.b + offset, eol), eol)
 
-                    a = view.line(s.a).a + final_offset + 1
-                    offset += match_in_line + 1
-            except ValueError:
-                pass
+                match = find_in_range(view, character,
+                                            search_range.a,
+                                            search_range.b,
+                                            sublime.LITERAL)
 
-            if final_offset > -1:
-                pt = view.line(s.b).a + final_offset
+                # Count too high or simply no match; break.
+                if match is None:
+                    match = s
+                    break
 
-                state = VintageState(view)
-                if state.mode == MODE_VISUAL or mode == _MODE_INTERNAL_NORMAL:
-                    return sublime.Region(s.a, pt)
+            if state.mode == MODE_VISUAL or mode == _MODE_INTERNAL_NORMAL:
+                if match == s:
+                    # FIXME: It won't blink because the current light can't be highlighted right
+                    # now (we are in command mode and there is a selection on the screen. Perhaps
+                    # we can make the gutter blink instead.)
+                    utils.blink()
+                    return s
+                return sublime.Region(s.a, match.b - 1)
 
-                return sublime.Region(pt - 1, pt - 1)
-
-            return s
+            if match == s:
+                utils.blink()
+                return s
+            return sublime.Region(match.a - 1, match.a - 1)
 
         # TODO: Give feedback to the user that the search failed?
         if character is None:
@@ -180,6 +215,13 @@ class ViReverseFindInLineExclusive(sublime_plugin.TextCommand):
                 return sublime.Region(pt + 1, pt + 1)
 
             return s
+
+
+        if character is None:
+            return
+        else:
+            state = VintageState(self.view)
+            state.last_character_search = character
 
         regions_transformer(self.view, f)
 
