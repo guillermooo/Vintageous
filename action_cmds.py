@@ -716,11 +716,9 @@ class _vi_ctrl_x(sublime_plugin.TextCommand):
 class _vi_g_v(IrreversibleTextCommand):
     def run(self):
         # Assume normal mode.
-        # state = VintageState(self.view)
-        # state.enter_visual_mode()
+        regs = (self.view.get_regions('vi_visual_selections') or
+                list(self.view.sel()))
 
-        regs = self.view.get_regions('vi_visual_selections')
-        if regs:
-            self.view.sel().clear()
-            for r in regs:
-                self.view.sel().add(r)
+        self.view.sel().clear()
+        for r in regs:
+            self.view.sel().add(r)

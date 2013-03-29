@@ -54,7 +54,9 @@ class ViRunCommand(sublime_plugin.TextCommand):
             if vi_cmd_data['restore_original_carets']:
                 self.save_caret_pos()
 
-            if vi_cmd_data['creates_jump_at_current_position']:
+            # If we're about to jump, we need to remember the current position so we can jump back
+            # here. XXX creates_jump_at_current_position might be redundant.
+            if vi_cmd_data['creates_jump_at_current_position'] or vi_cmd_data['is_jump']:
                 self.add_to_jump_list(vi_cmd_data)
 
             # XXX: Fix this. When should we run the motion exactly?
