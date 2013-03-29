@@ -607,7 +607,11 @@ class _vi_repeat(IrreversibleTextCommand):
             args['next_mode'] = MODE_NORMAL
             args['follow_up_mode'] = 'vi_enter_normal_mode'
 
-        # FIXME: What happens to 'sequence' commands? We need to modify the 'next_mode' there too.
+        elif cmd == 'sequence':
+            for i, _ in enumerate(args['commands']):
+                # Access this shape: {"commands":[['vi_run', {"foo": 100}],...]}
+                args['commands'][i][1]['next_mode'] = MODE_NORMAL
+                args['commands'][i][1]['follow_up_mode'] = 'vi_enter_normal_mode'
 
         self.view.run_command(cmd, args)
         # XXX: Needed here? Maybe enter_... type commands should be IrreversibleCommands so we
