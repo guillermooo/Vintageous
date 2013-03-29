@@ -1,3 +1,7 @@
+0.6.6
+	- Improve '' command.
+	- Implement counts for / and ? motions.
+	
 0.6.5
 	- Truly enable ability to repeat commands globally.
 	
