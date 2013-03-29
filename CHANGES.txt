@@ -1,3 +1,6 @@
+0.7
+	- Cumulative release, I guess.
+
 0.6.8
 	- Enable repetition of commands issues in visual modes.	
 
