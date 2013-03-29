@@ -1,3 +1,6 @@
+0.6.8
+	- Enable repetition of commands issues in visual modes.	
+
 0.6.7
 	- Improve pasting in visual line mode.
 	- 'Undo' restores the caret's xpos.
