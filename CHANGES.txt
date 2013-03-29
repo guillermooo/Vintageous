@@ -1,3 +1,7 @@
+0.6.1
+	- Jumps integrate with Sublime Text's jump list.
+	- Basic implementation of '' command (jump back/forward from current position).
+
 0.6
 	- Improve () motions.
 	- Add highlighting to / and ? motions.

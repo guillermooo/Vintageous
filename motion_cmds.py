@@ -704,3 +704,14 @@ class _vi_go_to_symbol(sublime_plugin.TextCommand):
         # Local symbol; select.
         location = self.view.text_point(*location)
         regions_transformer(self.view, f)
+
+
+class _vi_double_single_quote(IrreversibleTextCommand):
+    next_command = 'jump_back'
+    def run(self):
+        # FIXME: Whenever there's a motion (any motion) after jumping back, we need to reset
+        # this command to jumping back again. Otherwise the result will be confusing.
+        # FIXME: We should create a jump entry at the current position.
+        self.view.run_command(_vi_double_single_quote.next_command)
+        current = _vi_double_single_quote.next_command
+        _vi_double_single_quote.next_command = 'jump_forward' if current == 'jump_back' else 'jump_back'

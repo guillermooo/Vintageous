@@ -44,8 +44,10 @@ class CmdData(dict):
         # this and it's causing quite some trouble. Let commands specify an explicit command
         # to reorient the caret as occurs with other hooks.
         self['__reorient_caret'] = False
-        # Whether the motion is considered a jump.
+        # Indicates if the motion is to be considered a jump.
         self['is_jump'] = False
+        # Indicates whether the motion creates a jump entry at the current position.
+        self['creates_jump_at_current_position'] = False
         # Some actions must be cancelled if the selections didn't change after the motion.
         # Others, on the contrary, must always go ahead.
         self['cancel_action_if_motion_fails'] = False

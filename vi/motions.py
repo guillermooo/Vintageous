@@ -409,9 +409,10 @@ def vi_percent(vi_cmd_data):
 
 
 def vi_double_single_quote(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = 'vi_latest_jump'
+    vi_cmd_data['motion']['command'] = '_vi_double_single_quote'
     vi_cmd_data['motion']['args'] = {}
     vi_cmd_data['count'] = 1
+    vi_cmd_data['creates_jump_at_current_position'] = True
 
     return vi_cmd_data
 

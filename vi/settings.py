@@ -1,3 +1,8 @@
+WINDOW_SETTINGS = [
+    'last_buffer_search',
+]
+
+
 class SublimeSettings(object):
     """ Helper class for accessing settings values from views """
 
@@ -25,6 +30,9 @@ class VintageSettings(object):
         if view is not None and not isinstance(self.view.settings().get('vintage'), dict):
             self.view.settings().set('vintage', dict())
 
+        if view is not None and not isinstance(self.view.window().settings().get('vintage'), dict):
+            self.view.window().settings().set('vintage', dict())
+
     def __get__(self, instance, owner):
         if instance is not None:
             return VintageSettings(instance.v)
@@ -32,15 +40,22 @@ class VintageSettings(object):
 
     def __getitem__(self, key):
         try:
-            value = self.view.settings().get('vintage').get(key)
+            if key not in WINDOW_SETTINGS:
+                value = self.view.settings().get('vintage').get(key)
+            else:
+                value = self.view.window().settings().get('vintage').get(key)
         except (KeyError, AttributeError):
             value = None
         return value
 
     def __setitem__(self, key, value):
-        setts = self.view.settings().get('vintage')
+        if key not in WINDOW_SETTINGS:
+            setts, target = self.view.settings().get('vintage'), self.view
+        else:
+            setts, target = self.view.window().settings().get('vintage'), self.view.window()
+
         setts[key] = value
-        self.view.settings().set('vintage', setts)
+        target.settings().set('vintage', setts)
 
 
 class SettingsManager(object):

@@ -54,6 +54,9 @@ class ViRunCommand(sublime_plugin.TextCommand):
             if vi_cmd_data['restore_original_carets']:
                 self.save_caret_pos()
 
+            if vi_cmd_data['creates_jump_at_current_position']:
+                self.add_to_jump_list(vi_cmd_data)
+
             # XXX: Fix this. When should we run the motion exactly?
             if vi_cmd_data['action']:
                 # If no motion is present, we know we just have to run the action (like ctrl+w, v).
@@ -283,7 +286,8 @@ class ViRunCommand(sublime_plugin.TextCommand):
 
     def add_to_jump_list(self, vi_cmd_data):
         if vi_cmd_data['is_jump']:
-            self.view.run_command('vi_add_to_jump_list')
+            # It's a window command, but arguably this is prone to error.
+            self.view.window().run_command('vi_add_to_jump_list')
 
     def debug(self, *messages):
         state = VintageState(self.view)

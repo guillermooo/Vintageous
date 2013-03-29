@@ -12,7 +12,7 @@
 	{ "keys": ["i"], "command": "set_action", "args": {"action": "vi_enter_insert_mode"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_mode_visual_any", "operand": false}] },
 
 	// This allows insertions such as 5ifoobar\n<esc>. Macros help with this, but we should prevent the user from
-	// requesting a macro recording until after <esc> is pressed. TODO: Maybe create a context like "vi_in_normal_insert_mode"?
+	// requesting 	a macro recording until after <esc> is pressed. TODO: Maybe create a context like "vi_in_normal_insert_mode"?
 	{ "keys": ["i"], "command": "vi_enter_normal_insert_mode", "context": [{"key": "setting.command_mode"}, {"key": "vi_has_motion_count"}] },
 	{ "keys": ["a"], "command": "set_action", "args": {"action": "vi_a"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_mode_visual_any", "operand": false}] },
 
@@ -232,5 +232,6 @@
 	// XXX: Seems to need to come after every other key binding so it will catch every character. Investigate this.
 	{ "keys": ["<character>"], "command": "collect_user_input", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_user_input"}] },
 
-	// { "keys": ["'", "'"], "command": "set_motion", "args": {"motion": "vi_double_single_quote"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_state_next_character_is_user_input", "operand": false}] }
+	// TODO: Make this use the same mechanism as other digraph commands.
+	{ "keys": ["'", "'"], "command": "set_motion", "args": {"motion": "vi_double_single_quote"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_state_next_character_is_user_input", "operand": false}] }
 ]
