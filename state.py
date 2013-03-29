@@ -28,10 +28,25 @@ from Vintageous.vi.settings import VintageSettings
 from Vintageous.vi.marks import Marks
 
 
+# Some commands use input panels to gather user input. When they call their .on_done() method,
+# they most likely want the global state to remain untouched. However, an input panel is just
+# a view, so when it closes, the previous view gets activated and Vintageous init code runs.
+# This variable lets it know that is should exit early.
+# XXX: Make this a class-level attribute of VintageState (had some trouble with it last time I tried).
+# XXX Is there anything weird with ST and using class-level attributes from different modules?
+_dont_reset_during_init = False
+
+
 def _init_vintageous(view):
+    global _dont_reset_during_init
     # Operate only on actual views.
     if (not getattr(view, 'settings') or
             view.settings().get('is_widget')):
+        return
+
+    if _dont_reset_during_init:
+        # We are probably coming from an input panel, like when using '/'.
+        _dont_reset_during_init = False
         return
 
     state = VintageState(view)

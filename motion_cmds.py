@@ -9,6 +9,8 @@ from Vintageous.vi import utils
 from Vintageous.vi.search import reverse_search
 from Vintageous.vi.search import find_in_range
 
+import Vintageous.state
+
 
 class ViMoveToHardBol(sublime_plugin.TextCommand):
     def run(self, edit, extend=False):
@@ -418,11 +420,10 @@ class ViOctothorp(sublime_plugin.TextCommand):
 
 class ViBufferSearch(IrreversibleTextCommand):
     def run(self):
+        Vintageous.state._dont_reset_during_init = True
         self.view.window().show_input_panel('', '', self.on_done, None, self.on_cancel)
 
     def on_done(self, s):
-        # FIXME: Sublime Text seems to reset settings between the .run() call above and this
-        # .on_done() method. An issue has been filed about this. Awaiting response.
         state = VintageState(self.view)
         state.motion = 'vi_forward_slash'
 
@@ -442,11 +443,10 @@ class ViBufferSearch(IrreversibleTextCommand):
 
 class ViBufferReverseSearch(IrreversibleTextCommand):
     def run(self):
+        Vintageous.state._dont_reset_during_init = True
         self.view.window().show_input_panel('', '', self.on_done, None, self.on_cancel)
 
     def on_done(self, s):
-        # FIXME: Sublime Text seems to reset settings between the .run() call above and this
-        # .on_done() method. An issue has been filed about this. Awaiting response.
         state = VintageState(self.view)
         state.motion = 'vi_question_mark'
 
