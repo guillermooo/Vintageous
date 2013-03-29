@@ -466,8 +466,8 @@ class VintageState(object):
         # command. When switching files, Vintageous will be init'ed, and that data will be overwritten,
         # but since we're not creating a new command, it doesn't make sense.
         # FIXME: Not every action should update the latest repeat command.
-        if self.action:
-            self.update_repeat_command()
+
+        had_action = self.action
 
         self.motion = None
         self.action = None
@@ -497,6 +497,18 @@ class VintageState(object):
                 self.view.run_command(self.next_mode_command)
         else:
             pass
+
+        # Sometimes we'll reach this point after performing motions. If we have a stored repeat
+        # command in view A, we switch to view B and do a motion, we don't want .update_repeat_command()
+        # to inspect view B's undo stack and grab its latest modifying command; we want to keep
+        # view A's instead, which is what's stored in _latest_repeat_command. We only want to
+        # update this when there is a new action.
+        # FIXME: Even that will fail when we perform an action that does not modify the buffer,
+        # like splitting the window. The current view's latest modifying command will overwrite
+        # the genuine _latest_repeat_command. The correct solution seems to be to tag every single
+        # modifying command with a 'must_update_repeat_command' attribute.
+        if had_action:
+            self.update_repeat_command()
 
         self.next_mode = MODE_NORMAL
 
