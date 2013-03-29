@@ -35,6 +35,7 @@ def _init_vintageous(view):
         return
 
     state = VintageState(view)
+
     if state.mode in (MODE_VISUAL, MODE_VISUAL_LINE):
         view.run_command('enter_normal_mode')
     elif state.mode in (MODE_INSERT, MODE_REPLACE):
@@ -46,6 +47,7 @@ def _init_vintageous(view):
         state.enter_normal_mode()
 
     state.reset()
+
 
 def plugin_loaded():
     view = sublime.active_window().active_view()
@@ -68,6 +70,8 @@ class VintageState(object):
     registers = Registers()
     context = KeyContext()
     marks = Marks()
+
+    _latest_repeat_command = None
 
     def __init__(self, view):
         self.view = view
@@ -301,12 +305,12 @@ class VintageState(object):
 
     @property
     def repeat_command(self):
-        rep = self.settings.vi['repeat_command']
-        return rep or None
+        # This property is volatile. It won't be persisted between sessions.
+        return VintageState._latest_repeat_command
 
     @repeat_command.setter
     def repeat_command(self, value):
-        self.settings.vi['repeat_command'] = value
+        VintageState._latest_repeat_command = value
 
     def parse_motion(self):
         vi_cmd_data = CmdData(self)
@@ -443,6 +447,13 @@ class VintageState(object):
         self.update_status()
 
     def reset(self, next_mode=None):
+        # Some global data must be kept untouched. For example, that's the case of the lastest repeat
+        # command. When switching files, Vintageous will be init'ed, and that data will be overwritten,
+        # but since we're not creating a new command, it doesn't make sense.
+        # FIXME: Not every action should update the latest repeat command.
+        if self.action:
+            self.update_repeat_command()
+
         self.motion = None
         self.action = None
 
@@ -473,9 +484,9 @@ class VintageState(object):
             pass
 
         self.next_mode = MODE_NORMAL
+
         self.next_mode_command = None
 
-        self.update_repeat_command()
 
     def update_repeat_command(self):
         """Vintageous manages the repeat command on its own. Vim stores away the latest modifying
