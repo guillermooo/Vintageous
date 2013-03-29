@@ -1,3 +1,6 @@
+0.6.3
+	- 'Repeat' (.) stores the latest modifying command globally.
+
 0.6.2
 	- Remember current position before  jumping.
 	- Improve f, t, F, T and , and ;.
