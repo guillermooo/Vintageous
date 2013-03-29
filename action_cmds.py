@@ -411,7 +411,11 @@ class _vi_quote(sublime_plugin.TextCommand):
             return
 
         if isinstance(address, str):
-            self.view.window().open_file(address, sublime.ENCODED_POSITION)
+            if not address.startswith('<command'):
+                self.view.window().open_file(address, sublime.ENCODED_POSITION)
+            else:
+                # We get a command in this form: <command _vi_double_quote>
+                self.view.run_command(address.split(' ')[1][:-1])
             return
 
         # This is a motion in a composite command.

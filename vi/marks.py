@@ -19,6 +19,10 @@ class Marks(object):
         _MARKS[name] = win, view, rowcol
 
     def get_as_encoded_address(self, name):
+        if name == "'":
+            # Special case...
+            return '<command _vi_double_single_quote>'
+
         win, view, rowcol = _MARKS.get(name, (None,) * 3)
         if win:
             rowcol_encoded = ':'.join(str(i) for i in rowcol)
