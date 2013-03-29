@@ -1,3 +1,6 @@
+0.6.5
+	- Truly enable ability to repeat commands globally.
+	
 0.6.4
 	- Keep the expected mode after repeating a command, then switching tabs.
 	
