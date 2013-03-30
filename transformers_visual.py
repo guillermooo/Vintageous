@@ -1181,3 +1181,21 @@ class _vi_adjust_carets(sublime_plugin.TextCommand):
             return s
 
         regions_transformer(self.view, f)
+
+
+class _vi_minimal_scroll(sublime_plugin.TextCommand):
+    def run(self, edit, forward=True):
+        current_row = self.view.rowcol(self.view.sel()[0].b)[0]
+
+        amount = 0
+        if forward:
+            last_visible_row = self.view.rowcol(self.view.visible_region().b)[0]
+            if current_row >= last_visible_row:
+                amount = last_visible_row - current_row - 1
+        else:
+            first_visible_row = self.view.rowcol(self.view.visible_region().a)[0]
+            if current_row < first_visible_row:
+                amount = first_visible_row - current_row
+
+        if amount != 0:
+            self.view.run_command('scroll_lines', {'amount': amount})

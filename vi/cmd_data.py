@@ -70,6 +70,9 @@ class CmdData(dict):
         self['must_update_xpos'] = True
         # Whether we should make sure to show the first selection.
         self['scroll_into_view'] = True
+        # TODO: This one should be used instead of the above AND this one. Set this to a command
+        # that will decide whether to scroll or not. Format: ['cmd_name', {"arg1": 100}]
+        self['scroll_command'] = None
         # If not None, the corresponding mode will be entered before runnig ViRun.
         # It's basically used as a way to change to NORMALMODE and be able to capture further
         # key strokes for INSERTMODE chords. Use sparingly.

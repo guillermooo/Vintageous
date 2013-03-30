@@ -261,6 +261,9 @@ def vi_j(vi_cmd_data):
     vi_cmd_data['motion']['command'] = '_vi_j_motion'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'xpos': vi_cmd_data['xpos']}
     vi_cmd_data['count'] = 1
+    # We handle this on our own?
+    vi_cmd_data['scroll_into_view'] = True
+    vi_cmd_data['scroll_command'] = ['_vi_minimal_scroll',]
 
     return vi_cmd_data
 
@@ -274,6 +277,8 @@ def vi_k(vi_cmd_data):
     vi_cmd_data['motion']['command'] = '_vi_k_motion'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'xpos': vi_cmd_data['xpos']}
     vi_cmd_data['count'] = 1
+    vi_cmd_data['scroll_into_view'] = True
+    vi_cmd_data['scroll_command'] = ['_vi_minimal_scroll', {'forward': False}]
 
     return vi_cmd_data
 

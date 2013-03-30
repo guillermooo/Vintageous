@@ -90,8 +90,11 @@ class ViRunCommand(sublime_plugin.TextCommand):
             self.restore_original_carets_if_needed(vi_cmd_data)
 
             if vi_cmd_data['scroll_into_view']:
-                # TODO: If moving by lines, scroll the minimum amount to display the new sels.
-                self.view.show(self.view.sel()[0])
+                if vi_cmd_data['scroll_command']:
+                    self.view.run_command(*vi_cmd_data['scroll_command'])
+                else:
+                    # TODO: If moving by lines, scroll the minimum amount to display the new sels.
+                    self.view.show(self.view.sel()[0])
 
             # We cannot run (maybe_)mark_undo_groups_for_gluing/glue_marked_undo_groups commands
             # within a command meant to be subsumed in the group to be glued. It won't work. So
