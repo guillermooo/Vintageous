@@ -749,11 +749,30 @@ class _vi_go_to_symbol(sublime_plugin.TextCommand):
 
 
 class _vi_double_single_quote(IrreversibleTextCommand):
+    # (view_id, row) so we know where we stand.
+    _latest_known_location = None
     next_command = 'jump_back'
     def run(self):
+        # TODO: Long jumps are already recorded automatically, but if we press j many times, for
+        # example, the current position won't be updated, and we'll jump back to unexpected
+        # places.
+
+        # We have jumped back before, but then we've moved rows, so we don't want to jump forward
+        # any more.
+        if (_vi_double_single_quote._latest_known_location and
+            _vi_double_single_quote.next_command == 'jump_forward'):
+                if (_vi_double_single_quote._latest_known_location !=
+                     (self.view.view_id, self.view.rowcol(self.view.sel()[0].b)[0])):
+                        _vi_double_single_quote.next_command = 'jump_back'
+
         # FIXME: Whenever there's a motion (any motion) after jumping back, we need to reset
         # this command to jumping back again. Otherwise the result will be confusing.
         # FIXME: We should create a jump entry at the current position.
         self.view.run_command(_vi_double_single_quote.next_command)
+
+        if _vi_double_single_quote.next_command == 'jump_back':
+            # Jumping back... Store the far location.
+            _vi_double_single_quote._latest_known_location = (self.view.view_id, self.view.rowcol(self.view.sel()[0].b)[0])
+
         current = _vi_double_single_quote.next_command
         _vi_double_single_quote.next_command = 'jump_forward' if current == 'jump_back' else 'jump_back'
