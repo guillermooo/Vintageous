@@ -82,6 +82,8 @@ def vi_dollar(vi_cmd_data):
             vi_cmd_data['post_motion'].append(['move_to', {'to': 'eol'}])
             vi_cmd_data['post_motion'].append(['clip_end_to_line',])
 
+            # TODO: missing MODE_VISUAL_LINE here.
+
     return vi_cmd_data
 
 
@@ -144,6 +146,8 @@ def vi_zero(vi_cmd_data):
         if vi_cmd_data['mode'] == MODE_VISUAL:
             vi_cmd_data['pre_motion'] = ['_vi_orient_selections_toward_begin',]
             vi_cmd_data['motion']['args']['extend'] = True
+        elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
+            vi_cmd_data['motion']['args']['extend'] = True
 
     else:
         vi_cmd_data['motion']['command'] = 'move'
@@ -152,6 +156,8 @@ def vi_zero(vi_cmd_data):
 
         if vi_cmd_data['mode'] == MODE_VISUAL:
             vi_cmd_data['pre_motion'] = ['_vi_orient_selections_toward_begin',]
+            vi_cmd_data['motion']['args']['extend'] = True
+        elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
             vi_cmd_data['motion']['args']['extend'] = True
 
         # TODO: Unify handling of the 'extend' argument. All VISUAL modes need it, so either include
@@ -285,6 +291,7 @@ def vi_w(vi_cmd_data):
 
     elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
         vi_cmd_data['last_motion'] = ['_vi_w_last_motion', {'mode': vi_cmd_data['mode']}]
+        vi_cmd_data['motion']['args']['extend'] = True
 
     return vi_cmd_data
 
@@ -477,6 +484,7 @@ def vi_big_w(vi_cmd_data):
 
     elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
         vi_cmd_data['last_motion'] = ['_vi_big_w_last_motion', {'mode': vi_cmd_data['mode']}]
+        vi_cmd_data['motion']['args']['extend'] = True
 
     return vi_cmd_data
 
@@ -586,7 +594,7 @@ def vi_ctrl_f(vi_cmd_data):
     vi_cmd_data['motion']['args'] = {'by': 'pages', 'forward': True}
 
     if vi_cmd_data['mode'] != MODE_NORMAL:
-        # TODO: Sublime Text seems to ignore the 'extend' param to Ctrl+d, so disable it.
+        # TODO: Sublime Text seems to ignore the 'extend' param to Ctrl+f, so disable it.
         # vi_cmd_data['motion']['args']['extend'] = True
         vi_cmd_data['motion']['command'] = 'vi_no_op'
         vi_cmd_data['motion']['args'] = {}
@@ -598,7 +606,7 @@ def vi_ctrl_b(vi_cmd_data):
     vi_cmd_data['motion']['args'] = {'by': 'pages', 'forward': False}
 
     if vi_cmd_data['mode'] != MODE_NORMAL:
-        # TODO: Sublime Text seems to ignore the 'extend' param to Ctrl+d, so disable it.
+        # TODO: Sublime Text seems to ignore the 'extend' param to Ctrl+b, so disable it.
         # vi_cmd_data['motion']['args']['extend'] = True
         vi_cmd_data['motion']['command'] = 'vi_no_op'
         vi_cmd_data['motion']['args'] = {}

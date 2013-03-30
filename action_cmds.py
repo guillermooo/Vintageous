@@ -300,8 +300,8 @@ class ViEnterNormalInsertMode(sublime_plugin.TextCommand):
         state = VintageState(self.view)
         state.enter_normal_insert_mode()
 
-        # FIXME: We should glue undo groups here instead of using a macro.
-        self.view.run_command('toggle_record_macro')
+        # FIXME: We can't repeat 5ifoo<esc>
+        self.view.run_command('mark_undo_groups_for_gluing')
         # ...User types text...
 
 
@@ -309,10 +309,11 @@ class ViRunNormalInsertModeActions(sublime_plugin.TextCommand):
     def run(self, edit):
         state = VintageState(self.view)
         # We've recorded what the user has typed into the buffer. Turn macro recording off.
-        self.view.run_command('toggle_record_macro')
+        self.view.run_command('glue_marked_undo_groups')
 
+        # FIXME: We can't repeat 5ifoo<esc> after we're done.
         for i in range(state.count - 1):
-            self.view.run_command('run_macro')
+            self.view.run_command('repeat')
 
         # Ensure the count will be deleted.
         state.mode = MODE_NORMAL

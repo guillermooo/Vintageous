@@ -65,7 +65,6 @@ class ViRunCommand(sublime_plugin.TextCommand):
                 if ((vi_cmd_data['motion']) or
                     (vi_cmd_data['motion_required'] and
                      not view.has_non_empty_selection_region())):
-                        self.enter_visual_mode_if_needed(vi_cmd_data)
                         self.do_whole_motion(vi_cmd_data)
 
                 # The motion didn't change the selections: abort action if so required.
@@ -150,22 +149,6 @@ class ViRunCommand(sublime_plugin.TextCommand):
                 # XXX ??? ??? ???
                 pass
                 self.view.run_command(*vi_cmd_data['reposition_caret'])
-
-    def enter_visual_mode_if_needed(self, vi_cmd_data):
-        # FIXME: We shouldn't be adding args here; do this in the motion parsing phase instead.
-        if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-            vi_cmd_data['motion']['args']['extend'] = True
-            return
-
-        # XXX: We're assuming there's a motion available - why?
-        # XXX: What are examples of commands that would pass this test?
-        if (not self.view.has_non_empty_selection_region() and
-            vi_cmd_data['action']):
-                self.view.run_command('vi_enter_visual_mode')
-                vi_cmd_data['motion']['args']['extend'] = True
-                args = vi_cmd_data['motion'].get('args')
-                if args.get('by') == 'characters':
-                    vi_cmd_data['count'] = vi_cmd_data['count'] - 1
 
     def restore_original_carets_if_needed(self, vi_cmd_data):
         if vi_cmd_data['restore_original_carets'] == True:
