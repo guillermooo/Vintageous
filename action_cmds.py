@@ -265,14 +265,6 @@ class SetMotion(IrreversibleTextCommand):
         state.eval()
 
 
-class SetComposite(sublime_plugin.TextCommand):
-    def run(self, edit, motion, action):
-        state = VintageState(self.view)
-        state.motion = motion
-        state.action = action
-        state.eval()
-
-
 class ViPushDigit(sublime_plugin.TextCommand):
     def run(self, edit, digit):
         state = VintageState(self.view)

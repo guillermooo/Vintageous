@@ -213,6 +213,36 @@ def vi_big_c(vi_cmd_data):
     return vi_cmd_data
 
 
+def vi_big_d(vi_cmd_data):
+    vi_cmd_data['can_yank'] = True
+
+    # TODO: Use separate if branches for each mode.
+
+    if vi_cmd_data['count'] == 1:
+        vi_cmd_data['motion']['command'] = 'move_to'
+        vi_cmd_data['motion']['args'] = {'to': 'eol', 'extend': True}
+
+        vi_cmd_data['motion_required'] = False
+        vi_cmd_data['action']['command'] = 'right_delete'
+        vi_cmd_data['action']['args'] = {}
+
+    else:
+        # Avoid C'ing one line too many.
+        vi_cmd_data['count'] = vi_cmd_data['count'] - 1
+        vi_cmd_data['motion']['command'] = 'move'
+        vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': True, 'extend': True}
+        vi_cmd_data['post_motion'] = [['extend_to_minimal_width',], ['visual_extend_to_line',]]
+
+        vi_cmd_data['motion_required'] = False
+        vi_cmd_data['action']['command'] = 'right_delete'
+        vi_cmd_data['action']['args'] = {}
+
+    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+    vi_cmd_data['next_mode'] = MODE_NORMAL
+
+    return vi_cmd_data
+
+
 def vi_big_s(vi_cmd_data):
     # S
     # Motion + Action

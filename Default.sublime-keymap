@@ -118,7 +118,7 @@
 	// TODO: Improve this. XXX This is obsolete?
 	{ "keys": ["g", "g"], "command": "set_motion", "args": {"motion": "vi_gg"}, "context": [{"key": "vi_has_action"}] },
 	
-	{ "keys": ["D"], "command": "set_composite", "args": {"motion": "vi_dollar", "action": "vi_d"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["D"], "command": "set_action", "args": {"action": "vi_big_d"}, "context": [{"key": "setting.command_mode"}] },
 
 	// gg can either be an action or a motion. It's an action when there is no actual action.
 	{ "keys": ["g"], "command": "set_action", "args": {"action": "vi_gg"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
@@ -140,11 +140,9 @@
 	// These come after the ones above so we don't need extra context checks.
 	{ "keys": ["o"], "command": "set_action", "args": {"action": "vi_visual_o"}, "context": [{"key": "vi_mode_visual_any"}] },
 
-	// FIXME: X behaves linewise in visual mode. The following command is wrong at the moment.
-	{ "keys": ["X"], "command": "set_composite", "args": {"motion": "vi_dollar", "action": "vi_d"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_mode_visual"}]},
-
 	{ "keys": ["y"], "command": "set_action", "args": {"action": "vi_y"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["x"], "command": "set_action", "args": {"action": "vi_x"}, "context": [{"key": "setting.command_mode"}] },
+	// FIXME: X behaves linewise in visual mode. The following command is wrong at the moment.
 	{ "keys": ["X"], "command": "set_action", "args": {"action": "vi_big_x"}, "context": [{"key": "setting.command_mode"}] },
 
 	{ "keys": ["Y"], "command": "set_action", "args": {"action": "vi_yy"}, "context": [{"key": "setting.command_mode"}] },
