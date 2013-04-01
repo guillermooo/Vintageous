@@ -149,8 +149,6 @@ class ViRunCommand(sublime_plugin.TextCommand):
     def reposition_caret(self, vi_cmd_data):
         if self.view.has_non_empty_selection_region():
             if vi_cmd_data['reposition_caret']:
-                # XXX ??? ??? ???
-                pass
                 self.view.run_command(*vi_cmd_data['reposition_caret'])
 
     def restore_original_carets_if_needed(self, vi_cmd_data):
@@ -263,6 +261,8 @@ class ViRunCommand(sublime_plugin.TextCommand):
     def add_to_jump_list(self, vi_cmd_data):
         if vi_cmd_data['is_jump']:
             # It's a window command, but arguably this is prone to error.
+            # FIXME: Devise a way to convey in the command name whether we're looking at a view
+            # or a window command.
             self.view.window().run_command('vi_add_to_jump_list')
 
     def debug(self, *messages):
