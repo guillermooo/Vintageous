@@ -1,3 +1,7 @@
+0.7.2
+	- Improve D command.
+	- Fix behavior of b in visual mode.
+
 0.7.1
 	- 5ifoo<Esc>-type commands use .command_history() instead of macros.	
 	- Improved '' command. Attempting to jump forward from unknown position causes to jump back
