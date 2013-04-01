@@ -1,3 +1,9 @@
+0.7.1
+	- 5ifoo<Esc>-type commands use .command_history() instead of macros.	
+	- Improved '' command. Attempting to jump forward from unknown position causes to jump back
+	  again.
+	- j, k scroll one line at a time when they move off the visible region.
+
 0.7
 	- Cumulative release, I guess.
 
