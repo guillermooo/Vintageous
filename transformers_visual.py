@@ -1162,14 +1162,6 @@ class _vi_orient_selections_toward_begin(sublime_plugin.TextCommand):
 
         regions_transformer(self.view, f)
 
-# XXX: _vi_orient_selections_toward_begin and this one should be merged.
-class _vi_visual_orient_selections_toward_begin(sublime_plugin.TextCommand):
-    def run(self, edit):
-        def f(view, s):
-            return sublime.Region(s.end(), s.begin())
-
-        regions_transformer(self.view, f)
-
 
 class _vi_adjust_carets(sublime_plugin.TextCommand):
     def run(self, edit, mode=None):
