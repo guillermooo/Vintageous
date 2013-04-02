@@ -175,7 +175,7 @@ class VintageState(object):
         else:
             return True
 
-        unmark = False
+        was_modifed = False
         i = 0
         cmds = []
         while True:
@@ -192,10 +192,10 @@ class VintageState(object):
 
         # If we have an action between v..v calls, we have modified the buffer (most of the
         # time, anyway).
-        unmark = not [name for (name, data) in cmds
+        was_modifed = not [name for (name, data) in cmds
                                         if data and data.get('action')]
 
-        return unmark
+        return was_modifed
 
     @property
     def mode(self):
