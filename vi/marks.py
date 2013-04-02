@@ -15,6 +15,7 @@ class Marks(object):
 
     def add(self, name, view):
         # TODO: support multiple selections
+        # TODO: Use id attribute; references might change.
         win, view, rowcol = view.window(), view, view.rowcol(view.sel()[0].b)
         _MARKS[name] = win, view, rowcol
 
