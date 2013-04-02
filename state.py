@@ -147,7 +147,7 @@ class VintageState(object):
         """Returns `True` if we've changed the buffer while in visual mode.
         """
         # XXX: What if we used view.is_dirty() instead? That should be simpler?
-        # XXX: If we can be sure that any modifying command will leave the buffer in a dirty
+        # XXX: If we can be sure that every modifying command will leave the buffer in a dirty
         # state, we could go for this solution.
 
         # 'maybe_mark_undo_groups_for_gluing' and 'glue_marked_undo_groups' seem to add an entry
@@ -159,9 +159,9 @@ class VintageState(object):
         #   2) We exit visual mode by pressing 'v' again.
         #
         # Since before the first 'v' and after the second we've called the aforementioned commands,
-        # we'd now have a new (useless) entry in the undo stack, and the redo stack would be
-        # empty. This would be undesirable, so we need to find out whether marked groups in
-        # visual mode actually need to be glued or not.
+        # respectively, we'd now have a new (useless) entry in the undo stack, and the redo stack
+        # would be empty. This would be undesirable, so we need to find out whether marked groups
+        # in visual mode actually need to be glued or not and act based on that information.
 
         # FIXME: Design issue. This method won't always work. We have actions like yy that
         # will make this method return true, while it should return False (since it isn't a

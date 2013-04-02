@@ -49,7 +49,6 @@ class MarksTests(unittest.TestCase):
         TestsState.view.sel().clear()
         TestsState.view.sel().add(sublime.Region(100, 100))
         self.marks.add('a', TestsState.view)
-        # The caret's at the beginning of the buffer.
         self.assertEqual(self.marks.get_as_encoded_address('a'), sublime.Region(100, 100))
 
     def testCanRetrieveMarkInADifferentBufferAsEncodedMark(self):

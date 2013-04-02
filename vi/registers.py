@@ -60,6 +60,8 @@ class Registers(object):
 
 
     def __init__(self, view=None, settings=None):
+        # TODO: Why do we have an __init__? We should be able to set up the class inside the
+        # __get__ method instead.
         self.view = view
         self.settings = settings
 

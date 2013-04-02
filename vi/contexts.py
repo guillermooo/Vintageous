@@ -7,6 +7,8 @@ from Vintageous.vi import utils
 
 class KeyContext(object):
     def __init__(self, state=None):
+        # TODO: Why do we have an __init__? We should be able to set up the class inside the
+        # __get__ method instead.
         self.state = state
 
     def __get__(self, instance, owner):
