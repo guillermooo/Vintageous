@@ -101,7 +101,6 @@ class VintageState(object):
         # xpos.
         # XXX: Why is insert mode resetting xpos? xpos should never be reset?
         self.xpos = None if not self.view.sel() else self.view.rowcol(self.view.sel()[0].b)[1]
-        self.mode = MODE_NORMAL
 
         if self.view.overwrite_status():
             self.view.set_overwrite_status(False)
@@ -109,7 +108,15 @@ class VintageState(object):
         # Hide outlined regions created by searching.
         self.view.erase_regions('vi_search')
 
-        self.view.run_command('glue_marked_undo_groups')
+        if not self.buffer_was_changed_in_visual_mode():
+            # We've been in some visual mode, but we haven't modified the buffer at all.
+            self.view.run_command('unmark_undo_groups_for_gluing')
+        else:
+            # Either we haven't been in any visual mode or we've modified the buffer while in
+            # any visual mode.
+            self.view.run_command('glue_marked_undo_groups')
+
+        self.mode = MODE_NORMAL
 
     def enter_visual_line_mode(self):
         self.mode = MODE_VISUAL_LINE
@@ -135,6 +142,60 @@ class VintageState(object):
 
     def store_visual_selections(self):
         self.view.add_regions('vi_visual_selections', list(self.view.sel()))
+
+    def buffer_was_changed_in_visual_mode(self):
+        """Returns `True` if we've changed the buffer while in visual mode.
+        """
+        # XXX: What if we used view.is_dirty() instead? That should be simpler?
+        # XXX: If we can be sure that any modifying command will leave the buffer in a dirty
+        # state, we could go for this solution.
+
+        # 'maybe_mark_undo_groups_for_gluing' and 'glue_marked_undo_groups' seem to add an entry
+        # to the undo stack regardless of whether intervening modifying-commands have been
+        # issued.
+        #
+        # Example:
+        #   1) We enter visual mode by pressing 'v'.
+        #   2) We exit visual mode by pressing 'v' again.
+        #
+        # Since before the first 'v' and after the second we've called the aforementioned commands,
+        # we'd now have a new (useless) entry in the undo stack, and the redo stack would be
+        # empty. This would be undesirable, so we need to find out whether marked groups in
+        # visual mode actually need to be glued or not.
+
+        # FIXME: Design issue. This method won't always work. We have actions like yy that
+        # will make this method return true, while it should return False (since it isn't a
+        # modifying command). However, yy signals in its own way that it's a non-modifying command.
+        # I don't think it will cause any bug, but we need to unify.
+
+        if self.mode == MODE_VISUAL:
+            visual_cmd = 'enter_visual_mode'
+        elif self.mode == MODE_VISUAL_LINE:
+            visual_cmd = 'enter_visual_line_mode'
+        else:
+            return True
+
+        unmark = False
+        i = 0
+        cmds = []
+        while True:
+            cmd_name, args, _ = self.view.command_history(i)
+            if (cmd_name == 'vi_run' and args['action'] and
+                args['action']['command'] == visual_cmd):
+                    break
+
+            if not cmd_name or i < -250:
+                break
+
+            cmds.append((cmd_name, args))
+            i -= 1
+
+        # If we have an action between v..v calls, we have modified the buffer (most of the
+        # time, anyway).
+        unmark = not [name for (name, data) in cmds
+                                        if data and data.get('action')]
+
+        return unmark
 
     @property
     def mode(self):
