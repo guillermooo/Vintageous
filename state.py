@@ -560,20 +560,18 @@ class VintageState(object):
             self.repeat_command = cmd, args, times
 
     def update_xpos(self):
-        state = VintageState(self.view)
-
         first_sel = self.view.sel()[0]
         xpos = 0
-        if state.mode == MODE_VISUAL:
+        if self.mode == MODE_VISUAL:
             if first_sel.a < first_sel.b:
                 xpos = self.view.rowcol(first_sel.b - 1)[1]
             elif first_sel.a > first_sel.b:
                 xpos = self.view.rowcol(first_sel.b)[1]
 
-        elif state.mode == MODE_NORMAL:
+        elif self.mode == MODE_NORMAL:
             xpos = self.view.rowcol(first_sel.b)[1]
 
-        state.xpos = xpos
+        self.xpos = xpos
 
     def update_status(self):
         mode_name = mode_to_str(self.mode) or ""
