@@ -1,3 +1,6 @@
+0.7.3
+	- Improved undo/redo feature when using visual mode.
+
 0.7.2
 	- Improve D command.
 	- Fix behavior of b in visual mode.
