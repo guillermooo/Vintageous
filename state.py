@@ -86,7 +86,8 @@ class VintageState(object):
     context = KeyContext()
     marks = Marks()
 
-    _latest_repeat_command = None
+    # Let's imitate Sublime Text's .command_history() 'null' value.
+    _latest_repeat_command = ('', None, 0)
 
     def __init__(self, view):
         self.view = view
@@ -586,12 +587,13 @@ class VintageState(object):
         if not cmd:
             return
 
-        if cmd == 'vi_run' and args['action']:
+        if cmd == 'vi_run' and args.get('action'):
             try:
                 old_cmd, old_args, _ = self.repeat_command
                 if (cmd, args) == (old_cmd, old_args):
                     return
             except TypeError:
+                # Unreacheable.
                 pass
 
             self.repeat_command = cmd, args, times
@@ -600,7 +602,7 @@ class VintageState(object):
             try:
                 old_cmd, old_args, _ = self.repeat_command
             except TypeError:
-                return
+                pass
 
             if old_cmd == 'sequence':
                 pairs = zip(old_args['commands'], args['commands'])

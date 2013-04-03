@@ -126,3 +126,79 @@ class VintageStateTests(unittest.TestCase):
             cmd_hist.side_effect = reversed(many_items)
 
             self.assertFalse(self.state.buffer_was_changed_in_visual_mode())
+
+
+class VintageStateTests_update_repeat_command(unittest.TestCase):
+    def setUp(self):
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.window().settings().erase('vintage')
+        self.state = VintageState(TestsState.view)
+
+    def tearDown(self):
+        self.state.repeat_command = ('', None, 0)
+
+    def test_update_repeat_command_IsEmptyAfterInstantiation(self):
+        self.assertEqual(self.state.repeat_command, ('', None, 0))
+
+    def test_update_repeat_command_IgnoresEmptyCommands(self):
+        self.state.repeat_command = ('foo', {}, 0)
+        # patch command_history
+        with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
+            items = [('', None, 0)]
+            cmd_hist.side_effect = reversed(items)
+
+            self.state.update_repeat_command()
+            self.assertEqual(self.state.repeat_command, ('foo', {}, 0))
+
+    def test_update_repeat_command_CanUpdateIfNativeModifyingCommandFound(self):
+        self.state.repeat_command = ('foo', {}, 0)
+        # patch command_history
+        with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
+            items = [('bar', {}, 0)]
+            cmd_hist.side_effect = reversed(items)
+
+            self.state.update_repeat_command()
+            self.assertEqual(self.state.repeat_command, ('bar', {}, 0))
+
+    def test_update_repeat_command_CommandStaysTheSameIfIdenticalModifyingCommandFound(self):
+        self.state.repeat_command = ('foo', {}, 0)
+        # patch command_history
+        with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
+            items = [('foo', {}, 0)]
+            cmd_hist.side_effect = reversed(items)
+
+            self.state.update_repeat_command()
+            self.assertEqual(self.state.repeat_command, ('foo', {}, 0))
+
+    def test_update_repeat_command_IgnoreNonModifyingViRunCommands(self):
+        self.state.repeat_command = ('foo', {}, 0)
+        # patch command_history
+        with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
+            items = [('vi_run', {}, 0)]
+            cmd_hist.side_effect = reversed(items)
+
+            self.state.update_repeat_command()
+            self.assertEqual(self.state.repeat_command, ('foo', {}, 0))
+
+    def test_update_repeat_command_CanUpdateIfViRunModifyingCommandFound(self):
+        self.state.repeat_command = ('foo', {}, 0)
+        # patch command_history
+        with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
+            items = [('vi_run', {'action': 'fizz', 'args': {}}, 0)]
+            cmd_hist.side_effect = reversed(items)
+
+            self.state.update_repeat_command()
+            self.assertEqual(self.state.repeat_command, ('vi_run', {'action': 'fizz', 'args': {}}, 0))
+
+    def test_update_repeat_command_CommandStaysTheSameIfIdenticalViRunModifyingCommandFound(self):
+        self.state.repeat_command = ('vi_run', {'action': 'fizz', 'args': {}}, 0)
+        # patch command_history
+        with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
+            items = [('vi_run', {'action': 'fizz', 'args': {}}, 0)]
+            cmd_hist.side_effect = reversed(items)
+
+            self.state.update_repeat_command()
+            self.assertEqual(self.state.repeat_command, ('vi_run', {'action': 'fizz', 'args': {}}, 0))
+
+
+    # TODO: Test 'sequence' command case.

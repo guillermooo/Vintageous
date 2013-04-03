@@ -1,3 +1,6 @@
+0.7.5
+	- Enable repetition of v,e,d (example) when the global repeat command is in null state.
+	
 0.7.4
 	- Fix typos that were causing undo/redo to fail.
 	
