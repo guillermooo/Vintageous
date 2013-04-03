@@ -584,43 +584,18 @@ class VintageState(object):
            then previous latest modifying command becomes the new repeat command, and so on.
         """
         cmd, args, times = self.view.command_history(0, True)
+
         if not cmd:
             return
-
-        if cmd == 'vi_run' and args.get('action'):
-            try:
-                old_cmd, old_args, _ = self.repeat_command
-                if (cmd, args) == (old_cmd, old_args):
-                    return
-            except TypeError:
-                # Unreacheable.
-                pass
-
+        elif cmd == 'vi_run' and args.get('action'):
             self.repeat_command = cmd, args, times
-
         elif cmd == 'sequence':
-            try:
-                old_cmd, old_args, _ = self.repeat_command
-            except TypeError:
-                pass
-
-            if old_cmd == 'sequence':
-                pairs = zip(old_args['commands'], args['commands'])
-                # Compare pairs of (cmd_name, args_dict).
-                update = [(old, new) for (old, new) in pairs if old != new]
-                if not update:
-                    return
-
+            # XXX: We are assuming every 'sequence' command is a modifying command, which seems
+            # to be reasonable, but I dunno.
             self.repeat_command = cmd, args, times
-
         elif cmd != 'vi_run':
-            try:
-                old_cmd, old_args, _ = self.repeat_command
-                if (cmd, args,) == (old_cmd, old_args):
-                    return
-            except TypeError:
-                return
-
+            # XXX: We are assuming every 'native' command if a modifying commmand, but it doesn't
+            # look right...
             self.repeat_command = cmd, args, times
 
     def update_xpos(self):

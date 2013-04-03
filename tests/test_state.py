@@ -200,5 +200,22 @@ class VintageStateTests_update_repeat_command(unittest.TestCase):
             self.state.update_repeat_command()
             self.assertEqual(self.state.repeat_command, ('vi_run', {'action': 'fizz', 'args': {}}, 0))
 
+    def test_update_repeat_command_CanUpdateIfSequenceCommandFound(self):
+        self.state.repeat_command = ('foo', {}, 0)
+        # patch command_history
+        with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
+            items = [('sequence', {}, 0)]
+            cmd_hist.side_effect = reversed(items)
 
-    # TODO: Test 'sequence' command case.
+            self.state.update_repeat_command()
+            self.assertEqual(self.state.repeat_command, ('sequence', {}, 0))
+
+    def test_update_repeat_command_CommandStaysTheSameIfIdenticalSequenceModifyingCommandFound(self):
+        self.state.repeat_command = ('sequence', {'action': 'fizz', 'args': {}}, 0)
+        # patch command_history
+        with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
+            items = [('sequence', {'action': 'fizz', 'args': {}}, 0)]
+            cmd_hist.side_effect = reversed(items)
+
+            self.state.update_repeat_command()
+            self.assertEqual(self.state.repeat_command, ('sequence', {'action': 'fizz', 'args': {}}, 0))
