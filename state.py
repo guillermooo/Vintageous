@@ -594,7 +594,7 @@ class VintageState(object):
             # to be reasonable, but I dunno.
             self.repeat_command = cmd, args, times
         elif cmd != 'vi_run':
-            # XXX: We are assuming every 'native' command if a modifying commmand, but it doesn't
+            # XXX: We are assuming every 'native' command is a modifying commmand, but it doesn't
             # look right...
             self.repeat_command = cmd, args, times
 
