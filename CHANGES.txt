@@ -1,5 +1,5 @@
 0.7.4
-	- Fix typos.
+	- Fix typos that were causing undo/redo to fail.
 	
 0.7.3
 	- Improved undo/redo feature when using visual mode.
