@@ -391,7 +391,7 @@ def vi_cc(vi_cmd_data):
 def vi_y(vi_cmd_data):
     vi_cmd_data['motion_required'] = True
     vi_cmd_data['can_yank'] = True
-    # vi_cmd_data['restore_original_carets'] = True
+    vi_cmd_data['restore_original_carets'] = True
     # The yanked text will be put in the clipboard if needed. This command shouldn't do any action.
     vi_cmd_data['action']['command'] = 'no_op'
     vi_cmd_data['action']['args'] = {}

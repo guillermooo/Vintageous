@@ -1,3 +1,6 @@
+0.8
+	- Improve y command: The caret remains where it was found.
+
 0.7.5
 	- Enable repetition of v,e,d (example) when the global repeat command is in null state.
 	
