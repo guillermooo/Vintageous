@@ -12,33 +12,6 @@ from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
 
 
-# XXX: Use the mock module instead?
-##################################################
-class View(object):
-    def __init__(self, id_, fname, buffer_id=0):
-        self.view_id = id_
-        self.fname = fname
-        self._buffer_id = buffer_id
-        self._command_history = []
-        self._redo_stack = []
-
-    def file_name(self):
-        return self.fname
-
-    def buffer_id(self):
-        return self._buffer_id
-
-    def command_history(self, index, find_modifying_command=False):
-        if not self._command_history:
-            return ('', None, 0)
-        else:
-            pass
-
-class Window(object):
-    pass
-##################################################
-
-
 class VintageStateTests(unittest.TestCase):
     def setUp(self):
         TestsState.view.settings().erase('vintage')
