@@ -1,3 +1,6 @@
+0.7.4
+	- Fix typos.
+	
 0.7.3
 	- Improved undo/redo feature when using visual mode.
 
