@@ -595,7 +595,7 @@ class VintageState(object):
             self.repeat_command = cmd, args, times
         elif cmd != 'vi_run':
             # XXX: We are assuming every 'native' command is a modifying commmand, but it doesn't
-            # look right...
+            # feel right...
             self.repeat_command = cmd, args, times
 
     def update_xpos(self):
