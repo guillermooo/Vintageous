@@ -169,33 +169,34 @@ class VintageState(object):
         # I don't think it will cause any bug, but we need to unify.
 
         if self.mode == MODE_VISUAL:
-            visual_cmd = 'enter_visual_mode'
+            visual_cmd = 'vi_enter_visual_mode'
         elif self.mode == MODE_VISUAL_LINE:
-            visual_cmd = 'enter_visual_line_mode'
+            visual_cmd = 'vi_enter_visual_line_mode'
         else:
             return True
 
-        was_modifed = False
-        i = 0
         cmds = []
-        while True:
+        # Set an upper limit for look-ups in the undo stack.
+        for i in range(0, -249, -1):
             cmd_name, args, _ = self.view.command_history(i)
             if (cmd_name == 'vi_run' and args['action'] and
                 args['action']['command'] == visual_cmd):
                     break
 
-            if not cmd_name or i < -250:
+            if not cmd_name:
+                # Sublime Text returns ('', None, 0) when we hit the undo stack's bottom.
                 break
 
             cmds.append((cmd_name, args))
-            i -= 1
 
-        # If we have an action between v..v calls, we have modified the buffer (most of the
-        # time, anyway).
-        was_modifed = not [name for (name, data) in cmds
+        # If we have an action between v..v calls (or visual line), we have modified the buffer
+        # (most of the time, anyway, there are exceptions that we're not covering here).
+        # TODO: Cover exceptions too, like yy (non-modifying command, though has the shape of a
+        # modifying command).
+        was_modifed = [name for (name, data) in cmds
                                         if data and data.get('action')]
 
-        return was_modifed
+        return bool(was_modifed)
 
     @property
     def mode(self):
