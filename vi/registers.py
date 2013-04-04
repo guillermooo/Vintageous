@@ -112,7 +112,8 @@ class Registers(object):
         if (not (name.isalpha() or name.isdigit() or
                  name.isupper() or name == REG_UNNAMED or
                  name == REG_SYS_CLIPBOARD_1 or
-                 name == REG_EXPRESSION)):
+                 name == REG_EXPRESSION or
+                 name == REG_SMALL_DELETE)):
                     # Vim fails silently.
                     # raise Exception("Can only set a-z and 0-9 registers.")
                     return None
@@ -152,7 +153,7 @@ class Registers(object):
                 return ''
         elif name in REG_SYS_CLIPBOARD_ALL:
             return [sublime.get_clipboard()]
-        elif name != REG_UNNAMED and name in REG_SPECIAL:
+        elif name not in (REG_UNNAMED, REG_SMALL_DELETE) and name in REG_SPECIAL:
             return
         # Special case lumped among these --user always wants the sys
         # clipboard.

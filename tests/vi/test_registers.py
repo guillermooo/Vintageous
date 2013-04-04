@@ -228,3 +228,11 @@ class TestCaseRegisters(unittest.TestCase):
 
     def testGettingEmptyRegisterReturnsNone(self):
         self.assertEqual(self.regs.get('a'), None)
+
+    def testCanSetSmallDeleteRegister(self):
+        self.regs[registers.REG_SMALL_DELETE] = ['foo']
+        self.assertEqual(registers._REGISTER_DATA[registers.REG_SMALL_DELETE], ['foo'])
+
+    def testCanGetSmallDeleteRegister(self):
+        registers._REGISTER_DATA[registers.REG_SMALL_DELETE] = ['foo']
+        self.assertEqual(self.regs.get(registers.REG_SMALL_DELETE), ['foo'])

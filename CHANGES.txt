@@ -1,3 +1,6 @@
+0.8.1
+	- Add support for small register ("-).
+
 0.8
 	- Improve y command: The caret remains where it was found.
 

@@ -16,6 +16,7 @@ from Vintageous.vi.constants import mode_to_str
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
 from Vintageous.vi.registers import REG_UNNAMED
+from Vintageous.vi.registers import REG_SMALL_DELETE
 from Vintageous.vi.registers import Registers
 from Vintageous.vi.settings import SettingsManager
 from Vintageous.vi.settings import SublimeSettings
@@ -226,6 +227,13 @@ class ViRunCommand(sublime_plugin.TextCommand):
                     # TODO: Encapsulate this in registers.py. We could have a
                     # .yank() method there that knows about all the details.
                     state.registers[REG_UNNAMED] = self.get_selected_text(vi_cmd_data)
+
+            # XXX: Small register delete. Improve this implementation.
+            if vi_cmd_data['populates_small_delete_register']:
+                state = VintageState(self.view)
+                is_same_line = lambda r: self.view.line(r.begin()) == self.view.line(r.end() - 1)
+                if all(is_same_line(x) for x in list(self.view.sel())):
+                    state.registers[REG_SMALL_DELETE] = self.get_selected_text(vi_cmd_data)
 
             cmd = vi_cmd_data['action']['command']
             args = vi_cmd_data['action']['args']

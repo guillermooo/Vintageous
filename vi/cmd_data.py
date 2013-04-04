@@ -108,3 +108,5 @@ class CmdData(dict):
         # stack. (XXX This is mainly due to an [unconfirmed] issue with
         # 'maybe_mark_undo_groups_for_gluing'.)
         self['_mark_groups_for_gluing'] = True
+        self['populates_small_delete_register'] = False
+

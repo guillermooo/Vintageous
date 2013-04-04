@@ -63,6 +63,7 @@ def vi_enter_replace_mode(vi_cmd_data):
 def vi_d(vi_cmd_data):
     vi_cmd_data['cancel_action_if_motion_fails'] = True
     vi_cmd_data['can_yank'] = True
+    vi_cmd_data['populates_small_delete_register'] = True
     vi_cmd_data['motion_required'] = True
     forward = vi_cmd_data['motion'].get('args') and vi_cmd_data['motion']['args'].get('forward')
     # FIXME: Should not delete new line characters.
@@ -145,6 +146,7 @@ def vi_s(vi_cmd_data):
         vi_cmd_data['motion']['args'] = {'by': 'characters', 'extend': True, 'forward': True}
 
     vi_cmd_data['can_yank'] = True
+    vi_cmd_data['populates_small_delete_register'] = True
 
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = 'right_delete'
@@ -156,6 +158,7 @@ def vi_s(vi_cmd_data):
 
 def vi_c(vi_cmd_data):
     vi_cmd_data['can_yank'] = True
+    vi_cmd_data['populates_small_delete_register'] = True
     vi_cmd_data['cancel_action_if_motion_fails'] = True
 
     vi_cmd_data['motion_required'] = True
@@ -186,6 +189,7 @@ def vi_big_c(vi_cmd_data):
     # Count: LINEWISE + EXCLUSIVE
 
     vi_cmd_data['can_yank'] = True
+    vi_cmd_data['populates_small_delete_register'] = True
 
     if vi_cmd_data['count'] == 1:
         vi_cmd_data['motion']['command'] = 'move_to'
@@ -215,6 +219,7 @@ def vi_big_c(vi_cmd_data):
 
 def vi_big_d(vi_cmd_data):
     vi_cmd_data['can_yank'] = True
+    vi_cmd_data['populates_small_delete_register'] = True
 
     # TODO: Use separate if branches for each mode.
 
@@ -281,6 +286,7 @@ def vi_big_s(vi_cmd_data):
 
 def vi_x(vi_cmd_data):
     vi_cmd_data['can_yank'] = True
+    vi_cmd_data['populates_small_delete_register'] = True
     vi_cmd_data['motion_required'] = False
 
     if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
@@ -305,6 +311,7 @@ def vi_big_x(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
 
     if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
+        vi_cmd_data['populates_small_delete_register'] = True
         vi_cmd_data['cancel_action_if_motion_fails'] = True
         vi_cmd_data['motion']['command'] = 'move'
         vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': False, 'extend':True}
