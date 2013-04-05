@@ -1191,3 +1191,32 @@ class _vi_minimal_scroll(sublime_plugin.TextCommand):
 
         if amount != 0:
             self.view.run_command('scroll_lines', {'amount': amount})
+
+
+class _vi_big_b_post_motion(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None):
+        def f(view, s):
+            if mode == _MODE_INTERNAL_NORMAL:
+                if view.substr(s.b) != '\n':
+                    return sublime.Region(s.a, view.line(s.b).b)
+            elif mode == MODE_VISUAL:
+                if view.substr(s.b) != '\n':
+                    return sublime.Region(s.a, view.line(s.b).b)
+
+            return s
+
+        regions_transformer(self.view, f)
+
+
+class _vi_big_s_post_motion(sublime_plugin.TextCommand):
+    # Assume S with a count.
+    def run(self, edit, mode=None):
+        def f(view, s):
+            if mode == _MODE_INTERNAL_NORMAL:
+                return sublime.Region(view.line(s.a).a, view.line(s.b).b)
+            elif mode == MODE_VISUAL:
+                return sublime.Region(view.line(s.a).a, view.line(s.b - 1).b)
+
+            return s
+
+        regions_transformer(self.view, f)

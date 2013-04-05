@@ -1,3 +1,8 @@
+0.8.2
+	- Add count support for . and u.
+	- Improve D action when given counts.
+	- Improve S action when given counts.
+
 0.8.1
 	- Add support for small register ("-).
 
