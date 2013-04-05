@@ -568,6 +568,9 @@ class _vi_undo(IrreversibleTextCommand):
     Sublime Text we lose that information (at least it doesn't seem to be straightforward to
     obtain).
     """
+    #  !!! This is a special command that does not go through the usual processing. !!!
+    #  !!! It must skip the undo stack. !!!
+
     # TODO: It must be possible store or retrieve the actual position of the caret before the
     # visual selection performed by the user.
     def run(self):
@@ -580,7 +583,9 @@ class _vi_undo(IrreversibleTextCommand):
             else:
                 return sublime.Region(s.a, s.a)
 
-        self.view.run_command('undo')
+        state = VintageState(self.view)
+        for i in range(state.count):
+            self.view.run_command('undo')
 
         if self.view.has_non_empty_selection_region():
             regions_transformer(self.view, f)
@@ -593,13 +598,19 @@ class _vi_undo(IrreversibleTextCommand):
             self.view.run_command('move', {'by': 'characters', 'forward': False})
             # ////////////////////////////////////////////////////////////////////
 
-        VintageState(self.view).update_xpos()
+        state.update_xpos()
+        # Ensure that we wipe the count, if any.
+        state.reset()
 
 
 class _vi_repeat(IrreversibleTextCommand):
     """Vintageous manages the repeat operation on its own to ensure that we always use the latest
        modifying command, instead of being tied to the undo stack (as Sublime Text is by default).
     """
+
+    #  !!! This is a special command that does not go through the usual processing. !!!
+    #  !!! It must skip the undo stack. !!!
+
     def run(self):
         state = VintageState(self.view)
 
