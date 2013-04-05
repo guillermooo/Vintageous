@@ -625,14 +625,17 @@ class _vi_repeat(IrreversibleTextCommand):
         elif cmd == 'vi_run':
             args['next_mode'] = MODE_NORMAL
             args['follow_up_mode'] = 'vi_enter_normal_mode'
+            args['count'] = state.count * args['count']
+            self.view.run_command(cmd, args)
         elif cmd == 'sequence':
             for i, _ in enumerate(args['commands']):
                 # Access this shape: {"commands":[['vi_run', {"foo": 100}],...]}
                 args['commands'][i][1]['next_mode'] = MODE_NORMAL
                 args['commands'][i][1]['follow_up_mode'] = 'vi_enter_normal_mode'
 
-        for i in range(state.count):
-            self.view.run_command(cmd, args)
+            # TODO: Implement counts properly for 'sequence' command.
+            for i in range(state.count):
+                self.view.run_command(cmd, args)
 
         # Ensure we wipe count data if any.
         state.reset()
