@@ -6,6 +6,7 @@ from Vintageous.test_runner import TestsState
 from Vintageous.vi import registers
 from Vintageous.vi.registers import Registers
 from Vintageous.vi.settings import SettingsManager
+from Vintageous.state import VintageState
 
 
 class TestCaseRegistersConstants(unittest.TestCase):
@@ -73,8 +74,9 @@ class TestCaseRegisters(unittest.TestCase):
         registers._REGISTER_DATA = {}
         TestsState.view.settings().erase('vintage')
         TestsState.view.settings().erase('vintageous_use_sys_clipboard')
-        self.regs = Registers(view=TestsState.view,
-                              settings=SettingsManager(view=TestsState.view))
+        # self.regs = Registers(view=TestsState.view,
+                              # settings=SettingsManager(view=TestsState.view))
+        self.regs = VintageState(TestsState.view).registers
 
     def testCanInitializeClass(self):
         self.assertEqual(self.regs.view, TestsState.view)

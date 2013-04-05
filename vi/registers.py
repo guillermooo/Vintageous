@@ -59,15 +59,18 @@ class Registers(object):
     """
 
 
-    def __init__(self, view=None, settings=None):
-        # TODO: Why do we have an __init__? We should be able to set up the class inside the
-        # __get__ method instead.
-        self.view = view
-        self.settings = settings
+    # def __init__(self, view=None, settings=None):
+    #     # TODO: Why do we have an __init__? We should be able to set up the class inside the
+    #     # __get__ method instead.
+    #     self.view = view
+    #     self.settings = settings
 
     def __get__(self, instance, owner):
+        self.view = instance.view
+        self.settings = instance.settings
+        return self
         # This ensures that we can easiy access the active view.
-        return Registers(instance.view, instance.settings)
+        # return Registers(instance.view, instance.settings)
 
     def _set_default_register(self, values):
         assert isinstance(values, list)

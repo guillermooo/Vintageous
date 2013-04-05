@@ -31,7 +31,7 @@ class MarksTests(unittest.TestCase):
         marks._MARKS = {}
         TestsState.view.sel().clear()
         TestsState.view.sel().add(sublime.Region(0, 0))
-        self.marks = marks.Marks(VintageState(TestsState.view))
+        self.marks = VintageState(TestsState.view).marks
 
     def testCanSetMark(self):
         self.marks.add('a', TestsState.view)

@@ -6,15 +6,9 @@ from Vintageous.vi import utils
 
 
 class KeyContext(object):
-    def __init__(self, state=None):
-        # TODO: Why do we have an __init__? We should be able to set up the class inside the
-        # __get__ method instead.
-        self.state = state
-
     def __get__(self, instance, owner):
-        if instance is not None:
-            return KeyContext(instance)
-        return KeyContext()
+        self.state = instance
+        return self
 
     def vi_must_change_mode(self, key, operator, operand, match_all):
         is_normal_mode = self.state.settings.view['command_mode']

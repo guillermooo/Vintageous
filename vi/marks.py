@@ -5,15 +5,9 @@ import sublime
 _MARKS = {}
 
 class Marks(object):
-    def __init__(self, state=None):
-        # TODO: Why do we have an __init__? We should be able to set up the class inside the
-        # __get__ method instead.
-        self.state = state
-
     def __get__(self, instance, owner):
-        if not instance:
-            return self
-        return Marks(instance)
+        self.state = instance
+        return self
 
     def add(self, name, view):
         # TODO: support multiple selections
