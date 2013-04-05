@@ -602,22 +602,29 @@ class _vi_repeat(IrreversibleTextCommand):
     """
     def run(self):
         state = VintageState(self.view)
+
         try:
             cmd, args, _ = state.repeat_command
         except TypeError:
+            # Unreachable.
             return
 
-        if cmd == 'vi_run':
+        if not cmd:
+            return
+        elif cmd == 'vi_run':
             args['next_mode'] = MODE_NORMAL
             args['follow_up_mode'] = 'vi_enter_normal_mode'
-
         elif cmd == 'sequence':
             for i, _ in enumerate(args['commands']):
                 # Access this shape: {"commands":[['vi_run', {"foo": 100}],...]}
                 args['commands'][i][1]['next_mode'] = MODE_NORMAL
                 args['commands'][i][1]['follow_up_mode'] = 'vi_enter_normal_mode'
 
-        self.view.run_command(cmd, args)
+        for i in range(state.count):
+            self.view.run_command(cmd, args)
+
+        # Ensure we wipe count data if any.
+        state.reset()
         # XXX: Needed here? Maybe enter_... type commands should be IrreversibleCommands so we
         # must/can call them whenever we need them withouth affecting the undo stack.
         self.view.run_command('vi_enter_normal_mode')
