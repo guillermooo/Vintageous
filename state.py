@@ -525,11 +525,6 @@ class VintageState(object):
         self.update_status()
 
     def reset(self, next_mode=None):
-        # Some global data must be kept untouched. For example, that's the case of the lastest repeat
-        # command. When switching files, Vintageous will be init'ed, and that data will be overwritten,
-        # but since we're not creating a new command, it doesn't make sense.
-        # FIXME: Not every action should update the latest repeat command.
-
         had_action = self.action
 
         self.motion = None
