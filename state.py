@@ -681,8 +681,8 @@ class VintageStateTracker(sublime_plugin.EventListener):
         _init_vintageous(view)
 
     def on_post_save(self, view):
-        # Ensure the carets are within valid bounds. For instance, this is for example a concern
-        # when `trim_trailing_white_space_on_save` is set to true.
+        # Ensure the carets are within valid bounds. For instance, this is a concern when
+        # `trim_trailing_white_space_on_save` is set to true.
         state = VintageState(view)
         view.run_command('_vi_adjust_carets', {'mode': state.mode})
 
