@@ -219,3 +219,167 @@ class VintageStateTests_update_repeat_command(unittest.TestCase):
 
             self.state.update_repeat_command()
             self.assertEqual(self.state.repeat_command, ('sequence', {'action': 'fizz', 'args': {}}, 0))
+
+
+class TestSomeProperties(unittest.TestCase):
+    def setUp(self):
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.window().settings().erase('vintage')
+        self.state = VintageState(TestsState.view)
+
+    def testCantSetAction(self):
+        self.state.action = 'foo'
+        self.assertEqual(self.state.view.settings().get('vintage')['action'], 'foo')
+
+    def testCantGetAction(self):
+        self.state.action = 'foo'
+        self.assertEqual(self.state.action, 'foo')
+
+    def testCantSetMotion(self):
+        self.state.motion = 'foo'
+        self.assertEqual(self.state.view.settings().get('vintage')['motion'], 'foo')
+
+    def testCantGetMotion(self):
+        self.state.motion = 'foo'
+        self.assertEqual(self.state.motion, 'foo')
+
+    def testCantSetRegister(self):
+        self.state.register = 'foo'
+        self.assertEqual(self.state.view.settings().get('vintage')['register'], 'foo')
+
+    def testCantGetRegister(self):
+        self.state.register = 'foo'
+        self.assertEqual(self.state.register, 'foo')
+
+    def testCantSetUserInput(self):
+        self.state.user_input = 'foo'
+        self.assertEqual(self.state.view.settings().get('vintage')['user_input'], 'foo')
+
+    def testCantGetUserInput(self):
+        self.state.user_input = 'foo'
+        self.assertEqual(self.state.user_input, 'foo')
+
+    def testCantSetExpectingRegister(self):
+        self.state.expecting_register = 'foo'
+        self.assertEqual(self.state.view.settings().get('vintage')['expecting_register'], 'foo')
+
+    def testCantGetExpectingRegister(self):
+        self.state.expecting_register = 'foo'
+        self.assertEqual(self.state.expecting_register, 'foo')
+
+    def testCantSetExpectingUserInput(self):
+        self.state.expecting_user_input = 'foo'
+        self.assertEqual(self.state.view.settings().get('vintage')['expecting_user_input'], 'foo')
+
+    def testCantGetExpectingUserInput(self):
+        self.state.expecting_user_input = 'foo'
+        self.assertEqual(self.state.expecting_user_input, 'foo')
+
+    def testCantSetExpectingCancelAction(self):
+        self.state.cancel_action = 'foo'
+        self.assertEqual(self.state.view.settings().get('vintage')['cancel_action'], 'foo')
+
+    def testCantGetExpectingCancelAction(self):
+        self.state.cancel_action = 'foo'
+        self.assertEqual(self.state.cancel_action, 'foo')
+
+    def testCantSetMode(self):
+        self.state.mode = 'foo'
+        self.assertEqual(self.state.view.settings().get('vintage')['mode'], 'foo')
+
+    def testCantGetMode(self):
+        self.state.mode = 'foo'
+        self.assertEqual(self.state.mode, 'foo')
+
+    def testCantSetMotionDigits(self):
+        self.state.motion_digits = 'foo'
+        self.assertEqual(self.state.view.settings().get('vintage')['motion_digits'], 'foo')
+
+    def testCantGetMotionDigits(self):
+        self.state.motion_digits = 'foo'
+        self.assertEqual(self.state.motion_digits, 'foo')
+
+    def testCantSetActionDigits(self):
+        self.state.action_digits = 'foo'
+        self.assertEqual(self.state.view.settings().get('vintage')['action_digits'], 'foo')
+
+    def testCantGetActionDigits(self):
+        self.state.action_digits = 'foo'
+        self.assertEqual(self.state.action_digits, 'foo')
+
+    def testCantSetNextMode(self):
+        self.state.next_mode = 'foo'
+        self.assertEqual(self.state.view.settings().get('vintage')['next_mode'], 'foo')
+
+    def testCantGetNextMode(self):
+        self.state.next_mode = 'foo'
+        self.assertEqual(self.state.next_mode, 'foo')
+
+    def testCantSetNextModeCommand(self):
+        self.state.next_mode_command = 'foo'
+        self.assertEqual(self.state.view.settings().get('vintage')['next_mode_command'], 'foo')
+
+    def testCantGetNextModeCommand(self):
+        self.state.next_mode_command = 'foo'
+        self.assertEqual(self.state.next_mode_command, 'foo')
+
+
+class Test_reset(unittest.TestCase):
+    def setUp(self):
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.window().settings().erase('vintage')
+        self.state = VintageState(TestsState.view)
+
+    def testResetsData(self):
+        self.state.action = 'action'
+        self.state.motion = 'motion'
+        self.state.register = 'register'
+        self.state.user_input = 'user_input'
+        self.state.expecting_register = 'expecting_register'
+        self.state.expecting_user_input = 'expecting_user_input'
+        self.state.cancel_action = 'cancel_action'
+        self.state.mode = 'mode'
+        self.state.next_mode = 'next_mode'
+        self.state.next_mode_command = 'next_mode_command'
+
+        self.state.reset()
+
+        self.assertEqual(self.state.action, None)
+        self.assertEqual(self.state.motion, None)
+        self.assertEqual(self.state.register, None)
+        self.assertEqual(self.state.user_input, None)
+        self.assertEqual(self.state.expecting_register, False)
+        self.assertEqual(self.state.expecting_user_input, False)
+        self.assertEqual(self.state.cancel_action, False)
+        self.assertEqual(self.state.mode, 'mode')
+        self.assertEqual(self.state.next_mode, MODE_NORMAL)
+        self.assertEqual(self.state.next_mode_command, None)
+
+    def testCallsCorrectModeChangeMethod(self):
+        self.state.next_mode = MODE_INSERT
+        self.state.next_mode_command = 'foo'
+
+        # XXX Check the code. Do we actually need to call this method at this point?
+        with mock.patch.object(self.state, 'enter_insert_mode') as m, \
+             mock.patch.object(self.state.view, 'run_command') as rc:
+            self.state.reset()
+            m.assert_called_once_with()
+            rc.assert_called_once_with('foo')
+
+        self.state.reset()
+
+        self.state.next_mode = MODE_NORMAL
+        self.state.next_mode_command = 'bar'
+
+        with mock.patch.object(self.state.view, 'run_command') as m:
+            self.state.reset()
+            m.assert_called_once_with('bar')
+
+    def testDoesNotCallAnyCommandForOtherModes(self):
+        self.state.next_mode = MODE_VISUAL_LINE
+        self.state.next_mode_command = 'foo'
+
+        with mock.patch.object(self.state.view, 'run_command') as rc:
+            self.state.reset()
+            self.assertEqual(rc.call_count, 0)
+
