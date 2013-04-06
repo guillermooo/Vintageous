@@ -27,6 +27,7 @@ test_suites = {
         'registers': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.vi.test_registers'],
         'marks': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.vi.test_marks'],
         'state': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.test_state'],
+        'constants': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.vi.test_constants'],
 }
 
 
