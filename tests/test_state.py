@@ -8,28 +8,31 @@ from Vintageous.test_runner import TestsState
 from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
 from Vintageous.vi.constants import MODE_INSERT
 from Vintageous.vi.constants import MODE_NORMAL
+from Vintageous.vi.constants import MODE_REPLACE
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
+from Vintageous.vi.constants import MODE_NORMAL_INSERT
+from Vintageous.state import _init_vintageous
+import Vintageous.state
 
-
-class VintageStateTests(unittest.TestCase):
+class Test_buffer_was_changed_in_visual_mode(unittest.TestCase):
     def setUp(self):
         TestsState.view.settings().erase('vintage')
         TestsState.view.window().settings().erase('vintage')
         self.state = VintageState(TestsState.view)
 
-    def test_buffer_was_changed_in_visual_mode_AlwaysReportsChangedForNonVisualModes(self):
+    def testAlwaysReportsChangedForNonVisualModes(self):
         self.state.mode = _MODE_INTERNAL_NORMAL
         self.assertTrue(self.state.buffer_was_changed_in_visual_mode())
         self.state.mode = MODE_NORMAL
         self.assertTrue(self.state.buffer_was_changed_in_visual_mode())
 
-    def test_buffer_was_changed_in_visual_mode_ReportsFalseIfCommandHistoryIsEmpty(self):
+    def testReportsFalseIfCommandHistoryIsEmpty(self):
         self.state.mode = MODE_VISUAL
         self.assertEqual(self.state.view.command_history(-1), ('', None, 0))
         self.assertFalse(self.state.buffer_was_changed_in_visual_mode())
 
-    def test_buffer_was_changed_in_visual_mode_ReturnsFalseInVisualModeIfCantFindModifyingCommand(self):
+    def testReturnsFalseInVisualModeIfCantFindModifyingCommand(self):
         self.state.mode = MODE_VISUAL
         # patch command_history
         with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
@@ -42,7 +45,7 @@ class VintageStateTests(unittest.TestCase):
 
             self.assertFalse(self.state.buffer_was_changed_in_visual_mode())
 
-    def test_buffer_was_changed_in_visual_mode_ReturnsTrueInVisualModeIfCanlFindModifyingCommand(self):
+    def testReturnsTrueInVisualModeIfCanlFindModifyingCommand(self):
         self.state.mode = MODE_VISUAL
         # patch command_history
         with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
@@ -55,7 +58,7 @@ class VintageStateTests(unittest.TestCase):
 
             self.assertTrue(self.state.buffer_was_changed_in_visual_mode())
 
-    def test_buffer_was_changed_in_visual_mode_ReturnsFalseInVisualLineModeIfCantFindModifyingCommand(self):
+    def testReturnsFalseInVisualLineModeIfCantFindModifyingCommand(self):
         self.state.mode = MODE_VISUAL_LINE
         # patch command_history
         with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
@@ -68,7 +71,7 @@ class VintageStateTests(unittest.TestCase):
 
             self.assertFalse(self.state.buffer_was_changed_in_visual_mode())
 
-    def test_buffer_was_changed_in_visual_mode_ReturnsTrueInVisualLineModeIfCanFindModifyingCommand(self):
+    def testReturnsTrueInVisualLineModeIfCanFindModifyingCommand(self):
         self.state.mode = MODE_VISUAL_LINE
         # patch command_history
         with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
@@ -128,7 +131,7 @@ class VintageStateTests(unittest.TestCase):
             self.assertFalse(self.state.buffer_was_changed_in_visual_mode())
 
 
-class VintageStateTests_update_repeat_command(unittest.TestCase):
+class Test_update_repeat_command(unittest.TestCase):
     def setUp(self):
         TestsState.view.settings().erase('vintage')
         TestsState.view.window().settings().erase('vintage')
@@ -137,10 +140,10 @@ class VintageStateTests_update_repeat_command(unittest.TestCase):
     def tearDown(self):
         self.state.repeat_command = ('', None, 0)
 
-    def test_update_repeat_command_IsEmptyAfterInstantiation(self):
+    def testIsEmptyAfterInstantiation(self):
         self.assertEqual(self.state.repeat_command, ('', None, 0))
 
-    def test_update_repeat_command_IgnoresEmptyCommands(self):
+    def testIgnoresEmptyCommands(self):
         self.state.repeat_command = ('foo', {}, 0)
         # patch command_history
         with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
@@ -150,7 +153,7 @@ class VintageStateTests_update_repeat_command(unittest.TestCase):
             self.state.update_repeat_command()
             self.assertEqual(self.state.repeat_command, ('foo', {}, 0))
 
-    def test_update_repeat_command_CanUpdateIfNativeModifyingCommandFound(self):
+    def testCanUpdateIfNativeModifyingCommandFound(self):
         self.state.repeat_command = ('foo', {}, 0)
         # patch command_history
         with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
@@ -160,7 +163,7 @@ class VintageStateTests_update_repeat_command(unittest.TestCase):
             self.state.update_repeat_command()
             self.assertEqual(self.state.repeat_command, ('bar', {}, 0))
 
-    def test_update_repeat_command_CommandStaysTheSameIfIdenticalModifyingCommandFound(self):
+    def testCommandStaysTheSameIfIdenticalModifyingCommandFound(self):
         self.state.repeat_command = ('foo', {}, 0)
         # patch command_history
         with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
@@ -170,7 +173,7 @@ class VintageStateTests_update_repeat_command(unittest.TestCase):
             self.state.update_repeat_command()
             self.assertEqual(self.state.repeat_command, ('foo', {}, 0))
 
-    def test_update_repeat_command_IgnoreNonModifyingViRunCommands(self):
+    def testIgnoreNonModifyingViRunCommands(self):
         self.state.repeat_command = ('foo', {}, 0)
         # patch command_history
         with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
@@ -180,7 +183,7 @@ class VintageStateTests_update_repeat_command(unittest.TestCase):
             self.state.update_repeat_command()
             self.assertEqual(self.state.repeat_command, ('foo', {}, 0))
 
-    def test_update_repeat_command_CanUpdateIfViRunModifyingCommandFound(self):
+    def testCanUpdateIfViRunModifyingCommandFound(self):
         self.state.repeat_command = ('foo', {}, 0)
         # patch command_history
         with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
@@ -190,7 +193,7 @@ class VintageStateTests_update_repeat_command(unittest.TestCase):
             self.state.update_repeat_command()
             self.assertEqual(self.state.repeat_command, ('vi_run', {'action': 'fizz', 'args': {}}, 0))
 
-    def test_update_repeat_command_CommandStaysTheSameIfIdenticalViRunModifyingCommandFound(self):
+    def testCommandStaysTheSameIfIdenticalViRunModifyingCommandFound(self):
         self.state.repeat_command = ('vi_run', {'action': 'fizz', 'args': {}}, 0)
         # patch command_history
         with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
@@ -200,7 +203,7 @@ class VintageStateTests_update_repeat_command(unittest.TestCase):
             self.state.update_repeat_command()
             self.assertEqual(self.state.repeat_command, ('vi_run', {'action': 'fizz', 'args': {}}, 0))
 
-    def test_update_repeat_command_CanUpdateIfSequenceCommandFound(self):
+    def testCanUpdateIfSequenceCommandFound(self):
         self.state.repeat_command = ('foo', {}, 0)
         # patch command_history
         with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
@@ -210,7 +213,7 @@ class VintageStateTests_update_repeat_command(unittest.TestCase):
             self.state.update_repeat_command()
             self.assertEqual(self.state.repeat_command, ('sequence', {}, 0))
 
-    def test_update_repeat_command_CommandStaysTheSameIfIdenticalSequenceModifyingCommandFound(self):
+    def testCommandStaysTheSameIfIdenticalSequenceModifyingCommandFound(self):
         self.state.repeat_command = ('sequence', {'action': 'fizz', 'args': {}}, 0)
         # patch command_history
         with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
@@ -221,7 +224,7 @@ class VintageStateTests_update_repeat_command(unittest.TestCase):
             self.assertEqual(self.state.repeat_command, ('sequence', {'action': 'fizz', 'args': {}}, 0))
 
 
-class TestSomeProperties(unittest.TestCase):
+class TestVintageStateProperties(unittest.TestCase):
     def setUp(self):
         TestsState.view.settings().erase('vintage')
         TestsState.view.window().settings().erase('vintage')
@@ -405,3 +408,72 @@ class Test_reset(unittest.TestCase):
         with mock.patch.object(self.state, 'update_repeat_command') as m:
             self.state.reset()
             self.assertEqual(m.call_count, 0)
+
+
+class Test__init_vintageous(unittest.TestCase):
+    def setUp(self):
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.window().settings().erase('vintage')
+        TestsState.view.settings().erase('is_widget')
+        self.state = VintageState(TestsState.view)
+
+    def testAbortsIfPassedWidget(self):
+        self.state.action = 'foo'
+        self.state.view.settings().set('is_widget', True)
+        _init_vintageous(self.state.view)
+        self.assertEqual(self.state.action, 'foo')
+
+    def testAbortsIfPassedViewWithoutSettings(self):
+        self.state.action = 'foo'
+        _init_vintageous(object())
+        self.assertEqual(self.state.action, 'foo')
+
+    def testAbortsIfAskedToNotResetDuringInit(self):
+        self.state.action = 'foo'
+        with mock.patch.object(Vintageous.state, '_dont_reset_during_init') as x:
+            x.return_value = True
+            _init_vintageous(self.state.view)
+            self.assertEqual(self.state.action, 'foo')
+
+    def testResetIsCalled(self):
+        self.state.action = 'foo'
+        with mock.patch.object(VintageState, 'reset') as m:
+            _init_vintageous(self.state.view)
+            self.assertEqual(m.call_count, 1)
+
+    def testResets(self):
+        self.state.action = 'foo'
+        _init_vintageous(self.state.view)
+        self.assertEqual(self.state.action, None)
+
+    def testCallsEnterNormalModeCommandIfStateIsInVisualMode(self):
+        self.state.mode = MODE_VISUAL
+        with mock.patch.object(self.state.view, 'run_command') as m:
+            _init_vintageous(self.state.view)
+            m.assert_called_once_with('enter_normal_mode')
+
+    def testCallsEnterNormalModeCommandIfStateIsInVisualLineMode(self):
+        self.state.mode = MODE_VISUAL_LINE
+        with mock.patch.object(self.state.view, 'run_command') as m:
+            _init_vintageous(self.state.view)
+            m.assert_called_once_with('enter_normal_mode')
+
+    def testCallsEnterNormalModeFromInsertModeCommandIfStateIsInInsertMode(self):
+        self.state.mode = MODE_INSERT
+        with mock.patch.object(self.state.view, 'run_command') as m:
+            _init_vintageous(self.state.view)
+            m.assert_called_once_with('vi_enter_normal_mode_from_insert_mode')
+
+    def testCallsEnterNormalModeFromInsertModeCommandIfStateIsInReplaceMode(self):
+        self.state.mode = MODE_REPLACE
+        with mock.patch.object(self.state.view, 'run_command') as m:
+            _init_vintageous(self.state.view)
+            m.assert_called_once_with('vi_enter_normal_mode_from_insert_mode')
+
+    def testCallsRunNormalInsertModeActionsCommandIfStateIsInNormalInsertMode(self):
+        self.state.mode = MODE_NORMAL_INSERT
+        with mock.patch.object(self.state.view, 'run_command') as m:
+            _init_vintageous(self.state.view)
+            m.assert_called_once_with('vi_run_normal_insert_mode_actions')
+
+    # TODO: Test that enter_normal_mode() gets called when it should.

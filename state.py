@@ -40,8 +40,7 @@ _dont_reset_during_init = False
 def _init_vintageous(view):
     global _dont_reset_during_init
     # Operate only on actual views.
-    if (not getattr(view, 'settings') or
-            view.settings().get('is_widget')):
+    if (not getattr(view, 'settings', None) or view.settings().get('is_widget')):
         return
 
     if _dont_reset_during_init:
