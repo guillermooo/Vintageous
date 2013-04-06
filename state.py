@@ -545,7 +545,7 @@ class VintageState(object):
 
         self.update_status()
 
-    def reset(self, next_mode=None):
+    def reset(self):
         had_action = self.action
 
         self.motion = None
@@ -566,16 +566,9 @@ class VintageState(object):
         self.motion_digits = []
         self.action_digits = []
 
-        if self.next_mode == MODE_INSERT:
-            # XXX: Is this redundant?
-            self.enter_insert_mode()
+        if self.next_mode in (MODE_NORMAL, MODE_INSERT):
             if self.next_mode_command:
                 self.view.run_command(self.next_mode_command)
-        elif self.next_mode == MODE_NORMAL:
-            if self.next_mode_command:
-                self.view.run_command(self.next_mode_command)
-        else:
-            pass
 
         # Sometimes we'll reach this point after performing motions. If we have a stored repeat
         # command in view A, we switch to view B and do a motion, we don't want .update_repeat_command()
@@ -590,7 +583,6 @@ class VintageState(object):
             self.update_repeat_command()
 
         self.next_mode = MODE_NORMAL
-
         self.next_mode_command = None
 
     def update_repeat_command(self):

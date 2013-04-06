@@ -340,14 +340,14 @@ class ViExpressionRegister(sublime_plugin.TextCommand):
                     state.registers[REG_EXPRESSION] = rv
                 else:
                     self.view.run_command('insert_snippet', {'contents': str(rv[0])})
-                    state.reset(next_mode=MODE_INSERT)
+                    state.reset()
             except:
                 sublime.status_message("Vintageous: Invalid expression.")
                 on_cancel()
 
         def on_cancel():
             state = VintageState(self.view)
-            state.reset(next_mode=MODE_INSERT)
+            state.reset()
 
         self.view.window().show_input_panel('', '', on_done, None, on_cancel)
 

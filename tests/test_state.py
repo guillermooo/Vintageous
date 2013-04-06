@@ -360,10 +360,8 @@ class Test_reset(unittest.TestCase):
         self.state.next_mode_command = 'foo'
 
         # XXX Check the code. Do we actually need to call this method at this point?
-        with mock.patch.object(self.state, 'enter_insert_mode') as m, \
-             mock.patch.object(self.state.view, 'run_command') as rc:
+        with mock.patch.object(self.state.view, 'run_command') as rc:
             self.state.reset()
-            m.assert_called_once_with()
             rc.assert_called_once_with('foo')
 
         self.state.reset()
@@ -375,7 +373,7 @@ class Test_reset(unittest.TestCase):
             self.state.reset()
             m.assert_called_once_with('bar')
 
-    def testDoesNotCallAnyCommandForOtherModes(self):
+    def testDoesNotCallAnyModeChangeCommandForOtherModes(self):
         self.state.next_mode = MODE_VISUAL_LINE
         self.state.next_mode_command = 'foo'
 
@@ -383,3 +381,27 @@ class Test_reset(unittest.TestCase):
             self.state.reset()
             self.assertEqual(rc.call_count, 0)
 
+    def testDoesNotCallAnyModeChangeCommandIfNotSpecified(self):
+        self.state.next_mode = MODE_NORMAL
+
+        with mock.patch.object(self.state.view, 'run_command') as rc:
+            self.state.reset()
+            self.assertEqual(rc.call_count, 0)
+
+        self.state.next_mode = MODE_VISUAL
+
+        with mock.patch.object(self.state.view, 'run_command') as rc:
+            self.state.reset()
+            self.assertEqual(rc.call_count, 0)
+
+    def testUpdatesRepeatCommandIfThereWasAnAction(self):
+        self.state.action = 'foo'
+
+        with mock.patch.object(self.state, 'update_repeat_command') as m:
+            self.state.reset()
+            self.assertEqual(m.call_count, 1)
+
+    def testDoesNotUpdateRepeatCommandIfThereWasNoAction(self):
+        with mock.patch.object(self.state, 'update_repeat_command') as m:
+            self.state.reset()
+            self.assertEqual(m.call_count, 0)
