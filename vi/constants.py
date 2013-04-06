@@ -57,11 +57,6 @@ INCOMPLETE_ACTIONS = ('vi_g_action', 'vi_z_action', 'vi_ctrl_w_action',
                       'vi_ctrl_r_action')
 ACTIONS_EXITING_TO_INSERT_MODE = ('vi_ctrl_r_action',)
 
-MODE_COMMAND_MAP = {
-    MODE_NORMAL: ['vi_enter_normal_mode'],
-    MODE_INSERT: ['vi_enter_insert_mode'],
-}
-
 
 # TODO: This does not belong here.
 def mode_to_str(mode):
