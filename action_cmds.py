@@ -751,3 +751,53 @@ class _vi_g_v(IrreversibleTextCommand):
         self.view.sel().clear()
         for r in regs:
             self.view.sel().add(r)
+
+
+class ViQ(IrreversibleTextCommand):
+    def run(self):
+        state = VintageState(self.view)
+        state.action = 'vi_q'
+        state.expecting_user_input = True
+
+
+class _vi_q(IrreversibleTextCommand):
+    def run(self, name=None):
+        state = VintageState(self.view)
+
+        if name == None and not state.is_recording:
+            return
+
+        if not state.is_recording:
+            state._latest_macro_name = name
+            state.is_recording = True
+            self.view.run_command('start_record_macro')
+            return
+
+        if state.is_recording:
+            self.view.run_command('stop_record_macro')
+            state.is_recording = False
+            state.reset()
+
+            # Store the macro away.
+            modifying_cmd = self.view.command_history(0, True)
+            state.latest_macro = modifying_cmd
+
+
+class _vi_run_macro(IrreversibleTextCommand):
+    def run(self, name=None):
+        if not (name and VintageState(self.view).latest_macro):
+            return
+
+        if name == '@':
+            # Run the macro recorded latest.
+            self.view.run_command('run_macro')
+        else:
+            # TODO: Implement macro registers.
+            self.view.run_command('run_command')
+
+
+class ViAt(IrreversibleTextCommand):
+    def run(self):
+        state = VintageState(self.view)
+        state.action = 'vi_at'
+        state.expecting_user_input = True

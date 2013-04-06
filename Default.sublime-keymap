@@ -215,6 +215,11 @@
 	{ "keys": ["b"], "command": "set_action", "args": {"action": "vi_z_b"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 	{ "keys": ["t"], "command": "set_action", "args": {"action": "vi_z_t"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 
+	{ "keys": ["q"], "command": "vi_q", "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["q"], "command": "_vi_q", "context": [{"key": "vi_is_recording_macro"}] },
+
+	{ "keys": ["@"], "command": "vi_at", "context": [{"key": "vi_mode_normal"}] },
+
 	// Pane management
 	{ "keys": ["ctrl+w"], "command": "set_action", "args": {"action": "vi_ctrl_w_action"}, "context": [{"key": "setting.command_mode"}]},
 	{ "keys": ["ctrl+v"], "command": "set_action", "args": {"action": "vi_ctrl_w_v"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},

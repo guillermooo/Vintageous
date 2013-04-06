@@ -1,3 +1,6 @@
+0.8.4
+	- Basic implementation of macro recording: Enable q and @ and a single macro register.
+
 0.8.3
 	- Improve count handling in . command.
 	

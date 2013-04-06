@@ -126,6 +126,10 @@ class KeyContext(object):
         value = motion_digits or action_digits
         return self._check(value, operator, operand, match_all)
 
+    def vi_is_recording_macro(self, key, operator, operand, match_all):
+        value = self.state.is_recording
+        return self._check(value, operator, operand, match_all)
+
     def vi_can_enter_any_visual_mode(self, key, operator, operand, match_all):
         sels = self.state.view.sel()
         rv = True

@@ -812,3 +812,20 @@ def vi_equals_equals(vi_cmd_data):
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
+
+def vi_q(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['action']['command'] = '_vi_q'
+    vi_cmd_data['action']['args'] = {'name': vi_cmd_data['user_input']}
+    vi_cmd_data['count'] = 1
+
+    return vi_cmd_data
+
+
+def vi_at(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['action']['command'] = '_vi_run_macro'
+    vi_cmd_data['action']['args'] = {'name': vi_cmd_data['user_input']}
+    vi_cmd_data['count'] = 1
+
+    return vi_cmd_data

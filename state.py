@@ -85,9 +85,14 @@ class VintageState(object):
     registers = Registers()
     context = KeyContext()
     marks = Marks()
+    macros = {}
 
     # Let's imitate Sublime Text's .command_history() 'null' value.
     _latest_repeat_command = ('', None, 0)
+
+    # Stores the latest recorded macro.
+    _latest_macro = None
+    _is_recording = False
 
     def __init__(self, view):
         self.view = view
@@ -389,6 +394,22 @@ class VintageState(object):
     @repeat_command.setter
     def repeat_command(self, value):
         VintageState._latest_repeat_command = value
+
+    @property
+    def latest_macro(self):
+        return VintageState._latest_macro
+
+    @latest_macro.setter
+    def latest_macro(self, value):
+        VintageState._latest_macro = value
+
+    @property
+    def is_recording(self):
+        return VintageState._is_recording
+
+    @is_recording.setter
+    def is_recording(self, value):
+        VintageState._is_recording = value
 
     def parse_motion(self):
         vi_cmd_data = CmdData(self)
