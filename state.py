@@ -459,6 +459,7 @@ class VintageState(object):
 
         # This should happen only at initialization.
         # XXX: This is effectively zeroing xpos. Shouldn't we move this into new_vi_cmd_data()?
+        # XXX: REFACTOR
         if vi_cmd_data['xpos'] is None:
             xpos = 0
             if self.view.sel():
@@ -466,14 +467,12 @@ class VintageState(object):
             self.xpos = xpos
             vi_cmd_data['xpos'] = xpos
 
-        # Make sure we run NORMAL mode actions taking motions in _MODE_INTERNAL_NORMAL mode.
-        if ((self.mode in (MODE_VISUAL, MODE_VISUAL_LINE)) or
-            (self.motion and self.action) or
-            (self.action and self.mode == MODE_NORMAL)):
-                if self.mode not in (MODE_VISUAL, MODE_VISUAL_LINE):
-                    vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
-                else:
-                    vi_cmd_data['mode'] = self.mode
+        # Actions originating in normal mode are run in a pseudomode that helps to distiguish
+        # between visual mode and this case (both use selections, either implicitly or
+        # explicitly).
+        if self.mode == MODE_NORMAL:
+            if ((self.motion and self.action) or self.action):
+                vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
 
         motion = self.motion
         motion_func = None
