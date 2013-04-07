@@ -115,7 +115,7 @@ class VintageState(object):
         if self.view.overwrite_status():
             self.view.set_overwrite_status(False)
 
-        # Hide outlined regions created by searching.
+        # Clear regions outlined by buffer search commands.
         self.view.erase_regions('vi_search')
 
         if not self.buffer_was_changed_in_visual_mode():
