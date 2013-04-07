@@ -470,8 +470,7 @@ class VintageState(object):
         # Actions originating in normal mode are run in a pseudomode that helps to distiguish
         # between visual mode and this case (both use selections, either implicitly or
         # explicitly).
-        if self.mode == MODE_NORMAL:
-            if ((self.motion and self.action) or self.action):
+        if self.action and (self.mode == MODE_NORMAL):
                 vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
 
         motion = self.motion
