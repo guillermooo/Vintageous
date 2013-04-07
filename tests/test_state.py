@@ -16,6 +16,7 @@ from Vintageous.vi.constants import digraphs
 from Vintageous.vi.constants import DIGRAPH_MOTION
 from Vintageous.vi.constants import DIGRAPH_ACTION
 from Vintageous.state import _init_vintageous
+from Vintageous.vi.cmd_data import CmdData
 import Vintageous.state
 
 class Test_buffer_was_changed_in_visual_mode(unittest.TestCase):
@@ -655,3 +656,70 @@ class Test_xpos(unittest.TestCase):
     def testCanGetDefault(self):
         self.state.xpos = 'foo'
         self.assertEqual(self.state.xpos, None)
+
+
+class Test_parse_motion(unittest.TestCase):
+    def setUp(self):
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.window().settings().erase('vintage')
+        TestsState.view.settings().erase('is_widget')
+        self.state = VintageState(TestsState.view)
+
+    def tearDown(self):
+        self.state.view.sel().clear()
+        self.state.view.sel().add(sublime.Region(0, 0))
+
+    def testCanParseWithUnknownMotion(self):
+        self.state.motion = 'foobar'
+        self.assertRaises(AttributeError, self.state.parse_motion)
+
+    def testSetsXposIfItsNone(self):
+        self.assertEqual(self.state.xpos, None)
+        cmd_data = self.state.parse_motion()
+        # FIXME: The returned value looks like a mistake. It should rather be
+        # a scalar?
+        self.assertEqual(cmd_data['xpos'], (0, 0))
+
+    def testSetsXposToTheCurrentXposInTheView(self):
+        self.state.view.sel().clear()
+
+        pt = self.state.view.text_point(10, 10)
+        self.state.view.sel().add(sublime.Region(pt, pt))
+
+        cmd_data = self.state.parse_motion()
+        self.assertEqual(cmd_data['xpos'], (10, 10))
+
+        pt = self.state.view.text_point(10, 10)
+        self.state.view.sel().add(sublime.Region(pt, pt + 1))
+
+        cmd_data = self.state.parse_motion()
+        self.assertEqual(cmd_data['xpos'], (10, 11))
+
+    def testCmdDataDoesntChangeIfNoMotionProvided(self):
+        cmd_data = CmdData(self.state)
+        cmd_data['xpos'] = (0, 0)
+        new_cmd_data = self.state.parse_motion()
+        self.assertEqual(cmd_data, new_cmd_data)
+
+    def testActionInNormalModeSwitchesToInternalNormalMode(self):
+        self.state.mode = MODE_NORMAL
+        self.state.action = 'foobar'
+        cmd_data = self.state.parse_motion()
+        self.assertEqual(cmd_data['mode'], _MODE_INTERNAL_NORMAL)
+
+    def testActionAndMotionInNormalModeSwitchesToInternalNormalMode(self):
+        self.state.mode = MODE_NORMAL
+        self.state.motion = 'vi_l'
+        self.state.action = 'bar'
+        cmd_data = self.state.parse_motion()
+        self.assertEqual(cmd_data['mode'], _MODE_INTERNAL_NORMAL)
+
+    def testKeepSameModeIfInVisualMode(self):
+        self.state.mode = MODE_VISUAL
+        cmd_data = self.state.parse_motion()
+        self.assertEqual(cmd_data['mode'], MODE_VISUAL)
+
+    def testKeepSameModeIfInVisualLineMode(self):
+        self.state.mode = MODE_VISUAL_LINE
+        cmd_data = self.state.parse_motion()
+        self.assertEqual(cmd_data['mode'], MODE_VISUAL_LINE)
