@@ -1,7 +1,0 @@
-HELP
-
-	:help operator-pending
-	... for an overview of vim modes.
-
-	:help :omap
-	:help linewise

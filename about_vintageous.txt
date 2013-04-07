@@ -1,4 +1,0 @@
-DEBUGGING TIPS:
-
-For actions, remove the actual action and the follow-up mode, and you should
-be able to see the selection on which the action would have operated.
