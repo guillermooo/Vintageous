@@ -375,7 +375,6 @@ class VintageState(object):
     @last_buffer_search.setter
     def last_buffer_search(self, value):
         self.settings.vi['last_buffer_search'] = value
-        self.expecting_user_input = False
 
     @property
     def last_character_search(self):
@@ -385,8 +384,8 @@ class VintageState(object):
 
     @last_character_search.setter
     def last_character_search(self, value):
+        # TODO: Should this piece of data be global instead of local to each buffer?
         self.settings.vi['last_character_search'] = value
-        self.expecting_user_input = False
 
     @property
     def xpos(self):
