@@ -471,7 +471,7 @@ class VintageState(object):
         # between visual mode and this case (both use selections, either implicitly or
         # explicitly).
         if self.action and (self.mode == MODE_NORMAL):
-                vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
+            vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
 
         motion = self.motion
         motion_func = None
