@@ -709,6 +709,7 @@ class Test_parse_motion(unittest.TestCase):
 
     def testActionAndMotionInNormalModeSwitchesToInternalNormalMode(self):
         self.state.mode = MODE_NORMAL
+        # FIXME: We're introducing a dependency in this test.
         self.state.motion = 'vi_l'
         self.state.action = 'bar'
         cmd_data = self.state.parse_motion()

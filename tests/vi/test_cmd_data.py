@@ -123,3 +123,12 @@ class Test_CmdData(unittest.TestCase):
         self.assertEqual(self.cmd_data['synthetize_new_line_at_eof'], False)
         self.assertEqual(self.cmd_data['_mark_groups_for_gluing'], True)
         self.assertEqual(self.cmd_data['populates_small_delete_register'], False)
+
+    def testCurrentModeIsCarriedOver(self):
+        self.state.mode = MODE_VISUAL
+        cmd_data = CmdData(self.state)
+        self.assertEqual(cmd_data['mode'], MODE_VISUAL)
+
+        self.state.mode = MODE_VISUAL_LINE
+        cmd_data = CmdData(self.state)
+        self.assertEqual(cmd_data['mode'], MODE_VISUAL_LINE)

@@ -488,7 +488,7 @@ class VintageState(object):
         return vi_cmd_data
 
     def parse_action(self, vi_cmd_data):
-        """Updates and returns the passed-in CmdData instance with parsed data about the action.
+        """Updates and returns the passed-in CmdData instance using parsed data about the action.
         """
         action_func = getattr(actions, self.action)
         if action_func:
