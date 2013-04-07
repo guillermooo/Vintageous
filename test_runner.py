@@ -28,6 +28,7 @@ test_suites = {
         'marks': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.vi.test_marks'],
         'state': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.test_state'],
         'constants': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.vi.test_constants'],
+        'cmd_data': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.vi.test_cmd_data'],
 }
 
 
