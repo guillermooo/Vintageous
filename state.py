@@ -478,7 +478,11 @@ class VintageState(object):
         motion = self.motion
         motion_func = None
         if motion:
-            motion_func = getattr(motions, self.motion)
+            try:
+                motion_func = getattr(motions, self.motion)
+            except AttributeError:
+                raise AttributeError("Vintageous: Unknown motion: '{0}'".format(self.motion))
+
         if motion_func:
             vi_cmd_data = motion_func(vi_cmd_data)
 
