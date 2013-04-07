@@ -23,7 +23,7 @@ class TestsState(object):
         TestsState.suite = None
 
 test_suites = {
-        'settings': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.settings.test_settings'],
+        'settings': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.vi.test_settings'],
         'registers': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.vi.test_registers'],
         'marks': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.vi.test_marks'],
         'state': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.test_state'],
