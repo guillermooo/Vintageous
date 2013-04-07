@@ -12,6 +12,9 @@ from Vintageous.vi.constants import MODE_REPLACE
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
 from Vintageous.vi.constants import MODE_NORMAL_INSERT
+from Vintageous.vi.constants import digraphs
+from Vintageous.vi.constants import DIGRAPH_MOTION
+from Vintageous.vi.constants import DIGRAPH_ACTION
 from Vintageous.state import _init_vintageous
 import Vintageous.state
 
@@ -85,7 +88,7 @@ class Test_buffer_was_changed_in_visual_mode(unittest.TestCase):
             self.assertTrue(self.state.buffer_was_changed_in_visual_mode())
 
     @unittest.skip("Not implemented.")
-    def test_buffer_was_changed_in_visual_mode_IgnoresNonModifyingCommandsThatAreTrueCommands(self):
+    def test_IgnoresNonModifyingCommandsThatAreTrueCommands(self):
         # Leave this here for documentation. We need to exclude commands that do not modify the
         # buffer, although are treated as other commands.
 
@@ -99,7 +102,7 @@ class Test_buffer_was_changed_in_visual_mode(unittest.TestCase):
             cmd_hist.side_effect = reversed(items)
             self.assertFalse(self.state.buffer_was_changed_in_visual_mode())
 
-    def test_buffer_was_changed_in_visual_mode_ReturnsFalseWhenWeExceedLookUpsLimit(self):
+    def test_ReturnsFalseWhenWeExceedLookUpsLimit(self):
         self.state.mode = MODE_VISUAL
         # patch command_history
         with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
@@ -110,7 +113,7 @@ class Test_buffer_was_changed_in_visual_mode(unittest.TestCase):
 
             self.assertFalse(self.state.buffer_was_changed_in_visual_mode())
 
-    def test_buffer_was_changed_in_visual_mode_ReturnsTrueIfLastCommandInspectedIsModifyingCommand(self):
+    def test_ReturnsTrueIfLastCommandInspectedIsModifyingCommand(self):
         self.state.mode = MODE_VISUAL
         with mock.patch.object(self.state.view, 'command_history') as cmd_hist:
             many_items = [('xxx', {}, 0),] * 248
@@ -119,7 +122,7 @@ class Test_buffer_was_changed_in_visual_mode(unittest.TestCase):
 
             self.assertTrue(self.state.buffer_was_changed_in_visual_mode())
 
-    def test_buffer_was_changed_in_visual_mode_ReturnsFalseIfNoModifyingCommandFoundAndWeHitBottomOfUndoStack(self):
+    def test_ReturnsFalseIfNoModifyingCommandFoundAndWeHitBottomOfUndoStack(self):
         # XXX: This should actually never happen in visual mode! It would mean that the opening
         # vi_enter_visual_mode command was missing.
         self.state.mode = MODE_VISUAL
@@ -318,6 +321,9 @@ class TestVintageStateProperties(unittest.TestCase):
         self.state.next_mode = 'foo'
         self.assertEqual(self.state.next_mode, 'foo')
 
+    def testCanGetDefaultNextMode(self):
+        self.assertEqual(self.state.next_mode, MODE_NORMAL)
+
     def testCantSetNextModeCommand(self):
         self.state.next_mode_command = 'foo'
         self.assertEqual(self.state.view.settings().get('vintage')['next_mode_command'], 'foo')
@@ -477,3 +483,175 @@ class Test__init_vintageous(unittest.TestCase):
             m.assert_called_once_with('vi_run_normal_insert_mode_actions')
 
     # TODO: Test that enter_normal_mode() gets called when it should.
+
+
+class Test_action(unittest.TestCase):
+    def setUp(self):
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.window().settings().erase('vintage')
+        TestsState.view.settings().erase('is_widget')
+        self.state = VintageState(TestsState.view)
+
+    def canSet(self):
+        self.state.action = 'foo'
+        self.assertEqual(self.state.action, 'foo')
+
+    def testTriesToFindDigraph(self):
+        self.state.action = 'xxx'
+
+        with mock.patch.dict(digraphs, {('xxx', 'yyy'): ('ooo', None)}):
+            self.state.action = 'yyy'
+            self.assertEqual(self.state.action, 'ooo')
+
+    def testCanFindDigraphMotion(self):
+        self.state.action = 'xxx'
+        subst = {('xxx', 'xxx'): ('ooo', DIGRAPH_MOTION)}
+
+        with mock.patch.dict(digraphs, subst):
+            self.state.action = 'xxx'
+            self.assertEqual(self.state.motion, 'ooo')
+            self.assertEqual(self.state.action, None)
+
+    def testCanFindDigraphAction(self):
+        self.state.action = 'xxx'
+        subst = {('xxx', 'xxx'): ('ooo', DIGRAPH_ACTION)}
+
+        with mock.patch.dict(digraphs, subst):
+            self.state.action = 'xxx'
+            self.assertEqual(self.state.motion, None)
+            self.assertEqual(self.state.action, 'ooo')
+
+    def testCancelActionIfNoMatchFound(self):
+        self.state.action = 'xxx'
+
+        with mock.patch.dict(digraphs, {}):
+            self.state.action = 'xxx'
+            self.assertEqual(self.state.action, 'xxx')
+            self.assertEqual(self.state.motion, None)
+            self.assertTrue(self.state.cancel_action)
+
+
+class Test_count(unittest.TestCase):
+    def setUp(self):
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.window().settings().erase('vintage')
+        TestsState.view.settings().erase('is_widget')
+        self.state = VintageState(TestsState.view)
+
+    def testCanReturnDefault(self):
+        self.assertEqual(self.state.count, 1)
+
+    def testReturnsExpectedCount(self):
+        self.state.motion_digits = ['2']
+        self.assertEqual(self.state.count, 2)
+        self.state.action_digits = ['2']
+        self.assertEqual(self.state.count, 2 * 2)
+        self.state.motion_digits = []
+        self.assertEqual(self.state.count, 2)
+
+
+class Test_push_action_digit(unittest.TestCase):
+    def setUp(self):
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.window().settings().erase('vintage')
+        TestsState.view.settings().erase('is_widget')
+        self.state = VintageState(TestsState.view)
+
+    def testCanAddOneItemWhenListIsEmpty(self):
+        self.state.push_action_digit("1")
+        self.assertEqual(self.state.action_digits, ["1"])
+
+    def testCanAppendMoreDigits(self):
+        self.state.push_action_digit("1")
+        self.state.push_action_digit("1")
+        self.assertEqual(self.state.action_digits, ["1", "1"])
+
+
+class Test_push_motion_digit(unittest.TestCase):
+    def setUp(self):
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.window().settings().erase('vintage')
+        TestsState.view.settings().erase('is_widget')
+        self.state = VintageState(TestsState.view)
+
+    def testCanAddOneItemWhenListIsEmpty(self):
+        self.state.push_motion_digit("1")
+        self.assertEqual(self.state.motion_digits, ["1"])
+
+    def testCanAppendMoreDigits(self):
+        self.state.push_motion_digit("1")
+        self.state.push_motion_digit("1")
+        self.assertEqual(self.state.motion_digits, ["1", "1"])
+
+
+class Test_user_provided_count(unittest.TestCase):
+    def setUp(self):
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.window().settings().erase('vintage')
+        TestsState.view.settings().erase('is_widget')
+        self.state = VintageState(TestsState.view)
+
+    def testReturnsNoneIfNoneProvided(self):
+        self.assertEqual(self.state.user_provided_count, None)
+
+    def testCanReturnActualCount(self):
+        self.state.push_motion_digit("10")
+        self.state.push_action_digit("10")
+        self.assertEqual(self.state.user_provided_count, 100)
+
+
+class Test_user_input_Setter(unittest.TestCase):
+    def setUp(self):
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.window().settings().erase('vintage')
+        TestsState.view.settings().erase('is_widget')
+        self.state = VintageState(TestsState.view)
+
+    def testResetsExpectingUserInputFlag(self):
+        self.state.expecting_user_input = True
+        self.state.user_input = 'x'
+        self.assertEqual(self.state.user_input, 'x')
+        self.assertFalse(self.state.expecting_user_input)
+
+
+class Test_last_buffer_search(unittest.TestCase):
+    def setUp(self):
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.window().settings().erase('vintage')
+        TestsState.view.settings().erase('is_widget')
+        self.state = VintageState(TestsState.view)
+
+    def testCanSet(self):
+        self.state.last_buffer_search = 'xxx'
+        self.assertEqual(self.state.view.window().settings().get('vintage')['last_buffer_search'], 'xxx')
+
+class Test_last_character_search(unittest.TestCase):
+    def setUp(self):
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.window().settings().erase('vintage')
+        TestsState.view.settings().erase('is_widget')
+        self.state = VintageState(TestsState.view)
+
+    def testCanSet(self):
+        self.state.last_character_search = 'x'
+        self.assertEqual(self.state.view.settings().get('vintage')['last_character_search'], 'x')
+
+
+class Test_xpos(unittest.TestCase):
+    def setUp(self):
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.window().settings().erase('vintage')
+        TestsState.view.settings().erase('is_widget')
+        self.state = VintageState(TestsState.view)
+
+    def testCanSet(self):
+        self.state.xpos = 100
+        self.assertEqual(self.state.view.settings().get('vintage')['xpos'], 100)
+
+    def testCanGet(self):
+        self.state.xpos = 100
+        self.assertEqual(self.state.xpos, 100)
+
+    def testCanGetDefault(self):
+        self.state.xpos = 'foo'
+        self.assertEqual(self.state.xpos, None)
