@@ -490,7 +490,13 @@ class VintageState(object):
     def parse_action(self, vi_cmd_data):
         """Updates and returns the passed-in CmdData instance using parsed data about the action.
         """
-        action_func = getattr(actions, self.action)
+        try:
+            action_func = getattr(actions, self.action)
+        except AttributeError:
+            raise AttributeError("Vintageous: Unknown action: '{0}'".format(self.action))
+        except TypeError:
+            raise TypeError("Vintageous: parse_action requires an action be specified.")
+
         if action_func:
             vi_cmd_data = action_func(vi_cmd_data)
 
@@ -670,6 +676,7 @@ class VintageState(object):
 
         self.xpos = xpos
 
+    # TODO: Test me.
     def update_status(self):
         """Print to Sublime Text's status bar.
         """
@@ -678,6 +685,7 @@ class VintageState(object):
         sublime.status_message(mode_name)
 
 
+# TODO: Test me.
 class VintageStateTracker(sublime_plugin.EventListener):
     def on_load(self, view):
         _init_vintageous(view)
@@ -693,6 +701,7 @@ class VintageStateTracker(sublime_plugin.EventListener):
         return vintage_state.context.check(key, operator, operand, match_all)
 
 
+# TODO: Test me.
 class ViFocusRestorerEvent(sublime_plugin.EventListener):
     def __init__(self):
         self.timer = None
@@ -714,6 +723,7 @@ class ViFocusRestorerEvent(sublime_plugin.EventListener):
         self.timer.start()
 
 
+# TODO: Test me.
 class IrreversibleTextCommand(sublime_plugin.TextCommand):
     """ Base class.
 

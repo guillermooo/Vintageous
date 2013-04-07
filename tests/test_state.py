@@ -724,3 +724,81 @@ class Test_parse_motion(unittest.TestCase):
         self.state.mode = MODE_VISUAL_LINE
         cmd_data = self.state.parse_motion()
         self.assertEqual(cmd_data['mode'], MODE_VISUAL_LINE)
+
+
+class Test_parse_action(unittest.TestCase):
+    def setUp(self):
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.window().settings().erase('vintage')
+        TestsState.view.settings().erase('is_widget')
+        self.state = VintageState(TestsState.view)
+
+    def tearDown(self):
+        self.state.view.sel().clear()
+        self.state.view.sel().add(sublime.Region(0, 0))
+
+    def testCanParseWithUnknownMotion(self):
+        self.state.action = 'foobar'
+        cmd_data = CmdData(self.state)
+        self.assertRaises(AttributeError, self.state.parse_action, cmd_data)
+
+    def testCanParseWithUnknownMotion(self):
+        cmd_data = CmdData(self.state)
+        self.assertRaises(TypeError, self.state.parse_action, cmd_data)
+
+    def testCmdDataIsntModifiedIfThereIsNoAction(self):
+        # FIXME: The following creates a dependency in this test.
+        self.state.action = 'vi_d'
+        new_cmd_data = self.state.parse_action(CmdData(self.state))
+        self.assertEqual(new_cmd_data['action']['command'], 'left_delete')
+
+    def testCanRunActionWhenThereAreNonEmptySelections(self):
+        self.state.action = 'vi_d'
+        self.state.view.sel().clear()
+        self.state.view.sel().add(sublime.Region(10, 20))
+        new_cmd_data = self.state.parse_action(CmdData(self.state))
+        self.assertFalse(new_cmd_data['motion_required'])
+
+
+class Test_update_xpos(unittest.TestCase):
+    def setUp(self):
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.window().settings().erase('vintage')
+        TestsState.view.settings().erase('is_widget')
+        self.state = VintageState(TestsState.view)
+
+    def tearDown(self):
+        self.state.view.sel().clear()
+        self.state.view.sel().add(sublime.Region(0, 0))
+
+    def testCanSetXposInNormalMode(self):
+        self.state.mode = MODE_NORMAL
+        self.state.view.sel().clear()
+        pt = self.state.view.text_point(2, 10)
+        self.state.view.sel().add(sublime.Region(pt, pt))
+        self.state.update_xpos()
+        self.assertEqual(self.state.xpos, 10)
+
+    def testCanSetXposInVisualMode(self):
+        self.state.mode = MODE_VISUAL
+        self.state.view.sel().clear()
+        pt = self.state.view.text_point(2, 10)
+        self.state.view.sel().add(sublime.Region(pt - 5, pt))
+        self.state.update_xpos()
+        self.assertEqual(self.state.xpos, 9)
+
+    def testCanSetXposInVisualModeWithReversedRegion(self):
+        self.state.mode = MODE_VISUAL
+        self.state.view.sel().clear()
+        pt = self.state.view.text_point(2, 10)
+        self.state.view.sel().add(sublime.Region(pt, pt - 5))
+        self.state.update_xpos()
+        self.assertEqual(self.state.xpos, 5)
+
+    def testCanSetXposToDefaultValue(self):
+        self.state.mode = MODE_VISUAL_LINE
+        self.state.view.sel().clear()
+        pt = self.state.view.text_point(2, 10)
+        self.state.view.sel().add(sublime.Region(pt, pt - 5))
+        self.state.update_xpos()
+        self.assertEqual(self.state.xpos, 0)
