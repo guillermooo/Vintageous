@@ -17,6 +17,7 @@ from Vintageous.vi.constants import DIGRAPH_MOTION
 from Vintageous.vi.constants import DIGRAPH_ACTION
 from Vintageous.state import _init_vintageous
 from Vintageous.vi.cmd_data import CmdData
+from Vintageous.vi import utils
 import Vintageous.state
 
 class Test_buffer_was_changed_in_visual_mode(unittest.TestCase):
@@ -802,3 +803,52 @@ class Test_update_xpos(unittest.TestCase):
         self.state.view.sel().add(sublime.Region(pt, pt - 5))
         self.state.update_xpos()
         self.assertEqual(self.state.xpos, 0)
+
+
+class Test_do_cancel_action(unittest.TestCase):
+    def setUp(self):
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.window().settings().erase('vintage')
+        TestsState.view.settings().erase('is_widget')
+        self.state = VintageState(TestsState.view)
+
+    def tearDown(self):
+        self.state.view.sel().clear()
+        self.state.view.sel().add(sublime.Region(0, 0))
+
+    def testCallsExpectedFunctions(self):
+        with mock.patch.object(self.state, 'parse_motion') as pm, \
+            mock.patch.object(self.state, 'parse_action') as pa, \
+            mock.patch.object(utils, 'blink') as ub, \
+            mock.patch.object(self.state.view, 'run_command') as rc:
+                pm.return_value = 'xxx'
+                pa.return_value = {'_exit_mode': 'foo',
+                                   'must_blink_on_error': False,
+                                   '_exit_mode_command': 'bar'}
+
+                self.state.do_cancel_action()
+
+                self.assertEqual(pm.call_count, 1)
+                pa.assert_called_once_with('xxx')
+                self.assertEqual(ub.call_count, 0)
+                self.assertEqual(self.state.next_mode, 'foo')
+                rc.assert_called_once_with('bar')
+
+    def testDoesntCallsAllFunctions(self):
+        with mock.patch.object(self.state, 'parse_motion') as pm, \
+            mock.patch.object(self.state, 'parse_action') as pa, \
+            mock.patch.object(utils, 'blink') as ub, \
+            mock.patch.object(self.state.view, 'run_command') as rc:
+                pm.return_value = 'xxx'
+                pa.return_value = {'_exit_mode': 'foo',
+                                   'must_blink_on_error': True,
+                                   '_exit_mode_command': None}
+
+                self.state.do_cancel_action()
+
+                self.assertEqual(pm.call_count, 1)
+                pa.assert_called_once_with('xxx')
+                self.assertEqual(ub.call_count, 1)
+                self.assertEqual(self.state.next_mode, 'foo')
+                self.assertEqual(rc.call_count, 0)
+
