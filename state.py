@@ -512,11 +512,7 @@ class VintageState(object):
 
         return vi_cmd_data
 
-    def eval(self):
-        """Examines the current state and decides whether to actually run the action/motion.
-        """
-
-        if self.cancel_action:
+    def do_cancel_action(self):
             # TODO: add a .parse() method that includes boths steps?
             vi_cmd_data = self.parse_motion()
             vi_cmd_data = self.parse_action(vi_cmd_data)
@@ -527,6 +523,13 @@ class VintageState(object):
             # Since we are exiting early, ensure we leave the selections as the commands wants them.
             if vi_cmd_data['_exit_mode_command']:
                 self.view.run_command(vi_cmd_data['_exit_mode_command'])
+
+    def eval(self):
+        """Examines the current state and decides whether to actually run the action/motion.
+        """
+
+        if self.cancel_action:
+            self.do_cancel_action()
             self.reset()
             return
 
