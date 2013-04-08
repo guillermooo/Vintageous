@@ -581,6 +581,8 @@ class VintageState(object):
 
         self.update_status()
 
+    # TODO: Test me.
+    # TODO: Refactor so that .reset and update_status() are called in the separate methods.
     def eval(self):
         """Examines the current state and decides whether to actually run the action/motion.
         """
