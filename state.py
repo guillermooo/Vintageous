@@ -21,11 +21,11 @@ from Vintageous.vi.constants import mode_to_str
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
 from Vintageous.vi.contexts import KeyContext
+from Vintageous.vi.marks import Marks
 from Vintageous.vi.registers import Registers
 from Vintageous.vi.settings import SettingsManager
 from Vintageous.vi.settings import SublimeSettings
 from Vintageous.vi.settings import VintageSettings
-from Vintageous.vi.marks import Marks
 
 
 # Some commands gather user input through input panels. An input panel is just a view, so when it
