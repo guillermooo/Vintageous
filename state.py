@@ -524,6 +524,34 @@ class VintageState(object):
             if vi_cmd_data['_exit_mode_command']:
                 self.view.run_command(vi_cmd_data['_exit_mode_command'])
 
+    def do_full_command(self):
+        vi_cmd_data = self.parse_motion()
+        vi_cmd_data = self.parse_action(vi_cmd_data)
+
+        if not vi_cmd_data['is_digraph_start']:
+            # We are about to run an action, so let Sublime Text know we want all editing
+            # steps folded into a single sequence. "All editing steps" means slightly different
+            # things depending on the mode we are in.
+            if vi_cmd_data['_mark_groups_for_gluing']:
+                self.view.run_command('maybe_mark_undo_groups_for_gluing')
+            self.view.run_command('vi_run', vi_cmd_data)
+            self.reset()
+        else:
+            # If we have a digraph start, the global data is in an invalid state because we
+            # are still missing the complete digraph. Abort and clean up.
+            if vi_cmd_data['_exit_mode'] == MODE_INSERT:
+                # We've been requested to change to this mode. For example, we're looking at
+                # CTRL+r,j in INSERTMODE, which is an invalid sequence.
+                # !!! This could be simplified using parameters in .reset(), but then it
+                # wouldn't be obvious what was going on. Don't refactor. !!!
+                utils.blink()
+                self.reset()
+                self.enter_insert_mode()
+            elif self.mode != MODE_NORMAL:
+                # Normally we'd go back to normal mode.
+                self.enter_normal_mode()
+                self.reset()
+
     def eval(self):
         """Examines the current state and decides whether to actually run the action/motion.
         """
@@ -535,32 +563,7 @@ class VintageState(object):
 
         # Action + motion, like in "3dj".
         if self.action and self.motion:
-            vi_cmd_data = self.parse_motion()
-            vi_cmd_data = self.parse_action(vi_cmd_data)
-
-            if not vi_cmd_data['is_digraph_start']:
-                # We are about to run an action, so let Sublime Text know we want all editing
-                # steps folded into a single sequence. "All editing steps" means slightly different
-                # things depending on the mode we are in.
-                if vi_cmd_data['_mark_groups_for_gluing']:
-                    self.view.run_command('maybe_mark_undo_groups_for_gluing')
-                self.view.run_command('vi_run', vi_cmd_data)
-                self.reset()
-            else:
-                # If we have a digraph start, the global data is in an invalid state because we
-                # are still missing the complete digraph. Abort and clean up.
-                if vi_cmd_data['_exit_mode'] == MODE_INSERT:
-                    # We've been requested to change to this mode. For example, we're looking at
-                    # CTRL+r,j in INSERTMODE, which is an invalid sequence.
-                    # !!! This could be simplified using parameters in .reset(), but then it
-                    # wouldn't be obvious what was going on. Don't refactor. !!!
-                    utils.blink()
-                    self.reset()
-                    self.enter_insert_mode()
-                elif self.mode != MODE_NORMAL:
-                    # Normally we'd go back to normal mode.
-                    self.enter_normal_mode()
-                    self.reset()
+            self.do_full_command()
 
         # Motion only, like in '3j'.
         elif self.motion:
