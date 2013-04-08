@@ -852,3 +852,133 @@ class Test_do_cancel_action(unittest.TestCase):
                 self.assertEqual(self.state.next_mode, 'foo')
                 self.assertEqual(rc.call_count, 0)
 
+
+class Test_do_full_command(unittest.TestCase):
+    def setUp(self):
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.window().settings().erase('vintage')
+        TestsState.view.settings().erase('is_widget')
+        self.state = VintageState(TestsState.view)
+
+    def tearDown(self):
+        self.state.view.sel().clear()
+        self.state.view.sel().add(sublime.Region(0, 0))
+
+    def testFollowsDefaultPathIfIsNotDigraphStart(self):
+        data = {
+            'is_digraph_start': False,
+            '_mark_groups_for_gluing': False
+        }
+
+        with mock.patch.object(self.state, 'parse_motion') as pm, \
+             mock.patch.object(self.state, 'parse_action') as pa, \
+             mock.patch.object(self.state.view, 'run_command') as rc, \
+             mock.patch.object(self.state, 'reset') as res:
+
+                pm.return_value = 'foo'
+                pa.return_value = data
+
+                self.state.do_full_command()
+
+                self.assertEqual(pm.call_count, 1)
+                pa.assert_called_once_with('foo')
+                self.assertEqual(rc.call_count, 1)
+                rc.assert_called_once_with('vi_run', data)
+                self.assertEqual(res.call_count, 1)
+
+    def testFollowsExpectedPatIfNotDigraphStartAndMustMarkUndoGroups(self):
+        data = {
+            'is_digraph_start': False,
+            '_mark_groups_for_gluing': True
+        }
+
+        with mock.patch.object(self.state, 'parse_motion') as pm, \
+             mock.patch.object(self.state, 'parse_action') as pa, \
+             mock.patch.object(self.state.view, 'run_command') as rc, \
+             mock.patch.object(self.state, 'reset') as res:
+
+                pm.return_value = 'foo'
+                pa.return_value = data
+
+                self.state.do_full_command()
+
+                self.assertEqual(pm.call_count, 1)
+                pa.assert_called_once_with('foo')
+                self.assertEqual(rc.call_count, 2)
+                self.assertEqual(rc.call_args_list, [mock.call('maybe_mark_undo_groups_for_gluing'), mock.call('vi_run', data)])
+                self.assertEqual(res.call_count, 1)
+
+    def testFollowsExpectedDefaultPathForDigraphsModeNormal(self):
+        vi_cmd_data = {
+            'is_digraph_start': True,
+            '_exit_mode': MODE_NORMAL
+        }
+
+        self.state.mode = MODE_NORMAL
+
+        with mock.patch.object(self.state, 'parse_motion') as pm, \
+             mock.patch.object(self.state, 'parse_action') as pa, \
+             mock.patch.object(self.state.view, 'run_command') as rc, \
+             mock.patch.object(self.state, 'reset') as res:
+
+                pm.return_value = 'foo'
+                pa.return_value = vi_cmd_data
+
+                self.state.do_full_command()
+
+                self.assertEqual(pm.call_count, 1)
+                pa.assert_called_once_with('foo')
+                self.assertEqual(rc.call_count, 0)
+
+
+    def testFollowsExpectedDefaultPathForDigraphsModeNotNormal(self):
+        vi_cmd_data = {
+            'is_digraph_start': True,
+            '_exit_mode': MODE_NORMAL
+        }
+
+        self.state.mode = -100
+
+        with mock.patch.object(self.state, 'parse_motion') as pm, \
+             mock.patch.object(self.state, 'parse_action') as pa, \
+             mock.patch.object(self.state.view, 'run_command') as rc, \
+             mock.patch.object(self.state, 'reset') as res, \
+             mock.patch.object(self.state, 'enter_normal_mode') as en:
+
+                pm.return_value = 'foo'
+                pa.return_value = vi_cmd_data
+
+                self.state.do_full_command()
+
+                self.assertEqual(pm.call_count, 1)
+                pa.assert_called_once_with('foo')
+                self.assertEqual(rc.call_count, 0)
+                self.assertEqual(en.call_count, 1)
+                self.assertEqual(res.call_count, 1)
+
+    def testFollowsExpectedDefaultPathForDigraphsExitModeIsInsert(self):
+        vi_cmd_data = {
+            'is_digraph_start': True,
+            '_exit_mode': MODE_INSERT
+        }
+
+        self.state.mode = -100
+
+        with mock.patch.object(self.state, 'parse_motion') as pm, \
+             mock.patch.object(self.state, 'parse_action') as pa, \
+             mock.patch.object(self.state.view, 'run_command') as rc, \
+             mock.patch.object(self.state, 'reset') as res, \
+             mock.patch.object(utils, 'blink') as ub, \
+             mock.patch.object(self.state, 'enter_insert_mode') as ei:
+
+                pm.return_value = 'foo'
+                pa.return_value = vi_cmd_data
+
+                self.state.do_full_command()
+
+                self.assertEqual(pm.call_count, 1)
+                pa.assert_called_once_with('foo')
+                self.assertEqual(rc.call_count, 0)
+                self.assertEqual(ub.call_count, 1)
+                self.assertEqual(res.call_count, 1)
+                self.assertEqual(ei.call_count, 1)
