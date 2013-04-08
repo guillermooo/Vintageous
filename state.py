@@ -588,10 +588,9 @@ class VintageState(object):
         if self.cancel_action:
             self.do_cancel_action()
             self.reset()
-            return
 
-        # Action + motion, like in "3dj".
-        if self.action and self.motion:
+        # Action + motion, like in '3dj'.
+        elif self.action and self.motion:
             self.do_full_command()
 
         # Motion only, like in '3j'.
@@ -600,12 +599,10 @@ class VintageState(object):
             self.view.run_command('vi_run', vi_cmd_data)
             self.reset()
             self.update_status()
-            return
 
-        # Action only, like in "d" or "esc". Some actions can be executed without a motion.
+        # Action only, like in 'd' or 'esc'. Some actions can be executed without a motion.
         elif self.action:
             self.do_lone_action()
-            return
 
     def reset(self):
         """Reset global state.
