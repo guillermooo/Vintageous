@@ -513,18 +513,22 @@ class VintageState(object):
         return vi_cmd_data
 
     def do_cancel_action(self):
-            # TODO: add a .parse() method that includes boths steps?
-            vi_cmd_data = self.parse_motion()
-            vi_cmd_data = self.parse_action(vi_cmd_data)
-            if vi_cmd_data['must_blink_on_error']:
-                utils.blink()
-            # Modify the data that determines the mode we'll end up in when the command finishes.
-            self.next_mode = vi_cmd_data['_exit_mode']
-            # Since we are exiting early, ensure we leave the selections as the commands wants them.
-            if vi_cmd_data['_exit_mode_command']:
-                self.view.run_command(vi_cmd_data['_exit_mode_command'])
+        """Cancels the whole run of the command.
+        """
+        # TODO: add a .parse() method that includes boths steps?
+        vi_cmd_data = self.parse_motion()
+        vi_cmd_data = self.parse_action(vi_cmd_data)
+        if vi_cmd_data['must_blink_on_error']:
+            utils.blink()
+        # Modify the data that determines the mode we'll end up in when the command finishes.
+        self.next_mode = vi_cmd_data['_exit_mode']
+        # Since we are exiting early, ensure we leave the selections as the commands wants them.
+        if vi_cmd_data['_exit_mode_command']:
+            self.view.run_command(vi_cmd_data['_exit_mode_command'])
 
     def do_full_command(self):
+        """Evaluates a command like 3dj, where there is an action as well as a motion.
+        """
         vi_cmd_data = self.parse_motion()
         vi_cmd_data = self.parse_action(vi_cmd_data)
 
@@ -552,6 +556,31 @@ class VintageState(object):
                 self.enter_normal_mode()
                 self.reset()
 
+    def do_lone_action(self):
+        """Evaluate lone action like in 'd' or 'esc'. Some actions can be run without a motion.
+        """
+        vi_cmd_data = self.parse_motion()
+        vi_cmd_data = self.parse_action(vi_cmd_data)
+
+        if vi_cmd_data['is_digraph_start']:
+            # XXX: When does this happen? Why are we only interested in MODE_NORMAL?
+            # XXX In response to the above, this must be due to Ctrl+r.
+            if vi_cmd_data['_change_mode_to'] == MODE_NORMAL:
+                self.enter_normal_mode()
+            # We know we are not ready.
+            return
+
+        if not vi_cmd_data['motion_required']:
+            # We are about to run an action, so let Sublime Text know we want all editing
+            # steps folded into a single sequence. "All editing steps" means slightly different
+            # things depending on the mode we are in.
+            if vi_cmd_data['_mark_groups_for_gluing']:
+                self.view.run_command('maybe_mark_undo_groups_for_gluing')
+            self.view.run_command('vi_run', vi_cmd_data)
+            self.reset()
+
+        self.update_status()
+
     def eval(self):
         """Examines the current state and decides whether to actually run the action/motion.
         """
@@ -570,39 +599,13 @@ class VintageState(object):
             vi_cmd_data = self.parse_motion()
             self.view.run_command('vi_run', vi_cmd_data)
             self.reset()
+            self.update_status()
+            return
 
         # Action only, like in "d" or "esc". Some actions can be executed without a motion.
         elif self.action:
-            vi_cmd_data = self.parse_motion()
-            vi_cmd_data = self.parse_action(vi_cmd_data)
-
-            if vi_cmd_data['is_digraph_start']:
-                if vi_cmd_data['_change_mode_to']:
-                    # XXX: When does this happen? Why are we only interested in MODE_NORMAL?
-                    # XXX In response to the above, this must be due to Ctrl+r.
-                    if vi_cmd_data['_change_mode_to'] == MODE_NORMAL:
-                        self.enter_normal_mode()
-                # We know we are not ready.
-                return
-
-            # In cases like gg, we might receive the motion here, so check for that.
-            # XXX: The above doesn't seem to be true. When is this path reached?
-            if self.motion and not self.action:
-                self.view.run_command('vi_run', self.parse_motion())
-                self.update_status()
-                self.reset()
-                return
-
-            if not vi_cmd_data['motion_required']:
-                # We are about to run an action, so let Sublime Text know we want all editing
-                # steps folded into a single sequence. "All editing steps" means slightly different
-                # things depending on the mode we are in.
-                if vi_cmd_data['_mark_groups_for_gluing']:
-                    self.view.run_command('maybe_mark_undo_groups_for_gluing')
-                self.view.run_command('vi_run', vi_cmd_data)
-                self.reset()
-
-        self.update_status()
+            self.do_lone_action()
+            return
 
     def reset(self):
         """Reset global state.
