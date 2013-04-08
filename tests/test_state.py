@@ -737,12 +737,12 @@ class Test_parse_action(unittest.TestCase):
         self.state.view.sel().clear()
         self.state.view.sel().add(sublime.Region(0, 0))
 
-    def testCanParseWithUnknownMotion(self):
+    def testCantParseWithUnknownMotion(self):
         self.state.action = 'foobar'
         cmd_data = CmdData(self.state)
         self.assertRaises(AttributeError, self.state.parse_action, cmd_data)
 
-    def testCanParseWithUnknownMotion(self):
+    def testCanParseNoneMotion(self):
         cmd_data = CmdData(self.state)
         self.assertRaises(TypeError, self.state.parse_action, cmd_data)
 
