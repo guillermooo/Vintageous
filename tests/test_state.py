@@ -3,6 +3,7 @@ import unittest
 import sublime
 
 from Vintageous.tests.borrowed import mock
+from Vintageous.tests.borrowed.mock import call
 from Vintageous.state import VintageState
 from Vintageous.test_runner import TestsState
 from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
@@ -982,3 +983,106 @@ class Test_do_full_command(unittest.TestCase):
                 self.assertEqual(ub.call_count, 1)
                 self.assertEqual(res.call_count, 1)
                 self.assertEqual(ei.call_count, 1)
+
+
+
+class Test_do_lone_action(unittest.TestCase):
+    def setUp(self):
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.window().settings().erase('vintage')
+        TestsState.view.settings().erase('is_widget')
+        self.state = VintageState(TestsState.view)
+
+    def tearDown(self):
+        self.state.view.sel().clear()
+        self.state.view.sel().add(sublime.Region(0, 0))
+
+    def testFollowsDefaultPathIfDigraphStart(self):
+        vi_cmd_data = {
+            'is_digraph_start': True,
+            'motion_required': False,
+            '_change_mode_to': MODE_VISUAL,
+        }
+
+        with mock.patch.object(self.state, 'parse_motion') as pm, \
+             mock.patch.object(self.state, 'parse_action') as pa, \
+             mock.patch.object(self.state, 'update_status') as ups:
+
+                pm.return_value = 'foo'
+                pa.return_value = vi_cmd_data
+
+                self.state.do_lone_action()
+
+                self.assertEqual(pm.call_count, 1)
+                pa.assert_called_once_with('foo')
+                self.assertEqual(ups.call_count, 0)
+
+    def testFollowsDefaultPathIfDigraphStartAndMustChangeToModeNormal(self):
+        vi_cmd_data = {
+            'is_digraph_start': True,
+            'motion_required': False,
+            '_change_mode_to': MODE_NORMAL,
+        }
+
+        with mock.patch.object(self.state, 'parse_motion') as pm, \
+             mock.patch.object(self.state, 'parse_action') as pa, \
+             mock.patch.object(self.state, 'enter_normal_mode') as enm, \
+             mock.patch.object(self.state, 'update_status') as ups:
+
+                pm.return_value = 'foo'
+                pa.return_value = vi_cmd_data
+
+                self.state.do_lone_action()
+
+                self.assertEqual(pm.call_count, 1)
+                pa.assert_called_once_with('foo')
+                self.assertEqual(enm.call_count, 1)
+                self.assertEqual(ups.call_count, 0)
+
+    def testFollowsDefaultPathIfNotDigraphStartAndNotMarkingUndoGroups(self):
+        vi_cmd_data = {
+            'is_digraph_start': False,
+            'motion_required': False,
+            '_mark_groups_for_gluing': False,
+        }
+
+        with mock.patch.object(self.state, 'parse_motion') as pm, \
+             mock.patch.object(self.state, 'parse_action') as pa, \
+             mock.patch.object(self.state.view, 'run_command') as rc, \
+             mock.patch.object(self.state, 'reset') as res, \
+             mock.patch.object(self.state, 'update_status') as ups:
+
+                pm.return_value = 'foo'
+                pa.return_value = vi_cmd_data
+
+                self.state.do_lone_action()
+
+                self.assertEqual(pm.call_count, 1)
+                pa.assert_called_once_with('foo')
+                rc.assert_called_once_with('vi_run', vi_cmd_data)
+                self.assertEqual(res.call_count, 1)
+                self.assertEqual(ups.call_count, 1)
+
+    def testFollowsDefaultPathIfNotDigraphStartAndMarkingUndoGroups(self):
+        vi_cmd_data = {
+            'is_digraph_start': False,
+            'motion_required': False,
+            '_mark_groups_for_gluing': True,
+        }
+
+        with mock.patch.object(self.state, 'parse_motion') as pm, \
+             mock.patch.object(self.state, 'parse_action') as pa, \
+             mock.patch.object(self.state.view, 'run_command') as rc, \
+             mock.patch.object(self.state, 'reset') as res, \
+             mock.patch.object(self.state, 'update_status') as ups:
+
+                pm.return_value = 'foo'
+                pa.return_value = vi_cmd_data
+
+                self.state.do_lone_action()
+
+                self.assertEqual(pm.call_count, 1)
+                pa.assert_called_once_with('foo')
+                self.assertEqual(rc.call_args_list, [call('maybe_mark_undo_groups_for_gluing'), call('vi_run', vi_cmd_data)])
+                self.assertEqual(res.call_count, 1)
+                self.assertEqual(ups.call_count, 1)
