@@ -1,3 +1,6 @@
+0.8.9
+	- Cumulative code changes and small bug fixes.
+	
 0.8.4
 	- Basic implementation of macro recording: Enable q and @ and a single macro register.
 
