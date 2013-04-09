@@ -806,7 +806,7 @@ class Test_update_xpos(unittest.TestCase):
         self.assertEqual(self.state.xpos, 0)
 
 
-class Test_do_cancel_action(unittest.TestCase):
+class Test_eval_cancel_action(unittest.TestCase):
     def setUp(self):
         TestsState.view.settings().erase('vintage')
         TestsState.view.window().settings().erase('vintage')
@@ -827,7 +827,7 @@ class Test_do_cancel_action(unittest.TestCase):
                                    'must_blink_on_error': False,
                                    '_exit_mode_command': 'bar'}
 
-                self.state.do_cancel_action()
+                self.state.eval_cancel_action()
 
                 self.assertEqual(pm.call_count, 1)
                 pa.assert_called_once_with('xxx')
@@ -845,7 +845,7 @@ class Test_do_cancel_action(unittest.TestCase):
                                    'must_blink_on_error': True,
                                    '_exit_mode_command': None}
 
-                self.state.do_cancel_action()
+                self.state.eval_cancel_action()
 
                 self.assertEqual(pm.call_count, 1)
                 pa.assert_called_once_with('xxx')
