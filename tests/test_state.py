@@ -1056,4 +1056,3 @@ class Test_store_visual_selections(TestCaseUsingView):
 
         self.assertEqual(stored_sels[0], ra)
         self.assertEqual(stored_sels[1], rb)
-
