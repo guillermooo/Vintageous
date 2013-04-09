@@ -521,7 +521,7 @@ class VintageState(object):
 
         return vi_cmd_data
 
-    def do_cancel_action(self):
+    def eval_cancel_action(self):
         """Cancels the whole run of the command.
         """
         # TODO: add a .parse() method that includes boths steps?
@@ -597,7 +597,7 @@ class VintageState(object):
         """
 
         if self.cancel_action:
-            self.do_cancel_action()
+            self.eval_cancel_action()
             self.reset()
 
         # Action + motion, like in '3dj'.
