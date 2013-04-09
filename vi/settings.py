@@ -58,6 +58,7 @@ class VintageSettings(object):
         target.settings().set('vintage', setts)
 
 
+# TODO: Make this a descriptor; avoid instantiation.
 class SettingsManager(object):
     view = SublimeSettings()
     vi = VintageSettings()
