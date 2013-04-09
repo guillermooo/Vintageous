@@ -535,7 +535,7 @@ class VintageState(object):
         if vi_cmd_data['_exit_mode_command']:
             self.view.run_command(vi_cmd_data['_exit_mode_command'])
 
-    def do_full_command(self):
+    def eval_full_command(self):
         """Evaluates a command like 3dj, where there is an action as well as a motion.
         """
         vi_cmd_data = self.parse_motion()
@@ -602,7 +602,7 @@ class VintageState(object):
 
         # Action + motion, like in '3dj'.
         elif self.action and self.motion:
-            self.do_full_command()
+            self.eval_full_command()
 
         # Motion only, like in '3j'.
         elif self.motion:
