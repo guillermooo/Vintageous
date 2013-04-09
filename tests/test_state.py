@@ -854,7 +854,7 @@ class Test_do_cancel_action(unittest.TestCase):
                 self.assertEqual(rc.call_count, 0)
 
 
-class Test_do_full_command(unittest.TestCase):
+class Test_eval_full_command(unittest.TestCase):
     def setUp(self):
         TestsState.view.settings().erase('vintage')
         TestsState.view.window().settings().erase('vintage')
@@ -879,7 +879,7 @@ class Test_do_full_command(unittest.TestCase):
                 pm.return_value = 'foo'
                 pa.return_value = data
 
-                self.state.do_full_command()
+                self.state.eval_full_command()
 
                 self.assertEqual(pm.call_count, 1)
                 pa.assert_called_once_with('foo')
@@ -901,7 +901,7 @@ class Test_do_full_command(unittest.TestCase):
                 pm.return_value = 'foo'
                 pa.return_value = data
 
-                self.state.do_full_command()
+                self.state.eval_full_command()
 
                 self.assertEqual(pm.call_count, 1)
                 pa.assert_called_once_with('foo')
@@ -925,7 +925,7 @@ class Test_do_full_command(unittest.TestCase):
                 pm.return_value = 'foo'
                 pa.return_value = vi_cmd_data
 
-                self.state.do_full_command()
+                self.state.eval_full_command()
 
                 self.assertEqual(pm.call_count, 1)
                 pa.assert_called_once_with('foo')
@@ -949,7 +949,7 @@ class Test_do_full_command(unittest.TestCase):
                 pm.return_value = 'foo'
                 pa.return_value = vi_cmd_data
 
-                self.state.do_full_command()
+                self.state.eval_full_command()
 
                 self.assertEqual(pm.call_count, 1)
                 pa.assert_called_once_with('foo')
@@ -975,7 +975,7 @@ class Test_do_full_command(unittest.TestCase):
                 pm.return_value = 'foo'
                 pa.return_value = vi_cmd_data
 
-                self.state.do_full_command()
+                self.state.eval_full_command()
 
                 self.assertEqual(pm.call_count, 1)
                 pa.assert_called_once_with('foo')
