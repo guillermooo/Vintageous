@@ -21,12 +21,23 @@ from Vintageous.vi.cmd_data import CmdData
 from Vintageous.vi import utils
 import Vintageous.state
 
-class Test_buffer_was_changed_in_visual_mode(unittest.TestCase):
+
+class TestCaseUsingView(unittest.TestCase):
+    """Base class to get a clean view for testing.
+    """
     def setUp(self):
         TestsState.view.settings().erase('vintage')
         TestsState.view.window().settings().erase('vintage')
+        TestsState.view.settings().erase('is_widget')
         self.state = VintageState(TestsState.view)
+        self.state.view.set_overwrite_status(False)
 
+    def tearDown(self):
+        self.state.view.sel().clear()
+        self.state.view.sel().add(sublime.Region(0, 0))
+
+
+class Test_buffer_was_changed_in_visual_mode(TestCaseUsingView):
     def testAlwaysReportsChangedForNonVisualModes(self):
         self.state.mode = _MODE_INTERNAL_NORMAL
         self.assertTrue(self.state.buffer_was_changed_in_visual_mode())
@@ -137,12 +148,7 @@ class Test_buffer_was_changed_in_visual_mode(unittest.TestCase):
             self.assertFalse(self.state.buffer_was_changed_in_visual_mode())
 
 
-class Test_update_repeat_command(unittest.TestCase):
-    def setUp(self):
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.window().settings().erase('vintage')
-        self.state = VintageState(TestsState.view)
-
+class Test_update_repeat_command(TestCaseUsingView):
     def tearDown(self):
         self.state.repeat_command = ('', None, 0)
 
@@ -230,12 +236,7 @@ class Test_update_repeat_command(unittest.TestCase):
             self.assertEqual(self.state.repeat_command, ('sequence', {'action': 'fizz', 'args': {}}, 0))
 
 
-class TestVintageStateProperties(unittest.TestCase):
-    def setUp(self):
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.window().settings().erase('vintage')
-        self.state = VintageState(TestsState.view)
-
+class TestVintageStateProperties(TestCaseUsingView):
     def testCantSetAction(self):
         self.state.action = 'foo'
         self.assertEqual(self.state.view.settings().get('vintage')['action'], 'foo')
@@ -336,12 +337,7 @@ class TestVintageStateProperties(unittest.TestCase):
         self.assertEqual(self.state.next_mode_command, 'foo')
 
 
-class Test_reset(unittest.TestCase):
-    def setUp(self):
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.window().settings().erase('vintage')
-        self.state = VintageState(TestsState.view)
-
+class Test_reset(TestCaseUsingView):
     def testResetsData(self):
         self.state.action = 'action'
         self.state.motion = 'motion'
@@ -419,13 +415,7 @@ class Test_reset(unittest.TestCase):
             self.assertEqual(m.call_count, 0)
 
 
-class Test__init_vintageous(unittest.TestCase):
-    def setUp(self):
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.window().settings().erase('vintage')
-        TestsState.view.settings().erase('is_widget')
-        self.state = VintageState(TestsState.view)
-
+class Test__init_vintageous(TestCaseUsingView):
     def testAbortsIfPassedWidget(self):
         self.state.action = 'foo'
         self.state.view.settings().set('is_widget', True)
@@ -488,13 +478,7 @@ class Test__init_vintageous(unittest.TestCase):
     # TODO: Test that enter_normal_mode() gets called when it should.
 
 
-class Test_action(unittest.TestCase):
-    def setUp(self):
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.window().settings().erase('vintage')
-        TestsState.view.settings().erase('is_widget')
-        self.state = VintageState(TestsState.view)
-
+class Test_action(TestCaseUsingView):
     def canSet(self):
         self.state.action = 'foo'
         self.assertEqual(self.state.action, 'foo')
@@ -534,13 +518,7 @@ class Test_action(unittest.TestCase):
             self.assertTrue(self.state.cancel_action)
 
 
-class Test_count(unittest.TestCase):
-    def setUp(self):
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.window().settings().erase('vintage')
-        TestsState.view.settings().erase('is_widget')
-        self.state = VintageState(TestsState.view)
-
+class Test_count(TestCaseUsingView):
     def testCanReturnDefault(self):
         self.assertEqual(self.state.count, 1)
 
@@ -570,13 +548,7 @@ class Test_push_action_digit(unittest.TestCase):
         self.assertEqual(self.state.action_digits, ["1", "1"])
 
 
-class Test_push_motion_digit(unittest.TestCase):
-    def setUp(self):
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.window().settings().erase('vintage')
-        TestsState.view.settings().erase('is_widget')
-        self.state = VintageState(TestsState.view)
-
+class Test_push_motion_digit(TestCaseUsingView):
     def testCanAddOneItemWhenListIsEmpty(self):
         self.state.push_motion_digit("1")
         self.assertEqual(self.state.motion_digits, ["1"])
@@ -587,13 +559,7 @@ class Test_push_motion_digit(unittest.TestCase):
         self.assertEqual(self.state.motion_digits, ["1", "1"])
 
 
-class Test_user_provided_count(unittest.TestCase):
-    def setUp(self):
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.window().settings().erase('vintage')
-        TestsState.view.settings().erase('is_widget')
-        self.state = VintageState(TestsState.view)
-
+class Test_user_provided_count(TestCaseUsingView):
     def testReturnsNoneIfNoneProvided(self):
         self.assertEqual(self.state.user_provided_count, None)
 
@@ -603,13 +569,7 @@ class Test_user_provided_count(unittest.TestCase):
         self.assertEqual(self.state.user_provided_count, 100)
 
 
-class Test_user_input_Setter(unittest.TestCase):
-    def setUp(self):
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.window().settings().erase('vintage')
-        TestsState.view.settings().erase('is_widget')
-        self.state = VintageState(TestsState.view)
-
+class Test_user_input_Setter(TestCaseUsingView):
     def testResetsExpectingUserInputFlag(self):
         self.state.expecting_user_input = True
         self.state.user_input = 'x'
@@ -617,36 +577,19 @@ class Test_user_input_Setter(unittest.TestCase):
         self.assertFalse(self.state.expecting_user_input)
 
 
-class Test_last_buffer_search(unittest.TestCase):
-    def setUp(self):
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.window().settings().erase('vintage')
-        TestsState.view.settings().erase('is_widget')
-        self.state = VintageState(TestsState.view)
-
+class Test_last_buffer_search(TestCaseUsingView):
     def testCanSet(self):
         self.state.last_buffer_search = 'xxx'
         self.assertEqual(self.state.view.window().settings().get('vintage')['last_buffer_search'], 'xxx')
 
-class Test_last_character_search(unittest.TestCase):
-    def setUp(self):
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.window().settings().erase('vintage')
-        TestsState.view.settings().erase('is_widget')
-        self.state = VintageState(TestsState.view)
 
+class Test_last_character_search(TestCaseUsingView):
     def testCanSet(self):
         self.state.last_character_search = 'x'
         self.assertEqual(self.state.view.settings().get('vintage')['last_character_search'], 'x')
 
 
-class Test_xpos(unittest.TestCase):
-    def setUp(self):
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.window().settings().erase('vintage')
-        TestsState.view.settings().erase('is_widget')
-        self.state = VintageState(TestsState.view)
-
+class Test_xpos(TestCaseUsingView):
     def testCanSet(self):
         self.state.xpos = 100
         self.assertEqual(self.state.view.settings().get('vintage')['xpos'], 100)
@@ -660,17 +603,7 @@ class Test_xpos(unittest.TestCase):
         self.assertEqual(self.state.xpos, None)
 
 
-class Test_parse_motion(unittest.TestCase):
-    def setUp(self):
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.window().settings().erase('vintage')
-        TestsState.view.settings().erase('is_widget')
-        self.state = VintageState(TestsState.view)
-
-    def tearDown(self):
-        self.state.view.sel().clear()
-        self.state.view.sel().add(sublime.Region(0, 0))
-
+class Test_parse_motion(TestCaseUsingView):
     def testCanParseWithUnknownMotion(self):
         self.state.motion = 'foobar'
         self.assertRaises(AttributeError, self.state.parse_motion)
@@ -728,17 +661,7 @@ class Test_parse_motion(unittest.TestCase):
         self.assertEqual(cmd_data['mode'], MODE_VISUAL_LINE)
 
 
-class Test_parse_action(unittest.TestCase):
-    def setUp(self):
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.window().settings().erase('vintage')
-        TestsState.view.settings().erase('is_widget')
-        self.state = VintageState(TestsState.view)
-
-    def tearDown(self):
-        self.state.view.sel().clear()
-        self.state.view.sel().add(sublime.Region(0, 0))
-
+class Test_parse_action(TestCaseUsingView):
     def testCantParseWithUnknownMotion(self):
         self.state.action = 'foobar'
         cmd_data = CmdData(self.state)
@@ -762,17 +685,7 @@ class Test_parse_action(unittest.TestCase):
         self.assertFalse(new_cmd_data['motion_required'])
 
 
-class Test_update_xpos(unittest.TestCase):
-    def setUp(self):
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.window().settings().erase('vintage')
-        TestsState.view.settings().erase('is_widget')
-        self.state = VintageState(TestsState.view)
-
-    def tearDown(self):
-        self.state.view.sel().clear()
-        self.state.view.sel().add(sublime.Region(0, 0))
-
+class Test_update_xpos(TestCaseUsingView):
     def testCanSetXposInNormalMode(self):
         self.state.mode = MODE_NORMAL
         self.state.view.sel().clear()
@@ -806,17 +719,7 @@ class Test_update_xpos(unittest.TestCase):
         self.assertEqual(self.state.xpos, 0)
 
 
-class Test_eval_cancel_action(unittest.TestCase):
-    def setUp(self):
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.window().settings().erase('vintage')
-        TestsState.view.settings().erase('is_widget')
-        self.state = VintageState(TestsState.view)
-
-    def tearDown(self):
-        self.state.view.sel().clear()
-        self.state.view.sel().add(sublime.Region(0, 0))
-
+class Test_eval_cancel_action(TestCaseUsingView):
     def testCallsExpectedFunctions(self):
         with mock.patch.object(self.state, 'parse_motion') as pm, \
             mock.patch.object(self.state, 'parse_action') as pa, \
@@ -854,17 +757,7 @@ class Test_eval_cancel_action(unittest.TestCase):
                 self.assertEqual(rc.call_count, 0)
 
 
-class Test_eval_full_command(unittest.TestCase):
-    def setUp(self):
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.window().settings().erase('vintage')
-        TestsState.view.settings().erase('is_widget')
-        self.state = VintageState(TestsState.view)
-
-    def tearDown(self):
-        self.state.view.sel().clear()
-        self.state.view.sel().add(sublime.Region(0, 0))
-
+class Test_eval_full_command(TestCaseUsingView):
     def testFollowsDefaultPathIfIsNotDigraphStart(self):
         data = {
             'is_digraph_start': False,
@@ -985,18 +878,7 @@ class Test_eval_full_command(unittest.TestCase):
                 self.assertEqual(ei.call_count, 1)
 
 
-
-class Test_eval_lone_action(unittest.TestCase):
-    def setUp(self):
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.window().settings().erase('vintage')
-        TestsState.view.settings().erase('is_widget')
-        self.state = VintageState(TestsState.view)
-
-    def tearDown(self):
-        self.state.view.sel().clear()
-        self.state.view.sel().add(sublime.Region(0, 0))
-
+class Test_eval_lone_action(TestCaseUsingView):
     def testFollowsDefaultPathIfDigraphStart(self):
         vi_cmd_data = {
             'is_digraph_start': True,
@@ -1086,3 +968,92 @@ class Test_eval_lone_action(unittest.TestCase):
                 self.assertEqual(rc.call_args_list, [call('maybe_mark_undo_groups_for_gluing'), call('vi_run', vi_cmd_data)])
                 self.assertEqual(res.call_count, 1)
                 self.assertEqual(ups.call_count, 1)
+
+
+class Test_enter_normal_mode(TestCaseUsingView):
+    def testSetsXpos(self):
+        self.state.view.sel().clear()
+        pt = self.state.view.text_point(1, 5)
+        self.state.view.sel().add(sublime.Region(pt, pt))
+
+        self.state.enter_normal_mode()
+        self.assertEqual(self.state.xpos, 5)
+
+    def testCanSetSettings(self):
+        self.state.enter_normal_mode()
+        self.assertTrue(self.state.settings.view['command_mode'])
+        self.assertTrue(self.state.settings.view['inverse_caret_state'])
+
+    def testClearsOutlinedRegionsFromSearching(self):
+        with mock.patch.object(self.state.view, 'erase_regions') as erase_regs:
+            self.state.enter_normal_mode()
+            erase_regs.assert_called_once_with('vi_search')
+
+    def testSetsModeToNormalMode(self):
+        self.state.mode = MODE_VISUAL
+        self.state.enter_normal_mode()
+        self.assertEqual(self.state.mode, MODE_NORMAL)
+
+    def testTurnsOverwriteModeOff(self):
+        with mock.patch.object(self.state.view, 'set_overwrite_status') as overw, \
+             mock.patch.object(self.state.view, 'overwrite_status') as oevers:
+                oevers.return_value = True
+                self.state.enter_normal_mode()
+                overw.assert_called_once_with(False)
+
+    def testGluesMarkedGroups(self):
+        with mock.patch.object(self.state.view, 'run_command') as rc, \
+             mock.patch.object(self.state, 'buffer_was_changed_in_visual_mode') as bufch:
+                bufch.return_value = True
+                self.state.enter_normal_mode()
+                rc.assert_called_once_with('glue_marked_undo_groups')
+
+    def testUnmarksMarkedGroupsForGluing(self):
+        with mock.patch.object(self.state.view, 'run_command') as rc, \
+             mock.patch.object(self.state, 'buffer_was_changed_in_visual_mode') as bufch:
+                bufch.return_value = False
+                self.state.enter_normal_mode()
+                rc.assert_called_once_with('unmark_undo_groups_for_gluing')
+
+
+class Test_enter_visual_line_mode(TestCaseUsingView):
+    def testSetsMode(self):
+        self.state.enter_visual_line_mode()
+        self.assertEqual(self.state.mode, MODE_VISUAL_LINE)
+
+
+class Test_enter_normal_insert_mode(TestCaseUsingView):
+    def testSetsMode(self):
+        self.state.enter_normal_insert_mode()
+        self.assertEqual(self.state.mode, MODE_NORMAL_INSERT)
+
+    def testSetsSettings(self):
+        self.state.enter_normal_insert_mode()
+        self.assertFalse(self.state.settings.view['command_mode'])
+        self.assertFalse(self.state.settings.view['inverse_caret_state'])
+
+
+class Test_enter_replace_mode(TestCaseUsingView):
+    def testSetsMode(self):
+        self.state.enter_replace_mode()
+        self.assertEqual(self.state.mode, MODE_REPLACE)
+
+    def testSetsSettings(self):
+        self.state.enter_replace_mode()
+        self.assertFalse(self.state.settings.view['command_mode'])
+        self.assertFalse(self.state.settings.view['inverse_caret_state'])
+
+
+class Test_store_visual_selections(TestCaseUsingView):
+    def testStoresThem(self):
+        ra, rb = sublime.Region(10, 20), sublime.Region(30, 40)
+        self.state.view.sel().clear()
+        self.state.view.sel().add(ra)
+        self.state.view.sel().add(rb)
+
+        self.state.store_visual_selections()
+        stored_sels = self.state.view.get_regions('vi_visual_selections')
+
+        self.assertEqual(stored_sels[0], ra)
+        self.assertEqual(stored_sels[1], rb)
+

@@ -678,6 +678,7 @@ class VintageState(object):
             # feel right...
             self.repeat_command = cmd, args, times
 
+    # TODO: Test me.
     def update_xpos(self):
         first_sel = self.view.sel()[0]
         xpos = 0
