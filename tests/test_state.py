@@ -986,7 +986,7 @@ class Test_do_full_command(unittest.TestCase):
 
 
 
-class Test_do_lone_action(unittest.TestCase):
+class Test_eval_lone_action(unittest.TestCase):
     def setUp(self):
         TestsState.view.settings().erase('vintage')
         TestsState.view.window().settings().erase('vintage')
@@ -1011,7 +1011,7 @@ class Test_do_lone_action(unittest.TestCase):
                 pm.return_value = 'foo'
                 pa.return_value = vi_cmd_data
 
-                self.state.do_lone_action()
+                self.state.eval_lone_action()
 
                 self.assertEqual(pm.call_count, 1)
                 pa.assert_called_once_with('foo')
@@ -1032,7 +1032,7 @@ class Test_do_lone_action(unittest.TestCase):
                 pm.return_value = 'foo'
                 pa.return_value = vi_cmd_data
 
-                self.state.do_lone_action()
+                self.state.eval_lone_action()
 
                 self.assertEqual(pm.call_count, 1)
                 pa.assert_called_once_with('foo')
@@ -1055,7 +1055,7 @@ class Test_do_lone_action(unittest.TestCase):
                 pm.return_value = 'foo'
                 pa.return_value = vi_cmd_data
 
-                self.state.do_lone_action()
+                self.state.eval_lone_action()
 
                 self.assertEqual(pm.call_count, 1)
                 pa.assert_called_once_with('foo')
@@ -1079,7 +1079,7 @@ class Test_do_lone_action(unittest.TestCase):
                 pm.return_value = 'foo'
                 pa.return_value = vi_cmd_data
 
-                self.state.do_lone_action()
+                self.state.eval_lone_action()
 
                 self.assertEqual(pm.call_count, 1)
                 pa.assert_called_once_with('foo')
