@@ -70,11 +70,13 @@ def _init_vintageous(view):
     state.reset()
 
 
+# TODO: Test me.
 def plugin_loaded():
     view = sublime.active_window().active_view()
     _init_vintageous(view)
 
 
+# TODO: Test me.
 def unload_handler():
     for w in sublime.windows():
         for v in w.views():
@@ -105,6 +107,7 @@ class VintageState(object):
         # (settings.view).
         self.settings = SettingsManager(self.view)
 
+    # TODO: Test me.
     def enter_normal_mode(self):
         self.settings.view['command_mode'] = True
         self.settings.view['inverse_caret_state'] = True
@@ -128,29 +131,35 @@ class VintageState(object):
 
         self.mode = MODE_NORMAL
 
+    # TODO: Test me.
     def enter_visual_line_mode(self):
         self.mode = MODE_VISUAL_LINE
 
+    # TODO: Test me.
     def enter_insert_mode(self):
         self.settings.view['command_mode'] = False
         self.settings.view['inverse_caret_state'] = False
         self.mode = MODE_INSERT
 
+    # TODO: Test me.
     def enter_visual_mode(self):
         self.mode = MODE_VISUAL
 
+    # TODO: Test me.
     def enter_normal_insert_mode(self):
         # This is the mode we enter when we give i a count, as in 5ifoobar<CR><ESC>.
         self.mode = MODE_NORMAL_INSERT
         self.settings.view['command_mode'] = False
         self.settings.view['inverse_caret_state'] = False
 
+    # TODO: Test me.
     def enter_replace_mode(self):
         self.mode = MODE_REPLACE
         self.settings.view['command_mode'] = False
         self.settings.view['inverse_caret_state'] = False
         self.view.set_overwrite_status(True)
 
+    # TODO: Test me.
     def store_visual_selections(self):
         self.view.add_regions('vi_visual_selections', list(self.view.sel()))
 
