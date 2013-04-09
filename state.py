@@ -565,7 +565,7 @@ class VintageState(object):
                 self.enter_normal_mode()
                 self.reset()
 
-    def do_lone_action(self):
+    def eval_lone_action(self):
         """Evaluate lone action like in 'd' or 'esc'. Some actions can be run without a motion.
         """
         vi_cmd_data = self.parse_motion()
@@ -613,7 +613,7 @@ class VintageState(object):
 
         # Action only, like in 'd' or 'esc'. Some actions can be executed without a motion.
         elif self.action:
-            self.do_lone_action()
+            self.eval_lone_action()
 
     def reset(self):
         """Reset global state.
