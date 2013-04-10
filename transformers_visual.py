@@ -548,59 +548,9 @@ class _vi_b_pre_motion(sublime_plugin.TextCommand):
     # TODO: _MODE_INTERNAL_NORMAL is suspiciously mssing here.
     def run(self, edit, mode, current_iteration, total_iterations):
         def f(view, s):
-            delta = 1
             if mode == MODE_VISUAL:
-                delta = 1 if utils.is_region_reversed(view, s) else 2
-
-            text_before_caret = view.substr(sublime.Region(view.line(s.b).a, s.b - delta))
-            first_char_is_space = view.substr(s.b - delta).isspace() if (view.line(s.b).a == s.b - delta) else False
-
-            if mode == MODE_NORMAL:
-                if text_before_caret.isspace() or first_char_is_space:
-                    pt = utils.previous_non_white_space_char(self.view, s.b - 1, white_space='\t ')
-                    if view.line(pt).empty():
-                        return sublime.Region(s.a , pt + 1)
-                    elif view.word(pt).size() == 1:
-                        return sublime.Region(pt + 1, pt + 1)
-
-                    return sublime.Region(pt, pt)
-
-                # At BOL.
-                # XXX: Use a general function instead of spelling out the computation.
-                elif view.line(s.b).a == s.b and not view.line(s.b - 1).empty():
-                    return sublime.Region(s.b - 1, s.b - 1)
-
-            elif mode == MODE_VISUAL:
-                if utils.is_region_reversed(view, s):
-                    if text_before_caret.isspace() or first_char_is_space:
-                        pt = utils.previous_non_white_space_char(self.view, s.b - delta, white_space='\t ')
-                        # PREVIOUSLINE empty; don't go past it.
-                        if view.line(pt).empty():
-                            return sublime.Region(s.a , pt + 1)
-                        return sublime.Region(s.a, pt)
-
-                    elif utils.is_at_bol(view, s) and not view.line(s.b - 1).empty():
-                        # Single-character words are a special case; we don't want to skip over
-                        # them.
-                        if view.word(s.b - 1).size() > 1:
-                            return sublime.Region(s.a, s.b - 1)
-
-                else:
-                    # Non-reversed region. Note that .b here is at NEXTCHAR, not CURRENTCHAR.
-                    if text_before_caret.isspace() or first_char_is_space:
-                        pt = utils.previous_non_white_space_char(self.view, s.b - delta, white_space='\t ')
-                        if view.line(pt).empty():
-                            return sublime.Region(s.a , pt + 1)
-                        # XXX: I don't think this branch is necessary.
-                        # On new WORD; make sure motion doesn't skip it.
-                        elif view.substr(pt) not in ('\t \n'):
-                            return sublime.Region(s.a, pt + 1)
-
-                        return sublime.Region(s.a, pt)
-
-                    # At WORDBEGIN or at any non-ALPHANUMERICCHAR.
-                    elif (view.word(s.b - 1).a == s.b - 1) or not view.substr(s.b - 1).isalnum():
-                        return sublime.Region(s.a, s.b - 1)
+                if s.size() == 1:
+                    return sublime.Region(s.b, s.a)
 
             return s
 
@@ -613,9 +563,8 @@ class _vi_b_post_every_motion(sublime_plugin.TextCommand):
     def run(self, edit, mode, current_iteration, total_iterations):
         def f(view, s):
             if mode == MODE_VISUAL:
-                # Vim selects the FIRSTCHAR of NEXTWORD when moving backward in VISUAL mode.
-                if not utils.is_region_reversed(self.view, s):
-                    return sublime.Region(s.a, s.b + 1)
+                if s.size() == 0:
+                    return sublime.Region(s.a, s.a + 1)
 
             return s
 

@@ -302,14 +302,11 @@ def vi_w(vi_cmd_data):
 
 def vi_b(vi_cmd_data):
     # FIXME: b is a huge mess. Fix it.
-    vi_cmd_data['__reorient_caret'] = True
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_begin': True, 'punct_begin': True, 'empty_line': True, 'forward': False}
 
     if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
         vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode'],}]
-        vi_cmd_data['post_every_motion'] = ['dont_stay_on_eol_backward',]
     elif vi_cmd_data['mode'] == MODE_VISUAL:
         # TODO: Rename to factor in *every*.
         vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode'],}]
@@ -524,14 +521,10 @@ def vi_big_e(vi_cmd_data):
 
 
 def vi_big_b(vi_cmd_data):
-    vi_cmd_data['__reorient_caret'] = True
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_begin': True, 'empty_line': True, 'separators': '', 'forward': False}
 
-    if vi_cmd_data['mode'] == MODE_NORMAL:
-        vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode'],}]
-        vi_cmd_data['post_every_motion'] = ['dont_stay_on_eol_backward',]
-    elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
+    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
         vi_cmd_data['motion']['args']['extend'] = True
         vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode'],}]
         vi_cmd_data['post_every_motion'] = ['dont_stay_on_eol_backward',]
