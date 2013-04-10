@@ -1,9 +1,11 @@
 import sublime
 import sublime_plugin
 
+from itertools import chain
+import io
 import os
 import unittest
-import io
+
 
 TEST_DATA_PATH = None
 TEST_DATA_FILE_BASENAME = 'sample.txt'
@@ -14,6 +16,7 @@ def plugin_loaded():
 
 
 class TestsState(object):
+    running = False
     view = None
     suite = None
 
@@ -22,17 +25,37 @@ class TestsState(object):
         TestsState.view = None
         TestsState.suite = None
 
+
+TESTS_SETTINGS = 'Vintageous.tests.vi.test_settings'
+TESTS_REGISTERS = 'Vintageous.tests.vi.test_registers'
+TESTS_MARKS = 'Vintageous.tests.vi.test_marks'
+TESTS_STATE = 'Vintageous.tests.test_state'
+TESTS_CONSTANTS = 'Vintageous.tests.vi.test_constants'
+TESTS_CMD_DATA = 'Vintageous.tests.vi.test_cmd_data'
+
+
 test_suites = {
-        'settings': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.vi.test_settings'],
-        'registers': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.vi.test_registers'],
-        'marks': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.vi.test_marks'],
-        'state': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.test_state'],
-        'constants': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.vi.test_constants'],
-        'cmd_data': ['vintage_ex_run_data_file_based_tests', 'Vintageous.tests.vi.test_cmd_data'],
+        '_storage_': ['_pt_run_tests', [TESTS_MARKS, TESTS_SETTINGS, TESTS_REGISTERS, TESTS_CONSTANTS]],
+
+        'settings': ['_pt_run_tests', [TESTS_SETTINGS]],
+        'registers': ['_pt_run_tests', [TESTS_REGISTERS]],
+        'marks': ['_pt_run_tests', [TESTS_MARKS]],
+
+        'state': ['_pt_run_tests', [TESTS_STATE]],
+
+        'constants': ['_pt_run_tests', [TESTS_CONSTANTS]],
+
+        'cmd_data': ['_pt_run_tests', [TESTS_CMD_DATA]],
 }
 
 
-class PrintToBuffer(sublime_plugin.TextCommand):
+# Combine all tests under one key for convenience. Ignore keys starting with an underscore. Use
+# these for subsets of all the remaining tests that you don't want repeated under '_all_'.
+all_tests = chain(*[data[1] for (key, data) in test_suites.items() if not key.startswith('_')])
+test_suites['_all_'] = ['_pt_run_tests', all_tests]
+
+
+class _ptPrintResults(sublime_plugin.TextCommand):
     def run(self, edit, content):
         view = sublime.active_window().new_file()
         view.insert(edit, 0, content)
@@ -41,6 +64,7 @@ class PrintToBuffer(sublime_plugin.TextCommand):
 
 class ShowVintageousTestSuites(sublime_plugin.WindowCommand):
     def run(self):
+        TestsState.running = True
         self.window.show_quick_panel(sorted(test_suites.keys()), self.run_suite)
 
     def run_suite(self, idx):
@@ -51,33 +75,31 @@ class ShowVintageousTestSuites(sublime_plugin.WindowCommand):
         self.window.run_command(command_to_run, dict(suite_name=suite_name))
 
 
-class VintageExRunSimpleTestsCommand(sublime_plugin.WindowCommand):
-    def run(self, suite_name):
-        bucket = io.StringIO()
-        _, suite = test_suites[suite_name]
-        suite = unittest.defaultTestLoader.loadTestsFromName(suite)
-        unittest.TextTestRunner(stream=bucket, verbosity=1).run(suite)
-
-        self.window.active_view().run_command('print_to_buffer', {'content': bucket.getvalue()})
-
-
-class VintageExRunDataFileBasedTests(sublime_plugin.WindowCommand):
+class _ptRunTests(sublime_plugin.WindowCommand):
     def run(self, suite_name):
         self.window.open_file(TEST_DATA_PATH)
 
 
-class TestDataDispatcher(sublime_plugin.EventListener):
+class _ptTestDataDispatcher(sublime_plugin.EventListener):
     def on_load(self, view):
-        if view.file_name() and os.path.basename(view.file_name()) == TEST_DATA_FILE_BASENAME:
-            TestsState.view = view
+        if (view.file_name() and
+            os.path.basename(view.file_name()) == TEST_DATA_FILE_BASENAME and
+            TestsState.running):
 
-            _, suite_name = test_suites[TestsState.suite]
-            suite = unittest.TestLoader().loadTestsFromName(suite_name)
+                TestsState.running = False
+                TestsState.view = view
 
-            bucket = io.StringIO()
-            unittest.TextTestRunner(stream=bucket, verbosity=1).run(suite)
+                _, suite_names = test_suites[TestsState.suite]
+                suite = unittest.TestLoader().loadTestsFromNames(suite_names)
 
-            view.run_command('print_to_buffer', {'content': bucket.getvalue()})
-            w = sublime.active_window()
-            w.run_command('prev_view')
-            w.run_command('close')
+                bucket = io.StringIO()
+                unittest.TextTestRunner(stream=bucket, verbosity=1).run(suite)
+
+                view.run_command('_pt_print_results', {'content': bucket.getvalue()})
+                w = sublime.active_window()
+                # Close data view.
+                w.run_command('prev_view')
+                w.run_command('close')
+                # Ugly hack to return focus to the results view.
+                w.run_command('show_panel', {'panel': 'console', 'toggle': True})
+                w.run_command('show_panel', {'panel': 'console', 'toggle': True})
