@@ -1,3 +1,8 @@
+0.8.11 - 10/04/2013
+
+	- Improve b and B motions.
+	- Assorted fixes.
+
 0.8.9
 	- Cumulative code changes and small bug fixes.
 	
