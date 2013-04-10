@@ -1056,3 +1056,40 @@ class Test_store_visual_selections(TestCaseUsingView):
 
         self.assertEqual(stored_sels[0], ra)
         self.assertEqual(stored_sels[1], rb)
+
+
+class Test_update_xpos(TestCaseUsingView):
+    def testDefaultsToZero(self):
+        self.state.mode = -1
+        self.state.update_xpos()
+        self.assertEqual(self.state.xpos, 0)
+
+    def testDefaultsToZeroIfNoSelsAvailable(self):
+        self.state.xpos = 10
+        self.state.view.sel().clear()
+        self.state.update_xpos()
+        self.assertEqual(self.state.xpos, 0)
+
+    def testCanUpdateXposInNormalMode(self):
+        self.state.mode = MODE_NORMAL
+        self.state.view.sel().clear()
+        pt = self.state.view.text_point(5, 5)
+        self.state.view.sel().add(sublime.Region(pt, pt))
+        self.state.update_xpos()
+        self.assertEqual(self.state.xpos, 5)
+
+    def testCanUpdateXposInVisualMode(self):
+        self.state.mode = MODE_VISUAL
+        self.state.view.sel().clear()
+        pt = self.state.view.text_point(5, 5)
+        self.state.view.sel().add(sublime.Region(pt, pt + 1))
+        self.state.update_xpos()
+        self.assertEqual(self.state.xpos, 5)
+
+    def testCanUpdateXposInVisualModeReversedRegion(self):
+        self.state.mode = MODE_VISUAL
+        self.state.view.sel().clear()
+        pt = self.state.view.text_point(5, 5)
+        self.state.view.sel().add(sublime.Region(pt, pt - 1))
+        self.state.update_xpos()
+        self.assertEqual(self.state.xpos, 4)
