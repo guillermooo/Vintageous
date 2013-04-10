@@ -671,10 +671,16 @@ class VintageState(object):
             # feel right...
             self.repeat_command = cmd, args, times
 
-    # TODO: Test me.
     def update_xpos(self):
-        first_sel = self.view.sel()[0]
         xpos = 0
+
+        try:
+            first_sel = self.view.sel()[0]
+        except IndexError:
+            # XXX: Perhaps it's better to leave the xpos untouched?
+            self.xpos = xpos
+            return
+
         if self.mode == MODE_VISUAL:
             if first_sel.a < first_sel.b:
                 xpos = self.view.rowcol(first_sel.b - 1)[1]
