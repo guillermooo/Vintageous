@@ -51,7 +51,7 @@ test_suites = {
 
 # Combine all tests under one key for convenience. Ignore keys starting with an underscore. Use
 # these for subsets of all the remaining tests that you don't want repeated under '_all_'.
-all_tests = chain(*[data[1] for (key, data) in test_suites.items() if not key.startswith('_')])
+all_tests = list(chain(*[data[1] for (key, data) in test_suites.items() if not key.startswith('_')]))
 test_suites['_all_'] = ['_pt_run_tests', all_tests]
 
 
