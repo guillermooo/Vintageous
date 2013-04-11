@@ -97,8 +97,9 @@ class VintageState(object):
     # Let's imitate Sublime Text's .command_history() 'null' value.
     _latest_repeat_command = ('', None, 0)
 
-    # Stores the latest recorded macro.
-    _latest_macro = None
+    # Stores the latest register name used for macro recording. It's a volatile value that never
+    # gets reset during command execution.
+    _latest_macro_name = None
     _is_recording = False
 
     def __init__(self, view):
@@ -435,16 +436,6 @@ class VintageState(object):
         VintageState._latest_repeat_command = value
 
     @property
-    def latest_macro(self):
-        """Latest macro recorded. Accessed via @@.
-        """
-        return VintageState._latest_macro
-
-    @latest_macro.setter
-    def latest_macro(self, value):
-        VintageState._latest_macro = value
-
-    @property
     def is_recording(self):
         """Signals that we're recording a macro.
         """
@@ -453,6 +444,16 @@ class VintageState(object):
     @is_recording.setter
     def is_recording(self, value):
         VintageState._is_recording = value
+
+    @property
+    def latest_macro_name(self):
+        """Latest macro recorded. Accessed via @@.
+        """
+        return VintageState._latest_macro_name
+
+    @latest_macro_name.setter
+    def latest_macro_name(self, value):
+        VintageState._latest_macro_name = value
 
     def parse_motion(self):
         """Returns a CmdData instance with parsed motion data.

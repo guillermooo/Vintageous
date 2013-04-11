@@ -768,7 +768,7 @@ class _vi_q(IrreversibleTextCommand):
             return
 
         if not state.is_recording:
-            state._latest_macro_name = name
+            state.latest_macro_name = name
             state.is_recording = True
             self.view.run_command('start_record_macro')
             return
@@ -776,24 +776,31 @@ class _vi_q(IrreversibleTextCommand):
         if state.is_recording:
             self.view.run_command('stop_record_macro')
             state.is_recording = False
+            self.view.run_command('unmark_undo_groups_for_gluing')
             state.reset()
 
             # Store the macro away.
-            modifying_cmd = self.view.command_history(0, True)
-            state.latest_macro = modifying_cmd
+            state.macros[state.latest_macro_name] = sublime.get_macro()
 
 
 class _vi_run_macro(IrreversibleTextCommand):
     def run(self, name=None):
-        if not (name and VintageState(self.view).latest_macro):
+        state = VintageState(self.view)
+        if not (name and state.latest_macro_name):
             return
 
         if name == '@':
             # Run the macro recorded latest.
-            self.view.run_command('run_macro')
+            commands = state.macros[state.latest_macro_name]
         else:
-            # TODO: Implement macro registers.
-            self.view.run_command('run_command')
+            try:
+                commands = state.macros[name]
+            except KeyError:
+                # TODO: Add 'delayed message' support to VintageState.
+                return
+
+        for cmd in commands:
+            self.view.run_command(cmd['command'], cmd['args'])
 
 
 class ViAt(IrreversibleTextCommand):
