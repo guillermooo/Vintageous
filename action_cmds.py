@@ -768,6 +768,7 @@ class _vi_q(IrreversibleTextCommand):
             return
 
         if not state.is_recording:
+            self.view.run_command('unmark_undo_groups_for_gluing')
             state.latest_macro_name = name
             state.is_recording = True
             self.view.run_command('start_record_macro')
