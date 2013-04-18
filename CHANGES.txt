@@ -1,3 +1,9 @@
+0.9.2 - 18/04/2013
+
+	- Add 'vintageous_incsearch' setting to toggle incremental search.
+	- Add 'vintageous_hlsearch' setting to control search results highlighting.
+	- Fix bug in incremental search.
+
 0.9.1 - 18/04/2013
 
 	- Basic implementation of incremental search.
