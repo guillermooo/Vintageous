@@ -444,7 +444,7 @@ class ViBufferSearch(IrreversibleTextCommand):
     def on_change(self, s):
         # TODO: Improve this.
         self.view.erase_regions('vi_inc_search')
-        next_hit = self.view.find(s, self.view.sel()[0].b)
+        next_hit = self.view.find(s, self.view.sel()[0].b + 1)
         if next_hit:
             self.view.add_regions('vi_inc_search', [next_hit], 'comment', '')
 
