@@ -81,14 +81,16 @@ class TestViEditorSettings(unittest.TestCase):
 		self.settsman = VintageSettings(view=TestsState.view)
 
 	def testKnowsAllSettings(self):
-		all_settings = (
+		all_settings = [
 			'nohlsearch',
-			)
+			'incsearch'
+			]
 
-		self.assertEqual(all_settings, tuple(VI_OPTIONS.keys()))
+		self.assertEqual(sorted(all_settings), sorted(list(VI_OPTIONS.keys())))
 
 	def testSettingsAreCorrectlyDefined(self):
 		self.assertEqual(VI_OPTIONS['nohlsearch'], vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=False, parser=None))
+		self.assertEqual(VI_OPTIONS['incsearch'], vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=True, parser=None))
 
 	def testCanRetrieveDefaultValue(self):
 		self.assertEqual(self.settsman['nohlsearch'], False)

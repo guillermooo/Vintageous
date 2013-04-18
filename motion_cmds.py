@@ -421,7 +421,11 @@ class ViOctothorp(sublime_plugin.TextCommand):
 class ViBufferSearch(IrreversibleTextCommand):
     def run(self):
         Vintageous.state._dont_reset_during_init = True
-        self.view.window().show_input_panel('', '', self.on_done, self.on_change, self.on_cancel)
+
+        state = VintageState(self.view)
+        on_change = self.on_change if state.settings.vi['incsearch'] else None
+
+        self.view.window().show_input_panel('', '', self.on_done, on_change, self.on_cancel)
 
     def on_done(self, s):
         self.view.erase_regions('vi_inc_search')
