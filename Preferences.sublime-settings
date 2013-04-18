@@ -7,7 +7,7 @@
 	"vintageous_use_ctrl_keys": false,
 
 	// If true, search occurrences won't be highlighted at all.
-	"vintageous_nohlsearch": false,
+	"vintageous_hlsearch": true,
 
 	// If true, search patterns will be applied incrementally as they are typed in.
 	"vintageous_incsearch": true

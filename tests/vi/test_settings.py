@@ -75,29 +75,29 @@ class TestSettingsManager(unittest.TestCase):
 class TestViEditorSettings(unittest.TestCase):
 	def setUp(self):
 		TestsState.view.settings().erase('vintage')
-		TestsState.view.settings().erase('vintageous_nohlsearch')
+		TestsState.view.settings().erase('vintageous_hlsearch')
 		TestsState.view.settings().erase('vintageous_foo')
 		TestsState.view.window().settings().erase('vintageous_foo')
 		self.settsman = VintageSettings(view=TestsState.view)
 
 	def testKnowsAllSettings(self):
 		all_settings = [
-			'nohlsearch',
+			'hlsearch',
 			'incsearch'
 			]
 
 		self.assertEqual(sorted(all_settings), sorted(list(VI_OPTIONS.keys())))
 
 	def testSettingsAreCorrectlyDefined(self):
-		self.assertEqual(VI_OPTIONS['nohlsearch'], vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=False, parser=None))
+		self.assertEqual(VI_OPTIONS['hlsearch'], vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=True, parser=None))
 		self.assertEqual(VI_OPTIONS['incsearch'], vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=True, parser=None))
 
 	def testCanRetrieveDefaultValue(self):
-		self.assertEqual(self.settsman['nohlsearch'], False)
+		self.assertEqual(self.settsman['hlsearch'], True)
 
 	def testCanRetrieveDefaultValueIfSetValueIsInvalid(self):
-		self.settsman.view.settings().set('vintageous_nohlsearch', 100)
-		self.assertEqual(self.settsman['nohlsearch'], False)
+		self.settsman.view.settings().set('vintageous_hlsearch', 100)
+		self.assertEqual(self.settsman['hlsearch'], True)
 
 	def testCanRetrieveWindowLevelSettings(self):
 		# TODO: use mock to patch dict

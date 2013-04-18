@@ -487,7 +487,7 @@ class _vi_forward_slash(sublime_plugin.TextCommand):
             return
 
         state = VintageState(self.view)
-        if state.settings.vi['nohlsearch']:
+        if not state.settings.vi['hlsearch']:
             return
 
         self.view.add_regions('vi_search', regs, 'comment', '', sublime.DRAW_NO_FILL)
@@ -540,7 +540,7 @@ class _vi_question_mark(sublime_plugin.TextCommand):
             return
 
         state = VintageState(self.view)
-        if state.settings.vi['nohlsearch']:
+        if not state.settings.vi['hlsearch']:
             return
 
         self.view.add_regions('vi_search', regs, 'comment', '', sublime.DRAW_NO_FILL)
