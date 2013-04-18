@@ -481,6 +481,11 @@ class _vi_forward_slash(sublime_plugin.TextCommand):
         if not regs:
             self.view.erase_regions('vi_search')
             return
+
+        state = VintageState(self.view)
+        if state.settings.vi['nohlsearch']:
+            return
+
         self.view.add_regions('vi_search', regs, 'comment', '', sublime.DRAW_NO_FILL)
 
     def run(self, edit, search_string, mode=None, count=1, extend=False):
@@ -529,6 +534,11 @@ class _vi_question_mark(sublime_plugin.TextCommand):
         if not regs:
             self.view.erase_regions('vi_search')
             return
+
+        state = VintageState(self.view)
+        if state.settings.vi['nohlsearch']:
+            return
+
         self.view.add_regions('vi_search', regs, 'comment', '', sublime.DRAW_NO_FILL)
 
     def run(self, edit, search_string, mode=None, count=1, extend=False):

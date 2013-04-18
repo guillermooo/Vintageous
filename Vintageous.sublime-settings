@@ -4,5 +4,8 @@
 
 	// If true, some key bindings prefaced by the CTRL modifier will override default Sublime Text
 	// key bindings.
-	"vintageous_use_ctrl_keys": false
+	"vintageous_use_ctrl_keys": false,
+
+	// If true, search occurrences won't be highlighted at all.
+	"vintageous_nohlsearch": false
 }

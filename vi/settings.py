@@ -1,6 +1,31 @@
+import collections
+
+vi_user_setting = collections.namedtuple('vi_editor_setting', 'scope values default parser')
+
 WINDOW_SETTINGS = [
     'last_buffer_search',
 ]
+
+
+SCOPE_WINDOW = 1
+SCOPE_VIEW = 2
+
+
+VI_OPTIONS = {
+    # TODO: BUG - unrelated to this code: D,p,u,redo doesn't do what we want.
+    'nohlsearch': vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=False, parser=None),
+}
+
+
+def get_option(view, name):
+    # TODO: Should probably return global, local values.
+    option_data = VI_OPTIONS[name]
+    if option_data.scope == SCOPE_WINDOW:
+        value = view.window().settings().get('vintageous_' + name)
+    else:
+        value = view.settings().get('vintageous_' + name)
+
+    return value if (value in option_data.values) else option_data.default
 
 
 class SublimeSettings(object):
@@ -39,6 +64,12 @@ class VintageSettings(object):
         return VintageSettings()
 
     def __getitem__(self, key):
+
+        # Vi editor options.
+        if key in VI_OPTIONS:
+            return get_option(self.view, key)
+
+        # Vintageous settings.
         try:
             if key not in WINDOW_SETTINGS:
                 value = self.view.settings().get('vintage').get(key)
