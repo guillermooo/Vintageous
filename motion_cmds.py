@@ -421,9 +421,10 @@ class ViOctothorp(sublime_plugin.TextCommand):
 class ViBufferSearch(IrreversibleTextCommand):
     def run(self):
         Vintageous.state._dont_reset_during_init = True
-        self.view.window().show_input_panel('', '', self.on_done, None, self.on_cancel)
+        self.view.window().show_input_panel('', '', self.on_done, self.on_change, self.on_cancel)
 
     def on_done(self, s):
+        self.view.erase_regions('vi_inc_search')
         state = VintageState(self.view)
         state.motion = 'vi_forward_slash'
 
@@ -436,7 +437,15 @@ class ViBufferSearch(IrreversibleTextCommand):
             state.last_buffer_search = s
         state.eval()
 
+    def on_change(self, s):
+        # TODO: Improve this.
+        self.view.erase_regions('vi_inc_search')
+        next_hit = self.view.find(s, self.view.sel()[0].b)
+        if next_hit:
+            self.view.add_regions('vi_inc_search', [next_hit], 'comment', '')
+
     def on_cancel(self):
+        self.view.erase_regions('vi_inc_search')
         state = VintageState(self.view)
         state.reset()
 

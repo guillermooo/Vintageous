@@ -6,6 +6,8 @@
 
 [
 	{ "keys": ["escape"], "command": "set_action", "args": {"action": "vi_esc"}, "context": [{"key": "vi_must_change_mode"}, {"key": "vi_is_buffer"}] },
+	{ "keys": ["ctrl+["], "command": "set_action", "args": {"action": "vi_esc"}, "context": [{"key": "vi_must_change_mode"}, {"key": "vi_is_buffer"}] },
+	{ "keys": ["ctrl+c"], "command": "set_action", "args": {"action": "vi_esc"}, "context": [{"key": "vi_must_change_mode"}, {"key": "vi_is_buffer"}] },
 
 	{ "keys": ["R"], "command": "set_action", "args": {"action": "vi_enter_replace_mode"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_is_buffer"}] },
 
