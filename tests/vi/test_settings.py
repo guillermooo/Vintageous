@@ -119,33 +119,39 @@ class Test_get_option(unittest.TestCase):
 	def setUp(self):
 		TestsState.view.settings().erase('vintage')
 		TestsState.view.settings().erase('vintageous_foo')
-		self.settsman = VintageSettings(view=TestsState.view)
+		self.vi_settings = VintageSettings(view=TestsState.view)
 
 	def testDefaultScopeIsView(self):
 		VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100,), default='bar', parser=None)
-		self.settsman.view.settings().set('vintageous_foo', 100)
-		self.assertEqual(self.settsman['foo'], 100)
+		self.vi_settings.view.settings().set('vintageous_foo', 100)
+		self.assertEqual(self.vi_settings['foo'], 100)
+		del VI_OPTIONS['foo']
 
 	def testReturnsDefaultValueIfUnset(self):
 		VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100,), default='bar', parser=None)
-		self.assertEqual(self.settsman['foo'], 'bar')
+		self.assertEqual(self.vi_settings['foo'], 'bar')
+		del VI_OPTIONS['foo']
 
 	def testReturnsDefaultValueIfSetToWrongValue(self):
 		VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100,), default='bar', parser=None)
-		self.settsman.view.settings().set('vintageous_foo', 'maraca')
-		self.assertEqual(self.settsman['foo'], 'bar')
+		self.vi_settings.view.settings().set('vintageous_foo', 'maraca')
+		self.assertEqual(self.vi_settings['foo'], 'bar')
+		del VI_OPTIONS['foo']
 
 	def testReturnsCorrectValue(self):
 		VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100, 200), default='bar', parser=None)
-		self.settsman.view.settings().set('vintageous_foo', 200)
-		self.assertEqual(self.settsman['foo'], 200)
+		self.vi_settings.view.settings().set('vintageous_foo', 200)
+		self.assertEqual(self.vi_settings['foo'], 200)
+		del VI_OPTIONS['foo']
 
 	def testCanReturnWindowLevelSetting(self):
 		VI_OPTIONS['foo'] = vi_user_setting(scope=SCOPE_WINDOW, values=(100,), default='bar', parser=None)
-		self.settsman.view.window().settings().set('vintageous_foo', 100)
-		self.assertEqual(self.settsman['foo'], 100)
+		self.vi_settings.view.window().settings().set('vintageous_foo', 100)
+		self.assertEqual(self.vi_settings['foo'], 100)
+		del VI_OPTIONS['foo']
 
 	def testCanReturnViewLevelSetting(self):
 		VI_OPTIONS['foo'] = vi_user_setting(scope=SCOPE_VIEW, values=(100,), default='bar', parser=None)
-		self.settsman.view.settings().set('vintageous_foo', 100)
-		self.assertEqual(self.settsman['foo'], 100)
+		self.vi_settings.view.settings().set('vintageous_foo', 100)
+		self.assertEqual(self.vi_settings['foo'], 100)
+		del VI_OPTIONS['foo']
