@@ -457,9 +457,13 @@ class ViBufferSearch(IrreversibleTextCommand):
 class ViBufferReverseSearch(IrreversibleTextCommand):
     def run(self):
         Vintageous.state._dont_reset_during_init = True
-        self.view.window().show_input_panel('', '', self.on_done, None, self.on_cancel)
+
+        state = VintageState(self.view)
+        on_change = self.on_change if state.settings.vi['incsearch'] else None
+        self.view.window().show_input_panel('', '', self.on_done, on_change, self.on_cancel)
 
     def on_done(self, s):
+        self.view.erase_regions('vi_inc_search')
         state = VintageState(self.view)
         state.motion = 'vi_question_mark'
 
@@ -472,7 +476,15 @@ class ViBufferReverseSearch(IrreversibleTextCommand):
             state.last_buffer_search = s
         state.eval()
 
+    def on_change(self, s):
+        # TODO: Improve this.
+        self.view.erase_regions('vi_inc_search')
+        occurrence = reverse_search(self.view, s, 0, self.view.sel()[0].a)
+        if occurrence:
+            self.view.add_regions('vi_inc_search', [occurrence], 'comment', '')
+
     def on_cancel(self):
+        self.view.erase_regions('vi_inc_search')
         state = VintageState(self.view)
         state.reset()
 
