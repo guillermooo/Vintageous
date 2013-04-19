@@ -37,9 +37,9 @@
 	{ "keys": ["e"], "command": "set_motion", "args": {"motion": "vi_e"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["b"], "command": "set_motion", "args": {"motion": "vi_b"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 
-	{ "keys": ["w"], "command": "set_motion", "args": {"motion": "vi_big_w"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["e"], "command": "set_motion", "args": {"motion": "vi_big_e"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["b"], "command": "set_motion", "args": {"motion": "vi_big_b"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["W"], "command": "set_motion", "args": {"motion": "vi_big_w"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["E"], "command": "set_motion", "args": {"motion": "vi_big_e"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["B"], "command": "set_motion", "args": {"motion": "vi_big_b"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 
 	{ "keys": ["$"], "command": "set_motion", "args": {"motion": "vi_dollar"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["_"], "command": "set_motion", "args": {"motion": "vi_underscore"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
