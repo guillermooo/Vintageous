@@ -626,3 +626,13 @@ def vi_g_octothorp(vi_cmd_data):
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'exact_word': False}
 
     return vi_cmd_data
+
+def vi_enter(vi_cmd_data):
+    # TODO: Improve post_motion: should leave caret at first non-white space char.
+    vi_cmd_data['motion']['command'] = '_vi_j_motion'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'xpos': 0}
+
+    if vi_cmd_data['mode'] == MODE_VISUAL_LINE:
+        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'xpos': vi_cmd_data['xpos']}
+
+    return vi_cmd_data
