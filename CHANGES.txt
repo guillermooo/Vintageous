@@ -1,3 +1,7 @@
+0.9.4 - 19/04/2013
+
+	- Define 'enter' motion, 'space' motion and 'ctrl+space' motion.
+
 0.9.3 - 18/04/2013
 	
 	- Add basic incremental search functionality to '?' motion.
