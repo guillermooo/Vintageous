@@ -32,6 +32,7 @@ TESTS_MARKS = 'Vintageous.tests.vi.test_marks'
 TESTS_STATE = 'Vintageous.tests.test_state'
 TESTS_CONSTANTS = 'Vintageous.tests.vi.test_constants'
 TESTS_CMD_DATA = 'Vintageous.tests.vi.test_cmd_data'
+TESTS_KEYMAP = 'Vintageous.tests.test_keymap'
 
 
 test_suites = {
@@ -46,6 +47,8 @@ test_suites = {
         'constants': ['_pt_run_tests', [TESTS_CONSTANTS]],
 
         'cmd_data': ['_pt_run_tests', [TESTS_CMD_DATA]],
+
+        'keymap': ['_pt_run_tests', [TESTS_KEYMAP]],
 }
 
 
