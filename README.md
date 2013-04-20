@@ -51,9 +51,9 @@ Documentation
 Settings
 --------
 
-	- **vintageous_verbose**: If `true`, debug information will be printed to the console. Set to `false` by default.
-	- **vintageous_use_ctrl_keys**: If true, key bindings prefaced by the CTRL modifier will override default Sublime Text key bindings. Set to `false` by default.
-	- **vintageous_hlsearch**: If true, search occurrences will be highlighted in '/', '?', etc. Set to `true` by default.
-	- **vintageous_incsearch**: If true, search patterns will be applied incrementally as they are typed in. Set to `true` by default.
-	- **vintageous_search_mode": One of: `smart_case`, `case_insensitive`, `case_sensitive`. Controls interpretation of search patterns in `/`, `?`. Set to `smart_case` by default.
-	- **vintageous_enable_cmdline_mode**: If true, ':' and ex commands will be available.
+- **vintageous_verbose**: If `true`, debug information will be printed to the console. Set to `false` by default.
+- **vintageous_use_ctrl_keys**: If true, key bindings prefaced by the CTRL modifier will override default Sublime Text key bindings. Set to `false` by default.
+- **vintageous_hlsearch**: If true, search occurrences will be highlighted in '/', '?', etc. Set to `true` by default.
+- **vintageous_incsearch**: If true, search patterns will be applied incrementally as they are typed in. Set to `true` by default.
+- **vintageous_search_mode": One of: `smart_case`, `case_insensitive`, `case_sensitive`. Controls interpretation of search patterns in `/`, `?`. Set to `smart_case` by default.
+- **vintageous_enable_cmdline_mode**: If true, ':' and ex commands will be available.

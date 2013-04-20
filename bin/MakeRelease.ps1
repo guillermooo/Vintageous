@@ -11,7 +11,6 @@ $includeFiles = @(
         "*.sublime-keymap",
         "*.sublime-settings",
         "Default.sublime-commands",
-        "LICENSE.txt",
         "README.md",
         "*.tmLanguage"
     )
