@@ -51,4 +51,4 @@ Documentation
 Settings
 --------
 
-See *[Vintageous/Preferences.sublime-settings]*(https://github.com/guillermooo/Vintageous/blob/master/Preferences.sublime-settings) for a comprehensive list of settings.
+See [Vintageous/Preferences.sublime-settings](https://github.com/guillermooo/Vintageous/blob/master/Preferences.sublime-settings) for a comprehensive list of settings.
