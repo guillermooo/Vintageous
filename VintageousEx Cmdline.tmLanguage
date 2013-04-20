@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>name</key>
+	<string>Vintageous Command Line</string>
+	<key>scopeName</key>
+	<string>text.excmdline</string>
+	<key>uuid</key>
+	<string>eb9bb9a2-ab05-4edf-aee1-22d79cc9d9b0</string>
+</dict>
+</plist>

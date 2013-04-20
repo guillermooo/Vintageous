@@ -12,7 +12,8 @@ $includeFiles = @(
         "*.sublime-settings",
         "Default.sublime-commands",
         "LICENSE.txt",
-        "README.md"
+        "README.md",
+        "*.tmLanguage"
     )
 
 $excludeFiles = @(
@@ -22,7 +23,9 @@ $excludeFiles = @(
 
 $includeDirs = @(
         "vi",
-        "tests"
+        "tests",
+        "ex",
+        "licenses"
     )
 
 $excludeDirs = @(

@@ -10,5 +10,11 @@
 	"vintageous_hlsearch": true,
 
 	// If true, search patterns will be applied incrementally as they are typed in.
-	"vintageous_incsearch": true
+	"vintageous_incsearch": true,
+
+	// How "/" and "?" should operate. 
+	// One of: smart_case, case_insensitive, case_sensitive
+	// smart_case: Perform case sensitive search if mixed case in search term, otherwise case
+	// insensitive.
+	"vintageous_search_mode": "smart_case"
 }

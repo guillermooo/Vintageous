@@ -240,6 +240,15 @@
 	{ "keys": ["ctrl+x"], "command": "set_action", "args": {"action": "vi_ctrl_x"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "setting.command_mode"}]},
 
 
+	// Cmdline mode commands ======================================================================================================
+	{"keys": [":"], "command": "vi_colon_input", "context": [{"key": "setting.command_mode"}]},
+ 	{"keys": [":"], "command": "vi_colon_input", "args": {"initial_text": ":'<,'>"}, "context": [{"key": "setting.command_mode"}, {"key": "selection_empty", "operator": "equal", "operand": false }] },
+
+	{"keys": ["up"], "command": "cycle_cmdline_history", "args": {"backwards": true }, "context": [{ "key": "selector", "operator": "equal", "operand": "text.excmdline" }]},
+ 	{"keys": ["down"], "command": "cycle_cmdline_history", "context": [{"key": "selector", "operator": "equal", "operand": "text.excmdline"}]},
+	// =============================================================================================================================
+
+
 	// Collects user input for commands such as t, f, T, F.
 	// XXX: Seems to need to come after every other key binding so it will catch every character. Investigate this.
 	{ "keys": ["<character>"], "command": "collect_user_input", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_user_input"}] },
