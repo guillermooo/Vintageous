@@ -49,6 +49,10 @@ class KeyContext(object):
         value = self.state.settings.view['vintageous_use_ctrl_keys']
         return self._check(value, operator, operand, match_all)
 
+    def vi_enable_cmdline_mode(self, key, operator, operand, match_all):
+        value = self.state.settings.view['vintageous_enable_cmdline_mode']
+        return self._check(value, operator, operand, match_all)
+
     def vi_has_incomplete_action(self, key, operator, operand, match_all):
         value = self.state.action in constants.INCOMPLETE_ACTIONS
         return self._check(value, operator, operand, match_all)

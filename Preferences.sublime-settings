@@ -6,7 +6,7 @@
 	// key bindings.
 	"vintageous_use_ctrl_keys": false,
 
-	// If true, search occurrences won't be highlighted at all.
+	// If true, search occurrences will be highlighted in '/', '?', etc.
 	"vintageous_hlsearch": true,
 
 	// If true, search patterns will be applied incrementally as they are typed in.
@@ -16,5 +16,8 @@
 	// One of: smart_case, case_insensitive, case_sensitive
 	// smart_case: Perform case sensitive search if mixed case in search term, otherwise case
 	// insensitive.
-	"vintageous_search_mode": "smart_case"
+	"vintageous_search_mode": "smart_case",
+
+	// If true, ':' and ex commands will be available.
+	"vintageous_enable_cmdline_mode": true
 }
