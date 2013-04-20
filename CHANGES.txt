@@ -1,3 +1,8 @@
+0.9.7 - 20/04/2013
+
+	- Disable q action when we're in the middle of a chord like gq.
+	- Space behaves like l motion.
+
 0.9.6 - 20/04/2013
 
 	- Add command line mode (':' command).
