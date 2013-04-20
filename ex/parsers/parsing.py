@@ -24,7 +24,7 @@ class Lexer(object):
         pass
 
     def parse(self, string):
-        if not isinstance(string, basestring):
+        if not isinstance(string, str):
             raise TypeError("Can only parse strings.")
         self._reset()
         self.string = string

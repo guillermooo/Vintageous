@@ -369,7 +369,7 @@ def parse_command(cmd):
         if found_args:
             found_args = found_args.groupdict()
             # get rid of unset arguments so they don't clobber defaults
-            found_args = dict((k, v) for k, v in found_args if v is not None)
+            found_args = dict((k, v) for k, v in found_args.items() if v is not None)
             cmd_args.update(found_args)
             break
 
