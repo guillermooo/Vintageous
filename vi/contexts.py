@@ -16,6 +16,15 @@ class KeyContext(object):
         if (is_normal_mode and is_exit_mode_insert):
             return self._check(True, operator, operand, match_all)
 
+        # Close the ':' panel.
+        if self.vi_is_cmdline(key, operator, operand, match_all):
+            # We return False so that vi_esc will be skipped and the default Sublime Text command
+            # will be triggered instead. When the input panel finally closes, the initialization
+            # code in state.py will take care of clearing the state so we are left in a consistent
+            # state.
+            return False
+
+        # TODO: Simplify comparisons.
         if self.state.mode == MODE_NORMAL_INSERT:
             return True
 
@@ -30,6 +39,7 @@ class KeyContext(object):
         # cleanup tasks, so let the command run anyway.
         if self.state.view.get_regions('vi_search'):
             return True
+
 
     def vi_is_buffer(self, key, operator, operand, match_all):
         # !! The following check is based on an implementation detail of Sublime Text. !!
@@ -47,6 +57,10 @@ class KeyContext(object):
 
     def vi_use_ctrl_keys(self, key, operator, operand, match_all):
         value = self.state.settings.view['vintageous_use_ctrl_keys']
+        return self._check(value, operator, operand, match_all)
+
+    def vi_is_cmdline(self, key, operator, operand, match_all):
+        value = (self.state.view.score_selector(0, 'text.excmdline') != 0)
         return self._check(value, operator, operand, match_all)
 
     def vi_enable_cmdline_mode(self, key, operator, operand, match_all):

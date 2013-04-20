@@ -64,7 +64,7 @@ def _init_vintageous(view):
     elif state.mode == MODE_NORMAL_INSERT:
         view.run_command('vi_run_normal_insert_mode_actions')
     else:
-        # XXX: When is this run? Only at startup?
+        # This may be run when we're coming from cmdline mode.
         state.enter_normal_mode()
 
     state.reset()
