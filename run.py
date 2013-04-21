@@ -218,22 +218,9 @@ class ViRunCommand(sublime_plugin.TextCommand):
         self.debug("Vintageous: Action command: ", vi_cmd_data['action'])
         if vi_cmd_data['action']:
 
-            # Populate registers if we have to.
-            if vi_cmd_data['can_yank']:
-                state = VintageState(self.view)
-                if vi_cmd_data['register']:
-                    state.registers[vi_cmd_data['register']] = self.get_selected_text(vi_cmd_data)
-                else:
-                    # TODO: Encapsulate this in registers.py. We could have a
-                    # .yank() method there that knows about all the details.
-                    state.registers[REG_UNNAMED] = self.get_selected_text(vi_cmd_data)
-
-            # XXX: Small register delete. Improve this implementation.
-            if vi_cmd_data['populates_small_delete_register']:
-                state = VintageState(self.view)
-                is_same_line = lambda r: self.view.line(r.begin()) == self.view.line(r.end() - 1)
-                if all(is_same_line(x) for x in list(self.view.sel())):
-                    state.registers[REG_SMALL_DELETE] = self.get_selected_text(vi_cmd_data)
+            state = VintageState(self.view)
+            # First of all, yank if we have to, before the selections get destroyed.
+            state.registers.yank(vi_cmd_data)
 
             cmd = vi_cmd_data['action']['command']
             args = vi_cmd_data['action']['args']
@@ -243,24 +230,6 @@ class ViRunCommand(sublime_plugin.TextCommand):
             i = vi_cmd_data['count'] if vi_cmd_data['_repeat_action'] else 1
             for t in range(i):
                 self.view.run_command(cmd, args)
-
-    def get_selected_text(self, vi_cmd_data):
-        fragments = [self.view.substr(r) for r in list(self.view.sel())]
-
-        # Add new line at EOF, but don't add too many new lines.
-        if vi_cmd_data['synthetize_new_line_at_eof'] and not vi_cmd_data['yanks_linewise']:
-            if (not fragments[-1].endswith('\n') and
-                # XXX: It appears regions can end beyond the buffer's EOF (?).
-                self.view.sel()[-1].b >= self.view.size()):
-                    fragments[-1] += '\n'
-
-        if fragments and vi_cmd_data['yanks_linewise']:
-            for i, f in enumerate(fragments):
-                # When should we add a newline character?
-                #  * always except when we have a non-\n-only string followed by a newline char.
-                if (not f.endswith('\n')) or (f == '\n') or f.endswith('\n\n'):
-                    fragments[i] = f + '\n'
-        return fragments
 
     def do_post_action(self, vi_cmd_data):
         if vi_cmd_data['post_action']:
