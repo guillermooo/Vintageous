@@ -1,7 +1,9 @@
 import unittest
+import builtins
 
 import sublime
 
+from Vintageous.tests.borrowed import mock
 from Vintageous.test_runner import TestsState
 from Vintageous.vi import registers
 from Vintageous.vi.registers import Registers
@@ -238,3 +240,184 @@ class TestCaseRegisters(unittest.TestCase):
     def testCanGetSmallDeleteRegister(self):
         registers._REGISTER_DATA[registers.REG_SMALL_DELETE] = ['foo']
         self.assertEqual(self.regs.get(registers.REG_SMALL_DELETE), ['foo'])
+
+
+class Test_get_selected_text(unittest.TestCase):
+    def setUp(self):
+        sublime.set_clipboard('')
+        registers._REGISTER_DATA = {}
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.settings().erase('vintageous_use_sys_clipboard')
+        self.regs = VintageState(TestsState.view).registers
+        self.regs.view = mock.Mock()
+
+    def testExtractsSubstrings(self):
+        self.regs.view.sel.return_value = [10, 20, 30]
+        vi_cmd_data = {
+            'synthetize_new_line_at_eof': False,
+            'yanks_linewise': False,
+        }
+        self.regs.get_selected_text(vi_cmd_data)
+        self.assertEqual(self.regs.view.substr.call_count, 3)
+
+    def testReturnsFragments(self):
+        self.regs.view.sel.return_value = [10, 20, 30]
+        self.regs.view.substr.side_effect = lambda x: x
+        vi_cmd_data = {
+            'synthetize_new_line_at_eof': False,
+            'yanks_linewise': False,
+        }
+        rv = self.regs.get_selected_text(vi_cmd_data)
+        self.assertEqual(rv, [10, 20, 30])
+
+    def testCanSynthetizeNewLineAtEof(self):
+        self.regs.view.substr.return_value = "AAA"
+        self.regs.view.sel.return_value = [sublime.Region(10, 10), sublime.Region(10, 10)]
+        self.regs.view.size.return_value = 0
+
+        vi_cmd_data = {
+            'synthetize_new_line_at_eof': True,
+            'yanks_linewise': False,
+        }
+        rv = self.regs.get_selected_text(vi_cmd_data)
+        self.assertEqual(rv, ["AAA", "AAA\n"])
+
+    def testDoesntSynthetizeNewLineAtEofIfNotNeeded(self):
+        self.regs.view.substr.return_value = "AAA\n"
+        self.regs.view.sel.return_value = [sublime.Region(10, 10), sublime.Region(10, 10)]
+        self.regs.view.size.return_value = 0
+
+        vi_cmd_data = {
+            'synthetize_new_line_at_eof': True,
+            'yanks_linewise': False,
+        }
+        rv = self.regs.get_selected_text(vi_cmd_data)
+        self.assertEqual(rv, ["AAA\n", "AAA\n"])
+
+    def testDoesntSynthetizeNewLineAtEofIfNotAtEof(self):
+        self.regs.view.substr.return_value = "AAA"
+        self.regs.view.sel.return_value = [sublime.Region(10, 10), sublime.Region(10, 10)]
+        self.regs.view.size.return_value = 100
+
+        vi_cmd_data = {
+            'synthetize_new_line_at_eof': True,
+            'yanks_linewise': False,
+        }
+        rv = self.regs.get_selected_text(vi_cmd_data)
+        self.assertEqual(rv, ["AAA", "AAA"])
+
+    def testCanYankLinewise(self):
+        self.regs.view.substr.return_value = "AAA"
+        self.regs.view.sel.return_value = [sublime.Region(10, 10), sublime.Region(10, 10)]
+
+        vi_cmd_data = {
+            'synthetize_new_line_at_eof': False,
+            'yanks_linewise': True,
+        }
+        rv = self.regs.get_selected_text(vi_cmd_data)
+        self.assertEqual(rv, ["AAA\n", "AAA\n"])
+
+    def testDoesNotYankLinewiseIfNonEmptyStringFollowedByNewLine(self):
+        self.regs.view.substr.return_value = "AAA\n"
+        self.regs.view.sel.return_value = [sublime.Region(10, 10), sublime.Region(10, 10)]
+
+        vi_cmd_data = {
+            'synthetize_new_line_at_eof': False,
+            'yanks_linewise': True,
+        }
+        rv = self.regs.get_selected_text(vi_cmd_data)
+        self.assertEqual(rv, ["AAA\n", "AAA\n"])
+
+    def testYankLinewiseIfEmptyStringFollowedByNewLine(self):
+        self.regs.view.substr.return_value = "\n"
+        self.regs.view.sel.return_value = [sublime.Region(10, 10), sublime.Region(10, 10)]
+
+        vi_cmd_data = {
+            'synthetize_new_line_at_eof': False,
+            'yanks_linewise': True,
+        }
+        rv = self.regs.get_selected_text(vi_cmd_data)
+        self.assertEqual(rv, ["\n\n", "\n\n"])
+
+    def testYankLinewiseIfTwoTrailingNewLines(self):
+        self.regs.view.substr.return_value = "\n\n"
+        self.regs.view.sel.return_value = [sublime.Region(10, 10), sublime.Region(10, 10)]
+
+        vi_cmd_data = {
+            'synthetize_new_line_at_eof': False,
+            'yanks_linewise': True,
+        }
+        rv = self.regs.get_selected_text(vi_cmd_data)
+        self.assertEqual(rv, ["\n\n\n", "\n\n\n"])
+
+
+class Test_yank(unittest.TestCase):
+    def setUp(self):
+        sublime.set_clipboard('')
+        registers._REGISTER_DATA = {}
+        TestsState.view.settings().erase('vintage')
+        TestsState.view.settings().erase('vintageous_use_sys_clipboard')
+        self.regs = VintageState(TestsState.view).registers
+        self.regs.view = mock.Mock()
+
+    def testDontYankIfWeDontHaveTo(self):
+        vi_cmd_data = {'can_yank': False, 'populates_small_delete_register': False}
+        self.regs.yank(vi_cmd_data)
+        self.assertEqual(registers._REGISTER_DATA, {})
+
+    def testYanksToUnnamedRegisterIfNoRegisterNameProvided(self):
+        vi_cmd_data = {
+            'can_yank': True,
+            'register': None,
+            'populates_small_delete_register': False,
+            }
+
+        with mock.patch.object(self.regs, 'get_selected_text') as gst:
+            gst.return_value = ['foo']
+            self.regs.yank(vi_cmd_data)
+            self.assertEqual(registers._REGISTER_DATA, {'"': ['foo']})
+
+    def testYanksToRegisters(self):
+        vi_cmd_data = {
+            'can_yank': True,
+            'register': 'a',
+            'populates_small_delete_register': False,
+            }
+
+        with mock.patch.object(self.regs, 'get_selected_text') as gst:
+            gst.return_value = ['foo']
+            self.regs.yank(vi_cmd_data)
+            self.assertEqual(registers._REGISTER_DATA, {'"': ['foo'], 'a': ['foo']})
+
+    def testCanPopulateSmallDeleteRegister(self):
+        # TODO: Do we really need to populate the unnamed reg when we're populating the small
+        # delete one?
+        vi_cmd_data = {
+            'can_yank': False,
+            'populates_small_delete_register': True,
+            }
+
+        with mock.patch.object(builtins, 'all') as a, \
+             mock.patch.object(self.regs, 'get_selected_text') as gst:
+                gst.return_value = ['foo']
+                self.regs.view.sel.return_value = range(1)
+                a.return_value = True
+                self.regs.yank(vi_cmd_data)
+                self.assertEqual(registers._REGISTER_DATA, {'"': ['foo'], '-': ['foo']})
+
+    def testDoesNotPopulateSmallDeleteRegisterIfWeShouldNot(self):
+        # TODO: Do we really need to populate the unnamed reg when we're populating the small
+        # delete one?
+        vi_cmd_data = {
+            'can_yank': False,
+            'populates_small_delete_register': True,
+            }
+
+        with mock.patch.object(builtins, 'all') as a, \
+             mock.patch.object(self.regs, 'get_selected_text') as gst:
+                gst.return_value = ['foo']
+                self.regs.view.sel.return_value = range(1)
+                a.return_value = False
+                self.regs.yank(vi_cmd_data)
+                self.assertEqual(registers._REGISTER_DATA, {})
+
