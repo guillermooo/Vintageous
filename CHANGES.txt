@@ -1,7 +1,8 @@
-0.9.7 - 22/04/2013
+0.9.8 - 22/04/2013
 
 	- Improve 'enter' motion.
 	- Add ctrl+w,ctrl+q and ctrl+w,q key bindings.
+	- Restore ctrl+w,v key binding.
 
 0.9.7 - 20/04/2013
 
