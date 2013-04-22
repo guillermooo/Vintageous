@@ -1,3 +1,4 @@
+
 //
 // Basic rule to add new key bindings:
 //
@@ -29,7 +30,7 @@
 	{ "keys": ["left"], "command": "set_motion", "args": {"motion": "vi_h"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["right"], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "vi_mode_normal_or_visual"}] }, 
 
-	{ "keys": ["space"], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": [" "], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["enter"], "command": "set_motion", "args": {"motion": "vi_enter"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
 	{ "keys": ["ctrl+space"], "command": "set_motion", "args": {"motion": "vi_w"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 
@@ -221,7 +222,7 @@
 	{ "keys": ["b"], "command": "set_action", "args": {"action": "vi_z_b"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 	{ "keys": ["t"], "command": "set_action", "args": {"action": "vi_z_t"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 
-	{ "keys": ["q"], "command": "vi_q", "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["q"], "command": "vi_q", "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action", "operand": false}] },
 	{ "keys": ["q"], "command": "_vi_q", "context": [{"key": "vi_is_recording_macro"}] },
 
 	{ "keys": ["@"], "command": "vi_at", "context": [{"key": "vi_mode_normal"}] },
@@ -238,6 +239,15 @@
 
 	{ "keys": ["ctrl+a"], "command": "set_action", "args": {"action": "vi_ctrl_a"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "setting.command_mode"}]},
 	{ "keys": ["ctrl+x"], "command": "set_action", "args": {"action": "vi_ctrl_x"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "setting.command_mode"}]},
+
+
+	// Cmdline mode commands ======================================================================================================
+	{ "keys": [":"], "command": "vi_colon_input", "context": [{"key": "setting.command_mode"}, {"key": "vi_enable_cmdline_mode"}] },
+ 	{ "keys": [":"], "command": "vi_colon_input", "args": {"initial_text": ":'<,'>"}, "context": [{"key": "setting.command_mode"}, {"key": "selection_empty", "operator": "equal", "operand": false }, {"key": "vi_enable_cmdline_mode"}] },
+
+	{ "keys": ["up"], "command": "cycle_cmdline_history", "args": {"backwards": true }, "context": [{"key": "vi_is_cmdline"}] },
+ 	{ "keys": ["down"], "command": "cycle_cmdline_history", "context": [{"key": "vi_is_cmdline"}] },
+	// =============================================================================================================================
 
 
 	// Collects user input for commands such as t, f, T, F.
