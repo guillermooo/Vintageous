@@ -137,6 +137,7 @@
 	{ "keys": ["q"], "command": "set_action", "args": {"action": "vi_g_q"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 	{ "keys": ["*"], "command": "set_action", "args": {"action": "vi_g_star"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 	{ "keys": ["#"], "command": "set_action", "args": {"action": "vi_g_octothorp"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
+	// TODO: Action name is misleading.
 	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_g_v"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_incomplete_action"}] },
 
 	{ "keys": ["U"], "command": "set_action", "args": {"action": "vi_big_u"}, "context": [{"key": "vi_mode_visual_any"}] },

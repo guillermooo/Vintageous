@@ -53,6 +53,7 @@ class Test_constants(unittest.TestCase):
                 ('vi_z_action', 'vi_zz'),
                 ('vi_ctrl_w_action', 'vi_ctrl_w_v'),
                 ('vi_ctrl_w_action', 'vi_g_q'),
+                ('vi_ctrl_w_action', 'vi_g_v'),
                 ('vi_ctrl_r_action', 'vi_ctrl_r_equals'),
                 ('vi_g_action', 'vi_gg'),
                 ('vi_g_action', 'vi_g_d'),

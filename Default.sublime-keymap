@@ -231,8 +231,6 @@
 	// TODO: The action name is misleading.
 	{ "keys": ["ctrl+q"], "command": "set_action", "args": {"action": "vi_g_q"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
 	{ "keys": ["ctrl+v"], "command": "set_action", "args": {"action": "vi_ctrl_w_v"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
-	// FIXME: This one interferes with g,v, so disable this one for now. We need a notion of "keybinding namespace".
-	// { "keys": ["v"], "command": "set_action", "args": {"action": "vi_ctrl_w_v"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
 
 	// TODO: Simplify the logic needed to make the expression register work in INSERTMODE.
 	{ "keys": ["ctrl+r"], "command": "set_action", "args": {"action": "vi_ctrl_r_action"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "setting.command_mode", "operator": "equal", "operand": false}]},
