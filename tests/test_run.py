@@ -65,11 +65,53 @@ class Test_ViRunCommand(unittest.TestCase):
             self.assertEqual(x.run_command.call_count, 0)
 
     @mock.patch('Vintageous.state.VintageState')
-    def testDebug(self, mocked_class):
+    def testDebug(self, mocked_state):
         x = mock.Mock()
         x.settings.view = {'vintageous_verbose': True}
-        mocked_class.return_value = x
+        mocked_state.return_value = x
 
         with mock.patch.object(builtins, 'print') as p:
             self.vi_run.debug(['one', 'two'])
             p.assert_called_once_with('Vintageous:', ['one', 'two'])
+
+
+class Test_do_action(unittest.TestCase):
+    def setUp(self):
+        self.vi_run = ViRunCommand(mock.Mock())
+
+    def testDoesNothingIfNoActionAvailable(self):
+        vi_cmd_data = {'action': None}
+        with mock.patch.object(self.vi_run, 'debug') as deb:
+            self.vi_run.do_action(vi_cmd_data)
+            deb.assert_called_once_with('Vintageous: Action command: ', None)
+
+    @mock.patch('Vintageous.run.VintageState.registers')
+    def testCallsYank(self, mocked_regs):
+        mocked_regs.yank = mock.Mock()
+        vi_cmd_data = {
+            'action': {'command': 'foo', 'args': {}},
+            '_repeat_action': False,
+            }
+        self.vi_run.do_action(vi_cmd_data)
+        mocked_regs.yank.assert_called_once_with(vi_cmd_data)
+
+    @mock.patch('Vintageous.run.VintageState.registers')
+    def testRunsCommandOnceIfMustNotRepeatAction(self, mocked_regs):
+        mocked_regs.yank = mock.Mock()
+        vi_cmd_data = {
+            'action': {'command': 'foo', 'args': {}},
+            '_repeat_action': False,
+            }
+        self.vi_run.do_action(vi_cmd_data)
+        self.vi_run.view.run_command.assert_called_once_with('foo', {})
+
+    @mock.patch('Vintageous.run.VintageState.registers')
+    def testRunsCommandExpectedTimes(self, mocked_regs):
+        mocked_regs.yank = mock.Mock()
+        vi_cmd_data = {
+            'action': {'command': 'foo', 'args': {}},
+            '_repeat_action': True,
+            'count': 10,
+            }
+        self.vi_run.do_action(vi_cmd_data)
+        self.assertEqual(self.vi_run.view.run_command.call_count, 10)
