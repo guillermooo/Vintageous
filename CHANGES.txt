@@ -1,3 +1,8 @@
+0.9.7 - 22/04/2013
+
+	- Improve 'enter' motion.
+	- Add ctrl+w,ctrl+q and ctrl+w,q key bindings.
+
 0.9.7 - 20/04/2013
 
 	- Disable q action when we're in the middle of a chord like gq.
