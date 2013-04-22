@@ -639,7 +639,7 @@ class _vi_repeat(IrreversibleTextCommand):
 
         # Ensure we wipe count data if any.
         state.reset()
-        # XXX: Needed here? Maybe enter_... type commands should be IrreversibleCommands so we
+        # XXX: Needed here? Maybe enter_... type commands should be IrreversibleTextCommands so we
         # must/can call them whenever we need them withouth affecting the undo stack.
         self.view.run_command('vi_enter_normal_mode')
 
@@ -809,3 +809,8 @@ class ViAt(IrreversibleTextCommand):
         state = VintageState(self.view)
         state.action = 'vi_at'
         state.expecting_user_input = True
+
+
+class _vi_ctrl_w_q(IrreversibleTextCommand):
+    def run(self):
+        self.view.close()

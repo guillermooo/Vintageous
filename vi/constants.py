@@ -40,6 +40,8 @@ digraphs = {
     ('vi_z_action', 'vi_zz'): ('vi_zz', DIGRAPH_ACTION),
 
     ('vi_ctrl_w_action', 'vi_ctrl_w_v'): ('vi_ctrl_w_v', DIGRAPH_ACTION),
+    # TODO: vi_g_q is a bad name, since 'q' combines both with g and ctrl+w.
+    ('vi_ctrl_w_action', 'vi_g_q'): ('vi_ctrl_w_q', DIGRAPH_ACTION),
     ('vi_ctrl_r_action', 'vi_ctrl_r_equals'): ('vi_ctrl_r_equals', DIGRAPH_ACTION),
 
     ('vi_g_action', 'vi_gg'): ('vi_gg', DIGRAPH_MOTION),

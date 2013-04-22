@@ -829,3 +829,12 @@ def vi_at(vi_cmd_data):
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
+
+
+def vi_ctrl_w_q(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['action']['command'] = '_vi_ctrl_w_q'
+    vi_cmd_data['action']['args'] = {}
+    vi_cmd_data['count'] = 1
+
+    return vi_cmd_data
