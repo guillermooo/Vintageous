@@ -188,12 +188,13 @@ def vi_big_c(vi_cmd_data):
     # No count: CHARACTERWISE + EXCLUSIVE
     # Count: LINEWISE + EXCLUSIVE
 
+    vi_cmd_data['cancel_action_if_motion_fails'] = True
     vi_cmd_data['can_yank'] = True
     vi_cmd_data['populates_small_delete_register'] = True
 
     if vi_cmd_data['count'] == 1:
-        vi_cmd_data['motion']['command'] = 'move_to'
-        vi_cmd_data['motion']['args'] = {'to': 'eol', 'extend': True}
+        vi_cmd_data['motion']['command'] = '_vi_big_c'
+        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
 
         vi_cmd_data['motion_required'] = False
         vi_cmd_data['action']['command'] = 'right_delete'
@@ -254,6 +255,7 @@ def vi_big_s(vi_cmd_data):
     # No count: CHARACTERWISE + EXCLUSIVE
     # Count: LINEWISE + EXCLUSIVE
 
+    vi_cmd_data['cancel_action_if_motion_fails'] = True
     vi_cmd_data['can_yank'] = True
     vi_cmd_data['yanks_linewise'] = True
 
@@ -261,7 +263,7 @@ def vi_big_s(vi_cmd_data):
         # Force execution of motion steps.
         vi_cmd_data['motion']['command'] = 'no_op'
         vi_cmd_data['motion']['args'] = {'forward': True}
-        vi_cmd_data['post_motion'] = [['extend_to_minimal_width',], ['visual_extend_to_line',],]
+        vi_cmd_data['post_motion'] = [['_vi_big_s', {'mode': vi_cmd_data['mode']}]]
 
         vi_cmd_data['motion_required'] = False
         vi_cmd_data['action']['command'] = 'right_delete'

@@ -203,6 +203,36 @@ class VisualExtendToLine(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
+class _vi_big_s(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None):
+        def f(view, s):
+            if mode == _MODE_INTERNAL_NORMAL:
+                if view.line(s).empty():
+                    return s
+            elif mode == MODE_VISUAL:
+                if view.line(s.b - 1).empty():
+                    return s
+
+            return self.view.line(s)
+
+        regions_transformer(self.view, f)
+
+
+class _vi_big_c(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None):
+        def f(view, s):
+            if mode == _MODE_INTERNAL_NORMAL:
+                if view.line(s).empty():
+                    return s
+            elif mode == MODE_VISUAL:
+                if view.line(s.b - 1).empty():
+                    return s
+
+            return sublime.Region(s.a, self.view.line(s).b)
+
+        regions_transformer(self.view, f)
+
+
 class VisualExtendEndToHardEnd(sublime_plugin.TextCommand):
     def run(self, edit, mode=None):
         def f(view, s):

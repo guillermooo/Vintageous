@@ -7,6 +7,7 @@ from Vintageous.state import VintageState
 from Vintageous.vi import actions
 from Vintageous.vi import motions
 from Vintageous.vi import registers
+from Vintageous.vi import utils
 from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
 from Vintageous.vi.constants import digraphs
 from Vintageous.vi.constants import MODE_INSERT
@@ -53,13 +54,15 @@ class ViRunCommand(sublime_plugin.TextCommand):
         self.debug("Data in ViRunCommand:", vi_cmd_data)
 
         try:
-            if vi_cmd_data['restore_original_carets']:
-                self.save_caret_pos()
+            # Always save carets just in case.
+            self.save_caret_pos()
 
             # If we're about to jump, we need to remember the current position so we can jump back
             # here. XXX creates_jump_at_current_position might be redundant.
             if vi_cmd_data['creates_jump_at_current_position'] or vi_cmd_data['is_jump']:
                 self.add_to_jump_list(vi_cmd_data)
+
+            sels_before_motion = list(self.view.sel())
 
             # XXX: Fix this. When should we run the motion exactly?
             if vi_cmd_data['action']:
@@ -69,16 +72,23 @@ class ViRunCommand(sublime_plugin.TextCommand):
                      not view.has_non_empty_selection_region())):
                         self.do_whole_motion(vi_cmd_data)
 
-                # The motion didn't change the selections: abort action if so required.
-                # TODO: What to do with .post_action() and .restore_original_carets_if_needed() in this event?
-                if (vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL and
-                    all([v.empty() for v in self.view.sel()]) and
-                    vi_cmd_data['cancel_action_if_motion_fails']):
-                        return
+                        # The motion didn't change the selections: abort action if so required.
+                        # TODO: What to do with .post_action() and .restore_original_carets_if_needed() in this event?
+                        if (vi_cmd_data['mode'] in (_MODE_INTERNAL_NORMAL, MODE_VISUAL) and
+                            any([(old == new) for (old, new) in zip(sels_before_motion, list(self.view.sel()))]) and
+                            vi_cmd_data['cancel_action_if_motion_fails']):
+                                # TODO: There should be a method that lets us do this without modifying vi_cmd_data.
+                                vi_cmd_data['restore_original_carets'] = True
+                                self.restore_original_carets_if_needed(vi_cmd_data)
+                                utils.blink()
+                                return
 
                 self.do_action(vi_cmd_data)
             else:
                 self.do_whole_motion(vi_cmd_data)
+                # TODO: Instead of blinking for every motion, blink here if selections didn't change.
+                # TODO: For example, don't blink in the j command, but here. That should be less
+                # TODO: obtrusive.
 
         finally:
             # XXX: post_action should be run only if do_action succeeds (?).

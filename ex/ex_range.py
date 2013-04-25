@@ -98,7 +98,7 @@ def new_calculate_range(view, r):
                 end -= 1
             all_line_blocks.append((start, end))
         return all_line_blocks, True
-        
+
     # todo: '< and other marks
     if r['left_ref'] and (r['left_ref'].startswith("'") or (r['right_ref'] and r['right_ref'].startswith("'"))):
         return []
@@ -112,7 +112,7 @@ def new_calculate_range(view, r):
     current_line = None
     lr = r['left_ref']
     if lr is not None:
-        current_line = calculate_relative_ref(view, lr) 
+        current_line = calculate_relative_ref(view, lr)
     loffset = r['left_offset']
     if loffset:
         current_line = current_line or 0
@@ -126,7 +126,7 @@ def new_calculate_range(view, r):
     current_line = None
     rr = r['right_ref']
     if rr is not None:
-        current_line = calculate_relative_ref(view, rr) 
+        current_line = calculate_relative_ref(view, rr)
     roffset = r['right_offset']
     if roffset:
         current_line = current_line or 0
