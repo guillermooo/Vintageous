@@ -1,3 +1,9 @@
+0.9.9 - 25/04/2013
+
+	- Abort S and C actions if any caret is at EOL.
+	- Improve feedback when motion fails.	
+	- Incremental search shows next match if it's off the visible region.
+
 0.9.8 - 22/04/2013
 
 	- Improve 'enter' motion.
