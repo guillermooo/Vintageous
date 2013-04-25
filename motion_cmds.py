@@ -447,11 +447,16 @@ class ViBufferSearch(IrreversibleTextCommand):
         next_hit = self.view.find(s, self.view.sel()[0].b + 1)
         if next_hit:
             self.view.add_regions('vi_inc_search', [next_hit], 'comment', '')
+            if not self.view.visible_region().contains(next_hit):
+                self.view.show(next_hit)
 
     def on_cancel(self):
         self.view.erase_regions('vi_inc_search')
         state = VintageState(self.view)
         state.reset()
+
+        if not self.view.visible_region().contains(self.view.sel()[0]):
+            self.view.show(self.view.sel()[0])
 
 
 class ViBufferReverseSearch(IrreversibleTextCommand):
@@ -482,11 +487,16 @@ class ViBufferReverseSearch(IrreversibleTextCommand):
         occurrence = reverse_search(self.view, s, 0, self.view.sel()[0].a)
         if occurrence:
             self.view.add_regions('vi_inc_search', [occurrence], 'comment', '')
+            if not self.view.visible_region().contains(occurrence):
+                self.view.show(occurrence)
 
     def on_cancel(self):
         self.view.erase_regions('vi_inc_search')
         state = VintageState(self.view)
         state.reset()
+
+        if not self.view.visible_region().contains(self.view.sel()[0]):
+            self.view.show(self.view.sel()[0])
 
 
 class _vi_forward_slash(sublime_plugin.TextCommand):
