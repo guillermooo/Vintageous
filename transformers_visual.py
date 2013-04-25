@@ -890,12 +890,9 @@ class _vi_l_motion(sublime_plugin.TextCommand):
         def f(view, s):
             if mode == MODE_NORMAL:
                 if view.line(s.b).empty():
-                    utils.blink()
                     return s
 
                 x_limit = min(view.line(s.b).b - 1, s.b + count, view.size())
-                if s.b == x_limit:
-                    utils.blink()
                 return sublime.Region(x_limit, x_limit)
 
             if mode == _MODE_INTERNAL_NORMAL:
@@ -945,8 +942,6 @@ class _vi_h_motion(sublime_plugin.TextCommand):
 
             elif mode == MODE_NORMAL:
                 x_limit = max(view.line(s.b).a, s.b - count)
-                if s.b == x_limit:
-                    utils.blink()
                 return sublime.Region(x_limit, x_limit)
 
             # XXX: We should never reach this.
@@ -962,9 +957,6 @@ class _vi_j_motion(sublime_plugin.TextCommand):
                 current_row = view.rowcol(s.b)[0]
                 target_row = min(current_row + count, view.rowcol(view.size())[0])
                 target_pt = view.text_point(target_row, 0)
-
-                if current_row == view.rowcol(view.size())[0]:
-                    utils.blink()
 
                 if view.line(target_pt).empty():
                     return sublime.Region(target_pt, target_pt)
@@ -1051,9 +1043,6 @@ class _vi_k_motion(sublime_plugin.TextCommand):
                 current_row = view.rowcol(s.b)[0]
                 target_row = min(current_row - count, view.rowcol(view.size())[0])
                 target_pt = view.text_point(target_row, 0)
-
-                if current_row == 0:
-                    utils.blink()
 
                 if view.line(target_pt).empty():
                     return sublime.Region(target_pt, target_pt)

@@ -86,9 +86,9 @@ class ViRunCommand(sublime_plugin.TextCommand):
                 self.do_action(vi_cmd_data)
             else:
                 self.do_whole_motion(vi_cmd_data)
-                # TODO: Instead of blinking for every motion, blink here if selections didn't change.
-                # TODO: For example, don't blink in the j command, but here. That should be less
-                # TODO: obtrusive.
+                if (vi_cmd_data['mode'] == MODE_NORMAL and
+                    any([(old == new) for (old, new) in zip(sels_before_motion, list(self.view.sel()))])):
+                        utils.blink()
 
         finally:
             # XXX: post_action should be run only if do_action succeeds (?).
