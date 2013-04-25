@@ -48,6 +48,7 @@ class ViRunCommand(sublime_plugin.TextCommand):
     """Evaluates a full vim command. Everything that happens inside .run() will be left in the
        undo stack so that the "." command works as expected.
     """
+    # TODO: Test me.
     def run(self, edit, **vi_cmd_data):
         self.debug("Data in ViRunCommand:", vi_cmd_data)
 
@@ -106,9 +107,11 @@ class ViRunCommand(sublime_plugin.TextCommand):
             state.next_mode = vi_cmd_data['next_mode']
             state.next_mode_command = vi_cmd_data['follow_up_mode']
 
+    # TODO: Test me.
     def save_caret_pos(self):
         self.old_sels = list(self.view.sel())
 
+    # TODO: Test me.
     def do_whole_motion(self, vi_cmd_data):
         # If the action must be repeated, then the count cannot apply here; exit early.
         if vi_cmd_data['_repeat_action']:
@@ -133,6 +136,7 @@ class ViRunCommand(sublime_plugin.TextCommand):
 
         self.add_to_jump_list(vi_cmd_data)
 
+    # TODO: Test me.
     def reorient_caret(self, vi_cmd_data):
         if not vi_cmd_data['__reorient_caret']:
             return
@@ -147,11 +151,13 @@ class ViRunCommand(sublime_plugin.TextCommand):
                     else:
                         self.view.run_command('reorient_caret', {'forward': False, 'mode': vi_cmd_data['mode']})
 
+    # TODO: Test me.
     def reposition_caret(self, vi_cmd_data):
         if self.view.has_non_empty_selection_region():
             if vi_cmd_data['reposition_caret']:
                 self.view.run_command(*vi_cmd_data['reposition_caret'])
 
+    # TODO: Test me.
     def restore_original_carets_if_needed(self, vi_cmd_data):
         if vi_cmd_data['restore_original_carets'] == True:
             self.view.sel().clear()
@@ -159,6 +165,7 @@ class ViRunCommand(sublime_plugin.TextCommand):
                 # XXX: If the buffer has changed, this won't work well.
                 self.view.sel().add(s)
 
+    # TODO: Test me.
     def do_modify_selections(self, vi_cmd_data):
         # Gives command a chance to modify the selection after the motion/action. Useful for
         # cases like 3yk, where we need to collapse to .b (== .begin()).

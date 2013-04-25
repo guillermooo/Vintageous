@@ -115,3 +115,105 @@ class Test_do_action(unittest.TestCase):
             }
         self.vi_run.do_action(vi_cmd_data)
         self.assertEqual(self.vi_run.view.run_command.call_count, 10)
+
+
+class Test_do_post_motion(unittest.TestCase):
+    def setUp(self):
+        self.vi_run = ViRunCommand(mock.Mock())
+
+    def testDoesNotRunIfUnset(self):
+        vi_cmd_data = {'post_motion': []}
+        self.vi_run.do_post_motion(vi_cmd_data)
+        self.assertEqual(self.vi_run.view.run_command.call_count, 0)
+
+    def testRunsAsExpectedIfSet(self):
+        vi_cmd_data = {'post_motion': [['foo', {'bar': 100}]]}
+        self.vi_run.do_post_motion(vi_cmd_data)
+        self.vi_run.view.run_command.assert_called_once_with('foo', {'bar': 100})
+
+
+class Test_do_pre_motion(unittest.TestCase):
+    def setUp(self):
+        self.vi_run = ViRunCommand(mock.Mock())
+
+    def testDoesNotRunIfUnset(self):
+        vi_cmd_data = {'pre_motion': []}
+        self.vi_run.do_pre_motion(vi_cmd_data)
+        self.assertEqual(self.vi_run.view.run_command.call_count, 0)
+
+    def testRunsAsExpectedIfSet(self):
+        vi_cmd_data = {'post_motion': [['foo', {'bar': 100}]]}
+        self.vi_run.do_post_motion(vi_cmd_data)
+        self.vi_run.view.run_command.assert_called_once_with('foo', {'bar': 100})
+
+
+class Test_do_post_every_motion(unittest.TestCase):
+    def setUp(self):
+        self.vi_run = ViRunCommand(mock.Mock())
+
+    def testDoesNotRunIfUnset(self):
+        vi_cmd_data = {'post_every_motion': None}
+        self.vi_run.do_post_every_motion(vi_cmd_data, 0, 0)
+        self.assertEqual(self.vi_run.view.run_command.call_count, 0)
+
+    def testRunsAsExpectedIfSet(self):
+        vi_cmd_data = {'post_every_motion': ['foo', {'bar': 100}]}
+        self.vi_run.do_post_every_motion(vi_cmd_data, 100, 200)
+        self.vi_run.view.run_command.assert_called_once_with('foo', {'bar': 100, 'current_iteration': 100, 'total_iterations': 200})
+
+    def testRunsAsExpectedIfMissingArgs(self):
+        vi_cmd_data = {'post_every_motion': ['foo']}
+        self.vi_run.do_post_every_motion(vi_cmd_data, 100, 200)
+        self.vi_run.view.run_command.assert_called_once_with('foo', {'current_iteration': 100, 'total_iterations': 200})
+
+
+class Test_do_pre_every_motion(unittest.TestCase):
+    def setUp(self):
+        self.vi_run = ViRunCommand(mock.Mock())
+
+    def testDoesNotRunIfUnset(self):
+        vi_cmd_data = {'pre_every_motion': None}
+        self.vi_run.do_pre_every_motion(vi_cmd_data, 0, 0)
+        self.assertEqual(self.vi_run.view.run_command.call_count, 0)
+
+    def testRunsAsExpectedIfSet(self):
+        vi_cmd_data = {'pre_every_motion': ['foo', {'bar': 100}]}
+        self.vi_run.do_pre_every_motion(vi_cmd_data, 100, 200)
+        self.vi_run.view.run_command.assert_called_once_with('foo', {'bar': 100, 'current_iteration': 100, 'total_iterations': 200})
+
+    def testRunsAsExpectedIfMissingArgs(self):
+        vi_cmd_data = {'pre_every_motion': ['foo']}
+        self.vi_run.do_pre_every_motion(vi_cmd_data, 100, 200)
+        self.vi_run.view.run_command.assert_called_once_with('foo', {'current_iteration': 100, 'total_iterations': 200})
+
+
+class Test_do_last_motion(unittest.TestCase):
+    def setUp(self):
+        self.vi_run = ViRunCommand(mock.Mock())
+
+    def testRunsEvenIfUnset(self):
+        # TODO: Does this behavior make sense?
+        vi_cmd_data = {'last_motion': []}
+        self.vi_run.do_last_motion(vi_cmd_data)
+        self.assertEqual(self.vi_run.view.run_command.call_count, 1)
+
+    def testRunsAsExpectedIfSet(self):
+        vi_cmd_data = {'last_motion': ['foo', {'bar': 100}]}
+        self.vi_run.do_last_motion(vi_cmd_data)
+        self.vi_run.view.run_command.assert_called_once_with('foo', {'bar': 100})
+
+
+class Test_do_motion(unittest.TestCase):
+    def setUp(self):
+        self.vi_run = ViRunCommand(mock.Mock())
+
+    def testCallsDebug(self):
+        vi_cmd_data = {'motion': {'command': 'foo', 'args': {'bar': 100}}}
+        with mock.patch.object(self.vi_run, 'debug') as db:
+            self.vi_run.do_motion(vi_cmd_data)
+            db.assert_called_once_with('Vintageous: Motion command: ', vi_cmd_data['motion']['command'], vi_cmd_data['motion']['args'])
+
+    def testCallsRunCommand(self):
+        vi_cmd_data = {'motion': {'command': 'foo', 'args': {'bar': 100}}}
+        self.vi_run.do_motion(vi_cmd_data)
+        self.vi_run.view.run_command.assert_called_once_with('foo', {'bar': 100})
