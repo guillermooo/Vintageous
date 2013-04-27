@@ -1,4 +1,4 @@
-0.9.9 - 27/04/2013
+0.9.10 - 27/04/2013
 
 	- Translate cw to ce as Vim does.
 
