@@ -1,3 +1,7 @@
+0.9.9 - 27/04/2013
+
+	- Translate cw to ce as Vim does.
+
 0.9.9 - 25/04/2013
 
 	- Abort S and C actions if any caret is at EOL.
