@@ -62,6 +62,13 @@ INCOMPLETE_ACTIONS = ('vi_g_action', 'vi_z_action', 'vi_ctrl_w_action',
 ACTIONS_EXITING_TO_INSERT_MODE = ('vi_ctrl_r_action',)
 
 
+# TODO: Test me
+# Vim translates some motions when combined with certain actions.
+MOTION_TRANSLATION_TABLE = {
+    ('vi_c', 'vi_w'): 'vi_e',
+}
+
+
 # TODO: This does not belong here.
 def mode_to_str(mode):
     if mode == MODE_INSERT:

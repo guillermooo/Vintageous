@@ -10,6 +10,7 @@ from Vintageous.vi import registers
 from Vintageous.vi import utils
 from Vintageous.vi.cmd_data import CmdData
 from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
+from Vintageous.vi.constants import MOTION_TRANSLATION_TABLE
 from Vintageous.vi.constants import ACTIONS_EXITING_TO_INSERT_MODE
 from Vintageous.vi.constants import DIGRAPH_MOTION
 from Vintageous.vi.constants import digraphs
@@ -267,9 +268,10 @@ class VintageState(object):
         """
         return self.settings.vi['motion']
 
+    # TODO: Test me.
     @motion.setter
     def motion(self, name):
-        self.settings.vi['motion'] = name
+        self.settings.vi['motion'] = MOTION_TRANSLATION_TABLE.get((self.action, name), name)
 
     @property
     def motion_digits(self):
