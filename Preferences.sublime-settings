@@ -19,5 +19,8 @@
 	"vintageous_search_mode": "smart_case",
 
 	// If true, ':' and ex commands will be available.
-	"vintageous_enable_cmdline_mode": true
+	"vintageous_enable_cmdline_mode": true,
+
+	// If true, the current mode will be reset to normal mode when a tab gets activated.
+	"vintageous_reset_mode_when_switching_tabs": true
 }

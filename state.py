@@ -731,6 +731,9 @@ class ViFocusRestorerEvent(sublime_plugin.EventListener):
     def on_activated(self, view):
         if self.timer:
             # Switching to a different view; enter normal mode.
+            state = VintageState(view)
+            if not state.settings.view['vintageous_reset_mode_when_switching_tabs']:
+                return
             self.timer.cancel()
             _init_vintageous(view)
         else:
