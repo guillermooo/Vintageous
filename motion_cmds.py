@@ -8,6 +8,7 @@ from Vintageous.state import VintageState, IrreversibleTextCommand
 from Vintageous.vi import utils
 from Vintageous.vi.search import reverse_search
 from Vintageous.vi.search import find_in_range
+from Vintageous.vi.search import find_wrapping
 
 import Vintageous.state
 
@@ -442,9 +443,14 @@ class ViBufferSearch(IrreversibleTextCommand):
         state.eval()
 
     def on_change(self, s):
-        # TODO: Improve this.
         self.view.erase_regions('vi_inc_search')
-        next_hit = self.view.find(s, self.view.sel()[0].b + 1)
+        state = VintageState(self.view)
+        next_hit = find_wrapping(self.view,
+                                 term=s,
+                                 start=self.view.sel()[0].b + 1,
+                                 end=self.view.size(),
+                                 flags=0,
+                                 times=state.count)
         if next_hit:
             self.view.add_regions('vi_inc_search', [next_hit], 'comment', '')
             if not self.view.visible_region().contains(next_hit):
@@ -517,16 +523,13 @@ class _vi_forward_slash(sublime_plugin.TextCommand):
     def run(self, edit, search_string, mode=None, count=1, extend=False):
         def f(view, s):
             if mode == MODE_VISUAL:
-                if s.b < match.a:
-                    return sublime.Region(s.a, match.a)
+                return sublime.Region(s.a, match.a)
 
             elif mode == _MODE_INTERNAL_NORMAL:
-                if s.b < match.a:
-                    return sublime.Region(s.a, match.a)
+                return sublime.Region(s.a, match.a)
 
             elif mode == MODE_NORMAL:
-                if s.b < match.a:
-                    return sublime.Region(match.a, match.a)
+                return sublime.Region(match.a, match.a)
 
             return s
 
@@ -537,16 +540,13 @@ class _vi_forward_slash(sublime_plugin.TextCommand):
         # We want to start searching right after the current selection.
         current_sel = self.view.sel()[0]
         start = current_sel.b if not current_sel.empty() else current_sel.b + 1
+        wrapped_end = self.view.size()
 
         # TODO: What should we do here? Case-sensitive or case-insensitive search? Configurable?
-        match = self.view.find(search_string, start)
+        # Search wrapping around the end of the buffer.
+        match = find_wrapping(self.view, search_string, start, wrapped_end, flags=0, times=count)
         if not match:
             return
-
-        for x in range(count - 1):
-            match = self.view.find(search_string, match.b)
-            if not match:
-                return
 
         regions_transformer(self.view, f)
         self.hilite(search_string)
