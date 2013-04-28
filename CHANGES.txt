@@ -1,3 +1,11 @@
+0.9.12 - 29/04/2013
+
+	- Improve 'enter' motion.
+	- Implement 'shift+enter' as an antonym to 'enter' motion (non-standard Vim behavior).
+	- Add setting to control whether switching tabs resets the current mode to normal mode.
+	- Implement ctrl+w,h and ctrl-w,l actions.
+	- Implement 'autoindent' setting for S action.
+
 0.9.11 - 28/04/2013
 
 	- Improve / and ? motions: support counts in incsearch and wrap around buffer ends.
