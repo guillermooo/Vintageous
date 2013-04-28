@@ -83,14 +83,22 @@ class TestViEditorSettings(unittest.TestCase):
 	def testKnowsAllSettings(self):
 		all_settings = [
 			'hlsearch',
-			'incsearch'
-			]
+			'incsearch',
+			'autoindent'
+		]
 
 		self.assertEqual(sorted(all_settings), sorted(list(VI_OPTIONS.keys())))
 
 	def testSettingsAreCorrectlyDefined(self):
-		self.assertEqual(VI_OPTIONS['hlsearch'], vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=True, parser=None))
-		self.assertEqual(VI_OPTIONS['incsearch'], vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=True, parser=None))
+		KNOWN_OPTIONS = {
+			'hlsearch': vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=True, parser=None),
+			'incsearch': vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=True, parser=None),
+			'autoindent': vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=True, parser=None),
+		}
+
+		self.assertEqual(len(KNOWN_OPTIONS), len(VI_OPTIONS))
+		for (k, v) in KNOWN_OPTIONS.items():
+			self.assertEqual(VI_OPTIONS[k], v)
 
 	def testCanRetrieveDefaultValue(self):
 		self.assertEqual(self.settsman['hlsearch'], True)
