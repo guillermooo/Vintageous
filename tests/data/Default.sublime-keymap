@@ -218,6 +218,7 @@
 	// Ordering matters: To avoid conflicts with t and possibly other key bindings with less restrictive contexts, place these after them.
 	{ "keys": ["z"], "command": "set_action", "args": {"action": "vi_z_action"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["enter"], "command": "set_action", "args": {"action": "vi_z_enter"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
+	{ "keys": ["shift+enter"], "command": "set_motion", "args": {"motion": "vi_shift_enter"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
 	{ "keys": ["-"], "command": "set_action", "args": {"action": "vi_z_minus"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 	{ "keys": ["z"], "command": "set_action", "args": {"action": "vi_zz"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 	{ "keys": ["b"], "command": "set_action", "args": {"action": "vi_z_b"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
@@ -233,6 +234,8 @@
 	// TODO: The action name is misleading.
 	{ "keys": ["ctrl+q"], "command": "set_action", "args": {"action": "vi_g_q"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
 	{ "keys": ["ctrl+v"], "command": "set_action", "args": {"action": "vi_ctrl_w_v"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
+	{ "keys": ["l"], "command": "set_action", "args": {"action": "vi_ctrl_w_l"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_incomplete_action"}]},
+	{ "keys": ["h"], "command": "set_action", "args": {"action": "vi_ctrl_w_h"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_incomplete_action"}]},
 	// FIXME: This one interferes with g,v, so disable this one for now. We need a notion of "keybinding namespace".
 	// { "keys": ["v"], "command": "set_action", "args": {"action": "vi_ctrl_w_v"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
 
