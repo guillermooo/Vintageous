@@ -210,10 +210,24 @@ class _vi_big_s(sublime_plugin.TextCommand):
                 if view.line(s).empty():
                     return s
             elif mode == MODE_VISUAL:
-                if view.line(s.b - 1).empty():
+                if view.line(s.b - 1).empty() and s.size() == 1:
                     return s
 
-            return self.view.line(s)
+            state = VintageState(self.view)
+            autoindent = state.settings.vi['autoindent']
+
+            if mode == _MODE_INTERNAL_NORMAL:
+                if not autoindent:
+                    return self.view.line(s)
+                else:
+                    pt = utils.next_non_white_space_char(view, self.view.line(s).a)
+                    return sublime.Region(pt, self.view.line(s).b)
+            elif mode == MODE_VISUAL:
+                if not autoindent:
+                    return self.view.line(sublime.Region(s.a, s.b - 1))
+                else:
+                    pt = utils.next_non_white_space_char(view, self.view.line(s.a).a)
+                    return sublime.Region(pt, self.view.line(s.b - 1).b)
 
         regions_transformer(self.view, f)
 

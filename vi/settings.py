@@ -15,6 +15,7 @@ VI_OPTIONS = {
     # TODO: BUG - unrelated to this code: D,p,u,redo doesn't do what we want.
     'hlsearch': vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=True, parser=None),
     'incsearch': vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=True, parser=None),
+    'autoindent': vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=True, parser=None),
 }
 
 

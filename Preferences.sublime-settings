@@ -22,5 +22,8 @@
 	"vintageous_enable_cmdline_mode": true,
 
 	// If true, the current mode will be reset to normal mode when a tab gets activated.
-	"vintageous_reset_mode_when_switching_tabs": true
+	"vintageous_reset_mode_when_switching_tabs": true,
+
+	// If true, some commands will take the current indentation level into account.
+	"vintageous_autoindent": true,
 }
