@@ -9,6 +9,7 @@ from Vintageous.vi import utils
 from Vintageous.vi.search import reverse_search
 from Vintageous.vi.search import find_in_range
 from Vintageous.vi.search import find_wrapping
+from Vintageous.vi.search import reverse_find_wrapping
 
 import Vintageous.state
 
@@ -488,9 +489,14 @@ class ViBufferReverseSearch(IrreversibleTextCommand):
         state.eval()
 
     def on_change(self, s):
-        # TODO: Improve this.
         self.view.erase_regions('vi_inc_search')
-        occurrence = reverse_search(self.view, s, 0, self.view.sel()[0].a)
+        state = VintageState(self.view)
+        occurrence = reverse_find_wrapping(self.view,
+                                 term=s,
+                                 start=0,
+                                 end=self.view.sel()[0].b,
+                                 flags=0,
+                                 times=state.count)
         if occurrence:
             self.view.add_regions('vi_inc_search', [occurrence], 'comment', '')
             if not self.view.visible_region().contains(occurrence):
@@ -571,16 +577,13 @@ class _vi_question_mark(sublime_plugin.TextCommand):
         def f(view, s):
             # FIXME: Readjust carets if we searched for '\n'.
             if mode == MODE_VISUAL:
-                if s.b > found.a:
-                    return sublime.Region(s.end(), found.a)
+                return sublime.Region(s.end(), found.a)
 
             elif mode == _MODE_INTERNAL_NORMAL:
-                if s.b > found.a:
-                    return sublime.Region(s.end(), found.a)
+                return sublime.Region(s.end(), found.a)
 
             elif mode == MODE_NORMAL:
-                if s.b > found.a:
-                    return sublime.Region(found.a, found.a)
+                return sublime.Region(found.a, found.a)
 
             return s
 
@@ -588,19 +591,17 @@ class _vi_question_mark(sublime_plugin.TextCommand):
         if search_string is None:
             return
 
-        current_sel = self.view.sel()[0]
         # FIXME: What should we do here? Case-sensitive or case-insensitive search? Configurable?
-        found = reverse_search(self.view, search_string, 0, current_sel.a)
+        found = reverse_find_wrapping(self.view,
+                                      term=search_string,
+                                      start=0,
+                                      end=self.view.sel()[0].b,
+                                      flags=0,
+                                      times=count)
+
         if not found:
             print("Vintageous: Pattern not found.")
             return
-
-        for x in range(count - 1):
-            found = reverse_search(self.view, search_string, 0, found.a)
-            # XXX: Temporary fix until .find() gets fixed.
-            if not found:
-                print("Vintageous: Pattern not found.")
-                return
 
         regions_transformer(self.view, f)
         self.hilite(search_string)

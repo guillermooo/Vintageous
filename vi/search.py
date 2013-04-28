@@ -27,6 +27,26 @@ def find_wrapping(view, term, start, end, flags=0, times=1):
     return match
 
 
+def reverse_find_wrapping(view, term, start, end, flags=0, times=1):
+    current_sel = view.sel()[0]
+    # Search wrapping around the end of the buffer.
+    for x in range(times):
+        match = reverse_search(view, term, start, end)
+        # Start searching in the lower half of the buffer if we aren't doing it yet.
+        if not match and start < current_sel.b:
+            start = current_sel.b
+            end = view.size()
+            match = reverse_search(view, term, start, end)
+            if not match:
+                return
+        # No luck in the whole buffer.
+        elif not match:
+            return
+        end = match.a
+
+    return match
+
+
 def find_last_in_range(view, term, start, end, flags=0):
     found = find_in_range(view, term, start, end, flags)
     last_found = found
@@ -47,7 +67,7 @@ def reverse_search(view, term, start, end, flags=0):
     start = start if (start is not None) else 0
     end = end if (end is not None) else view.size()
 
-    if start < 0 or end >= view.size():
+    if start < 0 or end > view.size():
         return None
 
     lo_line = view.full_line(start)
