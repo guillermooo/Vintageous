@@ -834,12 +834,18 @@ class _vi_yy_post_motion(sublime_plugin.TextCommand):
 
 
 class _vi_move_caret_to_first_non_white_space_character(sublime_plugin.TextCommand):
-    # Assume NORMAL_MODE / _MODE_INTERNAL_NORMAL
-    def run(self, edit):
+    def run(self, edit, mode=None):
         def f(view, s):
-            line = view.line(s.b)
-            pt = utils.next_non_white_space_char(view, line.a)
-            return sublime.Region(pt, pt)
+            if mode == MODE_VISUAL:
+                line = view.line(s.b - 1)
+                pt = utils.next_non_white_space_char(view, line.a)
+                return sublime.Region(s.a, pt + 1)
+            elif mode != MODE_VISUAL_LINE:
+                line = view.line(s.b)
+                pt = utils.next_non_white_space_char(view, line.a)
+                return sublime.Region(pt, pt)
+
+            return s
 
         regions_transformer(self.view, f)
 

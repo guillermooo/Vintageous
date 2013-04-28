@@ -593,7 +593,12 @@ def vi_ctrl_f(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'pages', 'forward': True}
 
-    if vi_cmd_data['mode'] != MODE_NORMAL:
+    if vi_cmd_data['mode'] == MODE_VISUAL:
+        vi_cmd_data['motion']['args']['extend'] = True
+    elif vi_cmd_data['mode'] == MODE_VISUAL_LINE:
+        vi_cmd_data['motion']['args']['extend'] = True
+        vi_cmd_data['post_motion'] = [['visual_extend_to_full_line',]]
+    elif vi_cmd_data['mode'] != MODE_NORMAL:
         # TODO: Sublime Text seems to ignore the 'extend' param to Ctrl+f, so disable it.
         # vi_cmd_data['motion']['args']['extend'] = True
         vi_cmd_data['motion']['command'] = 'vi_no_op'
@@ -631,8 +636,23 @@ def vi_enter(vi_cmd_data):
     # TODO: Improve post_motion: should leave caret at first non-white space char.
     vi_cmd_data['motion']['command'] = '_vi_j_motion'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': 1, 'xpos': 0}
+    vi_cmd_data['post_action'] = ['_vi_move_caret_to_first_non_white_space_character', {'mode': vi_cmd_data['mode']}]
 
     if vi_cmd_data['mode'] == MODE_VISUAL_LINE:
         vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': 1, 'xpos': vi_cmd_data['xpos']}
+
+    return vi_cmd_data
+
+
+def vi_shift_enter(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = '_vi_k_motion'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': 1, 'xpos': 0}
+    vi_cmd_data['post_action'] = ['move_to', {'to': 'hardbol'}]
+
+    if vi_cmd_data['mode'] == MODE_VISUAL_LINE:
+        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': 1, 'xpos': vi_cmd_data['xpos']}
+        vi_cmd_data['post_action'] = None
+    elif vi_cmd_data['mode'] == MODE_VISUAL:
+        vi_cmd_data['post_action'] = ['move_to', {'to': 'hardbol', 'extend': True}]
 
     return vi_cmd_data
