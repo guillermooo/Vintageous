@@ -1,3 +1,7 @@
+0.9.11 - 28/04/2013
+
+	- Improve / and ? motions: support counts in incsearch and wrap around buffer ends.
+
 0.9.10 - 27/04/2013
 
 	- Translate cw to ce as Vim does.
