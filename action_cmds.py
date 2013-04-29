@@ -826,6 +826,15 @@ class _vi_ctrl_w_l(IrreversibleTextCommand):
             w.focus_group(current_group + 1)
 
 
+class _vi_ctrl_w_big_l(IrreversibleTextCommand):
+    def run(self):
+        w = self.view.window()
+        current_group = w.active_group()
+        if w.num_groups() > 1:
+            w.set_view_index(self.view, current_group + 1, 0)
+            w.focus_group(current_group + 1)
+
+
 class _vi_ctrl_w_h(IrreversibleTextCommand):
     # TODO: Should be a window command instead.
     # TODO: Should focus the group to the left only, not the 'previous' group.
@@ -833,4 +842,13 @@ class _vi_ctrl_w_h(IrreversibleTextCommand):
         w = self.view.window()
         current_group = w.active_group()
         if current_group > 0:
+            w.focus_group(current_group - 1)
+
+
+class _vi_ctrl_w_big_h(IrreversibleTextCommand):
+    def run(self):
+        w = self.view.window()
+        current_group = w.active_group()
+        if current_group > 0:
+            w.set_view_index(self.view, current_group - 1, 0)
             w.focus_group(current_group - 1)

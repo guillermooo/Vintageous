@@ -236,6 +236,7 @@
 	{ "keys": ["ctrl+v"], "command": "set_action", "args": {"action": "vi_ctrl_w_v"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
 	{ "keys": ["l"], "command": "set_action", "args": {"action": "vi_ctrl_w_l"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_incomplete_action"}]},
 	{ "keys": ["h"], "command": "set_action", "args": {"action": "vi_ctrl_w_h"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_incomplete_action"}]},
+	{ "keys": ["L"], "command": "set_action", "args": {"action": "vi_ctrl_w_big_l"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_incomplete_action"}]},
 	// FIXME: This one interferes with g,v, so disable this one for now. We need a notion of "keybinding namespace".
 	// { "keys": ["v"], "command": "set_action", "args": {"action": "vi_ctrl_w_v"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
 

@@ -46,6 +46,8 @@ digraphs = {
     ('vi_ctrl_w_action', 'vi_g_v'): ('vi_ctrl_w_v', DIGRAPH_ACTION),
     ('vi_ctrl_w_action', 'vi_ctrl_w_l'): ('vi_ctrl_w_l', DIGRAPH_ACTION),
     ('vi_ctrl_w_action', 'vi_ctrl_w_h'): ('vi_ctrl_w_h', DIGRAPH_ACTION),
+    ('vi_ctrl_w_action', 'vi_ctrl_w_big_l'): ('vi_ctrl_w_big_l', DIGRAPH_ACTION),
+    ('vi_ctrl_w_action', 'vi_ctrl_w_big_h'): ('vi_ctrl_w_big_h', DIGRAPH_ACTION),
     ('vi_ctrl_r_action', 'vi_ctrl_r_equals'): ('vi_ctrl_r_equals', DIGRAPH_ACTION),
 
     ('vi_g_action', 'vi_gg'): ('vi_gg', DIGRAPH_MOTION),
