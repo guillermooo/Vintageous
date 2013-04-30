@@ -615,8 +615,8 @@ class _vi_right_brace(sublime_plugin.TextCommand):
             par_as_region = view.expand_by_class(start, sublime.CLASS_EMPTY_LINE)
 
             if mode == MODE_NORMAL:
-                return sublime.Region(min(par_as_region.b, view.size() - 1),
-                                      min(par_as_region.b, view.size() - 1))
+                min_pt = max(0, min(par_as_region.b, view.size() - 1))
+                return sublime.Region(min_pt, min_pt)
 
             elif mode == MODE_VISUAL:
                 return sublime.Region(s.a, par_as_region.b + 1)

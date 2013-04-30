@@ -103,7 +103,7 @@ def next_non_white_space_char(view, pt, white_space='\t '):
 
 
 def previous_non_white_space_char(view, pt, white_space='\t \n'):
-    while view.substr(pt) in white_space:
+    while view.substr(pt) in white_space and pt > 0:
         pt -= 1
     return pt
 
