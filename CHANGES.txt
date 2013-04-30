@@ -1,3 +1,8 @@
+0.9.13 - 30/04/2013
+
+	- Improve { and } motions.
+	- Fix bug related to vintageous_reset_mode_when_switching_tabs setting.
+
 0.9.12 - 29/04/2013
 
 	- Improve 'enter' motion.
