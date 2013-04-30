@@ -58,6 +58,15 @@ def _init_vintageous(view):
 
     state = VintageState(view)
 
+    # Non-standard user setting.
+    reset = state.settings.view['vintageous_reset_mode_when_switching_tabs']
+    # XXX: If the view was already in normal mode, we still need to run the init code. I believe
+    # this is due to Sublime Text (intentionally) not serializing the inverted caret state and
+    # the command_mode setting when first loading a file.
+    if not reset and state.mode and (state.mode != MODE_NORMAL):
+        return
+
+    # TODO: make this a table in constants.py?
     if state.mode in (MODE_VISUAL, MODE_VISUAL_LINE):
         view.run_command('enter_normal_mode')
     elif state.mode in (MODE_INSERT, MODE_REPLACE):
@@ -732,9 +741,6 @@ class ViFocusRestorerEvent(sublime_plugin.EventListener):
         if self.timer:
             self.timer.cancel()
             # Switching to a different view; enter normal mode.
-            state = VintageState(view)
-            if not state.settings.view['vintageous_reset_mode_when_switching_tabs']:
-                return
             _init_vintageous(view)
         else:
             # Switching back from another application. Ignore.
