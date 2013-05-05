@@ -22,6 +22,7 @@ DIGRAPH_ACTION = 1
 DIGRAPH_MOTION = 2
 
 
+# TODO: We should separate digraph actions from digraph motions?
 digraphs = {
     ('vi_d', 'vi_d'): ('vi_dd', DIGRAPH_ACTION),
     ('vi_c', 'vi_c'): ('vi_cc', DIGRAPH_ACTION),
