@@ -32,6 +32,7 @@
 
 	{ "keys": [" "], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["enter"], "command": "set_motion", "args": {"motion": "vi_enter"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
+	{ "keys": ["shift+enter"], "command": "set_motion", "args": {"motion": "vi_shift_enter"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
 	{ "keys": ["ctrl+space"], "command": "set_motion", "args": {"motion": "vi_w"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 
 	{ "keys": ["w"], "command": "set_motion", "args": {"motion": "vi_w"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
@@ -137,7 +138,6 @@
 	{ "keys": ["q"], "command": "set_action", "args": {"action": "vi_g_q"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 	{ "keys": ["*"], "command": "set_action", "args": {"action": "vi_g_star"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 	{ "keys": ["#"], "command": "set_action", "args": {"action": "vi_g_octothorp"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
-	// TODO: Action name is misleading.
 	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_g_v"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_incomplete_action"}] },
 
 	{ "keys": ["U"], "command": "set_action", "args": {"action": "vi_big_u"}, "context": [{"key": "vi_mode_visual_any"}] },
@@ -218,7 +218,6 @@
 	// Ordering matters: To avoid conflicts with t and possibly other key bindings with less restrictive contexts, place these after them.
 	{ "keys": ["z"], "command": "set_action", "args": {"action": "vi_z_action"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["enter"], "command": "set_action", "args": {"action": "vi_z_enter"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
-	{ "keys": ["shift+enter"], "command": "set_motion", "args": {"motion": "vi_shift_enter"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
 	{ "keys": ["-"], "command": "set_action", "args": {"action": "vi_z_minus"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 	{ "keys": ["z"], "command": "set_action", "args": {"action": "vi_zz"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
 	{ "keys": ["b"], "command": "set_action", "args": {"action": "vi_z_b"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
@@ -237,8 +236,7 @@
 	{ "keys": ["l"], "command": "set_action", "args": {"action": "vi_ctrl_w_l"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_incomplete_action"}]},
 	{ "keys": ["h"], "command": "set_action", "args": {"action": "vi_ctrl_w_h"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_incomplete_action"}]},
 	{ "keys": ["L"], "command": "set_action", "args": {"action": "vi_ctrl_w_big_l"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_incomplete_action"}]},
-	// FIXME: This one interferes with g,v, so disable this one for now. We need a notion of "keybinding namespace".
-	// { "keys": ["v"], "command": "set_action", "args": {"action": "vi_ctrl_w_v"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
+	{ "keys": ["H"], "command": "set_action", "args": {"action": "vi_ctrl_w_big_h"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_incomplete_action"}]},
 
 	// TODO: Simplify the logic needed to make the expression register work in INSERTMODE.
 	{ "keys": ["ctrl+r"], "command": "set_action", "args": {"action": "vi_ctrl_r_action"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "setting.command_mode", "operator": "equal", "operand": false}]},
