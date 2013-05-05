@@ -827,3 +827,42 @@ class _vi_double_single_quote(IrreversibleTextCommand):
 
         current = _vi_double_single_quote.next_command
         _vi_double_single_quote.next_command = 'jump_forward' if current == 'jump_back' else 'jump_back'
+
+
+class _vi_pipe(sublime_plugin.TextCommand):
+    def col_to_pt(self, pt, nr):
+        if self.view.line(pt).size() < nr:
+            return self.view.line(pt).b - 1
+
+        row = self.view.rowcol(pt)[0]
+        return self.view.text_point(row, nr) - 1
+
+    def run(self, edit, mode=None, extend=False, count=None):
+        def f(view, s):
+            if mode == MODE_NORMAL:
+                pt = self.col_to_pt(pt=s.b, nr=count)
+                return sublime.Region(pt, pt)
+
+            elif mode == MODE_VISUAL:
+                pt = self.col_to_pt(pt=s.b - 1, nr=count)
+                if s.a < s.b:
+                    if pt < s.a:
+                        return sublime.Region(s.a + 1, pt)
+                    else:
+                        return sublime.Region(s.a, pt + 1)
+                else:
+                    if pt > s.a:
+                        return sublime.Region(s.a - 1, pt + 1)
+                    else:
+                        return sublime.Region(s.a, pt)
+
+            elif mode == _MODE_INTERNAL_NORMAL:
+                pt = self.col_to_pt(pt=s.b, nr=count)
+                if s.a < s.b:
+                    return sublime.Region(s.a, pt)
+                else:
+                    return sublime.Region(s.a + 1, pt)
+
+            return s
+
+        regions_transformer(self.view, f)

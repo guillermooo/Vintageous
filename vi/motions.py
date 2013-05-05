@@ -656,3 +656,11 @@ def vi_shift_enter(vi_cmd_data):
         vi_cmd_data['post_action'] = ['move_to', {'to': 'hardbol', 'extend': True}]
 
     return vi_cmd_data
+
+
+def vi_pipe(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = '_vi_pipe'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['count'] = 1
+
+    return vi_cmd_data
