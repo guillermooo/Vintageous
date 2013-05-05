@@ -453,9 +453,12 @@ class ViBufferSearch(IrreversibleTextCommand):
                                  flags=0,
                                  times=state.count)
         if next_hit:
+            if state.mode == MODE_VISUAL:
+                next_hit = sublime.Region(self.view.sel()[0].a, next_hit.a + 1)
+
             self.view.add_regions('vi_inc_search', [next_hit], 'comment', '')
-            if not self.view.visible_region().contains(next_hit):
-                self.view.show(next_hit)
+            if not self.view.visible_region().contains(next_hit.b):
+                self.view.show(next_hit.b)
 
     def on_cancel(self):
         self.view.erase_regions('vi_inc_search')
@@ -498,6 +501,8 @@ class ViBufferReverseSearch(IrreversibleTextCommand):
                                  flags=0,
                                  times=state.count)
         if occurrence:
+            if state.mode == MODE_VISUAL:
+                occurrence = sublime.Region(self.view.sel()[0].a, occurrence.a)
             self.view.add_regions('vi_inc_search', [occurrence], 'comment', '')
             if not self.view.visible_region().contains(occurrence):
                 self.view.show(occurrence)
@@ -529,7 +534,7 @@ class _vi_forward_slash(sublime_plugin.TextCommand):
     def run(self, edit, search_string, mode=None, count=1, extend=False):
         def f(view, s):
             if mode == MODE_VISUAL:
-                return sublime.Region(s.a, match.a)
+                return sublime.Region(s.a, match.a + 1)
 
             elif mode == _MODE_INTERNAL_NORMAL:
                 return sublime.Region(s.a, match.a)
