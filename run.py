@@ -59,6 +59,7 @@ class ViRunCommand(sublime_plugin.TextCommand):
 
             # If we're about to jump, we need to remember the current position so we can jump back
             # here. XXX creates_jump_at_current_position might be redundant.
+            # TODO: Extract method.
             if vi_cmd_data['creates_jump_at_current_position'] or vi_cmd_data['is_jump']:
                 self.add_to_jump_list(vi_cmd_data)
 
@@ -79,6 +80,7 @@ class ViRunCommand(sublime_plugin.TextCommand):
                             vi_cmd_data['cancel_action_if_motion_fails']):
                                 # TODO: There should be a method that lets us do this without modifying vi_cmd_data.
                                 vi_cmd_data['restore_original_carets'] = True
+                                # FIXME: This is redundant: we call the same method in 'finally' clause.
                                 self.restore_original_carets_if_needed(vi_cmd_data)
                                 utils.blink()
                                 return
@@ -94,6 +96,7 @@ class ViRunCommand(sublime_plugin.TextCommand):
             # XXX: post_action should be run only if do_action succeeds (?).
             self.do_post_action(vi_cmd_data)
 
+            # TODO: Extract method.
             if vi_cmd_data['must_update_xpos']:
                 state = VintageState(self.view)
                 state.update_xpos()
@@ -101,6 +104,7 @@ class ViRunCommand(sublime_plugin.TextCommand):
             self.do_modify_selections(vi_cmd_data)
             self.restore_original_carets_if_needed(vi_cmd_data)
 
+            # TODO: Extract method.
             if vi_cmd_data['scroll_into_view']:
                 if vi_cmd_data['scroll_command']:
                     self.view.run_command(*vi_cmd_data['scroll_command'])
@@ -113,6 +117,7 @@ class ViRunCommand(sublime_plugin.TextCommand):
             # let's save the data we need to transtion to the next mode, which will be taken care
             # of later by VintageState.reset().
             # XXX: This code can probably be moved to VintageState.run().
+            # TODO: Extract method.
             state = VintageState(self.view)
             state.next_mode = vi_cmd_data['next_mode']
             state.next_mode_command = vi_cmd_data['follow_up_mode']
@@ -140,13 +145,12 @@ class ViRunCommand(sublime_plugin.TextCommand):
             else:
                 self.do_last_motion(vi_cmd_data)
 
-
         self.do_post_motion(vi_cmd_data)
         self.reposition_caret(vi_cmd_data)
-
         self.add_to_jump_list(vi_cmd_data)
 
     # TODO: Test me.
+    # XXX: Is this method needed?
     def reorient_caret(self, vi_cmd_data):
         if not vi_cmd_data['__reorient_caret']:
             return
