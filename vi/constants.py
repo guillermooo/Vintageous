@@ -26,19 +26,29 @@ digraphs = {
     ('vi_d', 'vi_d'): ('vi_dd', DIGRAPH_ACTION),
     ('vi_c', 'vi_c'): ('vi_cc', DIGRAPH_ACTION),
     ('vi_y', 'vi_y'): ('vi_yy', DIGRAPH_ACTION),
+
     ('vi_equals', 'vi_equals'): ('vi_equals_equals', DIGRAPH_ACTION),
     ('vi_lambda', 'vi_lambda'): ('vi_double_lambda', DIGRAPH_ACTION),
     ('vi_antilambda', 'vi_antilambda'): ('vi_double_antilambda', DIGRAPH_ACTION),
+
     ('vi_g_action', 'vi_g_big_u'): ('vi_g_big_u', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_u'): ('vi_g_u', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_q'): ('vi_g_q', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_v'): ('vi_g_v', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_e'): ('vi_g_e', DIGRAPH_MOTION),
+    ('vi_g_action', 'vi_gg'): ('vi_gg', DIGRAPH_MOTION),
+    ('vi_g_action', 'vi_g_d'): ('vi_g_d', DIGRAPH_MOTION),
+    ('vi_g_action', 'vi_g_big_d'): ('vi_g_big_d', DIGRAPH_MOTION),
+    ('vi_g_action', 'vi_g_star'): ('vi_g_star', DIGRAPH_MOTION),
+    ('vi_g_action', 'vi_g_octothorp'): ('vi_g_octothorp', DIGRAPH_MOTION),
+
     ('vi_z_action', 'vi_z_enter'): ('vi_z_enter', DIGRAPH_ACTION),
     ('vi_z_action', 'vi_z_t'): ('vi_z_t', DIGRAPH_ACTION),
     ('vi_z_action', 'vi_z_minus'): ('vi_z_minus', DIGRAPH_ACTION),
     ('vi_z_action', 'vi_z_b'): ('vi_z_b', DIGRAPH_ACTION),
     ('vi_z_action', 'vi_zz'): ('vi_zz', DIGRAPH_ACTION),
+
+    ('vi_ctrl_r_action', 'vi_ctrl_r_equals'): ('vi_ctrl_r_equals', DIGRAPH_ACTION),
 
     ('vi_ctrl_w_action', 'vi_ctrl_w_v'): ('vi_ctrl_w_v', DIGRAPH_ACTION),
     # TODO: vi_g_q is a bad name, since 'q' combines both with g and ctrl+w.
@@ -49,13 +59,7 @@ digraphs = {
     ('vi_ctrl_w_action', 'vi_ctrl_w_h'): ('vi_ctrl_w_h', DIGRAPH_ACTION),
     ('vi_ctrl_w_action', 'vi_ctrl_w_big_l'): ('vi_ctrl_w_big_l', DIGRAPH_ACTION),
     ('vi_ctrl_w_action', 'vi_ctrl_w_big_h'): ('vi_ctrl_w_big_h', DIGRAPH_ACTION),
-    ('vi_ctrl_r_action', 'vi_ctrl_r_equals'): ('vi_ctrl_r_equals', DIGRAPH_ACTION),
 
-    ('vi_g_action', 'vi_gg'): ('vi_gg', DIGRAPH_MOTION),
-    ('vi_g_action', 'vi_g_d'): ('vi_g_d', DIGRAPH_MOTION),
-    ('vi_g_action', 'vi_g_big_d'): ('vi_g_big_d', DIGRAPH_MOTION),
-    ('vi_g_action', 'vi_g_star'): ('vi_g_star', DIGRAPH_MOTION),
-    ('vi_g_action', 'vi_g_octothorp'): ('vi_g_octothorp', DIGRAPH_MOTION),
     # XXX: I don't think the following is needed.
     ('vi_f_first_step', 'vi_set_user_input'): ('vi_f', DIGRAPH_MOTION),
 }
