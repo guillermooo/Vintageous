@@ -1,3 +1,9 @@
+1.0.1 - 5/5/2013
+
+	- Implement ge motion.
+	- Implement | motion.
+	- Improve shift-enter motion.
+
 1.0 - 5/5/2013
 
 	- Improve /, ?, n and N motions in visual mode.
