@@ -866,3 +866,70 @@ class _vi_pipe(sublime_plugin.TextCommand):
             return s
 
         regions_transformer(self.view, f)
+
+
+class _vi_shift_enter_post_motion(sublime_plugin.TextCommand):
+    def first_non_white_space_char(self, where):
+        start = self.view.text_point(self.view.rowcol(where)[0], 0)
+        pt = utils.next_non_white_space_char(self.view, start, white_space=' \t')
+        return pt
+
+    def run(self, edit, mode=None, extend=False):
+        def f(view, s):
+            if mode == MODE_NORMAL:
+                pt = self.first_non_white_space_char(s.b)
+                pt = min((pt, self.view.line(pt).b))
+                return sublime.Region(pt, pt)
+
+            elif mode == MODE_VISUAL:
+                pt = self.first_non_white_space_char(s.b)
+                return sublime.Region(s.a, pt)
+
+            elif mode == _MODE_INTERNAL_NORMAL:
+                # Same as dj, dk delete two entire lines, here we do a similar thing.
+                return sublime.Region(s.a, self.view.line(s.b).a)
+
+            return s
+
+        regions_transformer(self.view, f)
+
+
+class _vi_g_e_pre_motion(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, extend=False):
+        def f(view, s):
+            if mode == MODE_NORMAL:
+                pass
+
+            elif mode == MODE_VISUAL:
+                if s.a < s.b:
+                    if s.size() == 1:
+                        return sublime.Region(s.b, s.a)
+                else:
+                    pass
+
+
+            elif mode == _MODE_INTERNAL_NORMAL:
+                pass
+
+            return s
+
+        regions_transformer(self.view, f)
+
+
+class _vi_g_e_post_motion(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, extend=False):
+        def f(view, s):
+            if mode == MODE_NORMAL:
+                pass
+
+            elif mode == MODE_VISUAL:
+                if s.a > s.b:
+                    return sublime.Region(s.a, s.b - 1)
+
+
+            elif mode == _MODE_INTERNAL_NORMAL:
+                pass
+
+            return s
+
+        regions_transformer(self.view, f)

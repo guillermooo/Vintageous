@@ -33,6 +33,7 @@ digraphs = {
     ('vi_g_action', 'vi_g_u'): ('vi_g_u', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_q'): ('vi_g_q', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_v'): ('vi_g_v', DIGRAPH_ACTION),
+    ('vi_g_action', 'vi_g_e'): ('vi_g_e', DIGRAPH_MOTION),
     ('vi_z_action', 'vi_z_enter'): ('vi_z_enter', DIGRAPH_ACTION),
     ('vi_z_action', 'vi_z_t'): ('vi_z_t', DIGRAPH_ACTION),
     ('vi_z_action', 'vi_z_minus'): ('vi_z_minus', DIGRAPH_ACTION),

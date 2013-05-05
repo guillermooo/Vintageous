@@ -343,6 +343,31 @@ def vi_e(vi_cmd_data):
     return vi_cmd_data
 
 
+def vi_g_e(vi_cmd_data):
+    # TODO: Improve this by implementing the whole command in a TextCommand (don't use 'move').
+    vi_cmd_data['motion']['command'] = 'move'
+    vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_end': True, 'punct_end': True, 'empty_line': False, 'forward': False}
+    vi_cmd_data['__reorient_caret'] = True
+
+    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
+        vi_cmd_data['motion']['args']['extend'] = True
+        vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
+        vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
+
+    elif vi_cmd_data['mode'] == MODE_NORMAL:
+        vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
+        vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
+
+    elif vi_cmd_data['mode'] == MODE_VISUAL:
+        vi_cmd_data['motion']['args']['extend'] = True
+        # vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
+        vi_cmd_data['pre_motion'] = ['_vi_g_e_pre_motion', {'mode': vi_cmd_data['mode']}]
+        vi_cmd_data['post_motion'] = [['_vi_g_e_post_motion', {'mode': vi_cmd_data['mode']}]]
+        # vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
+
+    return vi_cmd_data
+
+
 def vi_octothorp(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_octothorp'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
@@ -647,13 +672,11 @@ def vi_enter(vi_cmd_data):
 def vi_shift_enter(vi_cmd_data):
     vi_cmd_data['motion']['command'] = '_vi_k_motion'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': 1, 'xpos': 0}
-    vi_cmd_data['post_action'] = ['move_to', {'to': 'hardbol'}]
+    vi_cmd_data['post_motion'] = [['_vi_shift_enter_post_motion', {'mode': vi_cmd_data['mode']}]]
 
     if vi_cmd_data['mode'] == MODE_VISUAL_LINE:
         vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': 1, 'xpos': vi_cmd_data['xpos']}
-        vi_cmd_data['post_action'] = None
-    elif vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['post_action'] = ['move_to', {'to': 'hardbol', 'extend': True}]
+        vi_cmd_data['post_motion'] = None
 
     return vi_cmd_data
 
