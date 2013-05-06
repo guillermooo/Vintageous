@@ -1,4 +1,4 @@
-1.0.1 - 6/5/2013
+1.0.2 - 6/5/2013
 
 	- Improve minimal scrolling when moving up by lines.
 	
