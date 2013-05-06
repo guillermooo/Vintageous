@@ -111,6 +111,7 @@ class VintageState(object):
     # gets reset during command execution.
     _latest_macro_name = None
     _is_recording = False
+    _cancel_macro = False
 
     def __init__(self, view):
         self.view = view
@@ -231,6 +232,17 @@ class VintageState(object):
     @mode.setter
     def mode(self, value):
         self.settings.vi['mode'] = value
+
+    @property
+    def cancel_macro(self):
+        """Signals whether a running macro should be cancel if, for instance, a motion failed.
+        """
+        return VintageState._cancel_macro
+
+    # Should only be called from _vi_run_macro.
+    @cancel_macro.setter
+    def cancel_macro(self, value):
+        VintageState._cancel_macro = value
 
     @property
     def cancel_action(self):

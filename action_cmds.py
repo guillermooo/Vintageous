@@ -787,6 +787,7 @@ class _vi_q(IrreversibleTextCommand):
 class _vi_run_macro(IrreversibleTextCommand):
     def run(self, name=None):
         state = VintageState(self.view)
+        state.cancel_macro = False
         if not (name and state.latest_macro_name):
             return
 
@@ -801,6 +802,9 @@ class _vi_run_macro(IrreversibleTextCommand):
                 return
 
         for cmd in commands:
+            if state.cancel_macro:
+                utils.blink()
+                break
             self.view.run_command(cmd['command'], cmd['args'])
 
 

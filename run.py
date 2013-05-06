@@ -53,6 +53,8 @@ class ViRunCommand(sublime_plugin.TextCommand):
     def run(self, edit, **vi_cmd_data):
         self.debug("Data in ViRunCommand:", vi_cmd_data)
 
+        state = VintageState(self.view)
+
         try:
             # Always save carets just in case.
             self.save_caret_pos()
@@ -83,6 +85,7 @@ class ViRunCommand(sublime_plugin.TextCommand):
                                 # FIXME: This is redundant: we call the same method in 'finally' clause.
                                 self.restore_original_carets_if_needed(vi_cmd_data)
                                 utils.blink()
+                                state.cancel_macro = True
                                 return
 
                 self.do_action(vi_cmd_data)
@@ -90,6 +93,7 @@ class ViRunCommand(sublime_plugin.TextCommand):
                 self.do_whole_motion(vi_cmd_data)
                 if (vi_cmd_data['mode'] == MODE_NORMAL and
                     any([(old == new) for (old, new) in zip(sels_before_motion, list(self.view.sel()))])):
+                        state.cancel_macro = True
                         utils.blink()
 
         finally:
