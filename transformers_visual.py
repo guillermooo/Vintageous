@@ -1164,21 +1164,8 @@ class _vi_adjust_carets(sublime_plugin.TextCommand):
 
 
 class _vi_minimal_scroll(sublime_plugin.TextCommand):
-    def run(self, edit, forward=True):
-        current_row = self.view.rowcol(self.view.sel()[0].b)[0]
-
-        amount = 0
-        if forward:
-            last_visible_row = self.view.rowcol(self.view.visible_region().b)[0]
-            if current_row >= last_visible_row:
-                amount = last_visible_row - current_row - 1
-        else:
-            first_visible_row = self.view.rowcol(self.view.visible_region().a)[0]
-            if current_row < first_visible_row:
-                amount = first_visible_row - current_row
-
-        if amount != 0:
-            self.view.run_command('scroll_lines', {'amount': amount})
+    def run(self, edit, forward=True, next_command=None):
+        self.view.show(self.view.sel()[0].b, False)
 
 
 class _vi_big_b_post_motion(sublime_plugin.TextCommand):
