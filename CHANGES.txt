@@ -1,8 +1,12 @@
+1.0.1 - 6/5/2013
+
+	- Improve minimal scrolling when moving up by lines.
+	
 1.0.1 - 5/5/2013
 
 	- Implement ge motion.
 	- Implement | motion.
-	- Improve shift-enter motion.
+	- Improve shift+enter motion.
 
 1.0 - 5/5/2013
 
