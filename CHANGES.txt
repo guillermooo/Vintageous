@@ -1,3 +1,8 @@
+1.1 - 8/5/2013
+
+	- Improve % motion.
+	- Abort macro execution as soon as a motion fails.	
+
 1.0.2 - 6/5/2013
 
 	- Improve minimal scrolling when moving up by lines.
