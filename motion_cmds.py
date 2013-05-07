@@ -249,11 +249,47 @@ class ViGoToLine(sublime_plugin.TextCommand):
 
 
 class ViPercent(sublime_plugin.TextCommand):
-    def run(self, edit, extend=False, percent=None):
+    pairs = (
+            ('(', ')'),
+            ('[', ']'),
+            ('{', '}'),
+    )
+
+    def run(self, edit, extend=False, percent=None, mode=None):
         if percent == None:
-            # TODO: 'move_to brackets' isn't as useful as the Vim command. Reimplement our own.
-            # TODO: Implement visual counterparts.
-            self.view.run_command('move_to', {'to': 'brackets'})
+            def move_to_bracket(view, s):
+                def find_bracket_location(pt):
+                    line_text = view.substr(view.line(pt))
+                    coords, forward = self.find_next_pair(line_text, self.view.rowcol(pt)[1])
+                    if coords is not None:
+                        row = view.rowcol(pt)[0]
+                        a = view.text_point(row, coords[1] if forward else coords[0])
+                        return a
+
+                if mode == MODE_VISUAL:
+                    # TODO: Improve handling of s.a < s.b and s.a > s.b cases.
+                    a = find_bracket_location(s.b - 1)
+                    if a is not None:
+                        a = a + 1 if a > s.b else a
+                        if a == s.a:
+                            a += 1
+                        return sublime.Region(s.a, a)
+
+                elif mode == MODE_NORMAL:
+                    a = find_bracket_location(s.b)
+                    if a is not None:
+                        return sublime.Region(a, a)
+
+                # TODO: According to Vim we must swallow brackets in this case.
+                elif mode == _MODE_INTERNAL_NORMAL:
+                    a = find_bracket_location(s.b)
+                    if a is not None:
+                        return sublime.Region(s.a, a)
+
+                return s
+
+            regions_transformer(self.view, move_to_bracket)
+
             return
 
         row = self.view.rowcol(self.view.size())[0] * (percent / 100)
@@ -267,6 +303,72 @@ class ViPercent(sublime_plugin.TextCommand):
         # FIXME: Bringing the selections into view will be undesirable in many cases. Maybe we
         # should have an optional .scroll_selections_into_view() step during command execution.
         self.view.show(self.view.sel()[0])
+
+    def find_balanced_pairs(self, a, b, s, start):
+        opening = [start]
+        closing = []
+
+        old_start = start
+
+        while True:
+            if a in s[start + 1:]:
+                opening.append(s.index(a, start + 1))
+                start = opening[-1]
+                if start + 1 >= len(s):
+                    break
+            else:
+                break
+
+        start = old_start
+        while True:
+            if b in s[start + 1:]:
+                closing.append(s.index(b, start + 1))
+                start = closing[-1]
+                if start + 1 >= len(s):
+                    break
+            else:
+                break
+
+        if not closing:
+            return []
+
+        if len(opening) == len(closing):
+            return zip(opening, closing)
+        elif len(opening) < len(closing):
+            return zip(opening, reversed(closing[:len(opening)]))
+        else:
+            return zip(opening[-len(closing):], reversed(closing))
+
+    def find_pairs(self, s):
+        matches = []
+        for (a, b) in self.pairs:
+            if (a in s) and (b in s):
+                if s.index(a) < s.index(b):
+                    all_for_bracket = self.find_balanced_pairs(a, b, s, 0)
+                    matches.extend(all_for_bracket)
+        return matches
+
+    def find_next_pair(self, s, start):
+        pairs = self.find_pairs(s)
+
+        if not pairs:
+            return None, None
+
+        found = [(a, b) for (a, b) in pairs if start in (a, b)]
+        if found:
+            return found[0], found[0][0] == start
+
+        min_a = min(a for (a,b) in pairs)
+        max_b = max(b for (a,b) in pairs)
+
+        if start <= min_a:
+            return [(a, b) for (a, b) in pairs if b == max_b][0], True
+        elif start <= max_b:
+            max_a = max(a for (a, b) in pairs if a <= start)
+            return [(a, b) for (a, b) in pairs if a == max_a][0], False
+        else:
+            return None, None
+
 
 class _vi_big_h(sublime_plugin.TextCommand):
     def run(self, edit, count=None, extend=False, mode=None):

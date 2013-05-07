@@ -439,7 +439,7 @@ def vi_percent(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_percent'
     # Make sure we know exactly what the user entered (1% != %) so we can disambiguate in the
     # command.
-    vi_cmd_data['motion']['args'] = {'percent': vi_cmd_data['_user_provided_count']}
+    vi_cmd_data['motion']['args'] = {'percent': vi_cmd_data['_user_provided_count'], 'mode': vi_cmd_data['mode']}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
