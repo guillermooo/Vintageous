@@ -875,3 +875,30 @@ def vi_ctrl_w_big_h(vi_cmd_data):
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
+
+def vi_tilde(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['action']['command'] = 'swap_case'
+
+    vi_cmd_data['action']['args'] = {}
+
+    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
+        vi_cmd_data['cancel_action_if_motion_fails'] = True
+        vi_cmd_data['motion']['command'] = 'move'
+        vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': True, 'extend': True}
+        vi_cmd_data['post_action'] = ['move',{'by': 'characters', 'forward': True}]
+    elif vi_cmd_data['mode'] == MODE_VISUAL:
+        vi_cmd_data['post_action'] = ['collapse_to_a',]
+        
+    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'    
+
+    return vi_cmd_data
+
+def vi_g_tilde(vi_cmd_data):
+
+    vi_cmd_data['motion_required'] = True
+    vi_cmd_data['action']['command'] = 'swap_case'
+    vi_cmd_data['action']['args'] = {}
+    vi_cmd_data['post_action'] = ['collapse_to_a',]
+
+    return vi_cmd_data
