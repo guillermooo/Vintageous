@@ -7,6 +7,7 @@ from Vintageous.vi.constants import MODE_VISUAL_LINE
 from Vintageous.state import VintageState, IrreversibleTextCommand
 from Vintageous.vi import utils
 from Vintageous.vi.search import reverse_search
+from Vintageous.vi.search import reverse_search_by_pt
 from Vintageous.vi.search import find_in_range
 from Vintageous.vi.search import find_wrapping
 from Vintageous.vi.search import reverse_find_wrapping
@@ -251,6 +252,7 @@ class ViGoToLine(sublime_plugin.TextCommand):
 
 
 class ViPercent(sublime_plugin.TextCommand):
+    # TODO: Perhaps truly support multiple regions here?
     pairs = (
             ('(', ')'),
             ('[', ']'),
@@ -266,7 +268,6 @@ class ViPercent(sublime_plugin.TextCommand):
                         return
 
                     if bracket == brackets[0]:
-                        # look for closing bracket
                         return self.find_balanced_closing_bracket(bracket_pt + 1, brackets)
                     else:
                         return self.find_balanced_opening_bracket(bracket_pt, brackets)
@@ -310,20 +311,26 @@ class ViPercent(sublime_plugin.TextCommand):
         self.view.show(self.view.sel()[0])
 
     def find_a_bracket(self, caret_pt):
-        """Locates the bracket closest to the caret. Vintageous should find the corresponding
-           pair. If None is found, abort execution.
+        """Locates the next bracket after the caret in the current line.
+           If None is found, execution must be aborted.
+           Returns: (bracket, brackets, bracket_pt)
+
+           Example: ('(', ('(', ')'), 1337))
         """
-        # Is there any opning OR closing paren after the caret?
         caret_row, caret_col = self.view.rowcol(caret_pt)
-        line_text = self.view.substr(sublime.Region(caret_pt, self.view.line(caret_pt).b))
+        line_text = self.view.substr(sublime.Region(caret_pt,
+                                                    self.view.line(caret_pt).b))
         try:
-            found_brackets = [(line_text.index(bracket), bracket) for bracket in chain(*self.pairs) if bracket in line_text]
-            found_brackets = min(found_brackets)
+            found_brackets = min([(line_text.index(bracket), bracket)
+                                        for bracket in chain(*self.pairs)
+                                        if bracket in line_text])
         except ValueError:
             return None, None, None
 
-        bracket_a, bracket_b = [(a, b) for (a, b) in self.pairs if found_brackets[1] in (a, b)][0]
-        return found_brackets[1], (bracket_a, bracket_b), self.view.text_point(caret_row, caret_col + found_brackets[0])
+        bracket_a, bracket_b = [(a, b) for (a, b) in self.pairs
+                                       if found_brackets[1] in (a, b)][0]
+        return (found_brackets[1], (bracket_a, bracket_b),
+                self.view.text_point(caret_row, caret_col + found_brackets[0]))
 
     def find_balanced_closing_bracket(self, start, brackets, unbalanced=0):
         new_start = start
@@ -333,7 +340,7 @@ class ViPercent(sublime_plugin.TextCommand):
                                                  end=self.view.size(),
                                                  flags=sublime.LITERAL)
             if next_closing_bracket is None:
-                # unbalanced bracktes; nothing we can do.
+                # Unbalanced brackets; nothing we can do.
                 return
             new_start = next_closing_bracket.end()
 
@@ -357,7 +364,7 @@ class ViPercent(sublime_plugin.TextCommand):
     def find_balanced_opening_bracket(self, start, brackets, unbalanced=0):
         new_start = start
         for i in range(unbalanced or 1):
-            prev_opening_bracket = reverse_search(self.view, brackets[0],
+            prev_opening_bracket = reverse_search_by_pt(self.view, brackets[0],
                                                       start=0,
                                                       end=new_start,
                                                       flags=sublime.LITERAL)
@@ -368,7 +375,7 @@ class ViPercent(sublime_plugin.TextCommand):
 
         nested = 0
         while True:
-            next_closing_bracket = reverse_search(self.view, brackets[1],
+            next_closing_bracket = reverse_search_by_pt(self.view, brackets[1],
                                                   start=prev_opening_bracket.a,
                                                   end=start,
                                                   flags=sublime.LITERAL)
