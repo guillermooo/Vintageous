@@ -13,6 +13,8 @@ from Vintageous.vi.search import reverse_find_wrapping
 
 import Vintageous.state
 
+from itertools import chain
+
 
 class ViMoveToHardBol(sublime_plugin.TextCommand):
     def run(self, edit, extend=False):
@@ -259,12 +261,15 @@ class ViPercent(sublime_plugin.TextCommand):
         if percent == None:
             def move_to_bracket(view, s):
                 def find_bracket_location(pt):
-                    line_text = view.substr(view.line(pt))
-                    coords, forward = self.find_next_pair(line_text, self.view.rowcol(pt)[1])
-                    if coords is not None:
-                        row = view.rowcol(pt)[0]
-                        a = view.text_point(row, coords[1] if forward else coords[0])
-                        return a
+                    bracket, brackets, bracket_pt = self.find_a_bracket(pt)
+                    if not bracket:
+                        return
+
+                    if bracket == brackets[0]:
+                        # look for closing bracket
+                        return self.find_balanced_closing_bracket(bracket_pt + 1, brackets)
+                    else:
+                        return self.find_balanced_opening_bracket(bracket_pt, brackets)
 
                 if mode == MODE_VISUAL:
                     # TODO: Improve handling of s.a < s.b and s.a > s.b cases.
@@ -304,70 +309,80 @@ class ViPercent(sublime_plugin.TextCommand):
         # should have an optional .scroll_selections_into_view() step during command execution.
         self.view.show(self.view.sel()[0])
 
-    def find_balanced_pairs(self, a, b, s, start):
-        opening = [start]
-        closing = []
+    def find_a_bracket(self, caret_pt):
+        """Locates the bracket closest to the caret. Vintageous should find the corresponding
+           pair. If None is found, abort execution.
+        """
+        # Is there any opning OR closing paren after the caret?
+        caret_row, caret_col = self.view.rowcol(caret_pt)
+        line_text = self.view.substr(sublime.Region(caret_pt, self.view.line(caret_pt).b))
+        try:
+            found_brackets = [(line_text.index(bracket), bracket) for bracket in chain(*self.pairs) if bracket in line_text]
+            found_brackets = min(found_brackets)
+        except ValueError:
+            return None, None, None
 
-        old_start = start
+        bracket_a, bracket_b = [(a, b) for (a, b) in self.pairs if found_brackets[1] in (a, b)][0]
+        return found_brackets[1], (bracket_a, bracket_b), self.view.text_point(caret_row, caret_col + found_brackets[0])
 
+    def find_balanced_closing_bracket(self, start, brackets, unbalanced=0):
+        new_start = start
+        for i in range(unbalanced or 1):
+            next_closing_bracket = find_in_range(self.view, brackets[1],
+                                                 start=new_start,
+                                                 end=self.view.size(),
+                                                 flags=sublime.LITERAL)
+            if next_closing_bracket is None:
+                # unbalanced bracktes; nothing we can do.
+                return
+            new_start = next_closing_bracket.end()
+
+        nested = 0
         while True:
-            if a in s[start + 1:]:
-                opening.append(s.index(a, start + 1))
-                start = opening[-1]
-                if start + 1 >= len(s):
-                    break
-            else:
+            next_opening_bracket = find_in_range(self.view, brackets[0],
+                                                 start=start,
+                                                 end=next_closing_bracket.end(),
+                                                 flags=sublime.LITERAL)
+            if not next_opening_bracket:
                 break
+            nested += 1
+            start = next_opening_bracket.end()
 
-        start = old_start
+        if nested > 0:
+            return self.find_balanced_closing_bracket(next_closing_bracket.end(),
+                                                      brackets, nested)
+        else:
+            return next_closing_bracket.begin()
+
+    def find_balanced_opening_bracket(self, start, brackets, unbalanced=0):
+        new_start = start
+        for i in range(unbalanced or 1):
+            prev_opening_bracket = reverse_search(self.view, brackets[0],
+                                                      start=0,
+                                                      end=new_start,
+                                                      flags=sublime.LITERAL)
+            if prev_opening_bracket is None:
+                # Unbalanced brackets; nothing we can do.
+                return
+            new_start = prev_opening_bracket.begin()
+
+        nested = 0
         while True:
-            if b in s[start + 1:]:
-                closing.append(s.index(b, start + 1))
-                start = closing[-1]
-                if start + 1 >= len(s):
-                    break
-            else:
+            next_closing_bracket = reverse_search(self.view, brackets[1],
+                                                  start=prev_opening_bracket.a,
+                                                  end=start,
+                                                  flags=sublime.LITERAL)
+            if not next_closing_bracket:
                 break
+            nested += 1
+            start = next_closing_bracket.begin()
 
-        if not closing:
-            return []
-
-        if len(opening) == len(closing):
-            return zip(opening, closing)
-        elif len(opening) < len(closing):
-            return zip(opening, reversed(closing[:len(opening)]))
+        if nested > 0:
+            return self.find_balanced_opening_bracket(prev_opening_bracket.begin(),
+                                                      brackets,
+                                                      nested)
         else:
-            return zip(opening[-len(closing):], reversed(closing))
-
-    def find_pairs(self, s):
-        matches = []
-        for (a, b) in self.pairs:
-            if (a in s) and (b in s):
-                if s.index(a) < s.index(b):
-                    all_for_bracket = self.find_balanced_pairs(a, b, s, 0)
-                    matches.extend(all_for_bracket)
-        return matches
-
-    def find_next_pair(self, s, start):
-        pairs = self.find_pairs(s)
-
-        if not pairs:
-            return None, None
-
-        found = [(a, b) for (a, b) in pairs if start in (a, b)]
-        if found:
-            return found[0], found[0][0] == start
-
-        min_a = min(a for (a,b) in pairs)
-        max_b = max(b for (a,b) in pairs)
-
-        if start <= min_a:
-            return [(a, b) for (a, b) in pairs if b == max_b][0], True
-        elif start <= max_b:
-            max_a = max(a for (a, b) in pairs if a <= start)
-            return [(a, b) for (a, b) in pairs if a == max_a][0], False
-        else:
-            return None, None
+            return prev_opening_bracket.begin()
 
 
 class _vi_big_h(sublime_plugin.TextCommand):
