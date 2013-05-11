@@ -1,3 +1,7 @@
+1.1.1 - 11/5/2013
+
+	- Motion % now finds brackets in different lines too.
+
 1.1 - 8/5/2013
 
 	- Improve % motion.
