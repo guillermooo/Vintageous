@@ -1,4 +1,4 @@
-1.1.2 - 13/5/2013
+1.1.3 - 13/5/2013
 	
 	- Implement ~, g~ commands (thanks @davecoates).
 
