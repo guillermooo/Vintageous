@@ -1,3 +1,7 @@
+1.1.2 - 13/5/2013
+	
+	- Implement ~, g~ commands (thanks @davecoates).
+
 1.1.2 - 11/5/2013
 
 	- Fix bug in % motion.
