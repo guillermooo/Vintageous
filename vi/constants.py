@@ -32,6 +32,7 @@ digraphs = {
     ('vi_lambda', 'vi_lambda'): ('vi_double_lambda', DIGRAPH_ACTION),
     ('vi_antilambda', 'vi_antilambda'): ('vi_double_antilambda', DIGRAPH_ACTION),
 
+    ('vi_g_action', 'vi_tilde'): ('vi_g_tilde', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_big_u'): ('vi_g_big_u', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_u'): ('vi_g_u', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_q'): ('vi_g_q', DIGRAPH_ACTION),

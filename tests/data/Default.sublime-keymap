@@ -146,6 +146,8 @@
 
 	{ "keys": ["U"], "command": "set_action", "args": {"action": "vi_big_u"}, "context": [{"key": "vi_mode_visual_any"}] },
 	{ "keys": ["u"], "command": "set_action", "args": {"action": "vi_u"}, "context": [{"key": "vi_mode_visual_any"}] },
+	
+	{ "keys": ["~"], "command": "set_action", "args": {"action": "vi_tilde"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
 
 	{ "keys": ["="], "command": "set_action", "args": {"action": "vi_equals"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
 
