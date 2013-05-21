@@ -24,6 +24,10 @@ class KeyContext(object):
             # state.
             return False
 
+        # If we have primed counts, we have to clear the state.
+        if self.state.user_provided_count:
+            return True
+
         # TODO: Simplify comparisons.
         if self.state.mode == MODE_NORMAL_INSERT:
             return True
