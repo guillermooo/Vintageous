@@ -9,6 +9,7 @@ from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
 from Vintageous.vi.constants import regions_transformer
+from Vintageous.vi.text_objects import tag_text_object
 
 
 class ExtendToMinimalWidth(sublime_plugin.TextCommand):
@@ -707,6 +708,7 @@ class _vi_select_text_object(sublime_plugin.TextCommand):
         "]": ("[", "]"),
         "{": ("{", "}"),
         "}": ("{", "}"),
+        "t": tag_text_object,
     }
 
     # XXX: Move to utils.
@@ -745,8 +747,15 @@ class _vi_select_text_object(sublime_plugin.TextCommand):
             #       a pretty weird behavior.
             if mode == _MODE_INTERNAL_NORMAL:
 
+                actual_text_object = None
                 if text_object in self.PAIRS:
-                    delim_a, delim_b = self.PAIRS[text_object]
+                    actual_text_object = self.PAIRS[text_object]
+
+                if callable(actual_text_object):
+                    tagged_region = actual_text_object(view, s, inclusive=inclusive)
+                    return tagged_region or s
+                elif len(actual_text_object) == 2:
+                    delim_a, delim_b = actual_text_object
                 else:
                     return s
 
@@ -790,8 +799,15 @@ class _vi_select_text_object(sublime_plugin.TextCommand):
             if mode == MODE_VISUAL:
                 # TODO: This class needs refactoring to reduce duplication.
 
+                actual_text_object = None
                 if text_object in self.PAIRS:
-                    delim_a, delim_b = self.PAIRS[text_object]
+                    actual_text_object = self.PAIRS[text_object]
+
+                if callable(actual_text_object):
+                    tagged_region = actual_text_object(view, s, inclusive=inclusive)
+                    return tagged_region or s
+                elif len(actual_text_object) == 2:
+                    delim_a, delim_b = actual_text_object
                 else:
                     return s
 
