@@ -5,6 +5,8 @@ from Vintageous.vi.search import find_in_range
 
 
 PAIRS = {
+    # FIXME: Treat quotation marks differently. We cannot distinguish between opening and closing
+    # in this case.
     '"': ('"', '"'),
     "'": ("'", "'"),
     "`": ("`", "`"),
