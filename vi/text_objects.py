@@ -61,7 +61,7 @@ def tag_text_object(view, s, inclusive=False):
     if (view.score_selector(s.b, 'text.html') == 0 and
         view.score_selector(s.b, 'text.xml') == 0):
             # TODO: What happens with other xml formats?
-            return None
+            return s
 
     end_tag_patt = "</(.+?)>"
     begin_tag_patt = "<{0}(\s+.*?)?>"
@@ -69,14 +69,14 @@ def tag_text_object(view, s, inclusive=False):
     closing_tag = view.find(end_tag_patt, s.b, sublime.IGNORECASE)
 
     if not closing_tag:
-        return None
+        return s
 
     begin_tag_patt = begin_tag_patt.format(view.substr(closing_tag)[2:-1])
 
     begin_tag = find_balanced_opening_tag(view, closing_tag.a, (begin_tag_patt, view.substr(closing_tag)))
 
     if not begin_tag:
-        return None
+        return s
 
     if not inclusive:
         return sublime.Region(begin_tag.b, closing_tag.a)
