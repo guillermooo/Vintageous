@@ -9,7 +9,7 @@ from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
 from Vintageous.vi.constants import regions_transformer
-from Vintageous.vi.text_objects import tag_text_object
+from Vintageous.vi.text_objects import get_text_object_region
 
 
 class ExtendToMinimalWidth(sublime_plugin.TextCommand):
@@ -697,146 +697,18 @@ class _vi_k_pre_motion(sublime_plugin.TextCommand):
 
 
 class _vi_select_text_object(sublime_plugin.TextCommand):
-    PAIRS = {
-        '"': ('"', '"'),
-        "'": ("'", "'"),
-        "`": ("`", "`"),
-        "(": ("(", ")"),
-        ")": ("(", ")"),
-        # XXX: Does Vim really allow this one?
-        "[": ("[", "]"),
-        "]": ("[", "]"),
-        "{": ("{", "}"),
-        "}": ("{", "}"),
-        "t": tag_text_object,
-    }
-
-    # XXX: Move to utils.
-    def find_previous(self, view, start, what):
-        limit = view.line(start).a
-        pt = start
-        while True:
-            if pt < limit:
-                return start
-
-            if view.substr(pt) == what:
-                return pt
-
-            pt -= 1
-
-        return start
-
-    # XXX: Move to utils.
-    def find_next(self, view, start, what):
-        limit = view.line(start).b
-        pt = start
-        while True:
-            if pt > limit:
-                return start
-
-            if view.substr(pt) == what:
-                return pt
-
-            pt += 1
-
-        return start
-
     def run(self, edit, text_object=None, mode=None, count=1, extend=False, inclusive=False):
         def f(view, s):
             # TODO: Vim seems to swallow the delimiters if you give this command a count, which is
             #       a pretty weird behavior.
             if mode == _MODE_INTERNAL_NORMAL:
 
-                actual_text_object = None
-                if text_object in self.PAIRS:
-                    actual_text_object = self.PAIRS[text_object]
-
-                if callable(actual_text_object):
-                    tagged_region = actual_text_object(view, s, inclusive=inclusive)
-                    return tagged_region or s
-                elif len(actual_text_object) == 2:
-                    delim_a, delim_b = actual_text_object
-                else:
-                    return s
-
-                text = view.substr(view.line(s.b))
-                line = view.line(s.b)
-                text_before_caret = view.substr(sublime.Region(line.a, s.b + 1))
-                text_after_caret = view.substr(sublime.Region(s.b + 1, line.b))
-
-                # Exit early if we don't have a pair of delimiters in the line.
-                if delim_a == delim_b:
-                    if len(text.split(delim_a)) < 2:
-                        return s
-                else:
-                    if not ((delim_a in text and delim_b in text) and
-                             text.index(delim_b) > text.index(delim_a)):
-                                return s
-
-                # Vim doesn't do anything if both delimiters are before the caret.
-                if delim_b not in text_after_caret and view.substr(s.b) != delim_b:
-                    return s
-
-                if delim_a not in text_before_caret:
-                    lhs = s.b if view.line(s.b).a == s.b else s.b - 1
-                    lhs = self.find_next(view, lhs, delim_a)
-                    rhs = self.find_next(view, lhs + 1, delim_b)
-
-                    if not inclusive:
-                        return sublime.Region(lhs + 1, rhs)
-                    else:
-                        return sublime.Region(lhs, rhs + 1)
-
-                else:
-                    lhs = s.b if view.line(s.b).a == s.b else s.b - 1
-                    lhs = self.find_previous(view, lhs, delim_a)
-                    rhs = self.find_next(view, lhs + 1, delim_b)
-                    if not inclusive:
-                        return sublime.Region(lhs + 1, rhs)
-                    else:
-                        return sublime.Region(lhs, rhs + 1)
+                return get_text_object_region(view, s, text_object,
+                                              inclusive=inclusive)
 
             if mode == MODE_VISUAL:
-                # TODO: This class needs refactoring to reduce duplication.
-
-                actual_text_object = None
-                if text_object in self.PAIRS:
-                    actual_text_object = self.PAIRS[text_object]
-
-                if callable(actual_text_object):
-                    tagged_region = actual_text_object(view, s, inclusive=inclusive)
-                    return tagged_region or s
-                elif len(actual_text_object) == 2:
-                    delim_a, delim_b = actual_text_object
-                else:
-                    return s
-
-
-                text = view.substr(view.line(s.b))
-                line = view.line(s.b)
-                text_before_sel = view.substr(sublime.Region(line.a, s.begin()))
-                text_after_sel = view.substr(sublime.Region(s.end(), line.b))
-
-                # Exit early if we don't have a pair of delimiters in the line.
-                if delim_a == delim_b:
-                    if len(text.split(delim_a)) < 2:
-                        return s
-                else:
-                    if not ((delim_a in text and delim_b in text) and
-                             text.index(delim_b) > text.index(delim_a)):
-                                return s
-
-                # Continue only if the selection is between delimiters.
-                if not (delim_b in text_after_sel and delim_a in text_before_sel):
-                    return s
-
-                lhs = s.begin()
-                lhs = self.find_previous(view, lhs, delim_a)
-                rhs = self.find_next(view, s.end(), delim_b)
-                if not inclusive:
-                    return sublime.Region(lhs + 1, rhs)
-                else:
-                    return sublime.Region(lhs, rhs + 1)
+                return get_text_object_region(view, s, text_object,
+                                              inclusive=inclusive)
 
             return s
 
