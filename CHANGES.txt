@@ -1,3 +1,8 @@
+1.1.5 - 23/5/2013
+
+	- Pressing Esc clear primed counts.
+	- Improve '(', '[', '{' text objects.
+
 1.1.4 - 21/5/2013
 	
 	- Implement tag text object ('vit', 'vat', etc.).
