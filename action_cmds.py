@@ -72,41 +72,84 @@ class _vi_big_i(sublime_plugin.TextCommand):
 class ViPaste(sublime_plugin.TextCommand):
     def run(self, edit, register=None, count=1):
         state = VintageState(self.view)
-
-        if register:
-            fragments = state.registers[register]
-        else:
-            # TODO: There should be a simpler way of getting the unnamed register's content.
-            fragments = state.registers['"']
-            if not fragments:
-                print("Vintageous: Nothing in register \".")
-                # XXX: This won't ever be printed because it will be overwritten by other status
-                # messages printed right after this one.
-                sublime.status_message("Vintageous: Nothing in register \".")
-                return
+        register = register or '"'
+        fragments = state.registers[register]
+        if not fragments:
+            print("Vintageous: Nothing in register \".")
+            return
 
         sels = list(self.view.sel())
-
+        # If we have the same number of pastes and selections, map 1:1. Otherwise paste paste[0]
+        # to all target selections.
         if len(sels) == len(fragments):
-            sel_frag = zip(sels, fragments)
+            sel_to_frag_mapped = zip(sels, fragments)
         else:
-            sel_frag = zip(sels, [fragments[0],] * len(sels))
+            sel_to_frag_mapped = zip(sels, [fragments[0],] * len(sels))
 
+        # FIXME: Fix this mess. Separate linewise from charwise pasting.
+        pasting_linewise = True
         offset = 0
-        for s, text in sel_frag:
-            text = self.prepare_fragment(text)
-            if text.startswith('\n'):
-                if utils.is_at_eol(self.view, s) or utils.is_at_bol(self.view, s):
-                    self.paste_all(edit, s, self.view.line(s.b).b, text, count)
+        paste_locations = []
+        for selection, fragment in reversed(list(sel_to_frag_mapped)):
+            fragment = self.prepare_fragment(fragment)
+            if fragment.startswith('\n'):
+                # Pasting linewise...
+                # If pasting at EOL or BOL, make sure we paste before the newline character.
+                if (utils.is_at_eol(self.view, selection) or
+                    utils.is_at_bol(self.view, selection)):
+                    l = self.paste_all(edit, selection,
+                                       self.view.line(selection.b).b,
+                                       fragment,
+                                       count)
+                    paste_locations.append(l)
                 else:
-                    self.paste_all(edit, s, self.view.line(s.b - 1).b, text, count)
+                    l = self.paste_all(edit, selection,
+                                   self.view.line(selection.b - 1).b,
+                                   fragment,
+                                   count)
+                    paste_locations.append(l)
             else:
-                # XXX: Refactor this whole class. It's getting out of hand.
-                if self.view.substr(s.b) == '\n':
-                    self.paste_all(edit, s, s.b + offset, text, count)
+                pasting_linewise = False
+                # Pasting charwise...
+                # If pasting at EOL, make sure we don't paste after the newline character.
+                if self.view.substr(selection.b) == '\n':
+                    l = self.paste_all(edit, selection, selection.b + offset,
+                                   fragment, count)
+                    paste_locations.append(l)
                 else:
-                    self.paste_all(edit, s, s.b + offset + 1, text, count)
-                offset += len(text) * count
+                    l = self.paste_all(edit, selection, selection.b + offset + 1,
+                                   fragment, count)
+                    paste_locations.append(l)
+                offset += len(fragment) * count
+
+        if pasting_linewise:
+            self.reset_carets_linewise()
+        else:
+            self.reset_carets_charwise(paste_locations, len(fragment))
+
+    def reset_carets_charwise(self, paste_locations, paste_len):
+        # FIXME: Won't work for multiple jagged pastes...
+        b_pts = [s.b for s in list(self.view.sel())]
+        if len(b_pts) > 1:
+            self.view.sel().clear()
+            self.view.sel().add_all([sublime.Region(ploc + paste_len - 1,
+                                                    ploc + paste_len - 1)
+                                            for ploc in paste_locations])
+        else:
+            self.view.sel().clear()
+            self.view.sel().add(sublime.Region(paste_locations[0] + paste_len - 1,
+                                               paste_locations[0] + paste_len - 1))
+
+    def reset_carets_linewise(self):
+        # FIXME: Won't work well for visual selections...
+        # FIXME: This might not work for cmdline paste command (the target row isn't necessarily
+        #        the next one.
+        # After pasting linewise, we should move the caret one line down.
+        b_pts = [s.b for s in list(self.view.sel())]
+        new_rows = [self.view.rowcol(b)[0] + 1 for b in b_pts]
+        row_starts = [self.view.text_point(r, 0) for r in new_rows]
+        self.view.sel().clear()
+        self.view.sel().add_all([sublime.Region(pt, pt) for pt in row_starts])
 
     def prepare_fragment(self, text):
         if text.endswith('\n') and text != '\n':
@@ -122,6 +165,8 @@ class ViPaste(sublime_plugin.TextCommand):
             at = at if at <= self.view.size() else self.view.size()
             for x in range(count):
                 self.view.insert(edit, at, text)
+                # Return position at which we have just pasted.
+                return at
         else:
             if text.startswith('\n'):
                 text = text * count
@@ -135,6 +180,8 @@ class ViPaste(sublime_plugin.TextCommand):
                     text = text[1:]
 
             self.view.replace(edit, sel, text)
+            # Return position at which we have just pasted.
+            return sel.a
 
 
 class ViPasteBefore(sublime_plugin.TextCommand):
