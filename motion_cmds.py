@@ -777,7 +777,11 @@ class _vi_left_brace(sublime_plugin.TextCommand):
                 return sublime.Region(par_as_region.a, par_as_region.a)
 
             elif mode == MODE_VISUAL:
-                return sublime.Region(s.a + 1, par_as_region.a)
+                # FIXME: Improve motion when .b end crosses over .a end: must extend .a end
+                # by one.
+                if s.a == par_as_region.a:
+                    return sublime.Region(s.a, s.a + 1)
+                return sublime.Region(s.a, par_as_region.a)
 
             elif mode == _MODE_INTERNAL_NORMAL:
                 return sublime.Region(s.a, par_as_region.a)
