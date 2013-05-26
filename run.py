@@ -253,8 +253,9 @@ class ViRunCommand(sublime_plugin.TextCommand):
             # Some actions that don't take a motion apply the count to the action. For example,
             # > in visual mode.
             i = vi_cmd_data['count'] if vi_cmd_data['_repeat_action'] else 1
+            runner = self.view if not vi_cmd_data['is_window_command'] else self.view.window()
             for t in range(i):
-                self.view.run_command(cmd, args)
+                runner.run_command(cmd, args)
 
     def do_post_action(self, vi_cmd_data):
         if vi_cmd_data['post_action']:

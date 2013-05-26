@@ -109,4 +109,5 @@ class CmdData(dict):
         # 'maybe_mark_undo_groups_for_gluing'.)
         self['_mark_groups_for_gluing'] = True
         self['populates_small_delete_register'] = False
-
+        # Commands like the non-standard gk and gl use window commands.
+        self['is_window_command'] = False

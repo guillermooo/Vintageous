@@ -1,7 +1,8 @@
 //
 // Basic rule to add new key bindings:
 //
-// Given two identical 'keys', the last one wins, even if its context is less strict.
+//  * Given two key bindings for the same key, the one defined last in the file wins, even if its
+//    context is less restrictive.
 //
 
 [
@@ -13,9 +14,10 @@
 
 	{ "keys": ["i"], "command": "set_action", "args": {"action": "vi_enter_insert_mode"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_mode_visual_any", "operand": false}] },
 
-	// This allows insertions such as 5ifoobar\n<esc>. Macros help with this, but we should prevent the user from
-	// requesting 	a macro recording until after <esc> is pressed. TODO: Maybe create a context like "vi_in_normal_insert_mode"?
-	{ "keys": ["i"], "command": "vi_enter_normal_insert_mode", "context": [{"key": "setting.command_mode"}, {"key": "vi_has_motion_count"}] },
+	// This allows insertions such as 5ifoobar\n<esc>. Macros help with this, but we should
+	// prevent the user from requesting a macro recording until after <esc> is pressed.
+	// TODO: Maybe create a context like "vi_in_normal_insert_mode"?
+	{ "keys": ["i"], "command": "vi_enter_normal_insert_mode",            "context": [{"key": "setting.command_mode"}, {"key": "vi_has_motion_count"}] },
 	{ "keys": ["a"], "command": "set_action", "args": {"action": "vi_a"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_mode_visual_any", "operand": false}] },
 
 	{ "keys": ["h"], "command": "set_motion", "args": {"motion": "vi_h"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
@@ -24,15 +26,15 @@
 	{ "keys": ["l"], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 	
 	{ "keys": ["down"], "command": "set_motion", "args": {"motion": "vi_j"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["up"], "command": "set_motion", "args": {"motion": "vi_k"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["up"], "command": "set_motion", "args": {"motion": "vi_k"},   "context": [{"key": "setting.command_mode"}] },
 
-	{ "keys": ["left"], "command": "set_motion", "args": {"motion": "vi_h"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["left"], "command": "set_motion", "args": {"motion": "vi_h"},  "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["right"], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "vi_mode_normal_or_visual"}] }, 
 
-	{ "keys": [" "], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["enter"], "command": "set_motion", "args": {"motion": "vi_enter"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
+	{ "keys": [" "], "command": "set_motion", "args": {"motion": "vi_l"},                     "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["enter"], "command": "set_motion", "args": {"motion": "vi_enter"},             "context": [{"key": "vi_mode_normal_or_any_visual"}] },
 	{ "keys": ["shift+enter"], "command": "set_motion", "args": {"motion": "vi_shift_enter"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
-	{ "keys": ["ctrl+space"], "command": "set_motion", "args": {"motion": "vi_w"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["ctrl+space"], "command": "set_motion", "args": {"motion": "vi_w"},            "context": [{"key": "vi_mode_normal_or_visual"}] },
 
 	{ "keys": ["w"], "command": "set_motion", "args": {"motion": "vi_w"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["e"], "command": "set_motion", "args": {"motion": "vi_e"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
@@ -46,20 +48,20 @@
 
 	{ "keys": ["|"], "command": "set_motion", "args": {"motion": "vi_pipe"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 
-	{ "keys": ["$"], "command": "set_motion", "args": {"motion": "vi_dollar"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["$"], "command": "set_motion", "args": {"motion": "vi_dollar"},     "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["_"], "command": "set_motion", "args": {"motion": "vi_underscore"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["^"], "command": "set_motion", "args": {"motion": "vi_underscore"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 
-	{ "keys": ["{"], "command": "set_motion", "args": {"motion": "vi_left_brace"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
+	{ "keys": ["{"], "command": "set_motion", "args": {"motion": "vi_left_brace"},  "context": [{"key": "vi_mode_normal_or_any_visual"}] },
 	{ "keys": ["}"], "command": "set_motion", "args": {"motion": "vi_right_brace"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
 
-	{ "keys": ["("], "command": "set_motion", "args": {"motion": "vi_left_parenthesis"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["("], "command": "set_motion", "args": {"motion": "vi_left_parenthesis"},  "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": [")"], "command": "set_motion", "args": {"motion": "vi_right_parenthesis"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 
 	{ "keys": ["I"], "command": "set_action", "args": {"action": "vi_big_i"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["A"], "command": "set_action", "args": {"action": "vi_big_a"}, "context": [{"key": "setting.command_mode"}] },
 
-	{ "keys": ["G"], "command": "set_motion", "args": {"motion": "vi_big_g"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["G"], "command": "set_motion", "args": {"motion": "vi_big_g"},   "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["%"], "command": "set_motion", "args": {"motion": "vi_percent"}, "context": [{"key": "setting.command_mode"}] },
 
 	// TODO: They don't work in VISUALLINEMODE.
@@ -67,7 +69,7 @@
 	{ "keys": ["M"], "command": "set_motion", "args": {"motion": "vi_big_m"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["L"], "command": "set_motion", "args": {"motion": "vi_big_l"}, "context": [{"key": "setting.command_mode"}] },
 
-	{ "keys": ["*"], "command": "set_motion", "args": {"motion": "vi_star"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["*"], "command": "set_motion", "args": {"motion": "vi_star"},      "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["#"], "command": "set_motion", "args": {"motion": "vi_octothorp"}, "context": [{"key": "setting.command_mode"}] },
 
 	// TODO: Do the same as for ESC and fold all v commands into a single one.
@@ -76,7 +78,7 @@
 	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_enter_visual_mode"}, "context": [{"key": "vi_mode_visual_line"}] },
 
 	{ "keys": ["V"], "command": "set_action", "args": {"action": "vi_enter_visual_line_mode"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_can_enter_any_visual_mode"}] },
-	{ "keys": ["V"], "command": "set_action", "args": {"action": "vi_enter_normal_mode"}, "context": [{"key": "vi_mode_visual_line"}] },
+	{ "keys": ["V"], "command": "set_action", "args": {"action": "vi_enter_normal_mode"},      "context": [{"key": "vi_mode_visual_line"}] },
 
 
 	{ "keys": ["1"], "command": "vi_push_digit", "args": {"digit": "1"}, "context": [{"key": "vi_mode_can_push_digit"}, {"key": "setting.command_mode"}] },
@@ -104,48 +106,46 @@
 	{ "keys": ["ctrl+r"], "command": "redo", "context": [{"key": "vi_mode_normal"}, {"key": "vi_use_ctrl_keys"}] },
 
 	// TODO: Do we really want to use the built-in jump list? Do we have are own?
-	{ "keys": ["ctrl+o"], "command": "jump_back", "context": [{"key": "vi_mode_normal"}, {"key": "vi_use_ctrl_keys"}] },
+	{ "keys": ["ctrl+o"], "command": "jump_back",    "context": [{"key": "vi_mode_normal"}, {"key": "vi_use_ctrl_keys"}] },
 	{ "keys": ["ctrl+i"], "command": "jump_forward", "context": [{"key": "vi_mode_normal"}, {"key": "vi_use_ctrl_keys"}] },
 
 	// Ctrl+f in Vim cannot be used as a motion for an action.
 	{ "keys": ["ctrl+f"], "command": "set_motion", "args": {"motion": "vi_ctrl_f"}, "context": [{"key": "vi_mode_normal_or_any_visual"}, {"key": "vi_use_ctrl_keys"}] },
 	{ "keys": ["ctrl+b"], "command": "set_motion", "args": {"motion": "vi_ctrl_b"}, "context": [{"key": "vi_mode_normal_or_any_visual"}, {"key": "vi_use_ctrl_keys"}] },
 
-	{ "keys": ["d"], "command": "set_action", "args": {"action": "vi_d"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["s"], "command": "set_action", "args": {"action": "vi_s"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["d"], "command": "set_action", "args": {"action": "vi_d"},     "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["s"], "command": "set_action", "args": {"action": "vi_s"},     "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["S"], "command": "set_action", "args": {"action": "vi_big_s"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["c"], "command": "set_action", "args": {"action": "vi_c"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["c"], "command": "set_action", "args": {"action": "vi_c"},     "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["C"], "command": "set_action", "args": {"action": "vi_big_c"}, "context": [{"key": "setting.command_mode"}] },
 
-	{ "keys": ["o"], "command": "set_action", "args": {"action": "vi_o"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["o"], "command": "set_action", "args": {"action": "vi_o"},     "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["O"], "command": "set_action", "args": {"action": "vi_big_o"}, "context": [{"key": "setting.command_mode"}] },
 
 	{ "keys": ["J"], "command": "set_action", "args": {"action": "vi_big_j"}, "context": [{"key": "setting.command_mode"}] },
 
-	// This is a fake action that allows gg to be issued.
-	{ "keys": ["g"], "command": "set_action", "args": {"action": "vi_g_action"}, "context": [{"key": "setting.command_mode"}] },
-
-	// gg can either be an action or a motion. It's a motion when there's a true action primed.
-	// TODO: Improve this. XXX This is obsolete?
-	{ "keys": ["g", "g"], "command": "set_motion", "args": {"motion": "vi_gg"}, "context": [{"key": "vi_has_action"}] },
-	
 	{ "keys": ["D"], "command": "set_action", "args": {"action": "vi_big_d"}, "context": [{"key": "setting.command_mode"}] },
 
-	// gg can either be an action or a motion. It's an action when there is no actual action.
-	{ "keys": ["g"], "command": "set_action", "args": {"action": "vi_gg"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
-	{ "keys": ["d"], "command": "set_action", "args": {"action": "vi_g_d"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
-	{ "keys": ["D"], "command": "set_action", "args": {"action": "vi_g_big_d"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
+	// This is a fake action that 'opens' the 'g' key namespace within Vintageous.
+	{ "keys": ["g"], "command": "set_action", "args": {"action": "vi_g_action"}, "context": [{"key": "setting.command_mode"}] },
 
-	{ "keys": ["U"], "command": "set_action", "args": {"action": "vi_g_big_u"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
-	{ "keys": ["u"], "command": "set_action", "args": {"action": "vi_g_u"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
-	{ "keys": ["q"], "command": "set_action", "args": {"action": "vi_g_q"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
-	{ "keys": ["*"], "command": "set_action", "args": {"action": "vi_g_star"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
-	{ "keys": ["#"], "command": "set_action", "args": {"action": "vi_g_octothorp"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
-	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_g_v"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_incomplete_action"}] },
+	// gg can either be an action or a motion. It's an action when there is no actual action.
+	{ "keys": ["g"], "command": "set_action", "args": {"action": "vi_gg"},          "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
+	{ "keys": ["d"], "command": "set_action", "args": {"action": "vi_g_d"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
+	{ "keys": ["D"], "command": "set_action", "args": {"action": "vi_g_big_d"},     "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
+	{ "keys": ["U"], "command": "set_action", "args": {"action": "vi_g_big_u"},     "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
+	{ "keys": ["u"], "command": "set_action", "args": {"action": "vi_g_u"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
+	{ "keys": ["q"], "command": "set_action", "args": {"action": "vi_g_q"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
+	{ "keys": ["*"], "command": "set_action", "args": {"action": "vi_g_star"},      "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
+	{ "keys": ["#"], "command": "set_action", "args": {"action": "vi_g_octothorp"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
+	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_g_v"},         "context": [{"key": "vi_mode_normal"},       {"key": "vi_in_key_namespace", "operand": "g"}] },
+
+	// Non-standard vi commands.
+	{ "keys": ["k"], "command": "set_action", "args": {"action": "vi_g_k"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
+	{ "keys": ["l"], "command": "set_action", "args": {"action": "vi_g_l"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
 
 	{ "keys": ["U"], "command": "set_action", "args": {"action": "vi_big_u"}, "context": [{"key": "vi_mode_visual_any"}] },
-	{ "keys": ["u"], "command": "set_action", "args": {"action": "vi_u"}, "context": [{"key": "vi_mode_visual_any"}] },
-
+	{ "keys": ["u"], "command": "set_action", "args": {"action": "vi_u"},     "context": [{"key": "vi_mode_visual_any"}] },
 	{ "keys": ["~"], "command": "set_action", "args": {"action": "vi_tilde"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
 
 	{ "keys": ["="], "command": "set_action", "args": {"action": "vi_equals"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
@@ -216,51 +216,52 @@
 
 	{ "keys": ["r"], "command": "vi_r", "context": [{"key": "vi_mode_normal"}, {"key": "vi_mode_normal"}] },
 	
-	{ "keys": [">"], "command": "set_action", "args": {"action": "vi_lambda"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": [">"], "command": "set_action", "args": {"action": "vi_lambda"},     "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["<"], "command": "set_action", "args": {"action": "vi_antilambda"}, "context": [{"key": "setting.command_mode"}] },
 
-	// This is a fake action that allows zz to be issued.
-	// Ordering matters: To avoid conflicts with t and possibly other key bindings with less restrictive contexts, place these after them.
-	{ "keys": ["z"], "command": "set_action", "args": {"action": "vi_z_action"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["enter"], "command": "set_action", "args": {"action": "vi_z_enter"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
-	{ "keys": ["-"], "command": "set_action", "args": {"action": "vi_z_minus"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
-	{ "keys": ["z"], "command": "set_action", "args": {"action": "vi_zz"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
-	{ "keys": ["b"], "command": "set_action", "args": {"action": "vi_z_b"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
-	{ "keys": ["t"], "command": "set_action", "args": {"action": "vi_z_t"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}] },
+	// This is a fake action that opens the 'z' key namespace within Vintageous.
+	{ "keys": ["z"],     "command": "set_action", "args": {"action": "vi_z_action"}, "context": [{"key": "setting.command_mode"}] },
+	// Order matters: To avoid conflicts with t and possibly other key bindings with less
+	// restrictive contexts, place these after them.
+	{ "keys": ["enter"], "command": "set_action", "args": {"action": "vi_z_enter"},  "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "z"}] },
+	{ "keys": ["-"],     "command": "set_action", "args": {"action": "vi_z_minus"},  "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "z"}] },
+	{ "keys": ["z"],     "command": "set_action", "args": {"action": "vi_zz"},       "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "z"}] },
+	{ "keys": ["b"],     "command": "set_action", "args": {"action": "vi_z_b"},      "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "z"}] },
+	{ "keys": ["t"],     "command": "set_action", "args": {"action": "vi_z_t"},      "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "z"}] },
 
-	{ "keys": ["q"], "command": "vi_q", "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action", "operand": false}] },
+	// Ensure this key isn't captured when a key namespace is expecting further input.
+	{ "keys": ["q"], "command": "vi_q",  "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action", "operand": false}] },
 	{ "keys": ["q"], "command": "_vi_q", "context": [{"key": "vi_is_recording_macro"}] },
-
 	{ "keys": ["@"], "command": "vi_at", "context": [{"key": "vi_mode_normal"}] },
 
 	// Pane management
 	{ "keys": ["ctrl+w"], "command": "set_action", "args": {"action": "vi_ctrl_w_action"}, "context": [{"key": "setting.command_mode"}]},
 	// TODO: The action name is misleading.
-	{ "keys": ["ctrl+q"], "command": "set_action", "args": {"action": "vi_g_q"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
-	{ "keys": ["ctrl+v"], "command": "set_action", "args": {"action": "vi_ctrl_w_v"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
-	{ "keys": ["l"], "command": "set_action", "args": {"action": "vi_ctrl_w_l"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_incomplete_action"}]},
-	{ "keys": ["h"], "command": "set_action", "args": {"action": "vi_ctrl_w_h"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_incomplete_action"}]},
-	{ "keys": ["L"], "command": "set_action", "args": {"action": "vi_ctrl_w_big_l"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_incomplete_action"}]},
-	{ "keys": ["H"], "command": "set_action", "args": {"action": "vi_ctrl_w_big_h"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_incomplete_action"}]},
+	{ "keys": ["ctrl+q"], "command": "set_action", "args": {"action": "vi_g_q"},          "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "ctrl_w"}] },
+	{ "keys": ["ctrl+v"], "command": "set_action", "args": {"action": "vi_ctrl_w_v"},     "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "ctrl_w"}] },
+	{ "keys": ["l"],      "command": "set_action", "args": {"action": "vi_ctrl_w_l"},     "context": [{"key": "vi_mode_normal"},       {"key": "vi_in_key_namespace", "operand": "ctrl_w"}] },
+	{ "keys": ["h"],      "command": "set_action", "args": {"action": "vi_ctrl_w_h"},     "context": [{"key": "vi_mode_normal"},       {"key": "vi_in_key_namespace", "operand": "ctrl_w"}] },
+	{ "keys": ["L"],      "command": "set_action", "args": {"action": "vi_ctrl_w_big_l"}, "context": [{"key": "vi_mode_normal"},       {"key": "vi_in_key_namespace", "operand": "ctrl_w"}] },
+	{ "keys": ["H"],      "command": "set_action", "args": {"action": "vi_ctrl_w_big_h"}, "context": [{"key": "vi_mode_normal"},       {"key": "vi_in_key_namespace", "operand": "ctrl_w"}] },
 
 	// TODO: Simplify the logic needed to make the expression register work in INSERTMODE.
-	{ "keys": ["ctrl+r"], "command": "set_action", "args": {"action": "vi_ctrl_r_action"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "setting.command_mode", "operator": "equal", "operand": false}]},
-	{ "keys": ["="], "command": "set_action", "args": {"action": "vi_ctrl_r_equals"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
+	{ "keys": ["ctrl+r"], "command": "set_action", "args": {"action": "vi_ctrl_r_action"}, "context": [{"key": "vi_use_ctrl_keys"},     {"key": "setting.command_mode", "operator": "equal", "operand": false}]},
+	{ "keys": ["="],      "command": "set_action", "args": {"action": "vi_ctrl_r_equals"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
 
 	{ "keys": ["ctrl+a"], "command": "set_action", "args": {"action": "vi_ctrl_a"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "setting.command_mode"}]},
 	{ "keys": ["ctrl+x"], "command": "set_action", "args": {"action": "vi_ctrl_x"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "setting.command_mode"}]},
 
 
 	// Cmdline mode commands ======================================================================================================
-	{ "keys": [":"], "command": "vi_colon_input", "context": [{"key": "setting.command_mode"}, {"key": "vi_enable_cmdline_mode"}] },
+	{ "keys": [":"], "command": "vi_colon_input",                                     "context": [{"key": "setting.command_mode"}, {"key": "vi_enable_cmdline_mode"}] },
  	{ "keys": [":"], "command": "vi_colon_input", "args": {"initial_text": ":'<,'>"}, "context": [{"key": "setting.command_mode"}, {"key": "selection_empty", "operator": "equal", "operand": false }, {"key": "vi_enable_cmdline_mode"}] },
 
-	{ "keys": ["up"], "command": "cycle_cmdline_history", "args": {"backwards": true }, "context": [{"key": "vi_is_cmdline"}] },
+	{ "keys": ["up"],   "command": "cycle_cmdline_history", "args": {"backwards": true }, "context": [{"key": "vi_is_cmdline"}] },
  	{ "keys": ["down"], "command": "cycle_cmdline_history", "context": [{"key": "vi_is_cmdline"}] },
 	// =============================================================================================================================
 
-
 	// Collects user input for commands such as t, f, T, F.
 	// XXX: Seems to need to come after every other key binding so it will catch every character. Investigate this.
+	// FIXME: Won't capture '\n'... Perhaps it's a limitation of Sublime Text?
 	{ "keys": ["<character>"], "command": "collect_user_input", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_user_input"}] },
 ]

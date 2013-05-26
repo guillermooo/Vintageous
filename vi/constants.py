@@ -37,6 +37,8 @@ digraphs = {
     ('vi_g_action', 'vi_g_u'): ('vi_g_u', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_q'): ('vi_g_q', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_v'): ('vi_g_v', DIGRAPH_ACTION),
+    ('vi_g_action', 'vi_g_k'): ('vi_g_k', DIGRAPH_ACTION),
+    ('vi_g_action', 'vi_g_l'): ('vi_g_l', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_e'): ('vi_g_e', DIGRAPH_MOTION),
     ('vi_g_action', 'vi_gg'): ('vi_gg', DIGRAPH_MOTION),
     ('vi_g_action', 'vi_g_d'): ('vi_g_d', DIGRAPH_MOTION),
@@ -78,6 +80,17 @@ ACTIONS_EXITING_TO_INSERT_MODE = ('vi_ctrl_r_action',)
 MOTION_TRANSLATION_TABLE = {
     ('vi_c', 'vi_w'): 'vi_e',
 }
+
+ACTION_TO_NAMESPACE_TABLE = {
+    'vi_ctrl_w_action': 'ctrl_w',
+    'vi_g_action': 'g',
+    'vi_z_action': 'z',
+    'vi_ctrl_r_action': 'ctrl_r',
+}
+
+
+def action_to_namespace(action):
+    return ACTION_TO_NAMESPACE_TABLE.get(action)
 
 
 # TODO: This does not belong here.
