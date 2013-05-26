@@ -1,3 +1,13 @@
+1.3.0 - 26/5/2013
+
+	- Implement ctrl+d, ctrl+u motions.
+	- Implement non-standard select mode:
+		* gh: Enter select mode.
+		*  j: Add selection while in select mode.
+		*  k: Remove selection while in select mode.
+		*  l: Skip selection over while in select mode.
+	- Improve {, } motions in visual mode.
+
 1.2.0 - 26/5/2013
 
 	- Cumulative release.
