@@ -688,3 +688,19 @@ def vi_pipe(vi_cmd_data):
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
+
+
+def vi_ctrl_d(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = '_vi_ctrl_d'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['count'] = 1
+
+    return vi_cmd_data
+
+
+def vi_ctrl_u(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = '_vi_ctrl_u'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['count'] = 1
+
+    return vi_cmd_data

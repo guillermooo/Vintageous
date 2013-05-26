@@ -1061,3 +1061,79 @@ class _vi_g_e_post_motion(sublime_plugin.TextCommand):
             return s
 
         regions_transformer(self.view, f)
+
+
+class _vi_ctrl_d(sublime_plugin.TextCommand):
+    def next_half_page(self, count):
+        origin = self.view.sel()[0]
+
+        visible = self.view.visible_region()
+        row_a = self.view.rowcol(visible.a)[0]
+        row_b = self.view.rowcol(visible.b)[0]
+
+        half_page_span = (row_b - row_a) // 2 * count
+
+        next_half_page = self.view.rowcol(origin.b)[0] + half_page_span
+
+        pt = self.view.text_point(next_half_page, 0)
+        return sublime.Region(pt, pt), (self.view.rowcol(pt)[0] -
+                                        self.view.rowcol(visible.a)[0])
+
+    def run(self, edit, mode=None, extend=False, count=None):
+
+        def f(view, s):
+            if mode == MODE_NORMAL:
+                return next
+
+            elif mode == MODE_VISUAL:
+                return sublime.Region(s.a, next.b)
+
+            elif mode == _MODE_INTERNAL_NORMAL:
+                return sublime.Region(s.a, next.b)
+
+            elif mode == MODE_VISUAL_LINE:
+                return sublime.Region(s.a, self.view.full_line(next.b).b)
+
+            return s
+
+        next, scroll_amount = self.next_half_page(count)
+        regions_transformer(self.view, f)
+        self.view.run_command('scroll_lines', {'amount': -scroll_amount})
+
+
+class _vi_ctrl_u(sublime_plugin.TextCommand):
+    def prev_half_page(self, count):
+        origin = self.view.sel()[0]
+
+        visible = self.view.visible_region()
+        row_a = self.view.rowcol(visible.a)[0]
+        row_b = self.view.rowcol(visible.b)[0]
+
+        half_page_span = (row_b - row_a) // 2 * count
+
+        prev_half_page = self.view.rowcol(origin.b)[0] - half_page_span
+
+        pt = self.view.text_point(prev_half_page, 0)
+        return sublime.Region(pt, pt), (self.view.rowcol(visible.b)[0] -
+                                        self.view.rowcol(pt)[0])
+
+    def run(self, edit, mode=None, extend=False, count=None):
+
+        def f(view, s):
+            if mode == MODE_NORMAL:
+                return previous
+
+            elif mode == MODE_VISUAL:
+                return sublime.Region(s.a, previous.b)
+
+            elif mode == _MODE_INTERNAL_NORMAL:
+                return sublime.Region(s.a, previous.b)
+
+            elif mode == MODE_VISUAL_LINE:
+                return sublime.Region(s.a, self.view.full_line(previous.b).b)
+
+            return s
+
+        previous, scroll_amount = self.prev_half_page(count)
+        regions_transformer(self.view, f)
+        self.view.run_command('scroll_lines', {'amount': scroll_amount})

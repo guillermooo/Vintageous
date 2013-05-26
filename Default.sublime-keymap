@@ -109,9 +109,12 @@
 	{ "keys": ["ctrl+o"], "command": "jump_back",    "context": [{"key": "vi_mode_normal"}, {"key": "vi_use_ctrl_keys"}] },
 	{ "keys": ["ctrl+i"], "command": "jump_forward", "context": [{"key": "vi_mode_normal"}, {"key": "vi_use_ctrl_keys"}] },
 
+
 	// Ctrl+f in Vim cannot be used as a motion for an action.
 	{ "keys": ["ctrl+f"], "command": "set_motion", "args": {"motion": "vi_ctrl_f"}, "context": [{"key": "vi_mode_normal_or_any_visual"}, {"key": "vi_use_ctrl_keys"}] },
 	{ "keys": ["ctrl+b"], "command": "set_motion", "args": {"motion": "vi_ctrl_b"}, "context": [{"key": "vi_mode_normal_or_any_visual"}, {"key": "vi_use_ctrl_keys"}] },
+	{ "keys": ["ctrl+d"], "command": "set_motion", "args": {"motion": "vi_ctrl_d"}, "context": [{"key": "vi_mode_normal_or_any_visual"}, {"key": "vi_use_ctrl_keys"}] },
+	{ "keys": ["ctrl+u"], "command": "set_motion", "args": {"motion": "vi_ctrl_u"}, "context": [{"key": "vi_mode_normal_or_any_visual"}, {"key": "vi_use_ctrl_keys"}] },
 
 	{ "keys": ["d"], "command": "set_action", "args": {"action": "vi_d"},     "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["s"], "command": "set_action", "args": {"action": "vi_s"},     "context": [{"key": "setting.command_mode"}] },
