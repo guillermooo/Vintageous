@@ -1,6 +1,6 @@
 import sublime
 
-from Vintageous.vi.constants import MODE_NORMAL, MODE_NORMAL_INSERT, MODE_INSERT, ACTIONS_EXITING_TO_INSERT_MODE, MODE_VISUAL_LINE, MODE_VISUAL
+from Vintageous.vi.constants import MODE_NORMAL, MODE_NORMAL_INSERT, MODE_INSERT, ACTIONS_EXITING_TO_INSERT_MODE, MODE_VISUAL_LINE, MODE_VISUAL, MODE_SELECT
 from Vintageous.vi import constants
 from Vintageous.vi import utils
 from Vintageous.vi.constants import action_to_namespace
@@ -37,6 +37,7 @@ class KeyContext(object):
             return True
 
         # check if we are NOT in normal mode -- if NOT, we need to change modes
+        # This covers, for example, SELECT_MODE.
         if self.state.mode != MODE_NORMAL:
             return True
 
@@ -99,6 +100,10 @@ class KeyContext(object):
 
     def vi_mode_visual_any(self, key, operator, operand, match_all):
         value = self.state.mode in (MODE_VISUAL_LINE, MODE_VISUAL)
+        return self._check(value, operator, operand, match_all)
+
+    def vi_mode_select(self, key, operator, operand, match_all):
+        value = self.state.mode == MODE_SELECT
         return self._check(value, operator, operand, match_all)
 
     def vi_mode_visual_line(self, key, operator, operand, match_all):

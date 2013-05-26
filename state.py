@@ -18,6 +18,7 @@ from Vintageous.vi.constants import MODE_INSERT
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_NORMAL_INSERT
 from Vintageous.vi.constants import MODE_REPLACE
+from Vintageous.vi.constants import MODE_SELECT
 from Vintageous.vi.constants import mode_to_str
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
@@ -144,6 +145,9 @@ class VintageState(object):
 
     def enter_visual_line_mode(self):
         self.mode = MODE_VISUAL_LINE
+
+    def enter_select_mode(self):
+        self.mode = MODE_SELECT
 
     def enter_insert_mode(self):
         self.settings.view['command_mode'] = False

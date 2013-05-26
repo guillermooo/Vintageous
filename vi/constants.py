@@ -16,6 +16,7 @@ MODE_NORMAL_INSERT = 1 << 4
 # Note that for pure motions we still use plain NORMAL mode.
 _MODE_INTERNAL_NORMAL = 1 << 5
 MODE_REPLACE = 1 << 6
+MODE_SELECT = 1 << 7
 
 
 DIGRAPH_ACTION = 1
@@ -37,8 +38,7 @@ digraphs = {
     ('vi_g_action', 'vi_g_u'): ('vi_g_u', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_q'): ('vi_g_q', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_v'): ('vi_g_v', DIGRAPH_ACTION),
-    ('vi_g_action', 'vi_g_k'): ('vi_g_k', DIGRAPH_ACTION),
-    ('vi_g_action', 'vi_g_l'): ('vi_g_l', DIGRAPH_ACTION),
+    ('vi_g_action', 'vi_g_h'): ('vi_enter_select_mode', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_e'): ('vi_g_e', DIGRAPH_MOTION),
     ('vi_g_action', 'vi_gg'): ('vi_gg', DIGRAPH_MOTION),
     ('vi_g_action', 'vi_g_d'): ('vi_g_d', DIGRAPH_MOTION),
@@ -103,6 +103,8 @@ def mode_to_str(mode):
         return "VISUAL"
     elif mode == MODE_VISUAL_LINE:
         return "VISUAL LINE"
+    elif mode == MODE_SELECT:
+        return "SELECT"
     elif mode == MODE_NORMAL_INSERT:
         return "INSERT"
     elif mode == MODE_REPLACE:

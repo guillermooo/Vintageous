@@ -9,6 +9,7 @@ from Vintageous.vi.constants import MODE_INSERT
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_NORMAL_INSERT
 from Vintageous.vi.constants import MODE_REPLACE
+from Vintageous.vi.constants import MODE_SELECT
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
 
@@ -16,6 +17,13 @@ from Vintageous.vi.constants import MODE_VISUAL_LINE
 def vi_enter_visual_mode(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = 'vi_enter_visual_mode'
+    vi_cmd_data['action']['args'] = {}
+    return vi_cmd_data
+
+
+def vi_enter_select_mode(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['action']['command'] = 'vi_enter_select_mode'
     vi_cmd_data['action']['args'] = {}
     return vi_cmd_data
 
@@ -736,6 +744,11 @@ def vi_esc(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
     if vi_cmd_data['mode'] == MODE_NORMAL_INSERT:
         vi_cmd_data['action']['command'] = 'vi_run_normal_insert_mode_actions'
+        vi_cmd_data['action']['args'] = {}
+        vi_cmd_data['motion']['command'] = 'no_op'
+        vi_cmd_data['motion']['args'] = {}
+    if vi_cmd_data['mode'] == MODE_SELECT:
+        vi_cmd_data['action']['command'] = 'vi_enter_normal_mode'
         vi_cmd_data['action']['args'] = {}
         vi_cmd_data['motion']['command'] = 'no_op'
         vi_cmd_data['motion']['args'] = {}

@@ -278,6 +278,12 @@ class ViEnterVisualMode(sublime_plugin.TextCommand):
         self.view.run_command('extend_to_minimal_width')
 
 
+class ViEnterSelectMode(sublime_plugin.TextCommand):
+    def run(self, edit):
+        state = VintageState(self.view)
+        state.enter_select_mode()
+
+
 class ViEnterVisualLineMode(sublime_plugin.TextCommand):
     def run(self, edit):
         state = VintageState(self.view)

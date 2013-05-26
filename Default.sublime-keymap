@@ -24,6 +24,12 @@
 	{ "keys": ["j"], "command": "set_motion", "args": {"motion": "vi_j"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["k"], "command": "set_motion", "args": {"motion": "vi_k"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["l"], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+
+	// Non-standard Vim commands.
+	{ "keys": ["j"], "command": "find_under_expand",      "context": [{"key": "vi_mode_select"}] },
+	{ "keys": ["k"], "command": "soft_undo",              "context": [{"key": "vi_mode_select"}] },
+	{ "keys": ["l"], "command": "find_under_expand_skip", "context": [{"key": "vi_mode_select"}] },
+	{ "keys": ["A"], "command": "find_all_under",         "context": [{"key": "vi_mode_select"}] },
 	
 	{ "keys": ["down"], "command": "set_motion", "args": {"motion": "vi_j"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["up"], "command": "set_motion", "args": {"motion": "vi_k"},   "context": [{"key": "setting.command_mode"}] },
@@ -59,7 +65,7 @@
 	{ "keys": [")"], "command": "set_motion", "args": {"motion": "vi_right_parenthesis"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 
 	{ "keys": ["I"], "command": "set_action", "args": {"action": "vi_big_i"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["A"], "command": "set_action", "args": {"action": "vi_big_a"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["A"], "command": "set_action", "args": {"action": "vi_big_a"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
 
 	{ "keys": ["G"], "command": "set_motion", "args": {"motion": "vi_big_g"},   "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["%"], "command": "set_motion", "args": {"motion": "vi_percent"}, "context": [{"key": "setting.command_mode"}] },
@@ -143,9 +149,12 @@
 	{ "keys": ["#"], "command": "set_action", "args": {"action": "vi_g_octothorp"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
 	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_g_v"},         "context": [{"key": "vi_mode_normal"},       {"key": "vi_in_key_namespace", "operand": "g"}] },
 
-	// Non-standard vi commands.
-	{ "keys": ["k"], "command": "set_action", "args": {"action": "vi_g_k"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
-	{ "keys": ["l"], "command": "set_action", "args": {"action": "vi_g_l"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
+	// Enters select mode (multiple selection mode in Vintageous).
+	// Includes the following actions:
+	//	* j: Adds selection (find_under_expand)
+	//	* k: Remove selection (soft_undo)
+	//	* l: Skip selection over (find_under_expand_skip)
+	{ "keys": ["h"], "command": "set_action", "args": {"action": "vi_g_h"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
 
 	{ "keys": ["U"], "command": "set_action", "args": {"action": "vi_big_u"}, "context": [{"key": "vi_mode_visual_any"}] },
 	{ "keys": ["u"], "command": "set_action", "args": {"action": "vi_u"},     "context": [{"key": "vi_mode_visual_any"}] },
