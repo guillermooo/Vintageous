@@ -98,7 +98,7 @@ def mode_to_str(mode):
     if mode == MODE_INSERT:
         return "INSERT"
     elif mode == MODE_NORMAL:
-        return ""
+        return "NORMAL"
     elif mode == MODE_VISUAL:
         return "VISUAL"
     elif mode == MODE_VISUAL_LINE:

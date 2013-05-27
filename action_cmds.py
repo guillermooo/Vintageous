@@ -9,6 +9,7 @@ from Vintageous.vi.constants import MODE_INSERT
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
+from Vintageous.vi.constants import MODE_SELECT
 from Vintageous.vi.constants import regions_transformer
 from Vintageous.vi.registers import REG_EXPRESSION
 
@@ -236,8 +237,11 @@ class ViEnterNormalMode(sublime_plugin.TextCommand):
         if state.mode == MODE_VISUAL:
             state.store_visual_selections()
 
-        self.view.run_command('collapse_to_direction')
-        self.view.run_command('dont_stay_on_eol_backward')
+        # When returning to normal mode from select mode, we want to keep the non-Vintageous
+        # selections just created.
+        if state.mode != MODE_SELECT:
+            self.view.run_command('collapse_to_direction')
+            self.view.run_command('dont_stay_on_eol_backward')
         state.enter_normal_mode()
 
 
