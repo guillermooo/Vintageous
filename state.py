@@ -607,11 +607,13 @@ class VintageState(object):
             if vi_cmd_data['_exit_mode'] == MODE_INSERT:
                 # We've been requested to change to this mode. For example, we're looking at
                 # CTRL+r,j in INSERTMODE, which is an invalid sequence.
-                # !!! This could be simplified using parameters in .reset(), but then it
-                # wouldn't be obvious what was going on. Don't refactor. !!!
                 utils.blink()
                 self.reset()
                 self.enter_insert_mode()
+            # We have an invalid command which consists in an action and a motion, like gl. Abort.
+            elif (self.mode == MODE_NORMAL) and self.motion:
+                utils.blink()
+                self.reset()
             elif self.mode != MODE_NORMAL:
                 # Normally we'd go back to normal mode.
                 self.enter_normal_mode()
@@ -651,6 +653,7 @@ class VintageState(object):
         if self.cancel_action:
             self.eval_cancel_action()
             self.reset()
+            utils.blink()
 
         # Action + motion, like in '3dj'.
         elif self.action and self.motion:
