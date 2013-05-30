@@ -936,3 +936,14 @@ def vi_g_l(vi_cmd_data):
     vi_cmd_data['action']['args'] = {}
 
     return vi_cmd_data
+
+
+def vi_g_tilde_g_tilde(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['restore_original_carets'] = True
+    vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
+    vi_cmd_data['action']['command'] = '_vi_g_tilde_g_tilde'
+    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
+    vi_cmd_data['post_action'] = ['collapse_to_a',]
+
+    return vi_cmd_data

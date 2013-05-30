@@ -21,6 +21,7 @@ MODE_SELECT = 1 << 7
 
 DIGRAPH_ACTION = 1
 DIGRAPH_MOTION = 2
+STASH = 3
 
 
 # TODO: We should separate digraph actions from digraph motions?
@@ -34,6 +35,12 @@ digraphs = {
     ('vi_antilambda', 'vi_antilambda'): ('vi_double_antilambda', DIGRAPH_ACTION),
 
     ('vi_g_action', 'vi_tilde'): ('vi_g_tilde', DIGRAPH_ACTION),
+    # Ex: g~g (incomplete)
+    ('vi_g_tilde', 'vi_g_action'): ('vi_g_tilde', STASH),
+    # Ex: g~g~ (complete)
+    ('vi_g_tilde', 'vi_g_tilde'): ('vi_g_tilde_g_tilde', DIGRAPH_ACTION),
+    # Ex: g~~ (complete)
+    ('vi_g_tilde', 'vi_tilde'): ('vi_g_tilde_g_tilde', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_big_u'): ('vi_g_big_u', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_u'): ('vi_g_u', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_q'): ('vi_g_q', DIGRAPH_ACTION),

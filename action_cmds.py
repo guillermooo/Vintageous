@@ -913,3 +913,15 @@ class _vi_ctrl_w_big_h(IrreversibleTextCommand):
         if current_group > 0:
             w.set_view_index(self.view, current_group - 1, 0)
             w.focus_group(current_group - 1)
+
+
+class _vi_g_tilde_g_tilde(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None):
+        def f(view, s):
+            if mode == _MODE_INTERNAL_NORMAL:
+                line = view.line(s.b)
+                view.replace(edit, line, view.substr(line).upper())
+                return line
+            return s
+
+        regions_transformer(self.view, f)

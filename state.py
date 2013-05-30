@@ -13,6 +13,7 @@ from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
 from Vintageous.vi.constants import MOTION_TRANSLATION_TABLE
 from Vintageous.vi.constants import ACTIONS_EXITING_TO_INSERT_MODE
 from Vintageous.vi.constants import DIGRAPH_MOTION
+from Vintageous.vi.constants import STASH
 from Vintageous.vi.constants import digraphs
 from Vintageous.vi.constants import MODE_INSERT
 from Vintageous.vi.constants import MODE_NORMAL
@@ -259,33 +260,63 @@ class VintageState(object):
     def cancel_action(self, value):
         self.settings.vi['cancel_action'] = value
 
+    # TODO: Test me.
+    @property
+    def stashed_action(self):
+        return self.settings.vi['stashed_action']
+
+    # TODO: Test me.
+    @stashed_action.setter
+    def stashed_action(self, name):
+        self.settings.vi['stashed_action'] = name
+
     @property
     def action(self):
         """Command's action; must be the name of a function in the `actions` module.
         """
         return self.settings.vi['action']
 
+    # TODO: Test me.
     @action.setter
-    def action(self, name):
-        action = self.settings.vi['action']
+    def action(self, action):
+        stored_action = self.settings.vi['action']
         target = 'action'
 
         # Check for digraphs like cc, dd, yy.
-        if action and name:
-            name, type_ = digraphs.get((action, name), ('', None))
+        final_action = action
+        if stored_action and action:
+            final_action, type_ = digraphs.get((stored_action, action), ('', None))
+            print("XXX", final_action, type_)
+
+            # Check for multigraphs like g~g~, g~~.
+            # This sequence would get us here:
+            #   * vi_g_action
+            #   * vi_tilde
+            #   * vi_g_action => vi_g_tilde, STASH
+            #   * vi_tilde => vi_g_tilde_vi_g_tilde, DIGRAPH_ACTION
+            if self.stashed_action:
+                final_action, type_ = digraphs.get((self.stashed_action, final_action),
+                                                 ('', None))
+
             # Some motion digraphs are captured as actions, but need to be stored as motions
             # instead so that the vi command is evaluated correctly.
+            # Ex: vi_g_action, vi_gg
             if type_ == DIGRAPH_MOTION:
                 target = 'motion'
                 self.settings.vi['action'] = None
+            elif type_ == STASH:
+                # In this case we need to overwrite the current action differently.
+                self.stashed_action = final_action
+                self.settings.vi['action'] = action
+                return
 
         # Avoid recursion. The .reset() method will try to set this property to None, not ''.
-        if name == '':
+        if final_action == '':
             # The chord is invalid, so notify that we need to cancel the command in .eval().
             self.cancel_action = True
             return
 
-        self.settings.vi[target] = name
+        self.settings.vi[target] = final_action
 
     @property
     def motion(self):
@@ -643,6 +674,7 @@ class VintageState(object):
 
         self.motion = None
         self.action = None
+        self.stashed_action = None
 
         self.register = None
         self.user_input = None
