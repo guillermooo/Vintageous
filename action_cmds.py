@@ -920,7 +920,10 @@ class _vi_g_tilde_g_tilde(sublime_plugin.TextCommand):
         def f(view, s):
             if mode == _MODE_INTERNAL_NORMAL:
                 line = view.line(s.b)
-                view.replace(edit, line, view.substr(line).upper())
+                if view.substr(line).isupper():
+                    view.replace(edit, line, view.substr(line).lower())
+                else:
+                    view.replace(edit, line, view.substr(line).upper())
                 return line
             return s
 
