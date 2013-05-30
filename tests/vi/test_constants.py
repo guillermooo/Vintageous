@@ -13,6 +13,7 @@ from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
 from Vintageous.vi.constants import MODE_REPLACE
 from Vintageous.vi.constants import DIGRAPH_ACTION
 from Vintageous.vi.constants import DIGRAPH_MOTION
+from Vintageous.vi.constants import STASH
 from Vintageous.vi.constants import INCOMPLETE_ACTIONS
 from Vintageous.vi.constants import ACTIONS_EXITING_TO_INSERT_MODE
 from Vintageous.vi.constants import digraphs
@@ -39,20 +40,35 @@ class Test_constants(unittest.TestCase):
         keys = [('vi_d', 'vi_d'),
                 ('vi_c', 'vi_c'),
                 ('vi_y', 'vi_y'),
+
                 ('vi_equals', 'vi_equals'),
                 ('vi_lambda', 'vi_lambda'),
                 ('vi_antilambda', 'vi_antilambda'),
+
                 ('vi_g_action', 'vi_tilde'),
+                ('vi_g_tilde', 'vi_g_action'),
+                ('vi_g_tilde', 'vi_g_tilde'),
+                ('vi_g_tilde', 'vi_tilde'),
                 ('vi_g_action', 'vi_g_big_u'),
                 ('vi_g_action', 'vi_g_u'),
                 ('vi_g_action', 'vi_g_q'),
                 ('vi_g_action', 'vi_g_v'),
+                ('vi_g_action', 'vi_g_h'),
                 ('vi_g_action', 'vi_g_e'),
+                ('vi_g_action', 'vi_gg'),
+                ('vi_g_action', 'vi_g_d'),
+                ('vi_g_action', 'vi_g_big_d'),
+                ('vi_g_action', 'vi_g_star'),
+                ('vi_g_action', 'vi_g_octothorp'),
+
                 ('vi_z_action', 'vi_z_enter'),
                 ('vi_z_action', 'vi_z_t'),
                 ('vi_z_action', 'vi_z_minus'),
                 ('vi_z_action', 'vi_z_b'),
                 ('vi_z_action', 'vi_zz'),
+
+                ('vi_ctrl_r_action', 'vi_ctrl_r_equals'),
+
                 ('vi_ctrl_w_action', 'vi_ctrl_w_v'),
                 ('vi_ctrl_w_action', 'vi_g_q'),
                 ('vi_ctrl_w_action', 'vi_g_v'),
@@ -60,12 +76,7 @@ class Test_constants(unittest.TestCase):
                 ('vi_ctrl_w_action', 'vi_ctrl_w_h'),
                 ('vi_ctrl_w_action', 'vi_ctrl_w_big_l'),
                 ('vi_ctrl_w_action', 'vi_ctrl_w_big_h'),
-                ('vi_ctrl_r_action', 'vi_ctrl_r_equals'),
-                ('vi_g_action', 'vi_gg'),
-                ('vi_g_action', 'vi_g_d'),
-                ('vi_g_action', 'vi_g_big_d'),
-                ('vi_g_action', 'vi_g_star'),
-                ('vi_g_action', 'vi_g_octothorp'),
+
                 ('vi_f_first_step', 'vi_set_user_input'),]
 
         for k in keys:
@@ -82,6 +93,10 @@ class Test_constants(unittest.TestCase):
             (('vi_lambda', 'vi_lambda'), ('vi_double_lambda', DIGRAPH_ACTION)),
             (('vi_antilambda', 'vi_antilambda'), ('vi_double_antilambda', DIGRAPH_ACTION)),
 
+            (('vi_g_action', 'vi_tilde'), ('vi_g_tilde', DIGRAPH_ACTION)),
+            (('vi_g_tilde', 'vi_g_action'), ('vi_g_tilde', STASH)),
+            (('vi_g_tilde', 'vi_g_tilde'), ('vi_g_tilde_g_tilde', DIGRAPH_ACTION)),
+            (('vi_g_tilde', 'vi_tilde'), ('vi_g_tilde_g_tilde', DIGRAPH_ACTION)),
             (('vi_g_action', 'vi_g_big_u'), ('vi_g_big_u', DIGRAPH_ACTION)),
             (('vi_g_action', 'vi_tilde'), ('vi_g_tilde', DIGRAPH_ACTION)),
             (('vi_g_action', 'vi_g_u'), ('vi_g_u', DIGRAPH_ACTION)),
@@ -141,7 +156,7 @@ class Test_mode_to_str(unittest.TestCase):
 
     def testCanTranslateKnownModes(self):
         self.assertEqual(mode_to_str(MODE_INSERT), "INSERT")
-        self.assertEqual(mode_to_str(MODE_NORMAL), "")
+        self.assertEqual(mode_to_str(MODE_NORMAL), "NORMAL")
         self.assertEqual(mode_to_str(MODE_VISUAL_LINE), "VISUAL LINE")
         self.assertEqual(mode_to_str(MODE_REPLACE), "REPLACE")
         self.assertEqual(mode_to_str(MODE_NORMAL_INSERT), "INSERT")

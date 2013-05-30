@@ -55,6 +55,7 @@ known_keys = [
     'synthetize_new_line_at_eof',
     '_mark_groups_for_gluing',
     'populates_small_delete_register',
+    'is_window_command',
 ]
 
 
@@ -123,6 +124,7 @@ class Test_CmdData(unittest.TestCase):
         self.assertEqual(self.cmd_data['synthetize_new_line_at_eof'], False)
         self.assertEqual(self.cmd_data['_mark_groups_for_gluing'], True)
         self.assertEqual(self.cmd_data['populates_small_delete_register'], False)
+        self.assertEqual(self.cmd_data['is_window_command'], False)
 
     def testCurrentModeIsCarriedOver(self):
         self.state.mode = MODE_VISUAL

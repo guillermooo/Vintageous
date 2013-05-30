@@ -94,6 +94,7 @@ class Test_do_action(unittest.TestCase):
         vi_cmd_data = {
             'action': {'command': 'foo', 'args': {}},
             '_repeat_action': False,
+            'is_window_command': False,
             }
         self.vi_run.do_action(vi_cmd_data)
         mocked_regs.yank.assert_called_once_with(vi_cmd_data)
@@ -104,6 +105,7 @@ class Test_do_action(unittest.TestCase):
         vi_cmd_data = {
             'action': {'command': 'foo', 'args': {}},
             '_repeat_action': False,
+            'is_window_command': False,
             }
         self.vi_run.do_action(vi_cmd_data)
         self.vi_run.view.run_command.assert_called_once_with('foo', {})
@@ -115,6 +117,7 @@ class Test_do_action(unittest.TestCase):
             'action': {'command': 'foo', 'args': {}},
             '_repeat_action': True,
             'count': 10,
+            'is_window_command': False,
             }
         self.vi_run.do_action(vi_cmd_data)
         self.assertEqual(self.vi_run.view.run_command.call_count, 10)

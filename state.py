@@ -286,7 +286,6 @@ class VintageState(object):
         final_action = action
         if stored_action and action:
             final_action, type_ = digraphs.get((stored_action, action), ('', None))
-            print("XXX", final_action, type_)
 
             # Check for multigraphs like g~g~, g~~.
             # This sequence would get us here:
