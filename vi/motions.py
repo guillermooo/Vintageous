@@ -93,7 +93,7 @@ def vi_big_g(vi_cmd_data):
 
     # FIXME: Cannot go to line 1. We need to signal when the count is user-provided and when it's
     # a default value.
-    if vi_cmd_data['count'] > 1:
+    if vi_cmd_data['_user_provided_count']:
         target = vi_cmd_data['count']
         vi_cmd_data['count'] = 1
         vi_cmd_data['motion']['command'] = 'vi_go_to_line'
