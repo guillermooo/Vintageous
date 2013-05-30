@@ -486,9 +486,19 @@ class ViStar(sublime_plugin.TextCommand):
             flags = sublime.IGNORECASE
 
             if mode == _MODE_INTERNAL_NORMAL:
-                match = view.find(pattern, view.word(s.end()).end(), flags)
+                match = find_wrapping(view,
+                                      term=pattern,
+                                      start=view.word(s.end()).end(),
+                                      end=view.size(),
+                                      flags=0,
+                                      times=1)
             else:
-                match = view.find(pattern, view.word(s).end(), flags)
+                match = find_wrapping(view,
+                                      term=pattern,
+                                      start=view.word(s.end()).end(),
+                                      end=view.size(),
+                                      flags=0,
+                                      times=1)
 
             if match:
                 if mode == _MODE_INTERNAL_NORMAL:
@@ -520,9 +530,19 @@ class ViOctothorp(sublime_plugin.TextCommand):
             flags = sublime.IGNORECASE
 
             if mode == _MODE_INTERNAL_NORMAL:
-                match = reverse_search(view, pattern, 0, current_sel.a, flags)
+                match = reverse_find_wrapping(view,
+                                         term=pattern,
+                                         start=0,
+                                         end=current_sel.a,
+                                         flags=0,
+                                         times=1)
             else:
-                match = reverse_search(view, pattern, 0, current_sel.a, flags)
+                match = reverse_find_wrapping(view,
+                                         term=pattern,
+                                         start=0,
+                                         end=current_sel.a,
+                                         flags=0,
+                                         times=1)
 
             if match:
                 if mode == _MODE_INTERNAL_NORMAL:
