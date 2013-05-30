@@ -361,10 +361,8 @@ def vi_g_e(vi_cmd_data):
 
     elif vi_cmd_data['mode'] == MODE_VISUAL:
         vi_cmd_data['motion']['args']['extend'] = True
-        # vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
         vi_cmd_data['pre_motion'] = ['_vi_g_e_pre_motion', {'mode': vi_cmd_data['mode']}]
         vi_cmd_data['post_motion'] = [['_vi_g_e_post_motion', {'mode': vi_cmd_data['mode']}]]
-        # vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
 
     return vi_cmd_data
 
