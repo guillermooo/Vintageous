@@ -686,6 +686,9 @@ class _vi_forward_slash(sublime_plugin.TextCommand):
             elif mode == MODE_NORMAL:
                 return sublime.Region(match.a, match.a)
 
+            elif mode == MODE_VISUAL_LINE:
+                return sublime.Region(s.a, view.full_line(match.b - 1).b)
+
             return s
 
         # This happens when we attempt to repeat the search and there's no search term stored yet.
@@ -733,6 +736,10 @@ class _vi_question_mark(sublime_plugin.TextCommand):
 
             elif mode == MODE_NORMAL:
                 return sublime.Region(found.a, found.a)
+
+            elif mode == MODE_VISUAL_LINE:
+                # FIXME: Ensure that the very first ? search excludes the current line.
+                return sublime.Region(s.end(), view.full_line(found.a).a)
 
             return s
 
