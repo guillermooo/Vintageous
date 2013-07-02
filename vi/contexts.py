@@ -29,6 +29,10 @@ class KeyContext(object):
         if self.state.user_provided_count:
             return True
 
+        # If we have an action, like in c<Esc> (leading to cc), we need to clear the state.
+        if self.state.action:
+            return True
+
         # TODO: Simplify comparisons.
         if self.state.mode == MODE_NORMAL_INSERT:
             return True
