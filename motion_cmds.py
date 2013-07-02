@@ -588,13 +588,14 @@ class ViBufferSearch(IrreversibleTextCommand):
         state.eval()
 
     def on_change(self, s):
+        flags = sublime.IGNORECASE | sublime.LITERAL
         self.view.erase_regions('vi_inc_search')
         state = VintageState(self.view)
         next_hit = find_wrapping(self.view,
                                  term=s,
                                  start=self.view.sel()[0].b + 1,
                                  end=self.view.size(),
-                                 flags=0,
+                                 flags=flags,
                                  times=state.count)
         if next_hit:
             if state.mode == MODE_VISUAL:
@@ -636,13 +637,14 @@ class ViBufferReverseSearch(IrreversibleTextCommand):
         state.eval()
 
     def on_change(self, s):
+        flags = sublime.IGNORECASE | sublime.LITERAL
         self.view.erase_regions('vi_inc_search')
         state = VintageState(self.view)
         occurrence = reverse_find_wrapping(self.view,
                                  term=s,
                                  start=0,
                                  end=self.view.sel()[0].b,
-                                 flags=0,
+                                 flags=flags,
                                  times=state.count)
         if occurrence:
             if state.mode == MODE_VISUAL:
@@ -663,7 +665,7 @@ class ViBufferReverseSearch(IrreversibleTextCommand):
 class _vi_forward_slash(sublime_plugin.TextCommand):
     def hilite(self, pattern):
         # TODO: Implement smartcase?
-        flags = sublime.IGNORECASE
+        flags = sublime.IGNORECASE | sublime.LITERAL
         regs = self.view.find_all(pattern, flags)
         if not regs:
             self.view.erase_regions('vi_search')
@@ -702,7 +704,8 @@ class _vi_forward_slash(sublime_plugin.TextCommand):
 
         # TODO: What should we do here? Case-sensitive or case-insensitive search? Configurable?
         # Search wrapping around the end of the buffer.
-        match = find_wrapping(self.view, search_string, start, wrapped_end, flags=0, times=count)
+        flags = sublime.IGNORECASE | sublime.LITERAL
+        match = find_wrapping(self.view, search_string, start, wrapped_end, flags=flags, times=count)
         if not match:
             return
 
@@ -713,7 +716,7 @@ class _vi_forward_slash(sublime_plugin.TextCommand):
 class _vi_question_mark(sublime_plugin.TextCommand):
     def hilite(self, pattern):
         # TODO: Implement smartcase?
-        flags = sublime.IGNORECASE
+        flags = sublime.IGNORECASE | sublime.LITERAL
         regs = self.view.find_all(pattern, flags)
         if not regs:
             self.view.erase_regions('vi_search')
@@ -747,12 +750,13 @@ class _vi_question_mark(sublime_plugin.TextCommand):
         if search_string is None:
             return
 
+        flags = sublime.IGNORECASE | sublime.LITERAL
         # FIXME: What should we do here? Case-sensitive or case-insensitive search? Configurable?
         found = reverse_find_wrapping(self.view,
                                       term=search_string,
                                       start=0,
                                       end=self.view.sel()[0].b,
-                                      flags=0,
+                                      flags=flags,
                                       times=count)
 
         if not found:

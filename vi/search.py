@@ -11,12 +11,12 @@ def find_wrapping(view, term, start, end, flags=0, times=1):
     current_sel = view.sel()[0]
     # Search wrapping around the end of the buffer.
     for x in range(times):
-        match = find_in_range(view, term, start, end)
+        match = find_in_range(view, term, start, end, flags)
         # Start searching in the upper half of the buffer if we aren't doing it yet.
         if not match and start > current_sel.b:
             start = 0
             end = current_sel.a
-            match = find_in_range(view, term, start, end)
+            match = find_in_range(view, term, start, end, flags)
             if not match:
                 return
         # No luck in the whole buffer.
@@ -31,12 +31,12 @@ def reverse_find_wrapping(view, term, start, end, flags=0, times=1):
     current_sel = view.sel()[0]
     # Search wrapping around the end of the buffer.
     for x in range(times):
-        match = reverse_search(view, term, start, end)
+        match = reverse_search(view, term, start, end, flags)
         # Start searching in the lower half of the buffer if we aren't doing it yet.
         if not match and start < current_sel.b:
             start = current_sel.b
             end = view.size()
-            match = reverse_search(view, term, start, end)
+            match = reverse_search(view, term, start, end, flags)
             if not match:
                 return
         # No luck in the whole buffer.
