@@ -859,12 +859,37 @@ class _vi_h_motion(sublime_plugin.TextCommand):
 
 
 class _vi_j_motion(sublime_plugin.TextCommand):
+    def folded_rows(self, pt):
+        folds = self.view.folded_regions()
+        try:
+            fold = [f for f in folds if f.contains(pt)][0]
+            fold_row_a = self.view.rowcol(fold.a)[0]
+            fold_row_b = self.view.rowcol(fold.b - 1)[0]
+            # Return no. of hidden lines.
+            return (fold_row_b - fold_row_a)
+        except IndexError:
+            return 0
+
+    def next_non_folded_pt(self, pt):
+        # FIXME: If we have two contiguous folds, this method will fail.
+        # Handle folded regions.
+        folds = self.view.folded_regions()
+        try:
+            fold = [f for f in folds if f.contains(pt)][0]
+            non_folded_row = self.view.rowcol(self.view.full_line(fold.b).b)[0]
+            pt = self.view.text_point(non_folded_row, 0)
+        except IndexError:
+            pass
+        return pt
+
     def run(self, edit, count=None, extend=False, mode=None, xpos=0):
         def f(view, s):
             if mode == MODE_NORMAL:
                 current_row = view.rowcol(s.b)[0]
                 target_row = min(current_row + count, view.rowcol(view.size())[0])
-                target_pt = view.text_point(target_row, 0)
+                invisible_rows = self.folded_rows(view.line(s.b).b + 1)
+                target_pt = view.text_point(target_row + invisible_rows, 0)
+                target_pt = self.next_non_folded_pt(target_pt)
 
                 if view.line(target_pt).empty():
                     return sublime.Region(target_pt, target_pt)
@@ -945,12 +970,25 @@ class _vi_j_motion(sublime_plugin.TextCommand):
 
 
 class _vi_k_motion(sublime_plugin.TextCommand):
+    def previous_non_folded_pt(self, pt):
+        # FIXME: If we have two contiguous folds, this method will fail.
+        # Handle folded regions.
+        folds = self.view.folded_regions()
+        try:
+            fold = [f for f in folds if f.contains(pt)][0]
+            non_folded_row = self.view.rowcol(fold.a - 1)[0]
+            pt = self.view.text_point(non_folded_row, 0)
+        except IndexError:
+            pass
+        return pt
+
     def run(self, edit, count=None, extend=False, mode=None, xpos=0):
         def f(view, s):
             if mode == MODE_NORMAL:
                 current_row = view.rowcol(s.b)[0]
                 target_row = min(current_row - count, view.rowcol(view.size())[0])
                 target_pt = view.text_point(target_row, 0)
+                target_pt = self.previous_non_folded_pt(target_pt)
 
                 if view.line(target_pt).empty():
                     return sublime.Region(target_pt, target_pt)
