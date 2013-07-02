@@ -41,6 +41,7 @@
 	{ "keys": ["enter"],       "command": "set_motion", "args": {"motion": "vi_enter"},       "context": [{"key": "vi_mode_normal_or_any_visual"}] },
 	{ "keys": ["shift+enter"], "command": "set_motion", "args": {"motion": "vi_shift_enter"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
 	{ "keys": ["ctrl+space"],  "command": "set_motion", "args": {"motion": "vi_w"},           "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["backspace"],   "command": "set_motion", "args": {"motion": "vi_h"},       	  "context": [{"key": "vi_mode_normal_or_any_visual"}] },
 
 	{ "keys": ["w"], "command": "set_motion", "args": {"motion": "vi_w"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["e"], "command": "set_motion", "args": {"motion": "vi_e"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
