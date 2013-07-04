@@ -73,7 +73,8 @@ def get_text_object_region(view, s, text_object, inclusive=False):
         # TODO: Improve this -- specify word separators.
         word_start = view.find_by_class(s.b,
                                         forward=True,
-                                        classes=sublime.CLASS_WORD_START)
+                                        classes=sublime.CLASS_WORD_START |
+                                                sublime.CLASS_PUNCTUATION_START)
         w = view.word(s.b)
 
         # XXX: I don't think this is necessary?
