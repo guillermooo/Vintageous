@@ -1168,3 +1168,23 @@ class _vi_ctrl_u(sublime_plugin.TextCommand):
         previous, scroll_amount = self.prev_half_page(count)
         regions_transformer(self.view, f)
         self.view.run_command('scroll_lines', {'amount': scroll_amount})
+
+
+class _vi_g__(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None):
+        def f(view, s):
+            if mode == MODE_NORMAL:
+                eol = view.line(s.b).b
+                return sublime.Region(eol - 1, eol - 1)
+
+            elif mode == MODE_VISUAL:
+                eol = view.line(s.b - 1).b
+                return sublime.Region(s.a, eol)
+
+            elif mode == _MODE_INTERNAL_NORMAL:
+                eol = view.line(s.b).b
+                return sublime.Region(s.a, eol - 1)
+
+            return s
+
+        regions_transformer(self.view, f)

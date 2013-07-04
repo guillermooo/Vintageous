@@ -252,6 +252,13 @@ def vi_big_m(vi_cmd_data):
     return vi_cmd_data
 
 
+def vi_g__(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = '_vi_g__'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
+
+    return vi_cmd_data
+
+
 def vi_j(vi_cmd_data):
     if vi_cmd_data['count'] > 5:
         vi_cmd_data['is_jump'] = True

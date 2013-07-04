@@ -146,6 +146,7 @@
 	{ "keys": ["U"], "command": "set_action", "args": {"action": "vi_g_big_u"},     "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
 	{ "keys": ["u"], "command": "set_action", "args": {"action": "vi_g_u"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
 	{ "keys": ["q"], "command": "set_action", "args": {"action": "vi_g_q"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
+	{ "keys": ["_"], "command": "set_action", "args": {"action": "vi_g__"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
 	{ "keys": ["*"], "command": "set_action", "args": {"action": "vi_g_star"},      "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
 	{ "keys": ["#"], "command": "set_action", "args": {"action": "vi_g_octothorp"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
 	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_g_v"},         "context": [{"key": "vi_mode_normal"},       {"key": "vi_in_key_namespace", "operand": "g"}] },
