@@ -1,3 +1,9 @@
+1.3.5 - 4/7/2013
+
+	- Implement g_ motion.
+	- Improve gg and G when they're given a count.
+	- Improve 'a' text object. 
+
 1.3.4 - 2/7/2013
 
 	- Clear state when cancelling digraphs, like in c<Esc>.
