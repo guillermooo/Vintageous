@@ -259,6 +259,7 @@ class ViGoToLine(sublime_plugin.TextCommand):
                 elif dest > s.a and s.a > s.b:
                     return sublime.Region(view.full_line(s.a - 1).a, view.full_line(dest).b)
                 return sublime.Region(s.a, view.full_line(dest).b)
+            return s
 
         regions_transformer(self.view, f)
 
