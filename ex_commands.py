@@ -19,6 +19,7 @@ from Vintageous.ex import ex_error
 from Vintageous.ex import ex_range
 from Vintageous.ex import shell
 from Vintageous.ex import parsers
+from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.state import VintageState
 
 GLOBAL_RANGES = []
@@ -94,8 +95,11 @@ class ExGoto(sublime_plugin.TextCommand):
             return
         ranges, _ = ex_range.new_calculate_range(self.view, line_range)
         a, b = ranges[0]
-        self.view.run_command('vi_go_to_line', {'line': b})
-        self.view.show(self.view.sel()[0])
+        state = VintageState(self.view)
+        # FIXME: In Visual mode, goto line does some weird stuff.
+        if state.mode == MODE_NORMAL:
+            self.view.run_command('vi_go_to_line', {'line': b, 'mode': MODE_NORMAL})
+            self.view.show(self.view.sel()[0])
 
 
 class ExShellOut(sublime_plugin.TextCommand):
