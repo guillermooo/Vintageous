@@ -97,7 +97,7 @@ def vi_big_g(vi_cmd_data):
         target = vi_cmd_data['count']
         vi_cmd_data['count'] = 1
         vi_cmd_data['motion']['command'] = 'vi_go_to_line'
-        vi_cmd_data['motion']['args'] = {'line': target}
+        vi_cmd_data['motion']['args'] = {'line': target, 'mode': vi_cmd_data['mode']}
     else:
         vi_cmd_data['motion']['command'] = 'move_to'
         vi_cmd_data['motion']['args'] = {'to': 'eof'}
@@ -122,7 +122,7 @@ def vi_gg(vi_cmd_data):
         target = vi_cmd_data['count']
         vi_cmd_data['count'] = 1
         vi_cmd_data['motion']['command'] = 'vi_go_to_line'
-        vi_cmd_data['motion']['args'] = {'line': target}
+        vi_cmd_data['motion']['args'] = {'line': target, 'mode': vi_cmd_data['mode']}
     else:
         vi_cmd_data['motion']['command'] = 'move_to'
         vi_cmd_data['motion']['args'] = {'to': 'bof'}
