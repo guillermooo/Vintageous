@@ -1,7 +1,18 @@
 import sublime
 
+from sublime import CLASS_WORD_START
+from sublime import CLASS_WORD_END
+from sublime import CLASS_PUNCTUATION_START
+from sublime import CLASS_PUNCTUATION_END
+from sublime import CLASS_LINE_END
+from sublime import CLASS_LINE_START
+
 from Vintageous.vi.search import reverse_search_by_pt
 from Vintageous.vi.search import find_in_range
+
+
+ANCHOR_NEXT_WORD_BOUNDARY = CLASS_WORD_START | CLASS_PUNCTUATION_START | CLASS_LINE_END
+ANCHOR_PREVIOUS_WORD_BOUNDARY = CLASS_WORD_END | CLASS_PUNCTUATION_END | CLASS_LINE_START
 
 
 BRACKET = 1
@@ -9,6 +20,7 @@ QUOTE = 2
 SENTENCE = 3
 TAG = 4
 WORD = 5
+BIG_WORD = 6
 
 
 PAIRS = {
@@ -25,13 +37,143 @@ PAIRS = {
     '}': (('\\{', '\\}'), BRACKET),
     't': (None, TAG),
     'w': (None, WORD),
+    'W': (None, BIG_WORD),
     's': (None, SENTENCE),
     # TODO: Implement this.
     # 'p': (None, PARAGRAPH),
 }
 
 
-def get_text_object_region(view, s, text_object, inclusive=False):
+def is_at_punctuation(view, pt):
+    next_char = view.substr(pt)
+    return (not (next_char.isalnum() or
+                 next_char.isspace() or
+                 next_char == '\n')
+            and next_char.isprintable())
+
+
+def is_at_word(view, pt):
+    next_char = view.substr(pt)
+    return next_char.isalnum()
+
+
+def is_at_space(view, pt):
+    return view.substr(pt).isspace()
+
+
+def get_punctuation_region(view, pt):
+   start = view.find_by_class(pt + 1, forward=False, classes=CLASS_PUNCTUATION_START)
+   end = view.find_by_class(pt, forward=True, classes=CLASS_PUNCTUATION_END)
+   return sublime.Region(start, end)
+
+
+def get_space_region(view, pt):
+    end = view.find_by_class(pt, forward=True, classes=ANCHOR_NEXT_WORD_BOUNDARY)
+    return sublime.Region(previous_word_end(view, pt + 1), end)
+
+
+def previous_word_end(view, pt):
+    return view.find_by_class(pt, forward=False, classes=ANCHOR_PREVIOUS_WORD_BOUNDARY)
+
+
+def next_word_start(view, pt):
+    if is_at_punctuation(view, pt):
+        # Skip all punctuation surrounding the caret and any trailing spaces.
+        end = get_punctuation_region(view, pt).b
+        if view.substr(end) in (' ', '\n'):
+            end = view.find_by_class(end, forward=True,
+                                     classes=ANCHOR_NEXT_WORD_BOUNDARY)
+            return end
+    elif is_at_space(view, pt):
+        # Skip all spaces surrounding the cursor and the text word.
+        end = get_space_region(view, pt).b
+        if is_at_word(view, end) or is_at_punctuation(view, end):
+            end = view.find_by_class(end, forward=True,
+                                     classes=CLASS_WORD_END | CLASS_PUNCTUATION_END | CLASS_LINE_END)
+            return end
+
+    # Skip the word under the caret and any trailing spaces.
+    return view.find_by_class(pt, forward=True, classes=ANCHOR_NEXT_WORD_BOUNDARY)
+
+
+def current_word_start(view, pt):
+    if is_at_punctuation(view, pt):
+        return get_punctuation_region(view, pt).a
+    elif is_at_space(view, pt):
+        return get_space_region(view, pt).a
+    return view.word(pt).a
+
+
+def current_word_end(view, pt):
+    if is_at_punctuation(view, pt):
+        return get_punctuation_region(view, pt).b
+    elif is_at_space(view, pt):
+        return get_space_region(view, pt).b
+    return view.word(pt).b
+
+
+def a_word(view, pt, inclusive=True, count=1):
+    assert count > 0
+    start = current_word_start(view, pt)
+    end = pt
+    for x in range(count):
+        if inclusive:
+            end = next_word_start(view, end)
+        else:
+            end = current_word_end(view, end)
+    return sublime.Region(start, end)
+
+def big_word_end(view, pt):
+    while True:
+        if is_at_punctuation(view, pt):
+            pt = get_punctuation_region(view, pt).b
+        elif is_at_word(view, pt):
+            pt = current_word_end(view, pt)
+        else:
+            break
+    return pt
+
+
+def big_word_start(view, pt):
+    while True:
+        if is_at_punctuation(view, pt):
+            pt = get_punctuation_region(view, pt).a - 1
+        elif is_at_word(view, pt):
+            pt = current_word_start(view, pt) - 1
+        else:
+            break
+    return pt + 1
+
+
+def a_big_word(view, pt, inclusive=True, count=1):
+    start, end = None, pt
+    for x in range(count):
+        if is_at_space(view, end):
+            if start is None:
+                start = get_space_region(view, pt)
+            if not inclusive:
+                end = get_space_region(view, end).b
+            else:
+                end = big_word_end(view, get_space_region(view, end).b)
+
+        if is_at_punctuation(view, end):
+            if start is None:
+                start = big_word_start(view, end)
+            end = big_word_end(view, end)
+            if inclusive and is_at_space(view, end):
+                end = get_space_region(view, end).b
+
+        else:
+            if start is None:
+                start = big_word_start(view, end)
+            end = big_word_end(view, end)
+            if inclusive and is_at_space(view, end):
+                end = get_space_region(view, end).b
+
+    return sublime.Region(start, end)
+
+
+def get_text_object_region(view, s, text_object, inclusive=False, count=1):
     try:
         delims, type_ = PAIRS[text_object]
     except KeyError:
@@ -70,21 +212,16 @@ def get_text_object_region(view, s, text_object, inclusive=False):
         return sublime.Region(prev_quote.a + 1, next_quote.b - 1)
 
     if type_ == WORD:
-        # TODO: Improve this -- specify word separators.
-        word_start = view.find_by_class(s.b,
-                                        forward=True,
-                                        classes=sublime.CLASS_WORD_START |
-                                                sublime.CLASS_PUNCTUATION_START)
-        w = view.word(s.b)
-
-        # XXX: I don't think this is necessary?
+        w = a_word(view, s.b, inclusive=inclusive, count=count)
         if not w:
             return s
+        return w
 
-        if inclusive:
-            return sublime.Region(w.a, word_start)
-        else:
-            return w
+    if type_ == BIG_WORD:
+        w = a_big_word(view, s.b, inclusive=inclusive, count=count)
+        if not w:
+            return s
+        return w
 
     if type_ == SENTENCE:
         # FIXME: This doesn't work well.

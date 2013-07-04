@@ -704,11 +704,13 @@ class _vi_select_text_object(sublime_plugin.TextCommand):
             if mode == _MODE_INTERNAL_NORMAL:
 
                 return get_text_object_region(view, s, text_object,
-                                              inclusive=inclusive)
+                                              inclusive=inclusive,
+                                              count=count)
 
             if mode == MODE_VISUAL:
                 return get_text_object_region(view, s, text_object,
-                                              inclusive=inclusive)
+                                              inclusive=inclusive,
+                                              count=count)
 
             return s
 
