@@ -10,7 +10,8 @@ $targetDir = resolve-path "~\Utilities\Sublime Text 3\Data\Installed Packages"
 copy-item (join-path $distDir "Vintageous.sublime-package") $targetDir -force
 
 # clean up so that we don't clutter ST's files and folders.
-remove-item "$distDir/*" -exclude "*.sublime-package" -recurse
+# Ensure we don't delete unrelated files by using join-path.
+remove-item (join-path "$distDir" "/*") -exclude "*.sublime-package" -recurse
 
 if ($Release -and (! $DontUpload)) {
 	start-process "https://bitbucket.org/guillermooo/vintageous/downloads"
