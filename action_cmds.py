@@ -146,12 +146,16 @@ class ViPaste(sublime_plugin.TextCommand):
         # FIXME: Won't work well for visual selections...
         # FIXME: This might not work for cmdline paste command (the target row isn't necessarily
         #        the next one.
-        # After pasting linewise, we should move the caret one line down.
-        b_pts = [s.b for s in list(self.view.sel())]
-        new_rows = [self.view.rowcol(b)[0] + 1 for b in b_pts]
-        row_starts = [self.view.text_point(r, 0) for r in new_rows]
-        self.view.sel().clear()
-        self.view.sel().add_all([sublime.Region(pt, pt) for pt in row_starts])
+        state = VintageState(self.view)
+        if state.mode == MODE_VISUAL_LINE:
+            self.view.run_command('collapse_to_a')
+        else:
+            # After pasting linewise, we should move the caret one line down.
+            b_pts = [s.b for s in list(self.view.sel())]
+            new_rows = [self.view.rowcol(b)[0] + 1 for b in b_pts]
+            row_starts = [self.view.text_point(r, 0) for r in new_rows]
+            self.view.sel().clear()
+            self.view.sel().add_all([sublime.Region(pt, pt) for pt in row_starts])
 
     def prepare_fragment(self, text):
         if text.endswith('\n') and text != '\n':
