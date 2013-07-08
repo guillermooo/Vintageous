@@ -474,22 +474,22 @@ class VintageState(object):
             # We have two parsers: one for the motion, one for the action.
             # Evaluate first the motion's.
             name = self.motion
-            validator = self.user_input_parsers.pop()
+            validator = self.user_input_parsers[-1]
         elif self.motion and INPUT_FOR_ACTIONS.get(self.action, (None, None))[0] == INPUT_AFTER_MOTION:
             assert len(self.user_input_parsers) == 1
             name = self.action
-            validator = self.user_input_parsers.pop()
+            validator = self.user_input_parsers[-1]
         elif self.motion and self.action:
             name = self.motion
-            validator = self.user_input_parsers.pop()
+            validator = self.user_input_parsers[-1]
         elif self.action:
             name = self.action
-            validator = self.user_input_parsers.pop()
+            validator = self.user_input_parsers[-1]
         elif self.motion:
             name = self.motion
-            validator = self.user_input_parsers.pop()
+            validator = self.user_input_parsers[-1]
 
-        assert validator
+        assert validator, "Validator must exist if expecting user input."
         if validator(self.user_input):
             if name == self.motion:
                 self.settings.vi['user_motion_input'] = self.user_input
@@ -498,6 +498,7 @@ class VintageState(object):
                 self.settings.vi['user_action_input'] = self.user_input
                 self.settings.vi['user_input'] = None
 
+            self.user_input_parsers.pop()
             if len(self.user_input_parsers) == 0:
                 self.expecting_user_input = False
 

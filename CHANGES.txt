@@ -1,3 +1,8 @@
+1.4.1 - 8/7/2013
+
+	- Implement basic plugin system.
+	- Fix regression affecting p command in visual line mode.
+
 1.4.0 - 4/7/2013
 
 	- Improve aW, iW, aw, iw text objects.
