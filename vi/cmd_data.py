@@ -40,6 +40,8 @@ class CmdData(dict):
         # TODO: Try to unify user-input collection (both for registers and this kind of
         # argument).
         self['user_input'] = state.user_input
+        self['user_motion_input'] = state.settings.vi['user_motion_input']
+        self['user_action_input'] = state.settings.vi['user_action_input']
         # TODO: Interim solution to avoid problems with this step. Many commands don't need
         # this and it's causing quite some trouble. Let commands specify an explicit command
         # to reorient the caret as occurs with other hooks.

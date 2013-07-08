@@ -3,11 +3,13 @@ import sublime_plugin
 
 import threading
 
+from Vintageous.vi.extend import PluginManager
 from Vintageous.vi import actions
 from Vintageous.vi import constants
 from Vintageous.vi import motions
 from Vintageous.vi import registers
 from Vintageous.vi import utils
+from Vintageous.vi import inputs
 from Vintageous.vi.cmd_data import CmdData
 from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
 from Vintageous.vi.constants import MOTION_TRANSLATION_TABLE
@@ -23,6 +25,10 @@ from Vintageous.vi.constants import MODE_SELECT
 from Vintageous.vi.constants import mode_to_str
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
+from Vintageous.vi.constants import INPUT_IMMEDIATE
+from Vintageous.vi.constants import INPUT_AFTER_MOTION
+from Vintageous.vi.constants import INPUT_FOR_MOTIONS
+from Vintageous.vi.constants import INPUT_FOR_ACTIONS
 from Vintageous.vi.contexts import KeyContext
 from Vintageous.vi.marks import Marks
 from Vintageous.vi.registers import Registers
@@ -82,8 +88,12 @@ def _init_vintageous(view):
     state.reset()
 
 
+plugin_manager = None
+
 # TODO: Test me.
 def plugin_loaded():
+    global plugin_manager
+    plugin_manager = PluginManager()
     view = sublime.active_window().active_view()
     _init_vintageous(view)
 
@@ -105,6 +115,8 @@ class VintageState(object):
     context = KeyContext()
     marks = Marks()
     macros = {}
+    # We maintain a stack of parsers for user input.
+    user_input_parsers = []
 
     # Let's imitate Sublime Text's .command_history() 'null' value.
     _latest_repeat_command = ('', None, 0)
@@ -286,6 +298,9 @@ class VintageState(object):
         final_action = action
         if stored_action and action:
             final_action, type_ = digraphs.get((stored_action, action), ('', None))
+            # We didn't find a built-in action; let's try with the plugins.
+            if final_action == '':
+                final_action, type_ = plugin_manager.composite_commands.get((stored_action, action), ('', None))
 
             # Check for multigraphs like g~g~, g~~.
             # This sequence would get us here:
@@ -302,6 +317,14 @@ class VintageState(object):
             # Ex: vi_g_action, vi_gg
             if type_ == DIGRAPH_MOTION:
                 target = 'motion'
+
+                # TODO: Encapsulate this in a method.
+                input_type, input_parser = INPUT_FOR_MOTIONS.get(final_action, (None, None))
+                if input_parser:
+                    self.user_input_parsers.append(input_parser)
+                if input_type == INPUT_IMMEDIATE:
+                    self.expecting_user_input = True
+
                 self.settings.vi['action'] = None
             elif type_ == STASH:
                 # In this case we need to overwrite the current action differently.
@@ -315,6 +338,13 @@ class VintageState(object):
             self.cancel_action = True
             return
 
+        if target == 'action':
+            input_type, input_parser = INPUT_FOR_ACTIONS.get(final_action, (None, None))
+            if input_parser:
+                self.user_input_parsers.append(input_parser)
+            if input_type == INPUT_IMMEDIATE:
+                self.expecting_user_input = True
+
         self.settings.vi[target] = final_action
 
     @property
@@ -326,7 +356,17 @@ class VintageState(object):
     # TODO: Test me.
     @motion.setter
     def motion(self, name):
-        self.settings.vi['motion'] = MOTION_TRANSLATION_TABLE.get((self.action, name), name)
+        motion_name = MOTION_TRANSLATION_TABLE.get((self.action, name), name)
+
+        input_type, input_parser = INPUT_FOR_MOTIONS.get(motion_name, (None, None))
+        if input_type == INPUT_IMMEDIATE:
+            self.expecting_user_input = True
+            self.user_input_parsers.append(input_parser)
+
+        if not input_type and self.user_input_parsers:
+            self.expecting_user_input = True
+
+        self.settings.vi['motion'] = motion_name
 
     @property
     def motion_digits(self):
@@ -419,12 +459,52 @@ class VintageState(object):
     def user_input(self):
         """Additional data provided by the user, as 'a' in @a.
         """
-        return self.settings.vi['user_input'] or None
+        return self.settings.vi['user_input'] or ''
 
     @user_input.setter
     def user_input(self, value):
         self.settings.vi['user_input'] = value
-        self.expecting_user_input = False
+        # FIXME: Sometimes we set the following property in other places too.
+        self.validate_user_input()
+        # self.expecting_user_input = False
+
+    def validate_user_input(self):
+        name = ''
+        if len(self.user_input_parsers) == 2:
+            # We have two parsers: one for the motion, one for the action.
+            # Evaluate first the motion's.
+            name = self.motion
+            validator = self.user_input_parsers.pop()
+        elif self.motion and INPUT_FOR_ACTIONS.get(self.action, (None, None))[0] == INPUT_AFTER_MOTION:
+            assert len(self.user_input_parsers) == 1
+            name = self.action
+            validator = self.user_input_parsers.pop()
+        elif self.motion and self.action:
+            name = self.motion
+            validator = self.user_input_parsers.pop()
+        elif self.action:
+            name = self.action
+            validator = self.user_input_parsers.pop()
+        elif self.motion:
+            name = self.motion
+            validator = self.user_input_parsers.pop()
+
+        assert validator
+        if validator(self.user_input):
+            if name == self.motion:
+                self.settings.vi['user_motion_input'] = self.user_input
+                self.settings.vi['user_input'] = None
+            elif name == self.action:
+                self.settings.vi['user_action_input'] = self.user_input
+                self.settings.vi['user_input'] = None
+
+            if len(self.user_input_parsers) == 0:
+                self.expecting_user_input = False
+
+    def clear_user_input_buffers(self):
+        self.settings.vi['user_action_input'] = None
+        self.settings.vi['user_motion_input'] = None
+        self.settings.vi['user_input'] = None
 
     @property
     def last_buffer_search(self):
@@ -512,6 +592,7 @@ class VintageState(object):
     def latest_macro_name(self, value):
         VintageState._latest_macro_name = value
 
+
     def parse_motion(self):
         """Returns a CmdData instance with parsed motion data.
         """
@@ -552,7 +633,11 @@ class VintageState(object):
         try:
             action_func = getattr(actions, self.action)
         except AttributeError:
-            raise AttributeError("Vintageous: Unknown action: '{0}'".format(self.action))
+            try:
+                # We didn't find the built-in function; let's try our luck with plugins.
+                action_func = plugin_manager.actions[self.action]
+            except KeyError:
+                raise AttributeError("Vintageous: Unknown action: '{0}'".format(self.action))
         except TypeError:
             raise TypeError("Vintageous: parse_action requires an action be specified.")
 
@@ -654,6 +739,9 @@ class VintageState(object):
             self.reset()
             utils.blink()
 
+        elif self.expecting_user_input:
+            return
+
         # Action + motion, like in '3dj'.
         elif self.action and self.motion:
             self.eval_full_command()
@@ -679,7 +767,8 @@ class VintageState(object):
         self.stashed_action = None
 
         self.register = None
-        self.user_input = None
+        self.clear_user_input_buffers()
+        self.user_input_parsers.clear()
         self.expecting_register = False
         self.expecting_user_input = False
         self.cancel_action = False

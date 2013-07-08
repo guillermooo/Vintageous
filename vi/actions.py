@@ -589,7 +589,7 @@ def vi_r(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'characters', 'extend': True, 'forward': True}
     vi_cmd_data['action']['command'] = '_vi_r'
-    vi_cmd_data['action']['args'] = {'character': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode']}
+    vi_cmd_data['action']['args'] = {'character': vi_cmd_data['user_action_input'], 'mode': vi_cmd_data['mode']}
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
@@ -775,7 +775,7 @@ def vi_esc(vi_cmd_data):
 def vi_m(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = '_vi_m'
-    vi_cmd_data['action']['args'] = {'character': vi_cmd_data['user_input']}
+    vi_cmd_data['action']['args'] = {'character': vi_cmd_data['user_action_input']}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
@@ -831,7 +831,7 @@ def vi_equals_equals(vi_cmd_data):
 def vi_q(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = '_vi_q'
-    vi_cmd_data['action']['args'] = {'name': vi_cmd_data['user_input']}
+    vi_cmd_data['action']['args'] = {'name': vi_cmd_data['user_action_input']}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
@@ -840,7 +840,7 @@ def vi_q(vi_cmd_data):
 def vi_at(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = '_vi_run_macro'
-    vi_cmd_data['action']['args'] = {'name': vi_cmd_data['user_input']}
+    vi_cmd_data['action']['args'] = {'name': vi_cmd_data['user_action_input']}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data

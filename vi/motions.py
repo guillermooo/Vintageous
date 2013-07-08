@@ -390,7 +390,9 @@ def vi_star(vi_cmd_data):
 
 def vi_f(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_find_in_line_inclusive'
-    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    print("AAA", vi_cmd_data['user_motion_input'])
+    print("BBB", vi_cmd_data['user_input'])
+    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_motion_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
@@ -398,7 +400,7 @@ def vi_f(vi_cmd_data):
 
 def vi_t(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_find_in_line_exclusive'
-    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_motion_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
@@ -406,7 +408,7 @@ def vi_t(vi_cmd_data):
 
 def vi_big_t(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_reverse_find_in_line_exclusive'
-    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_motion_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
@@ -414,7 +416,7 @@ def vi_big_t(vi_cmd_data):
 
 def vi_big_f(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_reverse_find_in_line_inclusive'
-    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_motion_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
@@ -423,7 +425,7 @@ def vi_big_f(vi_cmd_data):
 # TODO: Unify handling of text objects in one function. Perhaps add state.args to merge with vi_cmd_data['motion']['args']
 def vi_inclusive_text_object(vi_cmd_data):
     vi_cmd_data['motion']['command'] = '_vi_select_text_object'
-    vi_cmd_data['motion']['args'] = {'text_object': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'inclusive': True}
+    vi_cmd_data['motion']['args'] = {'text_object': vi_cmd_data['user_motion_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'inclusive': True}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
@@ -432,7 +434,7 @@ def vi_inclusive_text_object(vi_cmd_data):
 # TODO: Unify handling of text objects in one function. Perhaps add state.args to merge with vi_cmd_data['motion']['args']
 def vi_exclusive_text_object(vi_cmd_data):
     vi_cmd_data['motion']['command'] = '_vi_select_text_object'
-    vi_cmd_data['motion']['args'] = {'text_object': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'inclusive': False}
+    vi_cmd_data['motion']['args'] = {'text_object': vi_cmd_data['user_motion_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'inclusive': False}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
@@ -461,7 +463,7 @@ def vi_double_single_quote(vi_cmd_data):
 
 def vi_forward_slash(vi_cmd_data):
     vi_cmd_data['motion']['command'] = '_vi_forward_slash'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'search_string': vi_cmd_data['user_input']}
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'search_string': vi_cmd_data['user_motion_input']}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
@@ -469,7 +471,7 @@ def vi_forward_slash(vi_cmd_data):
 
 def vi_question_mark(vi_cmd_data):
     vi_cmd_data['motion']['command'] = '_vi_question_mark'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'search_string': vi_cmd_data['user_input']}
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'search_string': vi_cmd_data['user_motion_input']}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
@@ -614,7 +616,7 @@ def vi_g_big_d(vi_cmd_data):
 
 def vi_quote(vi_cmd_data):
     vi_cmd_data['motion']['command'] = '_vi_quote'
-    vi_cmd_data['motion']['args'] = {'character': vi_cmd_data['user_input'], 'mode': vi_cmd_data['mode']}
+    vi_cmd_data['motion']['args'] = {'character': vi_cmd_data['user_motion_input'], 'mode': vi_cmd_data['mode']}
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data

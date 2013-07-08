@@ -4,6 +4,7 @@ import sublime_plugin
 from Vintageous.state import IrreversibleTextCommand
 from Vintageous.state import VintageState
 from Vintageous.vi import utils
+from Vintageous.vi import inputs
 from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
 from Vintageous.vi.constants import MODE_INSERT
 from Vintageous.vi.constants import MODE_NORMAL
@@ -409,36 +410,10 @@ class ViExpressionRegister(sublime_plugin.TextCommand):
         self.view.window().show_input_panel('', '', on_done, None, on_cancel)
 
 
-class ViR(sublime_plugin.TextCommand):
-    def run(self, edit, character=None):
-        state = VintageState(self.view)
-        if character is None:
-            state.action = 'vi_r'
-            state.expecting_user_input = True
-        else:
-            state.user_input = character
-            state.expecting_user_input= False
-            state.eval()
-
-
-class ViM(sublime_plugin.TextCommand):
-    def run(self, edit, character=None):
-        state = VintageState(self.view)
-        state.action = 'vi_m'
-        state.expecting_user_input = True
-
-
 class _vi_m(sublime_plugin.TextCommand):
     def run(self, edit, character=None):
         state = VintageState(self.view)
         state.marks.add(character, self.view)
-
-
-class ViQuote(sublime_plugin.TextCommand):
-    def run(self, edit, character=None):
-        state = VintageState(self.view)
-        state.motion = 'vi_quote'
-        state.expecting_user_input = True
 
 
 class _vi_quote(sublime_plugin.TextCommand):
@@ -477,61 +452,8 @@ class _vi_quote(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
-class ViF(sublime_plugin.TextCommand):
-    def run(self, edit, character=None):
-        state = VintageState(self.view)
-        if character is None:
-            state.motion = 'vi_f'
-            state.expecting_user_input = True
-        else:
-            # FIXME: Dead code?
-            state.user_input = character
-            state.expecting_user_input= False
-            state.eval()
-
-
-class ViT(IrreversibleTextCommand):
-    def __init__(self, view):
-        IrreversibleTextCommand.__init__(self, view)
-
-    # XXX: Compare to ViBigF.
-    def run(self, character=None):
-        state = VintageState(self.view)
-        if character is None:
-            state.motion = 'vi_t'
-            state.expecting_user_input = True
-        else:
-            state.user_input = character
-            state.expecting_user_input= False
-            state.eval()
-
-
-class ViBigT(IrreversibleTextCommand):
-    def __init__(self, view):
-        IrreversibleTextCommand.__init__(self, view)
-
-    # XXX: Compare to ViBigF.
-    def run(self, character=None):
-        state = VintageState(self.view)
-        if character is None:
-            state.motion = 'vi_big_t'
-            state.expecting_user_input = True
-        else:
-            state.user_input = character
-            state.expecting_user_input= False
-            state.eval()
-
-
-class ViBigF(IrreversibleTextCommand):
-    def __init__(self, view):
-        IrreversibleTextCommand.__init__(self, view)
-
-    def run(self):
-        state = VintageState(self.view)
-        state.motion = 'vi_big_f'
-        state.expecting_user_input = True
-
-
+# TODO: Revise this text object... Can't we have a simpler approach without
+# this intermediary step?
 class ViI(IrreversibleTextCommand):
     def __init__(self, view):
         IrreversibleTextCommand.__init__(self, view)
@@ -542,7 +464,6 @@ class ViI(IrreversibleTextCommand):
             state.motion = 'vi_inclusive_text_object'
         else:
             state.motion = 'vi_exclusive_text_object'
-        state.expecting_user_input = True
 
 
 class CollectUserInput(IrreversibleTextCommand):
@@ -551,9 +472,10 @@ class CollectUserInput(IrreversibleTextCommand):
 
     def run(self, character=None):
         state = VintageState(self.view)
-        state.user_input = character
-        state.expecting_user_input= False
-        state.eval()
+        state.user_input += character
+        # The .user_input setter handles resetting the following property.
+        if not state.expecting_user_input:
+            state.eval()
 
 
 class _vi_z_enter(IrreversibleTextCommand):
@@ -810,13 +732,6 @@ class _vi_g_v(IrreversibleTextCommand):
             self.view.sel().add(r)
 
 
-class ViQ(IrreversibleTextCommand):
-    def run(self):
-        state = VintageState(self.view)
-        state.action = 'vi_q'
-        state.expecting_user_input = True
-
-
 class _vi_q(IrreversibleTextCommand):
     def run(self, name=None):
         state = VintageState(self.view)
@@ -863,13 +778,6 @@ class _vi_run_macro(IrreversibleTextCommand):
                 utils.blink()
                 break
             self.view.run_command(cmd['command'], cmd['args'])
-
-
-class ViAt(IrreversibleTextCommand):
-    def run(self):
-        state = VintageState(self.view)
-        state.action = 'vi_at'
-        state.expecting_user_input = True
 
 
 class _vi_ctrl_w_q(IrreversibleTextCommand):

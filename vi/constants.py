@@ -1,3 +1,6 @@
+from Vintageous.vi import inputs
+
+
 MODE_INSERT = 1
 MODE_NORMAL = 1 << 1
 MODE_VISUAL = 1 << 2
@@ -22,6 +25,11 @@ MODE_SELECT = 1 << 7
 DIGRAPH_ACTION = 1
 DIGRAPH_MOTION = 2
 STASH = 3
+
+
+INPUT_IMMEDIATE = 1
+INPUT_AFTER_MOTION = 2
+INPUT_SPECIAL = 3
 
 
 # TODO: We should separate digraph actions from digraph motions?
@@ -94,6 +102,27 @@ ACTION_TO_NAMESPACE_TABLE = {
     'vi_g_action': 'g',
     'vi_z_action': 'z',
     'vi_ctrl_r_action': 'ctrl_r',
+}
+
+
+INPUT_FOR_MOTIONS = {
+    'vi_f': (INPUT_IMMEDIATE, inputs.vi_f),
+    'vi_t': (INPUT_IMMEDIATE, inputs.vi_t),
+    'vi_big_f': (INPUT_IMMEDIATE, inputs.vi_big_f),
+    'vi_big_t': (INPUT_IMMEDIATE, inputs.vi_big_t),
+    'vi_inclusive_text_object': (INPUT_IMMEDIATE, inputs.vi_inclusive_text_object),
+    'vi_exclusive_text_object': (INPUT_IMMEDIATE, inputs.vi_exclusive_text_object),
+    'vi_quote': (INPUT_IMMEDIATE, inputs.vi_quote),
+    'vi_forward_slash': (INPUT_IMMEDIATE, inputs.vi_forward_slash),
+    'vi_question_mark': (INPUT_IMMEDIATE, inputs.vi_question_mark),
+}
+
+
+INPUT_FOR_ACTIONS = {
+    'vi_m': (INPUT_IMMEDIATE, inputs.vi_m),
+    'vi_r': (INPUT_IMMEDIATE, inputs.vi_r),
+    'vi_q': (INPUT_IMMEDIATE, inputs.vi_q),
+    'vi_at': (INPUT_IMMEDIATE, inputs.vi_at),
 }
 
 
