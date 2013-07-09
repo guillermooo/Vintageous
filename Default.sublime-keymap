@@ -189,11 +189,11 @@
 	{ "keys": ["T"], "command": "set_motion", "args":{"motion": "vi_big_t"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["F"], "command": "set_motion", "args":{"motion": "vi_big_f"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 
-	// Repeats f
+	// Repeats f backward
 	{ "keys": [","], "command": "set_motion", "args":{"motion": "vi_comma"}, "context": [{"key": "vi_mode_normal"}] },
 	{ "keys": [","], "command": "set_motion", "args":{"motion": "vi_comma"}, "context": [{"key": "vi_mode_visual"}] },
 
-	// Repeats f backward
+	// Repeats f
 	{ "keys": [";"], "command": "set_motion", "args":{"motion": "vi_semicolon"}, "context": [{"key": "vi_mode_normal"}] },
 	{ "keys": [";"], "command": "set_motion", "args":{"motion": "vi_semicolon"}, "context": [{"key": "vi_mode_visual"}] },
 
