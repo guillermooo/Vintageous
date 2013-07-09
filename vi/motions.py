@@ -390,8 +390,6 @@ def vi_star(vi_cmd_data):
 
 def vi_f(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_find_in_line_inclusive'
-    print("AAA", vi_cmd_data['user_motion_input'])
-    print("BBB", vi_cmd_data['user_input'])
     vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_motion_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
     vi_cmd_data['count'] = 1
 
