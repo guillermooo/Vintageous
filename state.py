@@ -345,6 +345,7 @@ class VintageState(object):
                 # In this case we need to overwrite the current action differently.
                 self.stashed_action = final_action
                 self.settings.vi['action'] = action
+                self.display_partial_command()
                 return
 
         # Avoid recursion. The .reset() method will try to set this property to None, not ''.
@@ -361,6 +362,7 @@ class VintageState(object):
                 self.expecting_user_input = True
 
         self.settings.vi[target] = final_action
+        self.display_partial_command()
 
     @property
     def motion(self):
@@ -391,6 +393,7 @@ class VintageState(object):
             self.expecting_user_input = True
 
         self.settings.vi['motion'] = motion_name
+        self.display_partial_command()
 
     @property
     def motion_digits(self):
@@ -401,14 +404,17 @@ class VintageState(object):
     @motion_digits.setter
     def motion_digits(self, value):
         self.settings.vi['motion_digits'] = value
+        self.display_partial_command()
 
     def push_motion_digit(self, value):
         digits = self.settings.vi['motion_digits']
         if not digits:
             self.settings.vi['motion_digits'] = [value]
+            self.display_partial_command()
             return
         digits.append(value)
         self.settings.vi['motion_digits'] = digits
+        self.display_partial_command()
 
     @property
     def action_digits(self):
@@ -419,14 +425,17 @@ class VintageState(object):
     @action_digits.setter
     def action_digits(self, value):
         self.settings.vi['action_digits'] = value
+        self.display_partial_command()
 
     def push_action_digit(self, value):
         digits = self.settings.vi['action_digits']
         if not digits:
             self.settings.vi['action_digits'] = [value]
+            self.display_partial_command()
             return
         digits.append(value)
         self.settings.vi['action_digits'] = digits
+        self.display_partial_command()
 
     @property
     def count(self):
@@ -491,6 +500,7 @@ class VintageState(object):
         # FIXME: Sometimes we set the following property in other places too.
         self.validate_user_input()
         # self.expecting_user_input = False
+        self.display_partial_command()
 
     def validate_user_input(self):
         name = ''
@@ -757,10 +767,8 @@ class VintageState(object):
             self.view.run_command('vi_run', vi_cmd_data)
             self.reset()
 
-        self.update_status()
 
     # TODO: Test me.
-    # TODO: Refactor so that .reset and update_status() are called in the separate methods.
     def eval(self):
         """Examines the current state and decides whether to actually run the action/motion.
         """
@@ -782,7 +790,6 @@ class VintageState(object):
             vi_cmd_data = self.parse_motion()
             self.view.run_command('vi_run', vi_cmd_data)
             self.reset()
-            self.update_status()
 
         # Action only, like in 'd' or 'esc'. Some actions can be executed without a motion.
         elif self.action:
@@ -874,13 +881,23 @@ class VintageState(object):
 
         self.xpos = xpos
 
-    # TODO: Test me.
-    def update_status(self):
-        """Print to Sublime Text's status bar.
-        """
+    def display_partial_command(self):
         mode_name = mode_to_str(self.mode) or ""
         mode_name = "-- %s --" % mode_name if mode_name else ""
-        sublime.status_message(mode_name)
+        msg = "{0} {1} {2} {3} {4} {5}"
+        action_count = ''.join(self.action_digits) or ''
+        action = self.stashed_action or self.action or ''
+        motion_count = ''.join(self.motion_digits) or ''
+        motion = self.motion or ''
+        motion_input = self.settings.vi['user_motion_input'] or ''
+        action_input = self.user_input or ''
+        if (action and motion) or motion:
+            msg = msg.format(action_count, action, motion_count, motion, motion_input, action_input)
+        elif action:
+            msg = msg.format(motion_count, action, action_count, motion, motion_input, action_input)
+        else:
+            msg = msg.format(action_count, action, motion_count, motion, motion_input, action_input)
+        sublime.status_message(mode_name + ' ' + msg)
 
 
 # TODO: Test me.
