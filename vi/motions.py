@@ -709,3 +709,18 @@ def vi_ctrl_u(vi_cmd_data):
     vi_cmd_data['count'] = 1
 
     return vi_cmd_data
+
+
+# We have this one duplicated in actions.py because vi_g_action (like in gg or gU) can sometimes
+# be an action, and other times a motion.
+def vi_g_action(vi_cmd_data):
+    """This doesn't do anything by itself, but tells global state to wait for a second action that
+       completes this one.
+    """
+    vi_cmd_data['motion_required'] = True
+    # Let global state know we still need a second action to complete this one.
+    vi_cmd_data['is_digraph_start'] = True
+    vi_cmd_data['action']['command'] = 'no_op'
+    vi_cmd_data['action']['args'] = {}
+
+    return vi_cmd_data

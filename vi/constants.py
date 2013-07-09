@@ -85,9 +85,15 @@ digraphs = {
 }
 
 
+ACTION_OR_MOTION = 1
+ACTION_ONLY = 2
+
 # Actions that cannot run on their own --they require a qualifier.
-INCOMPLETE_ACTIONS = ('vi_g_action', 'vi_z_action', 'vi_ctrl_w_action',
-                      'vi_ctrl_r_action')
+INCOMPLETE_ACTIONS = {'vi_g_action': ACTION_OR_MOTION,
+                      'vi_z_action': ACTION_ONLY,
+                      'vi_ctrl_w_action': ACTION_ONLY,
+                      'vi_ctrl_r_action': ACTION_ONLY,
+                    }
 ACTIONS_EXITING_TO_INSERT_MODE = ('vi_ctrl_r_action',)
 
 

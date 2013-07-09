@@ -16,6 +16,8 @@ from Vintageous.vi.constants import MOTION_TRANSLATION_TABLE
 from Vintageous.vi.constants import ACTIONS_EXITING_TO_INSERT_MODE
 from Vintageous.vi.constants import DIGRAPH_MOTION
 from Vintageous.vi.constants import STASH
+from Vintageous.vi.constants import INCOMPLETE_ACTIONS
+from Vintageous.vi.constants import ACTION_OR_MOTION
 from Vintageous.vi.constants import digraphs
 from Vintageous.vi.constants import MODE_INSERT
 from Vintageous.vi.constants import MODE_NORMAL
@@ -294,6 +296,18 @@ class VintageState(object):
         stored_action = self.settings.vi['action']
         target = 'action'
 
+        # Sometimes we'll receive an incomplete command that may be an action or a motion, like g
+        # or dg, both leading up to gg and dgg, respectively. When there's already a complete
+        # action, though, we already know it must be a motion (as in dg and dgg).
+        # Similarly, if there is an action and a motion, the motion must handle the new name just
+        # received. This would be the case when we have dg and we receive another 'g' (or
+        # anything else, for that matter).
+        if (self.action and INCOMPLETE_ACTIONS.get(action) == ACTION_OR_MOTION or
+            self.motion):
+            # The .motion should handle this.
+            self.motion = action
+            return
+
         # Check for digraphs like cc, dd, yy.
         final_action = action
         if stored_action and action:
@@ -314,7 +328,7 @@ class VintageState(object):
 
             # Some motion digraphs are captured as actions, but need to be stored as motions
             # instead so that the vi command is evaluated correctly.
-            # Ex: vi_g_action, vi_gg
+            # Ex: gg (vi_g_action, vi_gg)
             if type_ == DIGRAPH_MOTION:
                 target = 'motion'
 
@@ -326,6 +340,7 @@ class VintageState(object):
                     self.expecting_user_input = True
 
                 self.settings.vi['action'] = None
+            # We are still in an intermediary step, so do some bookkeeping...
             elif type_ == STASH:
                 # In this case we need to overwrite the current action differently.
                 self.stashed_action = final_action
@@ -356,6 +371,15 @@ class VintageState(object):
     # TODO: Test me.
     @motion.setter
     def motion(self, name):
+        # Check for digraphs like gg in dgg.
+        stored_motion = self.motion
+        if stored_motion and name:
+            name, type_ = digraphs.get((stored_motion, name), (None, None))
+            if type_ != DIGRAPH_MOTION:
+                # We know there's an action because we only check for digraphs  when there is one.
+                self.cancel_action = True
+                return
+
         motion_name = MOTION_TRANSLATION_TABLE.get((self.action, name), name)
 
         input_type, input_parser = INPUT_FOR_MOTIONS.get(motion_name, (None, None))
@@ -676,6 +700,12 @@ class VintageState(object):
         """Evaluates a command like 3dj, where there is an action as well as a motion.
         """
         vi_cmd_data = self.parse_motion()
+
+        # Sometimes we'll have an incomplete motion, like in dg leading up to dgg. In this case,
+        # we don't want the vi command evaluated just yet.
+        if vi_cmd_data['is_digraph_start']:
+            return
+
         vi_cmd_data = self.parse_action(vi_cmd_data)
 
         if not vi_cmd_data['is_digraph_start']:

@@ -26,11 +26,7 @@ class KeyContext(object):
             return False
 
         # If we have primed counts, we have to clear the state.
-        if self.state.user_provided_count:
-            return True
-
-        # If we have an action, like in c<Esc> (leading to cc), we need to clear the state.
-        if self.state.action:
+        if self.state.user_provided_count or self.state.motion or self.state.action:
             return True
 
         # TODO: Simplify comparisons.
@@ -78,7 +74,8 @@ class KeyContext(object):
         return self._check(value, operator, operand, match_all)
 
     def vi_has_incomplete_action(self, key, operator, operand, match_all):
-        value = self.state.action in constants.INCOMPLETE_ACTIONS
+        value = any(x for x in (self.state.action, self.state.motion) if
+                          x in constants.INCOMPLETE_ACTIONS)
         return self._check(value, operator, operand, match_all)
 
     def vi_has_action(self, key, operator, operand, match_all):
@@ -167,7 +164,7 @@ class KeyContext(object):
         if not has_incomplete_action:
             return False
 
-        value = action_to_namespace(self.state.action)
+        value = action_to_namespace(self.state.action) or action_to_namespace(self.state.motion)
         if not value:
             return False
         value = value == operand
