@@ -172,7 +172,7 @@ class ViPaste(sublime_plugin.TextCommand):
             for x in range(count):
                 self.view.insert(edit, at, text)
                 # Return position at which we have just pasted.
-                return at
+            return at
         else:
             if text.startswith('\n'):
                 text = text * count

@@ -344,14 +344,14 @@ def vi_p(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = 'vi_paste'
     vi_cmd_data['action']['args'] = {'count': vi_cmd_data['count'], 'register': vi_cmd_data['register']}
+    # XXX: Since actions perform the actual edits to the buffer, they too should be in charge of
+    # readjusting the selections? I think that would be better than the current approach.
     vi_cmd_data['post_action'] = ['dont_stay_on_eol_backward',]
 
-    if vi_cmd_data['mode'] == MODE_VISUAL:
+    if vi_cmd_data['mode'] in (MODE_VISUAL, MODE_VISUAL_LINE):
         vi_cmd_data['post_action'] = ['collapse_to_a',]
-        vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
-    elif vi_cmd_data['mode'] == MODE_VISUAL_LINE:
-        vi_cmd_data['post_action'] = ['collapse_to_a',]
-        vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+
+    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
 
