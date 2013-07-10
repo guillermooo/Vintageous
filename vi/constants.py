@@ -54,6 +54,11 @@ digraphs = {
     ('vi_g_action', 'vi_g_q'): ('vi_g_q', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_v'): ('vi_g_v', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_h'): ('vi_enter_select_mode', DIGRAPH_ACTION),
+    # Because the order in which commands appear in the key map file, we can take advantage of
+    # vi_t without creating a g<stuff>-specific 't' binding.
+    # TODO: We should be able to do the same with all the other key bindings prefixed with 'g'.
+    ('vi_g_action', 'vi_t'): ('vi_g_t', DIGRAPH_ACTION),
+    ('vi_g_action', 'vi_big_t'): ('vi_g_big_t', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_e'): ('vi_g_e', DIGRAPH_MOTION),
     ('vi_g_action', 'vi_gg'): ('vi_gg', DIGRAPH_MOTION),
     ('vi_g_action', 'vi_g_d'): ('vi_g_d', DIGRAPH_MOTION),

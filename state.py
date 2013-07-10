@@ -3,22 +3,23 @@ import sublime_plugin
 
 import threading
 
-from Vintageous.vi.extend import PluginManager
 from Vintageous.vi import actions
 from Vintageous.vi import constants
+from Vintageous.vi import inputs
 from Vintageous.vi import motions
 from Vintageous.vi import registers
 from Vintageous.vi import utils
-from Vintageous.vi import inputs
 from Vintageous.vi.cmd_data import CmdData
 from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
-from Vintageous.vi.constants import MOTION_TRANSLATION_TABLE
+from Vintageous.vi.constants import ACTION_OR_MOTION
 from Vintageous.vi.constants import ACTIONS_EXITING_TO_INSERT_MODE
 from Vintageous.vi.constants import DIGRAPH_MOTION
-from Vintageous.vi.constants import STASH
-from Vintageous.vi.constants import INCOMPLETE_ACTIONS
-from Vintageous.vi.constants import ACTION_OR_MOTION
 from Vintageous.vi.constants import digraphs
+from Vintageous.vi.constants import INCOMPLETE_ACTIONS
+from Vintageous.vi.constants import INPUT_AFTER_MOTION
+from Vintageous.vi.constants import INPUT_FOR_ACTIONS
+from Vintageous.vi.constants import INPUT_FOR_MOTIONS
+from Vintageous.vi.constants import INPUT_IMMEDIATE
 from Vintageous.vi.constants import MODE_INSERT
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_NORMAL_INSERT
@@ -27,11 +28,10 @@ from Vintageous.vi.constants import MODE_SELECT
 from Vintageous.vi.constants import mode_to_str
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
-from Vintageous.vi.constants import INPUT_IMMEDIATE
-from Vintageous.vi.constants import INPUT_AFTER_MOTION
-from Vintageous.vi.constants import INPUT_FOR_MOTIONS
-from Vintageous.vi.constants import INPUT_FOR_ACTIONS
+from Vintageous.vi.constants import MOTION_TRANSLATION_TABLE
+from Vintageous.vi.constants import STASH
 from Vintageous.vi.contexts import KeyContext
+from Vintageous.vi.extend import PluginManager
 from Vintageous.vi.marks import Marks
 from Vintageous.vi.registers import Registers
 from Vintageous.vi.settings import SettingsManager
@@ -373,6 +373,11 @@ class VintageState(object):
     # TODO: Test me.
     @motion.setter
     def motion(self, name):
+        if self.action in INCOMPLETE_ACTIONS:
+            # The .action should handle this.
+            self.action = name
+            return
+
         # Check for digraphs like gg in dgg.
         stored_motion = self.motion
         if stored_motion and name:
