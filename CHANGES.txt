@@ -1,3 +1,7 @@
+1.4.4 - 11/7/2013
+
+	- r action can replace with '\n'.
+
 1.4.3 - 11/7/2013
 
 	- Improve p action.
