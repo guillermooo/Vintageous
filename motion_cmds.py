@@ -114,10 +114,17 @@ class ViReverseFindInLineInclusive(sublime_plugin.TextCommand):
                 pt = view.line(s.b).a + final_offset
 
                 state = VintageState(view)
-                if state.mode == MODE_VISUAL or mode == _MODE_INTERNAL_NORMAL:
+                if mode == _MODE_INTERNAL_NORMAL:
                     if sublime.Region(s.b, pt) == s:
                         utils.blink()
                         return s
+                    return sublime.Region(s.a, pt)
+                elif mode == MODE_VISUAL:
+                    if sublime.Region(s.b, pt) == s:
+                        utils.blink()
+                        return s
+                    if s.a < s.b:
+                        return sublime.Region(s.a + 1, pt)
                     return sublime.Region(s.a, pt)
 
                 if pt == s.b:
