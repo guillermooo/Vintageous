@@ -529,9 +529,18 @@ class _vi_zz(IrreversibleTextCommand):
 
 class _vi_r(sublime_plugin.TextCommand):
     def run(self, edit, character=None, mode=None):
+        def f(view, s):
+            next_row = view.rowcol(s.b - 1)[0] + 1
+            pt = view.text_point(next_row, 0)
+            return sublime.Region(pt, pt)
+
         if mode == _MODE_INTERNAL_NORMAL:
             for s in self.view.sel():
                 self.view.replace(edit, s, character * s.size())
+
+        if character == '\n':
+            regions_transformer(self.view, f)
+
 
 
 class _vi_undo(IrreversibleTextCommand):

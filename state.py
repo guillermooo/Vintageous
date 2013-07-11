@@ -378,6 +378,14 @@ class VintageState(object):
             self.action = name
             return
 
+        # HACK: Translate vi_enter to \n if we're expecting user input.
+        # This enables r\n, for instance.
+        # XXX: I don't understand why the enter key is captured as a motion in this case, though;
+        # the catch-all key binding for user input should have intercepted it.
+        if self.expecting_user_input and name == 'vi_enter':
+            self.view.run_command('collect_user_input', {'character': '\n'})
+            return
+
         # Check for digraphs like gg in dgg.
         stored_motion = self.motion
         if stored_motion and name:
