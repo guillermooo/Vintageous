@@ -8,7 +8,7 @@
 # Motions, like actions, should be kept independent of state.VintageState. All necessary data to
 # run the command should be passed to it as arguments.
 #
-# For examaple, don't do this:
+# For example, don't do this:
 #
 #   def run(self, ...):
 #       ...
@@ -47,11 +47,11 @@
 # Motions normally specify a transformer function nested within their .run() method. They might do
 # some work in .run() too, if necessary. The transformer function is called `f` by convention.
 # For each selection in the active view, it receives the `view` instance and a selection region.
-# This way, you modify all selections in the view, ony by one (in order).
+# This way, you modify all selections in the view, one by one (in order).
 #
 # Inside `f`, you must proceed in different ways depending on the current mode. For instance, in
 # visual mode, the `l` motion can move past the new line character, but not in normal mode.
-# Branching out inside `f` you can accomodate this differences.
+# Branching out inside `f` you can accommodate this differences.
 #
 # `f` must always return a new sublime.Region instance to replace the corresponding one. As a safety
 # measure, you should *always* return the passed in selection region again for unhandled cases. This
