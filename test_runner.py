@@ -8,17 +8,14 @@ import unittest
 import tempfile
 
 
+# A tuple: (low level file_descriptor, path) as returned by `tempfile.mkstemp()`.
 TEST_DATA_PATH = None
-TEST_DATA_FILE_BASENAME = 'sample.txt'
-
-
-# def plugin_loaded():
-#     make_temp_file()
 
 
 def make_temp_file():
+    """Creates an new temporary file.
+    """
     global TEST_DATA_PATH
-    # TEST_DATA_PATH = os.path.join(sublime.packages_path(), '_Package Testing/%s' % TEST_DATA_FILE_BASENAME)
     TEST_DATA_PATH = tempfile.mkstemp()
 
 
@@ -83,6 +80,8 @@ class _ptPrintResults(sublime_plugin.TextCommand):
 
 
 class ShowVintageousTestSuites(sublime_plugin.WindowCommand):
+    """Displays a quick panel listing all available test stuites.
+    """
     def run(self):
         TestsState.running = True
         self.window.show_quick_panel(sorted(test_suites.keys()), self.run_suite)
@@ -98,6 +97,8 @@ class ShowVintageousTestSuites(sublime_plugin.WindowCommand):
 class _ptRunTests(sublime_plugin.WindowCommand):
     def run(self, suite_name):
         make_temp_file()
+        # We open the file here, but Sublime Text loads it asynchronously, so we continue in an
+        # event handler, once it's been fully loaded.
         self.window.open_file(TEST_DATA_PATH[1])
 
 
@@ -136,6 +137,11 @@ class _ptTestDataDispatcher(sublime_plugin.EventListener):
 
 
 class WriteToBuffer(sublime_plugin.TextCommand):
+    """Replaces the buffer's content with the specified `text`.
+
+       `text`: Text to be written to the buffer.
+       `file_name`: If this file name does not match the receiving view's, abort.
+    """
     def run(self, edit, file_name='', text=''):
         if not file_name:
             return
