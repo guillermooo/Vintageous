@@ -1,3 +1,66 @@
+"""Sublime Text commands performing vim motions.
+
+   If you are implementing a new motion, stick it here.
+"""
+
+# == NOTES ABOUT THE IMPLEMENTATION OF MOTION COMMANDS
+#
+# Motions, like actions, should be kept independent of state.VintageState. All necessary data to
+# run the command should be passed to it as arguments.
+#
+# For examaple, don't do this:
+#
+#   def run(self, ...):
+#       ...
+#       state = VintageState(self.view)
+#       if state.mode == MODE_NORMAL:
+#           ...
+#
+# But do this instead:
+#
+#   def run(self, mode=None, ...):
+#       ...
+#       if mode == MODE_NORMAL:
+#           ...
+#
+#  Sublime Text commands must base its operation only off arguments so that macros, undo and
+#  repeat work as expected. However, there are exceptions.
+#
+#  Additionally, motion commands should be as independent of each other as possible. This is why
+#  keeping so many classes in the same file should not impair their comprehension.
+#
+# == MOTION COMMAND NAMING
+#
+# Motion names should follow this pattern: _vi_l, _vi_g_h, etc.
+#
+# == ANATOMY OF A MOTION COMMAND
+#
+# (Any motion command not conforming to the pattern described below must be updated or is an
+# exception to the general rule.)
+#
+# Typically, motion commands follow the same pattern to deal with multiple modes and multiple
+# selections.
+#
+# Some of the work to implement motions so that they play well with Sublime Text has been abstracted
+# away, most notably in `regions_transformer`.
+#
+# Motions normally specify a transformer function nested within their .run() method. They might do
+# some work in .run() too, if necessary. The transformer function is called `f` by convention.
+# For each selection in the active view, it receives the `view` instance and a selection region.
+# This way, you modify all selections in the view, ony by one (in order).
+#
+# Inside `f`, you must proceed in different ways depending on the current mode. For instance, in
+# visual mode, the `l` motion can move past the new line character, but not in normal mode.
+# Branching out inside `f` you can accomodate this differences.
+#
+# `f` must always return a new sublime.Region instance to replace the corresponding one. As a safety
+# measure, you should *always* return the passed in selection region again for unhandled cases. This
+# ensures correct operation for unimplemented modes for the command or invalid modes for the command.
+#
+# A simple motion to check out for an implementation of this pattern is `_vi_g__`, which advances
+# all carets to the end of the line, excluding the new line character.
+
+
 import sublime
 import sublime_plugin
 
