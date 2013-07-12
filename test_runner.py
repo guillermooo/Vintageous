@@ -5,14 +5,21 @@ from itertools import chain
 import io
 import os
 import unittest
+import tempfile
 
 
 TEST_DATA_PATH = None
 TEST_DATA_FILE_BASENAME = 'sample.txt'
 
-def plugin_loaded():
+
+# def plugin_loaded():
+#     make_temp_file()
+
+
+def make_temp_file():
     global TEST_DATA_PATH
-    TEST_DATA_PATH = os.path.join(sublime.packages_path(), '_Package Testing/%s' % TEST_DATA_FILE_BASENAME)
+    # TEST_DATA_PATH = os.path.join(sublime.packages_path(), '_Package Testing/%s' % TEST_DATA_FILE_BASENAME)
+    TEST_DATA_PATH = tempfile.mkstemp()
 
 
 class TestsState(object):
@@ -25,6 +32,10 @@ class TestsState(object):
         TestsState.view = None
         TestsState.suite = None
 
+    @staticmethod
+    def reset_view_state():
+        TestsState.view.settings().set('vintage', {})
+
 
 TESTS_SETTINGS = 'Vintageous.tests.vi.test_settings'
 TESTS_REGISTERS = 'Vintageous.tests.vi.test_registers'
@@ -34,6 +45,7 @@ TESTS_CONSTANTS = 'Vintageous.tests.vi.test_constants'
 TESTS_CMD_DATA = 'Vintageous.tests.vi.test_cmd_data'
 TESTS_KEYMAP = 'Vintageous.tests.test_keymap'
 TESTS_RUN = 'Vintageous.tests.test_run'
+TESTS_COMMANDS = 'Vintageous.tests.commands.test_set_action'
 
 
 test_suites = {
@@ -51,6 +63,8 @@ test_suites = {
         'cmd_data': ['_pt_run_tests', [TESTS_CMD_DATA]],
 
         'keymap': ['_pt_run_tests', [TESTS_KEYMAP]],
+
+        'commands': ['_pt_run_tests', [TESTS_COMMANDS]],
 }
 
 
@@ -83,29 +97,48 @@ class ShowVintageousTestSuites(sublime_plugin.WindowCommand):
 
 class _ptRunTests(sublime_plugin.WindowCommand):
     def run(self, suite_name):
-        self.window.open_file(TEST_DATA_PATH)
+        make_temp_file()
+        self.window.open_file(TEST_DATA_PATH[1])
 
 
 class _ptTestDataDispatcher(sublime_plugin.EventListener):
     def on_load(self, view):
-        if (view.file_name() and
-            os.path.basename(view.file_name()) == TEST_DATA_FILE_BASENAME and
-            TestsState.running):
+        try:
+            if (view.file_name() and view.file_name() == TEST_DATA_PATH[1] and
+                TestsState.running):
 
-                TestsState.running = False
-                TestsState.view = view
+                    TestsState.running = False
+                    TestsState.view = view
 
-                _, suite_names = test_suites[TestsState.suite]
-                suite = unittest.TestLoader().loadTestsFromNames(suite_names)
+                    _, suite_names = test_suites[TestsState.suite]
+                    suite = unittest.TestLoader().loadTestsFromNames(suite_names)
 
-                bucket = io.StringIO()
-                unittest.TextTestRunner(stream=bucket, verbosity=1).run(suite)
+                    bucket = io.StringIO()
+                    unittest.TextTestRunner(stream=bucket, verbosity=1).run(suite)
 
-                view.run_command('_pt_print_results', {'content': bucket.getvalue()})
-                w = sublime.active_window()
-                # Close data view.
-                w.run_command('prev_view')
-                w.run_command('close')
-                # Ugly hack to return focus to the results view.
-                w.run_command('show_panel', {'panel': 'console', 'toggle': True})
-                w.run_command('show_panel', {'panel': 'console', 'toggle': True})
+                    view.run_command('_pt_print_results', {'content': bucket.getvalue()})
+                    w = sublime.active_window()
+                    # Close data view.
+                    w.run_command('prev_view')
+                    TestsState.view.set_scratch(True)
+                    w.run_command('close')
+                    # Ugly hack to return focus to the results view.
+                    w.run_command('show_panel', {'panel': 'console', 'toggle': True})
+                    w.run_command('show_panel', {'panel': 'console', 'toggle': True})
+        except Exception as e:
+            print(e)
+        finally:
+            try:
+                os.close(TEST_DATA_PATH[0])
+            except Exception as e:
+                print("Could not close temp file...")
+                print(e)
+
+
+class WriteToBuffer(sublime_plugin.TextCommand):
+    def run(self, edit, file_name='', text=''):
+        if not file_name:
+            return
+
+        if self.view.file_name().lower() == file_name.lower():
+            self.view.replace(edit, sublime.Region(0, self.view.size()), text)
