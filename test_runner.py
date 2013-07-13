@@ -42,7 +42,17 @@ TESTS_CONSTANTS = 'Vintageous.tests.vi.test_constants'
 TESTS_CMD_DATA = 'Vintageous.tests.vi.test_cmd_data'
 TESTS_KEYMAP = 'Vintageous.tests.test_keymap'
 TESTS_RUN = 'Vintageous.tests.test_run'
-TESTS_COMMANDS = 'Vintageous.tests.commands.test_set_action'
+
+TESTS_CMDS_SET_ACTION = 'Vintageous.tests.commands.test_set_action'
+TESTS_CMDS_SET_MOTION = 'Vintageous.tests.commands.test_set_motion'
+TESTS_CMDS_MOTION_VI_L = 'Vintageous.tests.commands.test__vi_l'
+TESTS_CMDS_MOTION_VI_H = 'Vintageous.tests.commands.test__vi_h'
+
+TESTS_CMDS_ALL_SUPPORT = [TESTS_CMDS_SET_ACTION, TESTS_CMDS_SET_MOTION]
+TESTS_CMDS_ALL_ACTIONS = []
+TESTS_CMDS_ALL_MOTIONS = [TESTS_CMDS_MOTION_VI_L, TESTS_CMDS_MOTION_VI_H,]
+
+TESTS_CMDS_ALL = TESTS_CMDS_ALL_MOTIONS + TESTS_CMDS_ALL_ACTIONS + TESTS_CMDS_ALL_SUPPORT
 
 
 test_suites = {
@@ -61,7 +71,7 @@ test_suites = {
 
         'keymap': ['_pt_run_tests', [TESTS_KEYMAP]],
 
-        'commands': ['_pt_run_tests', [TESTS_COMMANDS]],
+        'commands': ['_pt_run_tests', TESTS_CMDS_ALL],
 }
 
 
