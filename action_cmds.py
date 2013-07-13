@@ -314,6 +314,7 @@ class SetAction(IrreversibleTextCommand):
     def run(self, action):
         state = VintageState(self.view)
         state.action = action
+        print("FOOBAR", self.view.settings().get('vintage'))
         state.eval()
 
 

@@ -32,6 +32,8 @@ class TestsState(object):
     @staticmethod
     def reset_view_state():
         TestsState.view.settings().set('vintage', {})
+        TestsState.view.sel().clear()
+        TestsState.view.sel().add(sublime.Region(0, 0))
 
 
 TESTS_SETTINGS = 'Vintageous.tests.vi.test_settings'
