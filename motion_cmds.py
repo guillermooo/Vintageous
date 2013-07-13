@@ -1304,24 +1304,21 @@ class _vi_dollar(sublime_plugin.TextCommand):
     def run(self, edit, mode=None, count=None):
         def f(view, s):
             if mode == MODE_NORMAL:
-                pt = view.line(target_row_pt if target_row_pt is not None
-                                             else s.b).b
+                pt = view.line(target_row_pt).b
                 if not view.line(pt).empty():
                     return sublime.Region(pt - 1, pt - 1)
                 return sublime.Region(pt, pt)
 
             elif mode == MODE_VISUAL:
                 current_line_pt = (s.b - 1) if (s.a < s.b) else s.b
-                end = view.full_line(target_row_pt if target_row_pt is not None
-                                                   else current_line_pt).b
+                end = view.full_line(target_row_pt).b
                 end = end if (s.a < end) else (end - 1)
                 start = s.a if ((s.a < s.b) or (end < s.a)) else s.a - 1
                 return sublime.Region(start, end)
 
             elif mode == _MODE_INTERNAL_NORMAL:
-                pt = view.line(target_row_pt if target_row_pt is not None
-                                             else s.b).b
-                if target_row_pt is None:
+                pt = view.line(target_row_pt).b
+                if count == 1:
                     return sublime.Region(s.a, pt)
                 return sublime.Region(s.a, pt + 1)
 
@@ -1331,11 +1328,10 @@ class _vi_dollar(sublime_plugin.TextCommand):
 
             return s
 
-        target_row_pt = None
+        sel = self.view.sel()[0]
+        target_row_pt = (sel.b - 1) if (sel.b > sel.a) else sel.b
         if count > 1:
-            sel = self.view.sel()[0]
-            current_pt = sel.b if (sel.empty() or (sel.b < sel.a)) else (sel.b - 1)
-            current_row = self.view.rowcol(current_pt)[0]
+            current_row = self.view.rowcol(target_row_pt)[0]
             target_row = current_row + count - 1
             target_row_pt = self.view.text_point(target_row, 0)
 
