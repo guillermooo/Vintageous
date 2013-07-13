@@ -49,10 +49,14 @@ TESTS_CMDS_SET_ACTION = 'Vintageous.tests.commands.test_set_action'
 TESTS_CMDS_SET_MOTION = 'Vintageous.tests.commands.test_set_motion'
 TESTS_CMDS_MOTION_VI_L = 'Vintageous.tests.commands.test__vi_l'
 TESTS_CMDS_MOTION_VI_H = 'Vintageous.tests.commands.test__vi_h'
+TESTS_CMDS_MOTION_VI_BIG_G = 'Vintageous.tests.commands.test__vi_big_g'
 
 TESTS_CMDS_ALL_SUPPORT = [TESTS_CMDS_SET_ACTION, TESTS_CMDS_SET_MOTION]
 TESTS_CMDS_ALL_ACTIONS = []
-TESTS_CMDS_ALL_MOTIONS = [TESTS_CMDS_MOTION_VI_L, TESTS_CMDS_MOTION_VI_H,]
+TESTS_CMDS_ALL_MOTIONS = [TESTS_CMDS_MOTION_VI_L,
+                          TESTS_CMDS_MOTION_VI_H,
+                          TESTS_CMDS_MOTION_VI_BIG_G,
+                          ]
 
 TESTS_CMDS_ALL = TESTS_CMDS_ALL_MOTIONS + TESTS_CMDS_ALL_ACTIONS + TESTS_CMDS_ALL_SUPPORT
 

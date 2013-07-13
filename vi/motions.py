@@ -91,23 +91,14 @@ def vi_big_g(vi_cmd_data):
     if (vi_cmd_data['count'] > 5) or vi_cmd_data['count'] == 1:
         vi_cmd_data['is_jump'] = True
 
-    # FIXME: Cannot go to line 1. We need to signal when the count is user-provided and when it's
-    # a default value.
     if vi_cmd_data['_user_provided_count']:
         target = vi_cmd_data['count']
         vi_cmd_data['count'] = 1
         vi_cmd_data['motion']['command'] = 'vi_go_to_line'
         vi_cmd_data['motion']['args'] = {'line': target, 'mode': vi_cmd_data['mode']}
     else:
-        vi_cmd_data['motion']['command'] = 'move_to'
-        vi_cmd_data['motion']['args'] = {'to': 'eof'}
-
-    if vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-    elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-    elif vi_cmd_data['mode'] == MODE_VISUAL_LINE:
-        vi_cmd_data['motion']['args']['extend'] = True
+        vi_cmd_data['motion']['command'] = '_vi_big_g'
+        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
 
     return vi_cmd_data
 

@@ -1275,3 +1275,26 @@ class _vi_g__(sublime_plugin.TextCommand):
             return s
 
         regions_transformer(self.view, f)
+
+
+class _vi_big_g(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, count=None):
+        def f(view, s):
+            if mode == MODE_NORMAL:
+                pt = utils.previous_non_white_space_char(view, eof - 1,
+                                                         white_space='\n')
+                return sublime.Region(pt, pt)
+
+            elif mode == MODE_VISUAL:
+                return sublime.Region(s.a, eof)
+
+            elif mode == _MODE_INTERNAL_NORMAL:
+                return sublime.Region(s.a, eof)
+
+            elif mode == MODE_VISUAL_LINE:
+                return sublime.Region(s.a, eof)
+
+            return s
+
+        eof = self.view.size()
+        regions_transformer(self.view, f)
