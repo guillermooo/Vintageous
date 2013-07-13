@@ -24,21 +24,21 @@ class Test_vi_l(BufferTest):
         add_selection(self.view, a=0, b=0)
 
         self.view.run_command('_vi_l', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1, 'extend': False})
-        self.assertEqual(self.R(0, 1), self.view.sel()[0])
+        self.assertEqual(self.R(0, 1), first_sel(self.view))
 
     def testCanMoveInNormalModeWithCount(self):
         set_text(self.view, 'foo bar baz')
         add_selection(self.view, a=0, b=0)
 
         self.view.run_command('_vi_l', {'mode': MODE_NORMAL, 'count': 10, 'extend': False})
-        self.assertEqual(self.R(10, 10), self.view.sel()[0])
+        self.assertEqual(self.R(10, 10), first_sel(self.view))
 
     def testCanMoveInInternalNormalModeWithCount(self):
         set_text(self.view, 'foo bar baz')
         add_selection(self.view, a=0, b=0)
 
         self.view.run_command('_vi_l', {'mode': _MODE_INTERNAL_NORMAL, 'count': 10, 'extend': False})
-        self.assertEqual(self.R(0, 10), self.view.sel()[0])
+        self.assertEqual(self.R(0, 10), first_sel(self.view))
 
     def testCanMoveInVisualMode(self):
         set_text(self.view, 'abc')
