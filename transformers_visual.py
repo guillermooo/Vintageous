@@ -795,7 +795,7 @@ class _vi_big_x_motion(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
-class _vi_l_motion(sublime_plugin.TextCommand):
+class _vi_l(sublime_plugin.TextCommand):
     def run(self, edit, mode=None, count=None, extend=False):
         def f(view, s):
             if mode == MODE_NORMAL:
