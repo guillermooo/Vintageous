@@ -1298,3 +1298,45 @@ class _vi_big_g(sublime_plugin.TextCommand):
 
         eof = self.view.size()
         regions_transformer(self.view, f)
+
+
+class _vi_dollar(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, count=None):
+        def f(view, s):
+            if mode == MODE_NORMAL:
+                pt = view.line(target_row_pt if target_row_pt is not None
+                                             else s.b).b
+                if not view.line(pt).empty():
+                    return sublime.Region(pt - 1, pt - 1)
+                return sublime.Region(pt, pt)
+
+            elif mode == MODE_VISUAL:
+                current_line_pt = (s.b - 1) if (s.a < s.b) else s.b
+                end = view.full_line(target_row_pt if target_row_pt is not None
+                                                   else current_line_pt).b
+                end = end if (s.a < end) else (end - 1)
+                start = s.a if ((s.a < s.b) or (end < s.a)) else s.a - 1
+                return sublime.Region(start, end)
+
+            elif mode == _MODE_INTERNAL_NORMAL:
+                pt = view.line(target_row_pt if target_row_pt is not None
+                                             else s.b).b
+                if target_row_pt is None:
+                    return sublime.Region(s.a, pt)
+                return sublime.Region(s.a, pt + 1)
+
+            elif mode == MODE_VISUAL_LINE:
+                # TODO: Implement this. Not too useful, though.
+                return s
+
+            return s
+
+        target_row_pt = None
+        if count > 1:
+            sel = self.view.sel()[0]
+            current_pt = sel.b if (sel.empty() or (sel.b < sel.a)) else (sel.b - 1)
+            current_row = self.view.rowcol(current_pt)[0]
+            target_row = current_row + count - 1
+            target_row_pt = self.view.text_point(target_row, 0)
+
+        regions_transformer(self.view, f)

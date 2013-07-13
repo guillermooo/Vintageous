@@ -9,80 +9,9 @@ def vi_dollar(vi_cmd_data):
     if vi_cmd_data['count'] > 5:
         vi_cmd_data['is_jump'] = True
 
-    # No count given.
-    if vi_cmd_data['count'] == 1:
-        vi_cmd_data['motion']['command'] = 'move_to'
-        vi_cmd_data['motion']['args'] = {'to': 'eol'}
-
-        # CHARACTERWISE + INCLUSIVE
-        # d$
-        # TODO: If on hard eol, cancel movement; don't go to the next eol.
-        if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-            vi_cmd_data['motion']['args']['extend'] = True
-            vi_cmd_data['post_motion'] = [['visual_clip_end_to_eol',],]
-
-        # CHARACTERWISE + INCLUSIVE (includes EOL)
-        # vd$
-        elif vi_cmd_data['mode'] == MODE_VISUAL:
-            vi_cmd_data['motion']['args']['extend'] = True
-            # Prevent $ from jumping to next line's eol.
-            # XXX: This is a suboptimal. It will fail if $'ing on an empty line.
-            #      Perhaps we need a _visual_dollar_forward command to cover all cases.
-            vi_cmd_data['pre_motion'] = ['_back_one_if_on_hard_eol',]
-            vi_cmd_data['post_motion'] = [['_extend_b_to_hard_eol',],]
-
-        # LINEWISE + INCLUSIVE
-        # Vd$
-        elif vi_cmd_data['mode'] == MODE_VISUAL_LINE:
-            vi_cmd_data['motion']['args']['extend'] = True
-            vi_cmd_data['post_motion'] = [['visual_extend_to_full_line',],]
-
-        # CHARACTERWISE + INCLUSIVE
-        # $
-        else:
-            vi_cmd_data['post_motion'] = [['clip_end_to_line',],]
-
-    # Count given. Move lines downward.
-    else:
-        vi_cmd_data['motion']['command'] = 'move'
-        vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': True}
-        # <count>$ must include the current line, so we subtract one.
-        vi_cmd_data['count'] = vi_cmd_data['count'] - 1
-
-        if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-            vi_cmd_data['motion']['args']['extend'] = True
-            # LINEWISE
-            # 2d$
-            #
-            # $ behaves differently depending on whether the caret is at BOL (LINEWISE + INCLUSIVE)
-            # or not (LINEWISE + EXCLUSIVE). We cannot handle this here, so let an additional
-            # command take care of the final deicisions.
-            #
-            # FIXME: Behavior also depends on whitespace before the caret. Motion becomes
-            # linewise in that case.
-            #
-            # vi_cmd_data['count'] = vi_cmd_data['count'] + 1
-            vi_cmd_data['pre_every_motion'] = ['_pre_every_dollar',]
-            # vi_cmd_data['post_motion'] = [['_extend_b_to_hard_eol',],]
-            # Motion becomes linewise if caret is preceded only by white space.
-            # vi_cmd_data['post_motion'].append(['_extend_a_to_bol_if_leading_white_space',])
-
-        # CHARACTERWISE + INCLUSIVE (includes last EOL)
-        elif vi_cmd_data['mode'] == MODE_VISUAL:
-            # CHARACTERWISE + INCLUSIVE
-            # v2$
-            #
-            vi_cmd_data['motion']['args']['extend'] = True
-            vi_cmd_data['post_motion'].append(['_extend_b_to_hard_eol',])
-            # Motion becomes linewise if caret is preceded only by white space.
-            vi_cmd_data['post_motion'].append(['_extend_a_to_bol_if_leading_white_space',])
-        else:
-            # LINEWISE + EXCLUSIVE
-            # 2$
-            vi_cmd_data['post_motion'].append(['move_to', {'to': 'eol'}])
-            vi_cmd_data['post_motion'].append(['clip_end_to_line',])
-
-            # TODO: missing MODE_VISUAL_LINE here.
+    vi_cmd_data['motion']['command'] = '_vi_dollar'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['count'] = 1
 
     return vi_cmd_data
 
