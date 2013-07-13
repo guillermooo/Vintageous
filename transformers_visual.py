@@ -796,7 +796,7 @@ class _vi_big_x_motion(sublime_plugin.TextCommand):
 
 
 class _vi_l(sublime_plugin.TextCommand):
-    def run(self, edit, mode=None, count=None, extend=False):
+    def run(self, edit, mode=None, count=None):
         def f(view, s):
             if mode == MODE_NORMAL:
                 if view.line(s.b).empty():
