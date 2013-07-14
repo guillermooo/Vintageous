@@ -95,7 +95,7 @@ class Test_vi_j_InNormalMode(BufferTest):
         self.assertEqual(expected, first_sel(self.view))
 
 
-class Test_vi_big_g_InVisualMode(BufferTest):
+class Test_vi_j_InVisualMode(BufferTest):
     def testMoveOne(self):
         set_text(self.view, 'abc\nabc\nabc')
         add_selection(self.view, a=1, b=2)
@@ -104,6 +104,18 @@ class Test_vi_big_g_InVisualMode(BufferTest):
 
         target = self.view.text_point(1, 2)
         expected = self.R(1, target)
+
+        self.assertEqual(expected, first_sel(self.view))
+
+    # TODO: Fix this nonsense.
+    def testMoveOneReversedNoCrossOver(self):
+        set_text(self.view, 'abc\nabc\nabc')
+        add_selection(self.view, a=2, b=0)
+
+        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
+
+        target = self.view.text_point(1, 2)
+        expected = self.R(10, target)
 
         self.assertEqual(expected, first_sel(self.view))
 
@@ -176,7 +188,7 @@ class Test_vi_big_g_InVisualMode(BufferTest):
 
 
 # TODO: Ensure that we only create empty selections while testing. Add assert_all_sels_empty()?
-class Test_vi_big_g_InInternalNormalMode(BufferTest):
+class Test_vi_j_InInternalNormalMode(BufferTest):
     def testMoveOne(self):
         set_text(self.view, 'abc\nabc\nabc')
         add_selection(self.view, a=1, b=1)
@@ -262,7 +274,7 @@ class Test_vi_big_g_InInternalNormalMode(BufferTest):
         self.assertEqual(expected, first_sel(self.view))
 
 
-class Test_vi_big_g_InVisualLineMode(BufferTest):
+class Test_vi_j_InVisualLineMode(BufferTest):
     def testMoveOne(self):
         set_text(self.view, 'abc\nabc\nabc')
         add_selection(self.view, a=0, b=4)

@@ -57,22 +57,64 @@ class Test_vi_l_InInternalNormalMode(BufferTest):
         self.assertEqual(self.R(0, 3), first_sel(self.view))
 
 
-class Test_vi_l_InInternalVisualMode(BufferTest):
-    def testCanMoveInVisualMode(self):
+class Test_vi_l_InVisualMode(BufferTest):
+    def testCanMove(self):
         set_text(self.view, 'abc')
         add_selection(self.view, a=0, b=1)
 
         self.view.run_command('_vi_l', {'mode': MODE_VISUAL, 'count': 1})
         self.assertEqual(self.R(0, 2), first_sel(self.view))
 
-    def testCanMoveInVisualModeWithCount(self):
+    def testCanMoveReversedNoCrossOver(self):
+        set_text(self.view, 'abc')
+        add_selection(self.view, a=2, b=0)
+
+        self.view.run_command('_vi_l', {'mode': MODE_VISUAL, 'count': 1})
+        self.assertEqual(self.R(2, 1), first_sel(self.view))
+
+    def testCanMoveReversedMinimal(self):
+        set_text(self.view, 'abc')
+        add_selection(self.view, a=1, b=0)
+
+        self.view.run_command('_vi_l', {'mode': MODE_VISUAL, 'count': 1})
+        self.assertEqual(self.R(0, 2), first_sel(self.view))
+
+    def testCanMoveReversedCrossOver(self):
+        set_text(self.view, 'foo bar baz')
+        add_selection(self.view, a=5, b=0)
+
+        self.view.run_command('_vi_l', {'mode': MODE_VISUAL, 'count': 5})
+        self.assertEqual(self.R(4, 6), first_sel(self.view))
+
+    def testCanMoveReversedDifferentLines(self):
+        set_text(self.view, 'foo\nbar\n')
+        add_selection(self.view, a=5, b=1)
+
+        self.view.run_command('_vi_l', {'mode': MODE_VISUAL, 'count': 1})
+        self.assertEqual(self.R(5, 2), first_sel(self.view))
+
+    def testStopsAtEolDifferentLinesReversed(self):
+        set_text(self.view, 'foo\nbar\n')
+        add_selection(self.view, a=5, b=3)
+
+        self.view.run_command('_vi_l', {'mode': MODE_VISUAL, 'count': 1})
+        self.assertEqual(self.R(5, 3), first_sel(self.view))
+
+    def testStopsAtEolDifferentLinesReversedLargeCount(self):
+        set_text(self.view, 'foo\nbar\n')
+        add_selection(self.view, a=5, b=3)
+
+        self.view.run_command('_vi_l', {'mode': MODE_VISUAL, 'count': 100})
+        self.assertEqual(self.R(5, 3), first_sel(self.view))
+
+    def testCanMoveWithCount(self):
         set_text(self.view, 'foo bar fuzz buzz')
         add_selection(self.view, a=0, b=1)
 
         self.view.run_command('_vi_l', {'mode': MODE_VISUAL, 'count': 10})
         self.assertEqual(self.R(0, 11), first_sel(self.view))
 
-    def testStopsAtRightEndInVisualMode(self):
+    def testStopsAtRightEnd(self):
         set_text(self.view, 'abc\n')
         add_selection(self.view, a=0, b=1)
 
