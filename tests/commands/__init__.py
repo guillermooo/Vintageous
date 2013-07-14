@@ -12,8 +12,8 @@ class BufferTest(unittest.TestCase):
         self.R = sublime.Region
 
 
-def make_region_at_row(view, line=0, col=0, size=0):
-    pt = view.text_point(line, col)
+def make_region_at_row(view, row=0, col=0, size=0):
+    pt = view.text_point(row, col)
     return sublime.Region(pt, pt + size)
 
 
@@ -22,6 +22,9 @@ def set_text(view, text):
 
 
 def add_selection(view, a=0, b=0):
+    if isinstance(a, sublime.Region):
+        view.sel().add(a)
+        return
     view.sel().add(sublime.Region(a, b))
 
 
