@@ -1034,8 +1034,13 @@ class _vi_k_motion(sublime_plugin.TextCommand):
 
                 if is_long_enough:
                     if s.a < s.b:
+                        # FIXME: The following if-else could use some brains.
                         offset = 0
                         if xpos == 0 and not crosses_a:
+                            offset = 1
+                        elif xpos == 0 and crosses_a:
+                            pass
+                        else:
                             offset = 1
                         start = s.a if not crosses_a else s.a + 1
                         return sublime.Region(start, view.text_point(target_row, xpos + offset))

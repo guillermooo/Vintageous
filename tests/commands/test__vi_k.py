@@ -85,94 +85,94 @@ class Test_vi_k_InNormalMode(BufferTest):
 class Test_vi_k_InVisualMode(BufferTest):
     def testMoveOne(self):
         set_text(self.view, 'foo\nbar\nbaz\n')
-        original = make_region_at_row(self.view, row=1, col=1, size=1)
-        add_selection(self.view, original)
+        add_selection(self.view, self.R((1, 1), (1, 2)))
 
-        self.view.run_command('_vi_k_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
+        self.view.run_command('_vi_k_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 2})
 
-        expected = make_region_at_row(self.view, row=0, col=1, size=1)
-        expected = self.R(original.end(), expected.a)
+        expected = self.R((1, 2), (0, 2))
         self.assertEqual(expected, first_sel(self.view))
 
     def testMoveOppositeEndGreaterWithSelOfSize1(self):
         set_text(self.view, 'foo\nbar\nbaz\n')
-        original = make_region_at_row(self.view, row=2, col=1, size=1)
-        add_selection(self.view, self.R(original.b, original.a))
+        add_selection(self.view, self.R((2, 1), (2, 2)))
 
-        self.view.run_command('_vi_k_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
+        self.view.run_command('_vi_k_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 2})
 
-        expected = make_region_at_row(self.view, row=1, col=1, size=1)
-        expected = self.R(original.end(), expected.a)
+        expected = self.R((2, 2), (1, 2))
         self.assertEqual(expected, first_sel(self.view))
 
     def testMoveOppositeEndSmallerWithSelOfSize2(self):
         set_text(self.view, 'foo\nbar\nbaz\n')
-        original = make_region_at_row(self.view, row=1, col=1, size=2)
-        add_selection(self.view, original)
+        add_selection(self.view, self.R((1, 1), (1, 3)))
 
-        self.view.run_command('_vi_k_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
+        self.view.run_command('_vi_k_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 3})
 
-        expected = make_region_at_row(self.view, row=0, col=1, size=1)
-        expected = self.R(original.a + 1, expected.a)
+        expected = self.R((1, 2), (0, 3))
         self.assertEqual(expected, first_sel(self.view))
 
     def testMoveOppositeEndSmallerWithSelOfSize3(self):
         set_text(self.view, 'foobar\nbarfoo\nbuzzfizz\n')
-        original = make_region_at_row(self.view, row=1, col=1, size=3)
-        add_selection(self.view, original)
+        add_selection(self.view, self.R((1, 1), (1, 4)))
 
         self.view.run_command('_vi_k_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 3})
 
-        expected = make_region_at_row(self.view, row=0, col=3, size=1)
-        expected = self.R(original.a + 1, expected.a)
+        expected = self.R((1, 2), (0, 3))
         self.assertEqual(expected, first_sel(self.view))
 
-#     # FIXME: This is wrong in the implementation.
+    # FIXME: This is wrong in the implementation.
     def testMoveWhenOppositeEndSmallerAndDifferentLinesNoCrossOver(self):
         set_text(self.view, 'foo\nbar\nbaz\n')
-        row1 = make_region_at_row(self.view, row=2, col=1, size=1)
-        row2 = make_region_at_row(self.view, row=0, col=1, size=1)
-        add_selection(self.view, self.R(row2.a, row1.b))
+        add_selection(self.view, self.R((0, 1), (2, 1)))
 
         self.view.run_command('_vi_k_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
 
-        expected = make_region_at_row(self.view, row=1, col=1, size=1)
-        expected = self.R(row2.a, expected.b)
+        expected = self.R((0, 1), (1, 2))
+        self.assertEqual(expected, first_sel(self.view))
+
+    def testMoveWhenOppositeEndSmallerAndDifferentLinesCrossOverXposAt0(self):
+        set_text(self.view, 'foo\nbar\nbaz\n')
+        add_selection(self.view, self.R((1, 0), (2, 1)))
+
+        self.view.run_command('_vi_k_motion', {'mode': MODE_VISUAL, 'count': 2, 'xpos': 0})
+
+        expected = self.R((1, 1), (0, 0))
         self.assertEqual(expected, first_sel(self.view))
 
     def testMoveBackToSameLineSameXpos(self):
         set_text(self.view, 'foo\nbar\nbaz\n')
-        row1 = make_region_at_row(self.view, row=1, col=1, size=1)
-        row2 = make_region_at_row(self.view, row=0, col=1, size=1)
-        add_selection(self.view, self.R(row2.a, row1.b))
+        add_selection(self.view, self.R((0, 1), (1, 1)))
 
         self.view.run_command('_vi_k_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
 
-        expected = make_region_at_row(self.view, row=0, col=1, size=1)
+        expected = self.R((0, 2), (0, 1))
         self.assertEqual(expected, first_sel(self.view))
 
     def testMoveBackToSameLineSmallerXposInCurrentLine(self):
         set_text(self.view, 'foo\nbar\nbaz\n')
-        row1 = make_region_at_row(self.view, row=1, col=0, size=1)
-        row2 = make_region_at_row(self.view, row=0, col=2, size=1)
-        add_selection(self.view, self.R(row2.a, row1.b))
+        add_selection(self.view, self.R((0, 2), (1, 0)))
 
         self.view.run_command('_vi_k_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 0})
 
-        expected = make_region_at_row(self.view, row=0, col=0, size=3)
-        expected = self.R(expected.b, expected.a)
+        expected = self.R((0, 3), (0, 0))
         self.assertEqual(expected, first_sel(self.view))
 
-#     def testMoveReversedDownFromSameLine(self):
-#         set_text(self.view, 'abc\nabc\nabc')
-#         add_selection(self.view, a=6, b=5)
+    def testMoveManyWithReversedSelectionStartingAtSameLine(self):
+        set_text(self.view, ''.join(('foo\n',) * 50))
+        add_selection(self.view, self.R((20, 2), (20, 1)))
 
-#         self.view.run_command('_vi_k_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
+        self.view.run_command('_vi_k_motion', {'mode': MODE_VISUAL, 'count': 10, 'xpos': 1})
 
-#         target = self.view.text_point(2, 2)
-#         expected = self.R(5, target)
+        expected = self.R((20, 2), (10, 1))
+        self.assertEqual(expected, first_sel(self.view))
 
-#         self.assertEqual(expected, first_sel(self.view))
+    def testMoveManyWithReversedSelectionStartingAtDifferentLines(self):
+        set_text(self.view, ''.join(('foo\n',) * 50))
+        add_selection(self.view, self.R((21, 2), (20, 1)))
+
+        self.view.run_command('_vi_k_motion', {'mode': MODE_VISUAL, 'count': 10, 'xpos': 1})
+
+        expected = self.R((21, 2), (10, 1))
+        self.assertEqual(expected, first_sel(self.view))
 
 #     def testMoveMany(self):
 #         set_text(self.view, ''.join(('abc\n',) * 60))

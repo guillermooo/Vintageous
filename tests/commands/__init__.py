@@ -24,7 +24,7 @@ def make_region(view, a, b):
         pt_a = view.text_point(*a)
         pt_b = view.text_point(*b)
         return sublime.Region(pt_a, pt_b)
-    except TypeError, ValueError:
+    except (TypeError, ValueError):
         pass
 
     if (isinstance(a, int) and isinstance(b, int)):
