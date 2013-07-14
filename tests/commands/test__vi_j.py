@@ -107,15 +107,60 @@ class Test_vi_j_InVisualMode(BufferTest):
 
         self.assertEqual(expected, first_sel(self.view))
 
-    # TODO: Fix this nonsense.
-    def testMoveOneReversedNoCrossOver(self):
+    def testMoveReversedNoCrossOver(self):
         set_text(self.view, 'abc\nabc\nabc')
-        add_selection(self.view, a=2, b=0)
+        add_selection(self.view, a=10, b=1)
 
         self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
 
-        target = self.view.text_point(1, 2)
+        target = self.view.text_point(1, 1)
         expected = self.R(10, target)
+
+        self.assertEqual(expected, first_sel(self.view))
+
+    # FIXME: This is wrong in the implementation.
+    def testMoveReversedCrossOver(self):
+        set_text(self.view, 'abc\nabc\nabc')
+        add_selection(self.view, a=6, b=1)
+
+        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL, 'count': 2, 'xpos': 1})
+
+        target = self.view.text_point(2, 2)
+        expected = self.R(5, target)
+
+        self.assertEqual(expected, first_sel(self.view))
+
+    # FIXME: This is wrong in the implementation.
+    def testMoveReversedCrossOverTooFar(self):
+        set_text(self.view, 'abc\nabc\nabc')
+        add_selection(self.view, a=6, b=1)
+
+        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL, 'count': 100, 'xpos': 1})
+
+        target = self.view.text_point(2, 2)
+        expected = self.R(5, target)
+
+        self.assertEqual(expected, first_sel(self.view))
+
+    def testMoveReversedBackToSameLine(self):
+        set_text(self.view, 'abc\nabc\nabc')
+        add_selection(self.view, a=6, b=1)
+
+        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
+
+        target = self.view.text_point(1, 1)
+        expected = self.R(target, 6)
+
+        self.assertEqual(expected, first_sel(self.view))
+
+    def testMoveReversedDownFromSameLine(self):
+        set_text(self.view, 'abc\nabc\nabc')
+        add_selection(self.view, a=6, b=5)
+
+        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
+
+        target = self.view.text_point(2, 2)
+        expected = self.R(5, target)
 
         self.assertEqual(expected, first_sel(self.view))
 
