@@ -201,7 +201,7 @@ def vi_k(vi_cmd_data):
 
     vi_cmd_data['must_update_xpos'] = False
 
-    vi_cmd_data['motion']['command'] = '_vi_k_motion'
+    vi_cmd_data['motion']['command'] = '_vi_k'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'xpos': vi_cmd_data['xpos']}
     vi_cmd_data['count'] = 1
     vi_cmd_data['scroll_into_view'] = True
@@ -596,7 +596,7 @@ def vi_enter(vi_cmd_data):
 
 
 def vi_shift_enter(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_k_motion'
+    vi_cmd_data['motion']['command'] = '_vi_k'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': 1, 'xpos': 0}
     vi_cmd_data['post_motion'] = [['_vi_shift_enter_post_motion', {'mode': vi_cmd_data['mode']}]]
 

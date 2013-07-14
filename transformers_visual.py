@@ -970,7 +970,7 @@ class _vi_j(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
-class _vi_k_motion(sublime_plugin.TextCommand):
+class _vi_k(sublime_plugin.TextCommand):
     def previous_non_folded_pt(self, pt):
         # FIXME: If we have two contiguous folds, this method will fail.
         # Handle folded regions.
