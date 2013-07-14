@@ -14,11 +14,18 @@ from Vintageous.tests.commands import BufferTest
 
 class Test_vi_big_g_InNormalMode(BufferTest):
     def testCanMoveInNormalMode(self):
-        set_text(self.view, 'abc\nabc\n')
+        set_text(self.view, 'abc\nabc')
         add_selection(self.view, a=0, b=0)
 
         self.view.run_command('_vi_big_g', {'mode': MODE_NORMAL, 'count': 1})
         self.assertEqual(self.R(6, 6), first_sel(self.view))
+
+    def testGoToHardEofIfLastLineIsEmpty(self):
+        set_text(self.view, 'abc\nabc\n')
+        add_selection(self.view, a=0, b=0)
+
+        self.view.run_command('_vi_big_g', {'mode': MODE_NORMAL, 'count': 1})
+        self.assertEqual(self.R(8, 8), first_sel(self.view))
 
 
 class Test_vi_big_g_InVisualMode(BufferTest):

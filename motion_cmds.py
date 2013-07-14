@@ -1281,7 +1281,9 @@ class _vi_big_g(sublime_plugin.TextCommand):
     def run(self, edit, mode=None, count=None):
         def f(view, s):
             if mode == MODE_NORMAL:
-                pt = utils.previous_non_white_space_char(view, eof - 1,
+                pt = eof
+                if not view.line(eof).empty():
+                    pt = utils.previous_non_white_space_char(view, eof - 1,
                                                          white_space='\n')
                 return sublime.Region(pt, pt)
 
