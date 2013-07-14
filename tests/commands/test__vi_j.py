@@ -12,6 +12,7 @@ from Vintageous.tests.commands import first_sel
 from Vintageous.tests.commands import BufferTest
 
 
+# TODO: Test against folded regions.
 # TODO: Ensure that we only create empty selections while testing. Add assert_all_sels_empty()?
 class Test_vi_j_InNormalMode(BufferTest):
     def testMoveOne(self):

@@ -937,8 +937,7 @@ class _vi_j(sublime_plugin.TextCommand):
                     elif s.a > s.b:
                         start = s.a if not crosses_a else s.a - 1
                         end = view.text_point(target_row, xpos)
-                        if crosses_a and xpos == 0:
-                            end += 1
+                        end = end if (end < s.a) else end + 1
                         return sublime.Region(start, end)
                 else:
                     if s.a < s.b:
