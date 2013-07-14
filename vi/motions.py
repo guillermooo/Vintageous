@@ -185,7 +185,7 @@ def vi_j(vi_cmd_data):
 
     vi_cmd_data['must_update_xpos'] = False
 
-    vi_cmd_data['motion']['command'] = '_vi_j_motion'
+    vi_cmd_data['motion']['command'] = '_vi_j'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'xpos': vi_cmd_data['xpos']}
     vi_cmd_data['count'] = 1
     # We handle this on our own?
@@ -585,7 +585,7 @@ def vi_g_octothorp(vi_cmd_data):
 
 def vi_enter(vi_cmd_data):
     # TODO: Improve post_motion: should leave caret at first non-white space char.
-    vi_cmd_data['motion']['command'] = '_vi_j_motion'
+    vi_cmd_data['motion']['command'] = '_vi_j'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': 1, 'xpos': 0}
     vi_cmd_data['post_action'] = ['_vi_move_caret_to_first_non_white_space_character', {'mode': vi_cmd_data['mode']}]
 

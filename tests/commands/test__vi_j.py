@@ -12,15 +12,13 @@ from Vintageous.tests.commands import first_sel
 from Vintageous.tests.commands import BufferTest
 
 
-# TODO: Rename _vi_j_motion.
-# TODO: Remove 'extend' param.
 # TODO: Ensure that we only create empty selections while testing. Add assert_all_sels_empty()?
 class Test_vi_j_InNormalMode(BufferTest):
     def testMoveOne(self):
         set_text(self.view, 'abc\nabc\nabc')
         add_selection(self.view, a=1, b=1)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_NORMAL, 'count': 1, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': MODE_NORMAL, 'count': 1, 'xpos': 1})
 
         target = self.view.text_point(1, 1)
         expected = self.R(target, target)
@@ -31,7 +29,7 @@ class Test_vi_j_InNormalMode(BufferTest):
         set_text(self.view, ''.join(('abc\n',) * 60))
         add_selection(self.view, a=1, b=1)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_NORMAL, 'count': 50, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': MODE_NORMAL, 'count': 50, 'xpos': 1})
 
         target = self.view.text_point(50, 1)
         expected = self.R(target, target)
@@ -42,7 +40,7 @@ class Test_vi_j_InNormalMode(BufferTest):
         set_text(self.view, 'foo\nfoo bar\nfoo bar')
         add_selection(self.view, a=1, b=1)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_NORMAL, 'count': 1, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': MODE_NORMAL, 'count': 1, 'xpos': 1})
 
         target = self.view.text_point(1, 1)
         expected = self.R(target, target)
@@ -53,7 +51,7 @@ class Test_vi_j_InNormalMode(BufferTest):
         set_text(self.view, 'foo bar\nfoo\nbar')
         add_selection(self.view, a=5, b=5)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_NORMAL, 'count': 1, 'xpos': 5})
+        self.view.run_command('_vi_j', {'mode': MODE_NORMAL, 'count': 1, 'xpos': 5})
 
         target = self.view.text_point(1, 0)
         target = self.view.line(target).b - 1
@@ -65,7 +63,7 @@ class Test_vi_j_InNormalMode(BufferTest):
         set_text(self.view, '\nfoo\nbar')
         add_selection(self.view, a=0, b=0)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_NORMAL, 'count': 1, 'xpos': 0})
+        self.view.run_command('_vi_j', {'mode': MODE_NORMAL, 'count': 1, 'xpos': 0})
 
         target = self.view.text_point(1, 0)
         expected = self.R(target, target)
@@ -76,7 +74,7 @@ class Test_vi_j_InNormalMode(BufferTest):
         set_text(self.view, '\n\nbar')
         add_selection(self.view, a=0, b=0)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_NORMAL, 'count': 1, 'xpos': 0})
+        self.view.run_command('_vi_j', {'mode': MODE_NORMAL, 'count': 1, 'xpos': 0})
 
         target = self.view.text_point(1, 0)
         expected = self.R(target, target)
@@ -87,7 +85,7 @@ class Test_vi_j_InNormalMode(BufferTest):
         set_text(self.view, 'foo\nbar\nbaz')
         add_selection(self.view, a=1, b=1)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_NORMAL, 'count': 10000, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': MODE_NORMAL, 'count': 10000, 'xpos': 1})
 
         target = self.view.text_point(2, 1)
         expected = self.R(target, target)
@@ -100,7 +98,7 @@ class Test_vi_j_InVisualMode(BufferTest):
         set_text(self.view, 'abc\nabc\nabc')
         add_selection(self.view, a=1, b=2)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
 
         target = self.view.text_point(1, 2)
         expected = self.R(1, target)
@@ -111,7 +109,7 @@ class Test_vi_j_InVisualMode(BufferTest):
         set_text(self.view, 'abc\nabc\nabc')
         add_selection(self.view, a=10, b=1)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
 
         target = self.view.text_point(1, 1)
         expected = self.R(10, target)
@@ -123,7 +121,7 @@ class Test_vi_j_InVisualMode(BufferTest):
         set_text(self.view, 'abc\nabc\nabc')
         add_selection(self.view, a=6, b=1)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL, 'count': 2, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': MODE_VISUAL, 'count': 2, 'xpos': 1})
 
         target = self.view.text_point(2, 2)
         expected = self.R(5, target)
@@ -135,7 +133,7 @@ class Test_vi_j_InVisualMode(BufferTest):
         set_text(self.view, 'abc\nabc\nabc')
         add_selection(self.view, a=6, b=1)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL, 'count': 100, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': MODE_VISUAL, 'count': 100, 'xpos': 1})
 
         target = self.view.text_point(2, 2)
         expected = self.R(5, target)
@@ -146,7 +144,7 @@ class Test_vi_j_InVisualMode(BufferTest):
         set_text(self.view, 'abc\nabc\nabc')
         add_selection(self.view, a=6, b=1)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
 
         target = self.view.text_point(1, 1)
         expected = self.R(target, 6)
@@ -157,7 +155,7 @@ class Test_vi_j_InVisualMode(BufferTest):
         set_text(self.view, 'abc\nabc\nabc')
         add_selection(self.view, a=6, b=5)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
 
         target = self.view.text_point(2, 2)
         expected = self.R(5, target)
@@ -168,7 +166,7 @@ class Test_vi_j_InVisualMode(BufferTest):
         set_text(self.view, ''.join(('abc\n',) * 60))
         add_selection(self.view, a=1, b=2)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL, 'count': 50, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': MODE_VISUAL, 'count': 50, 'xpos': 1})
 
         target = self.view.text_point(50, 2)
         expected = self.R(1, target)
@@ -179,7 +177,7 @@ class Test_vi_j_InVisualMode(BufferTest):
         set_text(self.view, 'foo\nfoo bar\nfoo bar')
         add_selection(self.view, a=1, b=2)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 1})
 
         target = self.view.text_point(1, 2)
         expected = self.R(1, target)
@@ -190,7 +188,7 @@ class Test_vi_j_InVisualMode(BufferTest):
         set_text(self.view, 'foo bar\nfoo\nbar')
         add_selection(self.view, a=5, b=6)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 5})
+        self.view.run_command('_vi_j', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 5})
 
         target = self.view.text_point(1, 0)
         target = self.view.full_line(target).b
@@ -202,7 +200,7 @@ class Test_vi_j_InVisualMode(BufferTest):
         set_text(self.view, '\nfoo\nbar')
         add_selection(self.view, a=0, b=1)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 0})
+        self.view.run_command('_vi_j', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 0})
 
         target = self.view.text_point(1, 1)
         expected = self.R(0, target)
@@ -213,7 +211,7 @@ class Test_vi_j_InVisualMode(BufferTest):
         set_text(self.view, '\n\nbar')
         add_selection(self.view, a=0, b=1)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 0})
+        self.view.run_command('_vi_j', {'mode': MODE_VISUAL, 'count': 1, 'xpos': 0})
 
         target = self.view.text_point(1, 1)
         expected = self.R(0, target)
@@ -224,7 +222,7 @@ class Test_vi_j_InVisualMode(BufferTest):
         set_text(self.view, 'foo\nbar\nbaz')
         add_selection(self.view, a=1, b=2)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL, 'count': 10000, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': MODE_VISUAL, 'count': 10000, 'xpos': 1})
 
         target = self.view.text_point(2, 2)
         expected = self.R(1, target)
@@ -238,7 +236,7 @@ class Test_vi_j_InInternalNormalMode(BufferTest):
         set_text(self.view, 'abc\nabc\nabc')
         add_selection(self.view, a=1, b=1)
 
-        self.view.run_command('_vi_j_motion', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1, 'xpos': 1})
 
         target = self.view.text_point(1, 0)
         target = self.view.full_line(target).b
@@ -250,7 +248,7 @@ class Test_vi_j_InInternalNormalMode(BufferTest):
         set_text(self.view, ''.join(('abc\n',) * 60))
         add_selection(self.view, a=1, b=1)
 
-        self.view.run_command('_vi_j_motion', {'mode': _MODE_INTERNAL_NORMAL, 'count': 50, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': _MODE_INTERNAL_NORMAL, 'count': 50, 'xpos': 1})
 
         target = self.view.text_point(50, 2)
         target = self.view.full_line(target).b
@@ -262,7 +260,7 @@ class Test_vi_j_InInternalNormalMode(BufferTest):
         set_text(self.view, 'foo\nfoo bar\nfoo bar')
         add_selection(self.view, a=1, b=1)
 
-        self.view.run_command('_vi_j_motion', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1, 'xpos': 1})
 
         target = self.view.text_point(1, 0)
         target = self.view.full_line(target).b
@@ -274,7 +272,7 @@ class Test_vi_j_InInternalNormalMode(BufferTest):
         set_text(self.view, 'foo bar\nfoo\nbar')
         add_selection(self.view, a=5, b=5)
 
-        self.view.run_command('_vi_j_motion', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1, 'xpos': 5})
+        self.view.run_command('_vi_j', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1, 'xpos': 5})
 
         target = self.view.text_point(1, 0)
         target = self.view.full_line(target).b
@@ -286,7 +284,7 @@ class Test_vi_j_InInternalNormalMode(BufferTest):
         set_text(self.view, '\nfoo\nbar')
         add_selection(self.view, a=0, b=0)
 
-        self.view.run_command('_vi_j_motion', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1, 'xpos': 0})
+        self.view.run_command('_vi_j', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1, 'xpos': 0})
 
         target = self.view.text_point(1, 0)
         target = self.view.full_line(target).b
@@ -298,7 +296,7 @@ class Test_vi_j_InInternalNormalMode(BufferTest):
         set_text(self.view, '\n\nbar')
         add_selection(self.view, a=0, b=0)
 
-        self.view.run_command('_vi_j_motion', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1, 'xpos': 0})
+        self.view.run_command('_vi_j', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1, 'xpos': 0})
 
         target = self.view.text_point(1, 0)
         target = self.view.full_line(target).b
@@ -310,7 +308,7 @@ class Test_vi_j_InInternalNormalMode(BufferTest):
         set_text(self.view, 'foo\nbar\nbaz')
         add_selection(self.view, a=1, b=1)
 
-        self.view.run_command('_vi_j_motion', {'mode': _MODE_INTERNAL_NORMAL, 'count': 10000, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': _MODE_INTERNAL_NORMAL, 'count': 10000, 'xpos': 1})
 
         target = self.view.text_point(2, 0)
         target = self.view.full_line(target).b
@@ -324,7 +322,7 @@ class Test_vi_j_InVisualLineMode(BufferTest):
         set_text(self.view, 'abc\nabc\nabc')
         add_selection(self.view, a=0, b=4)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL_LINE, 'count': 1, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': MODE_VISUAL_LINE, 'count': 1, 'xpos': 1})
 
         target = self.view.text_point(1, 0)
         target = self.view.full_line(target).b
@@ -336,7 +334,7 @@ class Test_vi_j_InVisualLineMode(BufferTest):
         set_text(self.view, ''.join(('abc\n',) * 60))
         add_selection(self.view, a=0, b=4)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL_LINE, 'count': 50, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': MODE_VISUAL_LINE, 'count': 50, 'xpos': 1})
 
         target = self.view.text_point(50, 0)
         target = self.view.full_line(target).b
@@ -348,7 +346,7 @@ class Test_vi_j_InVisualLineMode(BufferTest):
         set_text(self.view, '\nfoo\nbar')
         add_selection(self.view, a=0, b=1)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL_LINE, 'count': 1, 'xpos': 0})
+        self.view.run_command('_vi_j', {'mode': MODE_VISUAL_LINE, 'count': 1, 'xpos': 0})
 
         target = self.view.text_point(1, 0)
         target = self.view.full_line(target).b
@@ -360,7 +358,7 @@ class Test_vi_j_InVisualLineMode(BufferTest):
         set_text(self.view, '\n\nbar')
         add_selection(self.view, a=0, b=1)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL_LINE, 'count': 1, 'xpos': 0})
+        self.view.run_command('_vi_j', {'mode': MODE_VISUAL_LINE, 'count': 1, 'xpos': 0})
 
         target = self.view.text_point(1, 0)
         target = self.view.full_line(target).b
@@ -372,7 +370,7 @@ class Test_vi_j_InVisualLineMode(BufferTest):
         set_text(self.view, 'foo\nbar\nbaz')
         add_selection(self.view, a=0, b=4)
 
-        self.view.run_command('_vi_j_motion', {'mode': MODE_VISUAL_LINE, 'count': 10000, 'xpos': 1})
+        self.view.run_command('_vi_j', {'mode': MODE_VISUAL_LINE, 'count': 10000, 'xpos': 1})
 
         target = self.view.text_point(2, 0)
         target = self.view.full_line(target).b
