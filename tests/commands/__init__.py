@@ -12,6 +12,11 @@ class BufferTest(unittest.TestCase):
         self.R = sublime.Region
 
 
+def make_region_at_row(view, line=0, col=0, size=0):
+    pt = view.text_point(line, col)
+    return sublime.Region(pt, pt + size)
+
+
 def set_text(view, text):
     view.run_command('write_to_buffer', {'text': text, 'file_name': view.file_name()})
 
