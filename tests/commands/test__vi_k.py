@@ -16,7 +16,6 @@ from Vintageous.tests.commands import BufferTest
 # TODO: Test against folded regions.
 # TODO: Ensure that we only create empty selections while testing. Add assert_all_sels_empty()?
 # TODO: Test different values for xpos in combination with the starting col.
-# TODO: Rename motion.
 class Test_vi_k_InNormalMode(BufferTest):
     def testMoveOne(self):
         set_text(self.view, 'abc\nabc\nabc')
