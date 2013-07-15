@@ -1270,7 +1270,7 @@ class _vi_g__(sublime_plugin.TextCommand):
 
             elif mode == _MODE_INTERNAL_NORMAL:
                 eol = view.line(s.b).b
-                return sublime.Region(s.a, eol - 1)
+                return sublime.Region(s.a, eol)
 
             return s
 
