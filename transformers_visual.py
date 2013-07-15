@@ -983,7 +983,7 @@ class _vi_k(sublime_plugin.TextCommand):
             pass
         return pt
 
-    def run(self, edit, count=None, extend=False, mode=None, xpos=0):
+    def run(self, edit, count=None, mode=None, xpos=0):
         def f(view, s):
             if mode == MODE_NORMAL:
                 current_row = view.rowcol(s.b)[0]
