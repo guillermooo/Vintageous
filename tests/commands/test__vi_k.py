@@ -137,6 +137,15 @@ class Test_vi_k_InVisualMode(BufferTest):
         expected = self.R((1, 1), (0, 0))
         self.assertEqual(expected, first_sel(self.view))
 
+    def testMove_OppositeEndSmaller_DifferentLines_CrossOver_Non0Xpos(self):
+        set_text(self.view, 'foo bar\nfoo bar\nfoo bar\n')
+        add_selection(self.view, self.R((1, 4), (2, 4)))
+
+        self.view.run_command('_vi_k', {'mode': MODE_VISUAL, 'count': 2, 'xpos': 4})
+
+        expected = self.R((1, 5), (0, 4))
+        self.assertEqual(expected, first_sel(self.view))
+
     def testMoveBackToSameLineSameXpos(self):
         set_text(self.view, 'foo\nbar\nbaz\n')
         add_selection(self.view, self.R((0, 1), (1, 1)))

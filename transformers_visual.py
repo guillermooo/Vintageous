@@ -1038,7 +1038,7 @@ class _vi_k(sublime_plugin.TextCommand):
                         offset = 0
                         if xpos == 0 and not crosses_a:
                             offset = 1
-                        elif xpos == 0 and crosses_a:
+                        elif crosses_a:
                             pass
                         else:
                             offset = 1
