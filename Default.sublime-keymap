@@ -179,7 +179,6 @@
 
 	// TODO: Restrict this to when there's no count, action or motion.
 	{ "keys": ["\""], "command": "set_register", "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["<character>"], "command": "set_register", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_register"}] },
 
 	{ "keys": ["m"], "command": "set_action", "args": {"action": "vi_m"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["'"], "command": "set_motion", "args": {"motion": "vi_quote"}, "context": [{"key": "setting.command_mode"}] },
@@ -262,6 +261,7 @@
  	{ "keys": ["down"], "command": "cycle_cmdline_history", "context": [{"key": "vi_is_cmdline"}] },
 	// =============================================================================================================================
 
+	{ "keys": ["<character>"], "command": "set_register", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_register"}] },
 	// Collects user input for commands such as t, f, T, F.
 	// XXX: Seems to need to come after every other key binding so it will catch every character. Investigate this.
 	// FIXME: Won't capture '\n'... Perhaps it's a limitation of Sublime Text?
