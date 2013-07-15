@@ -19,6 +19,9 @@ from Vintageous.vi.constants import DIGRAPH_ACTION
 from Vintageous.state import _init_vintageous
 from Vintageous.vi.cmd_data import CmdData
 from Vintageous.vi import utils
+from Vintageous.tests.commands import set_text
+from Vintageous.tests.commands import add_selection
+from Vintageous.tests.commands import make_region
 import Vintageous.state
 
 
@@ -262,12 +265,16 @@ class TestVintageStateProperties(TestCaseUsingView):
         self.assertEqual(self.state.register, 'foo')
 
     def testCantSetUserInput(self):
+        self.state.user_input_parsers.append(lambda x: True)
+        self.state.motion = 'bogus'
         self.state.user_input = 'foo'
-        self.assertEqual(self.state.view.settings().get('vintage')['user_input'], 'foo')
+        self.assertEqual(self.state.view.settings().get('vintage')['user_motion_input'], 'foo')
 
     def testCantGetUserInput(self):
+        self.state.user_input_parsers.append(lambda x: True)
+        self.state.motion = 'bogus'
         self.state.user_input = 'foo'
-        self.assertEqual(self.state.user_input, 'foo')
+        self.assertEqual(self.state.settings.vi['user_motion_input'], 'foo')
 
     def testCantSetExpectingRegister(self):
         self.state.expecting_register = 'foo'
@@ -342,6 +349,7 @@ class Test_reset(TestCaseUsingView):
         self.state.action = 'action'
         self.state.motion = 'motion'
         self.state.register = 'register'
+        self.state.user_input_parsers.append(lambda x: True)
         self.state.user_input = 'user_input'
         self.state.expecting_register = 'expecting_register'
         self.state.expecting_user_input = 'expecting_user_input'
@@ -355,7 +363,7 @@ class Test_reset(TestCaseUsingView):
         self.assertEqual(self.state.action, None)
         self.assertEqual(self.state.motion, None)
         self.assertEqual(self.state.register, None)
-        self.assertEqual(self.state.user_input, None)
+        self.assertEqual(self.state.user_input, '')
         self.assertEqual(self.state.expecting_register, False)
         self.assertEqual(self.state.expecting_user_input, False)
         self.assertEqual(self.state.cancel_action, False)
@@ -572,8 +580,10 @@ class Test_user_provided_count(TestCaseUsingView):
 class Test_user_input_Setter(TestCaseUsingView):
     def testResetsExpectingUserInputFlag(self):
         self.state.expecting_user_input = True
+        self.state.motion = 'bogus'
+        self.state.user_input_parsers.append(lambda x: True)
         self.state.user_input = 'x'
-        self.assertEqual(self.state.user_input, 'x')
+        self.assertEqual(self.state.settings.vi['user_motion_input'], 'x')
         self.assertFalse(self.state.expecting_user_input)
 
 
@@ -618,17 +628,18 @@ class Test_parse_motion(TestCaseUsingView):
     def testSetsXposToTheCurrentXposInTheView(self):
         self.state.view.sel().clear()
 
-        pt = self.state.view.text_point(10, 10)
+        set_text(self.state.view, 'foobar foobar\nfoobar foobar\n')
+        pt = self.state.view.text_point(1, 10)
         self.state.view.sel().add(sublime.Region(pt, pt))
 
         cmd_data = self.state.parse_motion()
-        self.assertEqual(cmd_data['xpos'], (10, 10))
+        self.assertEqual(cmd_data['xpos'], (1, 10))
 
-        pt = self.state.view.text_point(10, 10)
+        pt = self.state.view.text_point(1, 10)
         self.state.view.sel().add(sublime.Region(pt, pt + 1))
 
         cmd_data = self.state.parse_motion()
-        self.assertEqual(cmd_data['xpos'], (10, 11))
+        self.assertEqual(cmd_data['xpos'], (1, 11))
 
     def testCmdDataDoesntChangeIfNoMotionProvided(self):
         cmd_data = CmdData(self.state)
@@ -645,8 +656,8 @@ class Test_parse_motion(TestCaseUsingView):
     def testActionAndMotionInNormalModeSwitchesToInternalNormalMode(self):
         self.state.mode = MODE_NORMAL
         # FIXME: We're introducing a dependency in this test.
+        self.state.action = 'vi_d'
         self.state.motion = 'vi_l'
-        self.state.action = 'bar'
         cmd_data = self.state.parse_motion()
         self.assertEqual(cmd_data['mode'], _MODE_INTERNAL_NORMAL)
 
@@ -759,7 +770,7 @@ class Test_eval_cancel_action(TestCaseUsingView):
 
 class Test_eval_full_command(TestCaseUsingView):
     def testFollowsDefaultPathIfIsNotDigraphStart(self):
-        data = {
+        vi_cmd_data = {
             'is_digraph_start': False,
             '_mark_groups_for_gluing': False
         }
@@ -769,19 +780,22 @@ class Test_eval_full_command(TestCaseUsingView):
              mock.patch.object(self.state.view, 'run_command') as rc, \
              mock.patch.object(self.state, 'reset') as res:
 
-                pm.return_value = 'foo'
-                pa.return_value = data
+                pm.return_value = vi_cmd_data
+                pa.return_value = vi_cmd_data
 
                 self.state.eval_full_command()
 
                 self.assertEqual(pm.call_count, 1)
-                pa.assert_called_once_with('foo')
+                pa.assert_called_once_with(vi_cmd_data)
                 self.assertEqual(rc.call_count, 1)
-                rc.assert_called_once_with('vi_run', data)
+                rc.assert_called_once_with('vi_run', vi_cmd_data)
                 self.assertEqual(res.call_count, 1)
 
     def testFollowsExpectedPatIfNotDigraphStartAndMustMarkUndoGroups(self):
-        data = {
+        motion_vi_cmd_data = {
+            'is_digraph_start': False,
+        }
+        vi_cmd_data = {
             'is_digraph_start': False,
             '_mark_groups_for_gluing': True
         }
@@ -791,18 +805,21 @@ class Test_eval_full_command(TestCaseUsingView):
              mock.patch.object(self.state.view, 'run_command') as rc, \
              mock.patch.object(self.state, 'reset') as res:
 
-                pm.return_value = 'foo'
-                pa.return_value = data
+                pm.return_value = motion_vi_cmd_data
+                pa.return_value = vi_cmd_data
 
                 self.state.eval_full_command()
 
                 self.assertEqual(pm.call_count, 1)
-                pa.assert_called_once_with('foo')
+                pa.assert_called_once_with(motion_vi_cmd_data)
                 self.assertEqual(rc.call_count, 2)
-                self.assertEqual(rc.call_args_list, [mock.call('maybe_mark_undo_groups_for_gluing'), mock.call('vi_run', data)])
+                self.assertEqual(rc.call_args_list, [mock.call('maybe_mark_undo_groups_for_gluing'), mock.call('vi_run', vi_cmd_data)])
                 self.assertEqual(res.call_count, 1)
 
     def testFollowsExpectedDefaultPathForDigraphsModeNormal(self):
+        motion_vi_cmd_data = {
+            'is_digraph_start': False,
+        }
         vi_cmd_data = {
             'is_digraph_start': True,
             '_exit_mode': MODE_NORMAL
@@ -815,17 +832,20 @@ class Test_eval_full_command(TestCaseUsingView):
              mock.patch.object(self.state.view, 'run_command') as rc, \
              mock.patch.object(self.state, 'reset') as res:
 
-                pm.return_value = 'foo'
+                pm.return_value = motion_vi_cmd_data
                 pa.return_value = vi_cmd_data
 
                 self.state.eval_full_command()
 
                 self.assertEqual(pm.call_count, 1)
-                pa.assert_called_once_with('foo')
+                pa.assert_called_once_with(motion_vi_cmd_data)
                 self.assertEqual(rc.call_count, 0)
 
 
     def testFollowsExpectedDefaultPathForDigraphsModeNotNormal(self):
+        motion_vi_cmd_data = {
+            'is_digraph_start': False,
+        }
         vi_cmd_data = {
             'is_digraph_start': True,
             '_exit_mode': MODE_NORMAL
@@ -839,18 +859,21 @@ class Test_eval_full_command(TestCaseUsingView):
              mock.patch.object(self.state, 'reset') as res, \
              mock.patch.object(self.state, 'enter_normal_mode') as en:
 
-                pm.return_value = 'foo'
+                pm.return_value = motion_vi_cmd_data
                 pa.return_value = vi_cmd_data
 
                 self.state.eval_full_command()
 
                 self.assertEqual(pm.call_count, 1)
-                pa.assert_called_once_with('foo')
+                pa.assert_called_once_with(motion_vi_cmd_data)
                 self.assertEqual(rc.call_count, 0)
                 self.assertEqual(en.call_count, 1)
                 self.assertEqual(res.call_count, 1)
 
     def testFollowsExpectedDefaultPathForDigraphsExitModeIsInsert(self):
+        motion_vi_cmd_data = {
+            'is_digraph_start': False,
+        }
         vi_cmd_data = {
             'is_digraph_start': True,
             '_exit_mode': MODE_INSERT
@@ -865,13 +888,13 @@ class Test_eval_full_command(TestCaseUsingView):
              mock.patch.object(utils, 'blink') as ub, \
              mock.patch.object(self.state, 'enter_insert_mode') as ei:
 
-                pm.return_value = 'foo'
+                pm.return_value = motion_vi_cmd_data
                 pa.return_value = vi_cmd_data
 
                 self.state.eval_full_command()
 
                 self.assertEqual(pm.call_count, 1)
-                pa.assert_called_once_with('foo')
+                pa.assert_called_once_with(motion_vi_cmd_data)
                 self.assertEqual(rc.call_count, 0)
                 self.assertEqual(ub.call_count, 1)
                 self.assertEqual(res.call_count, 1)
@@ -887,8 +910,7 @@ class Test_eval_lone_action(TestCaseUsingView):
         }
 
         with mock.patch.object(self.state, 'parse_motion') as pm, \
-             mock.patch.object(self.state, 'parse_action') as pa, \
-             mock.patch.object(self.state, 'update_status') as ups:
+             mock.patch.object(self.state, 'parse_action') as pa:
 
                 pm.return_value = 'foo'
                 pa.return_value = vi_cmd_data
@@ -897,7 +919,6 @@ class Test_eval_lone_action(TestCaseUsingView):
 
                 self.assertEqual(pm.call_count, 1)
                 pa.assert_called_once_with('foo')
-                self.assertEqual(ups.call_count, 0)
 
     def testFollowsDefaultPathIfDigraphStartAndMustChangeToModeNormal(self):
         vi_cmd_data = {
@@ -908,8 +929,7 @@ class Test_eval_lone_action(TestCaseUsingView):
 
         with mock.patch.object(self.state, 'parse_motion') as pm, \
              mock.patch.object(self.state, 'parse_action') as pa, \
-             mock.patch.object(self.state, 'enter_normal_mode') as enm, \
-             mock.patch.object(self.state, 'update_status') as ups:
+             mock.patch.object(self.state, 'enter_normal_mode') as enm:
 
                 pm.return_value = 'foo'
                 pa.return_value = vi_cmd_data
@@ -919,7 +939,6 @@ class Test_eval_lone_action(TestCaseUsingView):
                 self.assertEqual(pm.call_count, 1)
                 pa.assert_called_once_with('foo')
                 self.assertEqual(enm.call_count, 1)
-                self.assertEqual(ups.call_count, 0)
 
     def testFollowsDefaultPathIfNotDigraphStartAndNotMarkingUndoGroups(self):
         vi_cmd_data = {
@@ -931,8 +950,7 @@ class Test_eval_lone_action(TestCaseUsingView):
         with mock.patch.object(self.state, 'parse_motion') as pm, \
              mock.patch.object(self.state, 'parse_action') as pa, \
              mock.patch.object(self.state.view, 'run_command') as rc, \
-             mock.patch.object(self.state, 'reset') as res, \
-             mock.patch.object(self.state, 'update_status') as ups:
+             mock.patch.object(self.state, 'reset') as res:
 
                 pm.return_value = 'foo'
                 pa.return_value = vi_cmd_data
@@ -943,7 +961,6 @@ class Test_eval_lone_action(TestCaseUsingView):
                 pa.assert_called_once_with('foo')
                 rc.assert_called_once_with('vi_run', vi_cmd_data)
                 self.assertEqual(res.call_count, 1)
-                self.assertEqual(ups.call_count, 1)
 
     def testFollowsDefaultPathIfNotDigraphStartAndMarkingUndoGroups(self):
         vi_cmd_data = {
@@ -955,8 +972,7 @@ class Test_eval_lone_action(TestCaseUsingView):
         with mock.patch.object(self.state, 'parse_motion') as pm, \
              mock.patch.object(self.state, 'parse_action') as pa, \
              mock.patch.object(self.state.view, 'run_command') as rc, \
-             mock.patch.object(self.state, 'reset') as res, \
-             mock.patch.object(self.state, 'update_status') as ups:
+             mock.patch.object(self.state, 'reset') as res:
 
                 pm.return_value = 'foo'
                 pa.return_value = vi_cmd_data
@@ -967,12 +983,12 @@ class Test_eval_lone_action(TestCaseUsingView):
                 pa.assert_called_once_with('foo')
                 self.assertEqual(rc.call_args_list, [call('maybe_mark_undo_groups_for_gluing'), call('vi_run', vi_cmd_data)])
                 self.assertEqual(res.call_count, 1)
-                self.assertEqual(ups.call_count, 1)
 
 
 class Test_enter_normal_mode(TestCaseUsingView):
     def testSetsXpos(self):
         self.state.view.sel().clear()
+        set_text(self.state.view, 'foo bar\nfoo bar\n')
         pt = self.state.view.text_point(1, 5)
         self.state.view.sel().add(sublime.Region(pt, pt))
 
@@ -1073,7 +1089,8 @@ class Test_update_xpos(TestCaseUsingView):
     def testCanUpdateXposInNormalMode(self):
         self.state.mode = MODE_NORMAL
         self.state.view.sel().clear()
-        pt = self.state.view.text_point(5, 5)
+        set_text(self.state.view, 'foo bar\n')
+        pt = self.state.view.text_point(0, 5)
         self.state.view.sel().add(sublime.Region(pt, pt))
         self.state.update_xpos()
         self.assertEqual(self.state.xpos, 5)
@@ -1081,7 +1098,8 @@ class Test_update_xpos(TestCaseUsingView):
     def testCanUpdateXposInVisualMode(self):
         self.state.mode = MODE_VISUAL
         self.state.view.sel().clear()
-        pt = self.state.view.text_point(5, 5)
+        set_text(self.state.view, 'foo bar\n')
+        pt = self.state.view.text_point(0, 5)
         self.state.view.sel().add(sublime.Region(pt, pt + 1))
         self.state.update_xpos()
         self.assertEqual(self.state.xpos, 5)
@@ -1089,7 +1107,13 @@ class Test_update_xpos(TestCaseUsingView):
     def testCanUpdateXposInVisualModeReversedRegion(self):
         self.state.mode = MODE_VISUAL
         self.state.view.sel().clear()
-        pt = self.state.view.text_point(5, 5)
+        set_text(self.state.view, 'foo bar\n')
+        pt = self.state.view.text_point(0, 5)
         self.state.view.sel().add(sublime.Region(pt, pt - 1))
         self.state.update_xpos()
         self.assertEqual(self.state.xpos, 4)
+
+
+class Test_action_property(TestCaseUsingView):
+    def testDefaultsToNone(self):
+        self.assertIsNone(self.state.action)
