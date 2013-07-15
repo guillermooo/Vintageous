@@ -1117,3 +1117,30 @@ class Test_update_xpos(TestCaseUsingView):
 class Test_action_property(TestCaseUsingView):
     def testDefaultsToNone(self):
         self.assertIsNone(self.state.action)
+
+    def testCanSetUnknownAction(self):
+        self.state.action = 'xxx_foo_yyy'
+        self.assertEqual(self.state.action, 'xxx_foo_yyy')
+
+    def testCanSetSimpleAction(self):
+        self.state.action = 'vi_d'
+        self.assertEqual(self.state.action, 'vi_d')
+
+    def testCanSetPrefixAction(self):
+        self.state.action = 'vi_g_action'
+        self.assertEqual(self.state.action, 'vi_g_action')
+
+    def testCanSetPrefixedMotionFromAction(self):
+        self.state.action = 'vi_g_action'
+        self.state.action = 'vi_g_d'
+        self.assertEqual(self.state.motion, 'vi_g_d')
+
+    def testCanSetPrefixedAction(self):
+        self.state.action = 'vi_z_action'
+        self.state.action = 'vi_z_enter'
+        self.assertEqual(self.state.action, 'vi_z_enter')
+
+    def testMustCancelActionIfUnknownPrefixedAction(self):
+        self.state.action = 'vi_z_action'
+        self.state.action = 'xxx'
+        self.assertTrue(self.state.cancel_action)
