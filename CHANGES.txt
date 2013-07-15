@@ -1,4 +1,8 @@
-1.4.6 - 13/7/2013
+1.4.7 - 15/7/2013
+
+	- Re-enable " action in visual mode.
+
+1.4.6 - 15/7/2013
 	
 	- Improve G motion.
 	- Improve j motion.
