@@ -118,8 +118,7 @@ class Test_vi_k_InVisualMode(BufferTest):
         expected = self.R((1, 2), (0, 3))
         self.assertEqual(expected, first_sel(self.view))
 
-    # FIXME: This is wrong in the implementation.
-    def testMoveWhenOppositeEndSmallerAndDifferentLinesNoCrossOver(self):
+    def testMove_OppositeEndSmaller_DifferentLines_NoCrossOver(self):
         set_text(self.view, 'foo\nbar\nbaz\n')
         add_selection(self.view, self.R((0, 1), (2, 1)))
 
@@ -128,7 +127,7 @@ class Test_vi_k_InVisualMode(BufferTest):
         expected = self.R((0, 1), (1, 2))
         self.assertEqual(expected, first_sel(self.view))
 
-    def testMoveWhenOppositeEndSmallerAndDifferentLinesCrossOverXposAt0(self):
+    def testMove_OppositeEndSmaller_DifferentLines_CrossOver_XposAt0(self):
         set_text(self.view, 'foo\nbar\nbaz\n')
         add_selection(self.view, self.R((1, 0), (2, 1)))
 
@@ -155,7 +154,7 @@ class Test_vi_k_InVisualMode(BufferTest):
         expected = self.R((0, 2), (0, 1))
         self.assertEqual(expected, first_sel(self.view))
 
-    def testMoveBackToSameLineSmallerXposInCurrentLine(self):
+    def testMoveBackToSameLine_OppositeEndHasGreaterXpos(self):
         set_text(self.view, 'foo\nbar\nbaz\n')
         add_selection(self.view, self.R((0, 2), (1, 0)))
 
@@ -164,7 +163,7 @@ class Test_vi_k_InVisualMode(BufferTest):
         expected = self.R((0, 3), (0, 0))
         self.assertEqual(expected, first_sel(self.view))
 
-    def testMoveManyWithReversedSelectionStartingAtSameLine(self):
+    def testMoveMany_OppositeEndGreater_FromSameLine(self):
         set_text(self.view, ''.join(('foo\n',) * 50))
         add_selection(self.view, self.R((20, 2), (20, 1)))
 
@@ -173,7 +172,7 @@ class Test_vi_k_InVisualMode(BufferTest):
         expected = self.R((20, 2), (10, 1))
         self.assertEqual(expected, first_sel(self.view))
 
-    def testMoveManyWithReversedSelectionStartingAtDifferentLines(self):
+    def testMoveMany_OppositeEndGreater_DifferentLines(self):
         set_text(self.view, ''.join(('foo\n',) * 50))
         add_selection(self.view, self.R((21, 2), (20, 1)))
 
