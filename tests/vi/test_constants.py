@@ -19,6 +19,8 @@ from Vintageous.vi.constants import ACTIONS_EXITING_TO_INSERT_MODE
 from Vintageous.vi.constants import digraphs
 from Vintageous.vi.constants import mode_to_str
 from Vintageous.vi.constants import regions_transformer
+from Vintageous.vi.constants import ACTION_OR_MOTION
+from Vintageous.vi.constants import ACTION_ONLY
 
 
 class Test_constants(unittest.TestCase):
@@ -54,9 +56,12 @@ class Test_constants(unittest.TestCase):
                 ('vi_g_action', 'vi_g_q'),
                 ('vi_g_action', 'vi_g_v'),
                 ('vi_g_action', 'vi_g_h'),
+                ('vi_g_action', 'vi_t'),
+                ('vi_g_action', 'vi_big_t'),
                 ('vi_g_action', 'vi_g_e'),
                 ('vi_g_action', 'vi_gg'),
                 ('vi_g_action', 'vi_g_d'),
+                ('vi_g_action', 'vi_g__'),
                 ('vi_g_action', 'vi_g_big_d'),
                 ('vi_g_action', 'vi_g_star'),
                 ('vi_g_action', 'vi_g_octothorp'),
@@ -102,6 +107,9 @@ class Test_constants(unittest.TestCase):
             (('vi_g_action', 'vi_g_u'), ('vi_g_u', DIGRAPH_ACTION)),
             (('vi_g_action', 'vi_g_q'), ('vi_g_q', DIGRAPH_ACTION)),
             (('vi_g_action', 'vi_g_v'), ('vi_g_v', DIGRAPH_ACTION)),
+            (('vi_g_action', 'vi_g_h'), ('vi_enter_select_mode', DIGRAPH_ACTION)),
+            (('vi_g_action', 'vi_t'), ('vi_g_t', DIGRAPH_ACTION)),
+            (('vi_g_action', 'vi_big_t'), ('vi_g_big_t', DIGRAPH_ACTION)),
             (('vi_g_action', 'vi_g_e'), ('vi_g_e', DIGRAPH_MOTION)),
             (('vi_g_action', 'vi_gg'), ('vi_gg', DIGRAPH_MOTION)),
             (('vi_g_action', 'vi_g_d'), ('vi_g_d', DIGRAPH_MOTION)),
@@ -135,12 +143,12 @@ class Test_constants(unittest.TestCase):
 
 
     def testIncompleteActions(self):
-        expected = (
-            'vi_g_action',
-            'vi_z_action',
-            'vi_ctrl_w_action',
-            'vi_ctrl_r_action',
-        )
+        expected = {
+            'vi_g_action': ACTION_OR_MOTION,
+            'vi_z_action': ACTION_ONLY,
+            'vi_ctrl_w_action': ACTION_ONLY,
+            'vi_ctrl_r_action': ACTION_ONLY,
+        }
 
         self.assertEqual(expected, INCOMPLETE_ACTIONS)
 

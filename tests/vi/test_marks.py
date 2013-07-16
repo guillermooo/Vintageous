@@ -5,6 +5,9 @@ import sublime
 from Vintageous.test_runner import TestsState
 from Vintageous.vi import marks
 from Vintageous.state import VintageState
+from Vintageous.tests.commands import make_region
+from Vintageous.tests.commands import set_text
+from Vintageous.tests.commands import add_selection
 
 
 # XXX: Use the mock module instead?
@@ -46,10 +49,11 @@ class MarksTests(unittest.TestCase):
         self.assertEqual(self.marks.get_as_encoded_address('a'), sublime.Region(0, 0))
 
     def testCanRetrieveMarkInTheCurrentBufferAsTuple2(self):
+        set_text(TestsState.view, '\n'.join(('foo bar ' * 30,) * 50))
         TestsState.view.sel().clear()
-        TestsState.view.sel().add(sublime.Region(100, 100))
+        TestsState.view.sel().add(sublime.Region(25, 25))
         self.marks.add('a', TestsState.view)
-        self.assertEqual(self.marks.get_as_encoded_address('a'), sublime.Region(100, 100))
+        self.assertEqual(self.marks.get_as_encoded_address('a'), sublime.Region(25, 25))
 
     def testCanRetrieveMarkInADifferentBufferAsEncodedMark(self):
         view = View(id_=TestsState.view.view_id + 1, fname=r'C:\foo.txt')

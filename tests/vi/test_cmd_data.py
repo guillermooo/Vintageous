@@ -56,6 +56,8 @@ known_keys = [
     '_mark_groups_for_gluing',
     'populates_small_delete_register',
     'is_window_command',
+    'user_motion_input',
+    'user_action_input',
 ]
 
 
@@ -71,6 +73,7 @@ class Test_CmdData(unittest.TestCase):
         state.last_character_search = 700
         state.xpos = 800
         self.state = state
+        self.state.settings.vi = {'user_motion_input': 'foo', 'user_action_input': 'bar'}
         self.cmd_data = CmdData(self.state)
 
     def testHasExpectedAmountOfKeys(self):

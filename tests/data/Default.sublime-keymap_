@@ -33,15 +33,16 @@
 	{ "keys": ["A"], "command": "find_all_under",         "context": [{"key": "vi_mode_select"}] },
 	
 	{ "keys": ["down"], "command": "set_motion", "args": {"motion": "vi_j"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["up"], "command": "set_motion", "args": {"motion": "vi_k"},   "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["up"],   "command": "set_motion", "args": {"motion": "vi_k"},   "context": [{"key": "setting.command_mode"}] },
 
-	{ "keys": ["left"], "command": "set_motion", "args": {"motion": "vi_h"},  "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["left"],  "command": "set_motion", "args": {"motion": "vi_h"},  "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["right"], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "vi_mode_normal_or_visual"}] }, 
 
-	{ "keys": [" "], "command": "set_motion", "args": {"motion": "vi_l"},                     "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["enter"], "command": "set_motion", "args": {"motion": "vi_enter"},             "context": [{"key": "vi_mode_normal_or_any_visual"}] },
+	{ "keys": [" "],           "command": "set_motion", "args": {"motion": "vi_l"},           "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["enter"],       "command": "set_motion", "args": {"motion": "vi_enter"},       "context": [{"key": "vi_mode_normal_or_any_visual"}] },
 	{ "keys": ["shift+enter"], "command": "set_motion", "args": {"motion": "vi_shift_enter"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
-	{ "keys": ["ctrl+space"], "command": "set_motion", "args": {"motion": "vi_w"},            "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["ctrl+space"],  "command": "set_motion", "args": {"motion": "vi_w"},           "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["backspace"],   "command": "set_motion", "args": {"motion": "vi_h"},       	  "context": [{"key": "vi_mode_normal_or_any_visual"}] },
 
 	{ "keys": ["w"], "command": "set_motion", "args": {"motion": "vi_w"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["e"], "command": "set_motion", "args": {"motion": "vi_e"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
@@ -146,6 +147,7 @@
 	{ "keys": ["U"], "command": "set_action", "args": {"action": "vi_g_big_u"},     "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
 	{ "keys": ["u"], "command": "set_action", "args": {"action": "vi_g_u"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
 	{ "keys": ["q"], "command": "set_action", "args": {"action": "vi_g_q"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
+	{ "keys": ["_"], "command": "set_action", "args": {"action": "vi_g__"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
 	{ "keys": ["*"], "command": "set_action", "args": {"action": "vi_g_star"},      "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
 	{ "keys": ["#"], "command": "set_action", "args": {"action": "vi_g_octothorp"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
 	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_g_v"},         "context": [{"key": "vi_mode_normal"},       {"key": "vi_in_key_namespace", "operand": "g"}] },
@@ -178,36 +180,22 @@
 
 	// TODO: Restrict this to when there's no count, action or motion.
 	{ "keys": ["\""], "command": "set_register", "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["<character>"], "command": "set_register", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_register"}] },
 
-	// Twofold process: First set the motion, then collect user input and run global state.
-	{ "keys": ["f"], "command": "vi_f", "context": [{"key": "vi_mode_normal"}] },
-	{ "keys": ["f"], "command": "vi_f", "context": [{"key": "vi_mode_visual"}] },
-	// TODO: Is the following key binding needed?
-	{ "keys": ["<character>"], "command": "vi_f", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_user_input"}] },
+	{ "keys": ["m"], "command": "set_action", "args": {"action": "vi_m"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["'"], "command": "set_motion", "args": {"motion": "vi_quote"}, "context": [{"key": "setting.command_mode"}] },
 
-	{ "keys": ["m"], "command": "vi_m", "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["'"], "command": "vi_quote", "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["f"], "command": "set_motion", "args":{"motion": "vi_f"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["t"], "command": "set_motion", "args":{"motion": "vi_t"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["T"], "command": "set_motion", "args":{"motion": "vi_big_t"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["F"], "command": "set_motion", "args":{"motion": "vi_big_f"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 
-	// Repeats f
+	// Repeats f backward
 	{ "keys": [","], "command": "set_motion", "args":{"motion": "vi_comma"}, "context": [{"key": "vi_mode_normal"}] },
 	{ "keys": [","], "command": "set_motion", "args":{"motion": "vi_comma"}, "context": [{"key": "vi_mode_visual"}] },
 
-	// Repeats f backward
+	// Repeats f
 	{ "keys": [";"], "command": "set_motion", "args":{"motion": "vi_semicolon"}, "context": [{"key": "vi_mode_normal"}] },
 	{ "keys": [";"], "command": "set_motion", "args":{"motion": "vi_semicolon"}, "context": [{"key": "vi_mode_visual"}] },
-
-	// Twofold process: First set the motion, then collect user input and run global state.
-	{ "keys": ["t"], "command": "vi_t", "context": [{"key": "vi_mode_normal"},] },
-	{ "keys": ["t"], "command": "vi_t", "context": [{"key": "vi_mode_visual"},] },
-
-	// Twofold process: First set the motion, then collect user input and run global state.
-	{ "keys": ["T"], "command": "vi_big_t", "context": [{"key": "vi_mode_normal"}] },
-	{ "keys": ["T"], "command": "vi_big_t", "context": [{"key": "vi_mode_visual"}] },
-
-	// Twofold process: First set the motion, then collect user input and run global state.
-	{ "keys": ["F"], "command": "vi_big_f", "context": [{"key": "vi_mode_normal"}] },
-	{ "keys": ["F"], "command": "vi_big_f", "context": [{"key": "vi_mode_visual"}] },
 
 	{ "keys": ["/"], "command": "vi_buffer_search", "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["?"], "command": "vi_buffer_reverse_search", "context": [{"key": "setting.command_mode"}] },
@@ -227,7 +215,7 @@
 	{ "keys": ["a"], "command": "vi_i", "args": {"inclusive": true}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_action"}] },
 	{ "keys": ["a"], "command": "vi_i", "args": {"inclusive": true}, "context": [{"key": "vi_mode_visual"},] },
 
-	{ "keys": ["r"], "command": "vi_r", "context": [{"key": "vi_mode_normal"}, {"key": "vi_mode_normal"}] },
+	{ "keys": ["r"], "command": "set_action", "args": {"action": "vi_r"},     "context": [{"key": "vi_mode_normal"}] },
 	
 	{ "keys": [">"], "command": "set_action", "args": {"action": "vi_lambda"},     "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["<"], "command": "set_action", "args": {"action": "vi_antilambda"}, "context": [{"key": "setting.command_mode"}] },
@@ -243,9 +231,10 @@
 	{ "keys": ["t"],     "command": "set_action", "args": {"action": "vi_z_t"},      "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "z"}] },
 
 	// Ensure this key isn't captured when a key namespace is expecting further input.
-	{ "keys": ["q"], "command": "vi_q",  "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action", "operand": false}] },
-	{ "keys": ["q"], "command": "_vi_q", "context": [{"key": "vi_is_recording_macro"}] },
-	{ "keys": ["@"], "command": "vi_at", "context": [{"key": "vi_mode_normal"}] },
+	{ "keys": ["q"], "command": "set_action", "args": {"action": "vi_q"},  "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action", "operand": false}] },
+	// TODO: Can we have this command go the same path as others?
+	{ "keys": ["q"], "command": "_vi_q", 								   "context": [{"key": "vi_is_recording_macro"}] },
+	{ "keys": ["@"], "command": "set_action", "args": {"action": "vi_at"}, "context": [{"key": "vi_mode_normal"}] },
 
 	// Pane management
 	{ "keys": ["ctrl+w"], "command": "set_action", "args": {"action": "vi_ctrl_w_action"}, "context": [{"key": "setting.command_mode"}]},
@@ -273,6 +262,7 @@
  	{ "keys": ["down"], "command": "cycle_cmdline_history", "context": [{"key": "vi_is_cmdline"}] },
 	// =============================================================================================================================
 
+	{ "keys": ["<character>"], "command": "set_register", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_register"}] },
 	// Collects user input for commands such as t, f, T, F.
 	// XXX: Seems to need to come after every other key binding so it will catch every character. Investigate this.
 	// FIXME: Won't capture '\n'... Perhaps it's a limitation of Sublime Text?
