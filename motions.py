@@ -188,8 +188,10 @@ class ViReverseFindInLineInclusive(sublime_plugin.TextCommand):
                     if sublime.Region(s.b, pt) == s:
                         utils.blink()
                         return s
-                    if s.a < s.b:
+                    if s.a < s.b and pt < s.a:
                         return sublime.Region(s.a + 1, pt)
+                    if pt >= s.a:
+                        return sublime.Region(s.a, pt + 1)
                     return sublime.Region(s.a, pt)
 
                 if pt == s.b:
