@@ -1,3 +1,8 @@
+"""Action parsers.
+
+   Action commands go in Vintageous/actions.py; not here.
+"""
+
 # All data types stores in the ``vi_cmd_data`` dictionary must be valid for JSON.
 # The dictionary ends up being an argumento to an ST command.
 

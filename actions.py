@@ -1,3 +1,10 @@
+"""Sublime Text commands performing vim actions.
+
+   If you are implementing a new action command, stick it here.
+
+   Action parsers belong instead in Vintageous/vi/actions.py.
+"""
+
 import sublime
 import sublime_plugin
 

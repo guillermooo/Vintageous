@@ -1,3 +1,8 @@
+"""Motion parsers.
+
+   Motion commands go in Vintageous/motions.py; not here.
+"""
+
 from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL

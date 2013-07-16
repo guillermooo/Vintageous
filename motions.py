@@ -1,6 +1,8 @@
 """Sublime Text commands performing vim motions.
 
-   If you are implementing a new motion, stick it here.
+   If you are implementing a new motion command, stick it here.
+
+   Motion parsers belong instead in Vintageous/vi/motions.py.
 """
 
 # == NOTES ABOUT THE IMPLEMENTATION OF MOTION COMMANDS
