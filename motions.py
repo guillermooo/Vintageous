@@ -7,10 +7,10 @@
 
 # == NOTES ABOUT THE IMPLEMENTATION OF MOTION COMMANDS
 #
-# Motions, like actions, should be kept independent of state.VintageState. All necessary data to
-# run the command should be passed to it as arguments.
+# Keep motion commands decoupled from state.VintageState. Pass them all necessary state data as
+# arguments (and only JSON values).
 #
-# For example, don't do this:
+# For example, DON'T do this:
 #
 #   def run(self, ...):
 #       ...
@@ -18,17 +18,17 @@
 #       if state.mode == MODE_NORMAL:
 #           ...
 #
-# But do this instead:
+# But DO this instead:
 #
 #   def run(self, mode=None, ...):
 #       ...
 #       if mode == MODE_NORMAL:
 #           ...
 #
-#  Sublime Text commands must base its operation only off arguments so that macros, undo and
-#  repeat work as expected. However, there are exceptions.
+#  Sublime Text commands must base its operation on arguments so that macros, undo and repeat work
+#  as expected. (There may be, however, exceptions.)
 #
-#  Additionally, motion commands should be as independent of each other as possible. This is why
+#  Also, motion commands should be as independent of each other as possible. This is why
 #  keeping so many classes in the same file should not impair their comprehension.
 #
 # == MOTION COMMAND NAMING
