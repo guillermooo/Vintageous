@@ -847,3 +847,21 @@ class ExTabFirstCommand(sublime_plugin.WindowCommand):
 class ExTabOnlyCommand(sublime_plugin.WindowCommand):
     def run(self, forced=False):
         self.window.run_command("tab_control", {"command": "only", "forced": forced, }, )
+
+
+class ExCdCommand(sublime_plugin.WindowCommand):
+    def run(self, path=None):
+        # TODO why do I need the kwargs here? ExTabOpen doesn't seem to need it...
+        if path is None:
+            # User typed :cd, print current directory
+            sublime.status_message("Vintageous: %s" % os.getcwd())
+            return
+
+        # Note: cwd is meaningless in sublime since anyone/plugin can and will change it
+        # although it is provided so we cannot rely on this to always be right
+        if not os.path.exists(path):
+            sublime.status_message("Vintageous: Error can't find directory %s" % path)
+            return
+
+        os.chdir(path)
+        sublime.status_message("Vintageous: %s" % os.getcwd())
