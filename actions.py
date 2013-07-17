@@ -791,9 +791,13 @@ class _vi_ctrl_x(sublime_plugin.TextCommand):
             pairs = iter(reversed(list(self.check_words(self.view.sel()))))
 
         try:
+            xpos = []
+            if len(self.view.sel()) > 1:
+                rowcols = [self.view.rowcol(s.b - 1) for s in self.view.sel()]
             regions_transformer_reversed(self.view, f)
             if len(self.view.sel()) > 1:
-                next_nums = self.find_next_num([sublime.Region(s.b -1) for s in list(self.view.sel())])
+                regs = [sublime.Region(self.view.text_point(*rc)) for rc in rowcols]
+                next_nums = self.find_next_num(regs)
                 if next_nums:
                     self.view.sel().clear()
                     self.view.sel().add_all(next_nums)
