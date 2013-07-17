@@ -847,3 +847,20 @@ class ExTabFirstCommand(sublime_plugin.WindowCommand):
 class ExTabOnlyCommand(sublime_plugin.WindowCommand):
     def run(self, forced=False):
         self.window.run_command("tab_control", {"command": "only", "forced": forced, }, )
+
+
+class ExCdCommand(sublime_plugin.WindowCommand):
+    def run(self, path=None):
+        if path is None:
+            # User typed :cd, print current directory
+            sublime.status_message("Vintageous: %s" % os.getcwd())
+            return
+
+        # Note: cwd is almost meaningless in sublime since anyone/plugin can and will change it.
+        # Although it is provided you should not rely on this to always be right
+        if not os.path.exists(path):
+            sublime.status_message("Vintageous: Error can't find directory %s" % path)
+            return
+
+        os.chdir(path)
+        sublime.status_message("Vintageous: %s" % os.getcwd())
