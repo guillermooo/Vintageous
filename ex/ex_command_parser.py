@@ -330,7 +330,7 @@ EX_COMMANDS = {
                                         ex_error.ERR_TRAILING_CHARS,)
                                      ),
     ('cd', 'cd'): ex_cmd_data(command='ex_cd',
-                              invocations=( re.compile(r'^(?P<path>.+)$'),),
+                              invocations=(re.compile(r'^(?P<path>.+)$'),),
                               error_on=(ex_error.ERR_NO_RANGE_ALLOWED,)
                               ),
 }
