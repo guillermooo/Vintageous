@@ -54,6 +54,7 @@ TESTS_CMDS_MOTION_VI_DOLLAR = 'Vintageous.tests.commands.test__vi_dollar'
 TESTS_CMDS_MOTION_VI_J = 'Vintageous.tests.commands.test__vi_j'
 TESTS_CMDS_MOTION_VI_K = 'Vintageous.tests.commands.test__vi_k'
 TESTS_CMDS_MOTION_VI_BIG_F = 'Vintageous.tests.commands.test__vi_big_f'
+TESTS_CMDS_ACTION_CTRL_X = 'Vintageous.tests.commands.test__ctrl_x_and__ctrl_a'
 
 TESTS_CMDS_ALL_SUPPORT = [TESTS_CMDS_SET_ACTION, TESTS_CMDS_SET_MOTION]
 TESTS_CMDS_ALL_ACTIONS = []
@@ -64,6 +65,7 @@ TESTS_CMDS_ALL_MOTIONS = [TESTS_CMDS_MOTION_VI_L,
                           TESTS_CMDS_MOTION_VI_J,
                           TESTS_CMDS_MOTION_VI_K,
                           TESTS_CMDS_MOTION_VI_BIG_F,
+                          TESTS_CMDS_ACTION_CTRL_X,
                           ]
 
 TESTS_CMDS_ALL = TESTS_CMDS_ALL_MOTIONS + TESTS_CMDS_ALL_ACTIONS + TESTS_CMDS_ALL_SUPPORT

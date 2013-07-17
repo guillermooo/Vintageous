@@ -175,3 +175,16 @@ def regions_transformer(view, f):
     view.sel().clear()
     for s in new_sels:
         view.sel().add(s)
+
+def regions_transformer_reversed(view, f):
+    """Applies ``f`` to every selection region in ``view`` and replaces the existing selections.
+    """
+    sels = reversed(list(view.sel()))
+
+    new_sels = []
+    for s in sels:
+        new_sels.append(f(view, s))
+
+    view.sel().clear()
+    for ns in new_sels:
+        view.sel().add(ns)

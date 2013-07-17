@@ -19,7 +19,10 @@ from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
 from Vintageous.vi.constants import MODE_SELECT
 from Vintageous.vi.constants import regions_transformer
+from Vintageous.vi.constants import regions_transformer_reversed
 from Vintageous.vi.registers import REG_EXPRESSION
+
+import re
 
 
 class ViEditAtEol(sublime_plugin.TextCommand):
@@ -718,12 +721,57 @@ class _vi_ctrl_a(sublime_plugin.TextCommand):
 
 
 class _vi_ctrl_x(sublime_plugin.TextCommand):
+    DIGIT_PAT = re.compile('(-)?(\d+)(\D+)?')
+    NUM_PAT = re.compile('\d')
+
+    def get_word(self, s):
+        word = self.view.word(s.b)
+        if word.a > 0:
+            if self.view.substr(word.a - 1) == '-':
+               return sublime.Region(word.a - 1, word.b)
+        return word
+
+    def check_words(self, regions):
+        nums = [self.view.substr(s.b).isdigit() for s in regions]
+        if not all(nums):
+            return []
+
+        words = [self.get_word(s) for s in regions]
+        matches = [_vi_ctrl_x.DIGIT_PAT.match(self.view.substr(w)) for w in words]
+
+        if all(matches):
+            return zip(words, matches)
+        return []
+
+    def find_next_num(self, regions):
+        lines = [self.view.substr(sublime.Region(r.b, self.view.line(r.b).b)) for r in regions]
+        positions = [_vi_ctrl_x.NUM_PAT.search(text) for text in lines]
+        if all(positions):
+            pairs = zip(regions, positions)
+            rv = [sublime.Region(r.b + p.start()) for (r, p) in pairs]
+            return rv
+        return []
+
     def run(self, edit, count=1, mode=None):
         def f(view, s):
             if mode == _MODE_INTERNAL_NORMAL:
-                word = view.word(s.a)
-                new_digit = int(view.substr(word)) - count
-                view.replace(edit, word, str(new_digit))
+
+                word, match = next(pairs)
+                sign, amount, suffix = match.groups()
+                sign = -1 if sign else 1
+                suffix = suffix or ''
+
+                new_digit = (sign * int(amount)) - count
+                view.replace(edit, word, str(new_digit) + suffix)
+
+                offset = 0
+                if sign == -1:
+                    offset += 0
+                offset += len(str(new_digit))
+                # FIXME: Deal with multiple sels as we should.
+                if len(view.sel()) == 1:
+                    return sublime.Region(word.a + offset - 1)
+                # return sublime.Region(word.b - len(suffix) - 1)
 
             return s
 
@@ -732,13 +780,26 @@ class _vi_ctrl_x(sublime_plugin.TextCommand):
 
         # TODO: Deal with octal, hex notations.
         # TODO: Improve detection of numbers.
-        # TODO: Find the next numeric word in the line if none is found under the caret.
-        words = [self.view.substr(self.view.word(s)) for s in self.view.sel()]
-        if not all([w.isdigit() for w in words]):
+        pairs = list(self.check_words(list(self.view.sel())))
+        if not pairs:
+            next_nums = self.find_next_num(list(self.view.sel()))
+            if not next_nums:
+                utils.blink()
+                return
+            pairs = iter(reversed(list(self.check_words(next_nums))))
+        else:
+            pairs = iter(reversed(list(self.check_words(self.view.sel()))))
+
+        try:
+            regions_transformer_reversed(self.view, f)
+            if len(self.view.sel()) > 1:
+                next_nums = self.find_next_num([sublime.Region(s.b -1) for s in list(self.view.sel())])
+                if next_nums:
+                    self.view.sel().clear()
+                    self.view.sel().add_all(next_nums)
+        except StopIteration:
             utils.blink()
             return
-
-        regions_transformer(self.view, f)
 
 
 class _vi_g_v(IrreversibleTextCommand):
