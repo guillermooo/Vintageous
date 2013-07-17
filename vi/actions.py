@@ -395,15 +395,17 @@ def vi_cc(vi_cmd_data):
     # LINEWISE.
     vi_cmd_data['yanks_linewise'] = True
 
-    vi_cmd_data['motion']['command'] = 'no_op'
-    vi_cmd_data['motion']['args'] = {'forward': True}
+    # We needa separate motion step so that registers get populated.
+    vi_cmd_data['motion']['command'] = '_vi_cc_motion'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['count'] = 1
     vi_cmd_data['motion_required'] = False
-    vi_cmd_data['post_motion'] = [['visual_extend_to_line',],]
+    # vi_cmd_data['post_motion'] = [['visual_extend_to_line',],]
 
     # FIXME: cc should not delete empty lines, so we need a specific command here that takes that
     # into account.
-    vi_cmd_data['action']['command'] = 'right_delete'
-    vi_cmd_data['action']['args'] = {}
+    vi_cmd_data['action']['command'] = '_vi_cc_action'
+    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
     vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
     vi_cmd_data['next_mode'] = MODE_INSERT
 

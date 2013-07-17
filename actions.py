@@ -921,3 +921,16 @@ class _vi_g_tilde_g_tilde(sublime_plugin.TextCommand):
             return s
 
         regions_transformer(self.view, f)
+
+
+class _vi_cc_action(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None):
+        def f(view, s):
+            # We've made a selection with _vi_cc_motion just before this.
+            if mode == _MODE_INTERNAL_NORMAL:
+                pt = utils.next_non_white_space_char(view, s.a, white_space=' \t')
+                view.erase(edit, sublime.Region(pt, view.line(s.b).b))
+                return sublime.Region(pt, pt)
+            return s
+
+        regions_transformer(self.view, f)
