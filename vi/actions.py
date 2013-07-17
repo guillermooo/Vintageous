@@ -395,7 +395,7 @@ def vi_cc(vi_cmd_data):
     # LINEWISE.
     vi_cmd_data['yanks_linewise'] = True
 
-    # We needa separate motion step so that registers get populated.
+    # We need a separate motion step so that registers get populated.
     vi_cmd_data['motion']['command'] = '_vi_cc_motion'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
     vi_cmd_data['count'] = 1
