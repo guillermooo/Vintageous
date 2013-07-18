@@ -34,7 +34,11 @@ class Test_vi_cc_InModeInternalNormal(BufferTest):
         self.view.run_command('_vi_cc_action', {'mode': _MODE_INTERNAL_NORMAL})
         self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo bar\n\t  \nfoo bar\n')
 
-    @unittest.skip("Implement this")
+    @unittest.skip("Implement")
     def testCanDeleteWithCount(self):
+        self.assertTrue(False)
+
+    @unittest.skip("Implement")
+    def testDeletedLinesAreYanked(self):
         self.assertTrue(False)
 
