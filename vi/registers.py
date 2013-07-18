@@ -82,7 +82,7 @@ class Registers(object):
     def _maybe_set_sys_clipboard(self, name, value):
         # We actually need to check whether the option is set to a bool; could
         # be any JSON type.
-        if (name == REG_SYS_CLIPBOARD_1 or
+        if (name in REG_SYS_CLIPBOARD_ALL or
             self.settings.view['vintageous_use_sys_clipboard'] == True):
                 # Make sure Sublime Text does the right thing in the presence of multiple
                 # selections.
