@@ -1356,3 +1356,20 @@ class _vi_cc_motion(sublime_plugin.TextCommand):
             return s
 
         regions_transformer(self.view, f)
+
+
+class _vi_big_s_motion(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, count=1):
+        def f(view, s):
+            if mode == _MODE_INTERNAL_NORMAL:
+                if count == 1:
+                    line = view.line(s.b)
+                    if not view.substr(line).strip():
+                        return s
+                    return line
+                row, _ = view.rowcol(s.b)
+                target_line = view.text_point(row + count - 1, 0)
+                return sublime.Region(view.line(s.b).a, view.line(target_line).b)
+            return s
+
+        regions_transformer(self.view, f)

@@ -272,29 +272,14 @@ def vi_big_s(vi_cmd_data):
     vi_cmd_data['can_yank'] = True
     vi_cmd_data['yanks_linewise'] = True
 
-    if vi_cmd_data['count'] == 1:
-        # Force execution of motion steps.
-        vi_cmd_data['motion']['command'] = 'no_op'
-        vi_cmd_data['motion']['args'] = {'forward': True}
-        vi_cmd_data['post_motion'] = [['_vi_big_s', {'mode': vi_cmd_data['mode']}]]
-
-        vi_cmd_data['motion_required'] = False
-        vi_cmd_data['action']['command'] = 'right_delete'
-        vi_cmd_data['action']['args'] = {}
-        vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
-        vi_cmd_data['next_mode'] = MODE_INSERT
-    else:
-        # Avoid S'ing one line too many.
-        vi_cmd_data['count'] = vi_cmd_data['count'] - 1
-        vi_cmd_data['motion']['command'] = 'move'
-        vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': True, 'extend': True}
-        vi_cmd_data['post_motion'] = [['_vi_big_s_post_motion' ,{'mode': vi_cmd_data['mode']}],]
-
-        vi_cmd_data['motion_required'] = False
-        vi_cmd_data['action']['command'] = 'right_delete'
-        vi_cmd_data['action']['args'] = {}
-        vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
-        vi_cmd_data['next_mode'] = MODE_INSERT
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['motion']['command'] = '_vi_big_s_motion'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['action']['command'] = '_vi_big_s_action'
+    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
+    vi_cmd_data['count'] == 1
+    vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
+    vi_cmd_data['next_mode'] = MODE_INSERT
 
     return vi_cmd_data
 

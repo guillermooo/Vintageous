@@ -204,35 +204,6 @@ class VisualExtendToLine(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
-class _vi_big_s(sublime_plugin.TextCommand):
-    def run(self, edit, mode=None):
-        def f(view, s):
-            if mode == _MODE_INTERNAL_NORMAL:
-                if view.line(s).empty():
-                    return s
-            elif mode == MODE_VISUAL:
-                if view.line(s.b - 1).empty() and s.size() == 1:
-                    return s
-
-            state = VintageState(self.view)
-            autoindent = state.settings.vi['autoindent']
-
-            if mode == _MODE_INTERNAL_NORMAL:
-                if not autoindent:
-                    return self.view.line(s)
-                else:
-                    pt = utils.next_non_white_space_char(view, self.view.line(s).a)
-                    return sublime.Region(pt, self.view.line(s).b)
-            elif mode == MODE_VISUAL:
-                if not autoindent:
-                    return self.view.line(sublime.Region(s.a, s.b - 1))
-                else:
-                    pt = utils.next_non_white_space_char(view, self.view.line(s.a).a)
-                    return sublime.Region(pt, self.view.line(s.b - 1).b)
-
-        regions_transformer(self.view, f)
-
-
 class _vi_big_c(sublime_plugin.TextCommand):
     def run(self, edit, mode=None):
         def f(view, s):
@@ -1109,20 +1080,6 @@ class _vi_big_b_post_motion(sublime_plugin.TextCommand):
             elif mode == MODE_VISUAL:
                 if view.substr(s.b) != '\n':
                     return sublime.Region(s.a, view.line(s.b).b)
-
-            return s
-
-        regions_transformer(self.view, f)
-
-
-class _vi_big_s_post_motion(sublime_plugin.TextCommand):
-    # Assume S with a count.
-    def run(self, edit, mode=None):
-        def f(view, s):
-            if mode == _MODE_INTERNAL_NORMAL:
-                return sublime.Region(view.line(s.a).a, view.line(s.b).b)
-            elif mode == MODE_VISUAL:
-                return sublime.Region(view.line(s.a).a, view.line(s.b - 1).b)
 
             return s
 
