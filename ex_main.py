@@ -85,9 +85,11 @@ class ExCompletionsProvider(sublime_plugin.EventListener):
         if prefix and prefix in self.CACHED_COMPLETION_PREFIXES:
             return self.CACHED_COMPLETIONS
 
-        compls = [x for x in COMPLETIONS if x.startswith(prefix)]
+        compls = [x for x in COMPLETIONS if x.startswith(prefix) and x != prefix]
         self.CACHED_COMPLETION_PREFIXES = [prefix] + compls
-        self.CACHED_COMPLETIONS = zip([prefix] + compls, compls + [prefix])
+        # S3 can only handle lists, not iterables.
+        self.CACHED_COMPLETIONS = list(zip([prefix] + compls, compls + [prefix]))
+
         return self.CACHED_COMPLETIONS
 
 

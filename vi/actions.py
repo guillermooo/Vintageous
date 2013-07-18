@@ -391,8 +391,6 @@ def vi_dd(vi_cmd_data):
 
 def vi_cc(vi_cmd_data):
     vi_cmd_data['can_yank'] = True
-    # Even though this command operates CHARACTERWISE, when populating registers it switches to
-    # LINEWISE.
     vi_cmd_data['yanks_linewise'] = True
 
     # We need a separate motion step so that registers get populated.
@@ -400,10 +398,7 @@ def vi_cc(vi_cmd_data):
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
     vi_cmd_data['count'] = 1
     vi_cmd_data['motion_required'] = False
-    # vi_cmd_data['post_motion'] = [['visual_extend_to_line',],]
 
-    # FIXME: cc should not delete empty lines, so we need a specific command here that takes that
-    # into account.
     vi_cmd_data['action']['command'] = '_vi_cc_action'
     vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
     vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
