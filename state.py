@@ -570,6 +570,17 @@ class VintageState(object):
         """
         return self.settings.vi['last_character_search'] or None
 
+    @property
+    def last_character_search_forward(self):
+        """Returns True, False or `None`. Used by the , and ; commands.
+        """
+        return self.settings.vi['last_character_search_forward'] or None
+
+    @last_character_search_forward.setter
+    def last_character_search_forward(self, value):
+        # TODO: Should this piece of data be global instead of local to each buffer?
+        self.settings.vi['last_character_search_forward'] = value
+
     @last_character_search.setter
     def last_character_search(self, value):
         # TODO: Should this piece of data be global instead of local to each buffer?

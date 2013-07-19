@@ -105,7 +105,7 @@ class ViMoveToHardBol(sublime_plugin.TextCommand):
 # FIXME: Only find exact char counts. Vim ignores the command when the count is larger than the
 # number of instances of the sought character.
 class ViFindInLineInclusive(sublime_plugin.TextCommand):
-    def run(self, edit, extend=False, character=None, mode=None, count=1):
+    def run(self, edit, extend=False, character=None, mode=None, count=1, change_direction=True):
         def f(view, s):
             eol = view.line(s.b).end()
             if not s.empty():
@@ -149,6 +149,9 @@ class ViFindInLineInclusive(sublime_plugin.TextCommand):
         else:
             state = VintageState(self.view)
             state.last_character_search = character
+            # Change only if the command is f, F, t, T; not if it's ',' or ';'.
+            if change_direction:
+                state.last_character_search_forward = True
 
         regions_transformer(self.view, f)
 
@@ -156,7 +159,7 @@ class ViFindInLineInclusive(sublime_plugin.TextCommand):
 # FIXME: Only find exact char counts. Vim ignores the command when the count is larger than the
 # number of instances of the sought character.
 class ViReverseFindInLineInclusive(sublime_plugin.TextCommand):
-    def run(self, edit, extend=False, character=None, mode=None, count=1):
+    def run(self, edit, extend=False, character=None, mode=None, count=1, change_direction=True):
         def f(view, s):
             # TODO: Refactor this mess.
             line_text = view.substr(sublime.Region(view.line(s.b).a, s.b))
@@ -207,6 +210,9 @@ class ViReverseFindInLineInclusive(sublime_plugin.TextCommand):
         else:
             state = VintageState(self.view)
             state.last_character_search = character
+            # Change only if the command is f, F, t, T; not if it's ',' or ';'.
+            if change_direction:
+                state.last_character_search_forward = False
 
         regions_transformer(self.view, f)
 
@@ -215,7 +221,7 @@ class ViFindInLineExclusive(sublime_plugin.TextCommand):
     """Contrary to *f*, *t* does not look past the caret's position, so if ``character`` is under
        the caret, nothing happens.
     """
-    def run(self, edit, extend=False, character=None, mode=None, count=1):
+    def run(self, edit, extend=False, character=None, mode=None, count=1, change_direction=True):
         def f(view, s):
             eol = view.line(s.b).end()
             if not s.empty():
@@ -261,6 +267,9 @@ class ViFindInLineExclusive(sublime_plugin.TextCommand):
         else:
             state = VintageState(self.view)
             state.last_character_search = character
+            # Change only if the command is f, F, t, T; not if it's ',' or ';'.
+            if change_direction:
+                state.last_character_search_forward = True
 
         regions_transformer(self.view, f)
 
@@ -269,7 +278,7 @@ class ViReverseFindInLineExclusive(sublime_plugin.TextCommand):
     """Contrary to *F*, *T* does not look past the caret's position, so if ``character`` is right
        before the caret, nothing happens.
     """
-    def run(self, edit, extend=False, character=None, mode=None, count=1):
+    def run(self, edit, extend=False, character=None, mode=None, count=1, change_direction=True):
         def f(view, s):
             line_text = view.substr(sublime.Region(view.line(s.b).a, s.b))
             a, b = view.line(s.b).a, s.b
@@ -303,6 +312,9 @@ class ViReverseFindInLineExclusive(sublime_plugin.TextCommand):
         else:
             state = VintageState(self.view)
             state.last_character_search = character
+            # Change only if the command is f, F, t, T; not if it's ',' or ';'.
+            if change_direction:
+                state.last_character_search_forward = False
 
         regions_transformer(self.view, f)
 

@@ -61,6 +61,8 @@ class CmdData(dict):
         self['last_buffer_search'] = state.last_buffer_search
         # Search character used last to find text in the line (like the f command).
         self['last_character_search'] = state.last_character_search
+        # Search direction used last to find a character in the line (like the f command).
+        self['last_character_search_forward'] = state.last_character_search_forward
         # Whether we want to save the original selections to restore them after the command.
         self['restore_original_carets'] = False
         # We keep track of the caret's x position so vertical motions like j, k can restore it
