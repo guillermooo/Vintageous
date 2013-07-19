@@ -1,3 +1,9 @@
+1.5.0 - 19/7/2013
+
+	- Improve indentation handling with S command.
+	- Enable '+' register.
+	- Reverse ',' and ';' depending on the last character search command.
+
 1.4.9 - 18/7/2013
 
 	- Add :cd command.
