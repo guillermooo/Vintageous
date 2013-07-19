@@ -54,14 +54,3 @@ class _vi_d_post_action(sublime_plugin.TextCommand):
             return s
 
         regions_transformer(self.view, f)
-
-
-class DontOvershootLineLeft(sublime_plugin.TextCommand):
-    def run(self, edit, **kwargs):
-        def f(view, s):
-            if view.size() > 0 and is_at_eol(self.view, s):
-                return forward_one_char(s)
-            else:
-                return s
-
-        regions_transformer(self.view, f)

@@ -116,48 +116,6 @@ class ReorientCaret(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
-class VisualClipEndToEol(sublime_plugin.TextCommand):
-    def run(self, edit):
-        def f(view, s):
-            if s.a < s.b:
-                # going forward
-                if utils.is_at_hard_eol(self.view, s) and \
-                   not utils.visual_is_on_empty_line_forward(self.view, s):
-                        return utils.back_end_one_char(s)
-                else:
-                    return s
-            else:
-                # Moving down by lines.
-                return s
-
-        regions_transformer(self.view, f)
-
-
-class VisualDontOvershootLineLeft(sublime_plugin.TextCommand):
-    def run(self, edit, **kwargs):
-        def f(view, s):
-            if (s.a > s.b and utils.is_at_eol(self.view, s) and not s.b == 0):
-                    return utils.forward_end_one_char(s)
-            elif (s.a < s.b and utils.is_at_hard_eol(self.view, s)):
-                    return sublime.Region(s.a, s.b + 1)
-            else:
-                return s
-
-        regions_transformer(self.view, f)
-
-
-class VisualShrinkEndOneChar(sublime_plugin.TextCommand):
-    def run(self, edit):
-        def f(view, s):
-            if (s.a < s.b and not utils.visual_is_on_empty_line_forward(self.view, s) and
-               not (utils.visual_is_end_at_bol(self.view, s))):
-                    return utils.back_end_one_char(s)
-            else:
-                return s
-
-        regions_transformer(self.view, f)
-
-
 class VisualExtendToFullLine(sublime_plugin.TextCommand):
     def run(self, edit):
         def f(view, s):
@@ -215,26 +173,6 @@ class _vi_big_c(sublime_plugin.TextCommand):
                     return s
 
             return sublime.Region(s.a, self.view.line(s).b)
-
-        regions_transformer(self.view, f)
-
-
-class VisualExtendEndToHardEnd(sublime_plugin.TextCommand):
-    def run(self, edit, mode=None):
-        def f(view, s):
-            if s.a < s.b:
-                # TODO: Wait until regions can compare themselves neatly.
-                if (self.view.line(s.b).a == self.view.line(s.b -1).a and
-                    self.view.line(s.b).b == self.view.line(s.b -1).b):
-                    return sublime.Region(s.a, self.view.full_line(s.b).b)
-                else:
-                    return s
-            else:
-                if self.view.line(s.b).a != s.b:
-                    r = sublime.Region(s.a, self.view.full_line(s.b).a)
-                    return r
-                else:
-                    return s
 
         regions_transformer(self.view, f)
 
@@ -416,74 +354,6 @@ class _d_w_post_every_motion(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
-class _back_one_if_on_hard_eol(sublime_plugin.TextCommand):
-    def run(self, edit, **kwargs):
-        def f(view, s):
-            if (s.a < s.b and self.view.full_line(s.b - 1).b == s.b):
-                    return sublime.Region(s.a, s.b - 1)
-            else:
-                return s
-
-        regions_transformer(self.view, f)
-
-
-class _extend_b_to_hard_eol(sublime_plugin.TextCommand):
-    """Ensures that all selections encompass the following new line character.
-
-       Use only for CHARACTERWISE VISUAL MODE or equivalent.
-    """
-    def run(self, edit, **kwargs):
-        def f(view, s):
-            # Consider 2d$. This command should delete two lines and this class helps with that.
-            # In some cases, though, we can't possibly know whether .b is at SOMELINE HARDEOL
-            # or at SOMELINE HARDBOL. For example, if .b is at CURRENTLINE HARDEOL and NEXTLINE is
-            # shorter, 2d$ may cause the caret to land at NEXTLINE HARDEOL, which is the same
-            # point as HARDBOL two lines down. In such case, we don't need to extend .b to
-            # HARDEOL, but with the available data to this function, we can't know that.
-            #
-            # For now, we'll consider the example above as an exception and let Vintageous do the
-            # wrong thing. It's more important that the command mentioned above works well when
-            # the caret is in the middle of a line or at HARDBOL.
-            state = VintageState(view)
-
-            if state.mode == MODE_VISUAL:
-                if s.a < s.b and not view.line(s.b - 1).empty():
-                    hard_eol = self.view.full_line(s.b - 1).b
-                    return sublime.Region(s.a, hard_eol)
-
-            elif state.mode == MODE_NORMAL:
-                pass
-
-            return s
-
-        regions_transformer(self.view, f)
-
-
-class _pre_every_dollar(sublime_plugin.TextCommand):
-    def run(self, edit, current_iteration, total_iterations):
-        def f(view, s):
-            state = VintageState(view)
-
-            if state.mode == MODE_NORMAL:
-                pass
-            return s
-
-        regions_transformer(self.view, f)
-
-
-class _extend_a_to_bol_if_leading_white_space(sublime_plugin.TextCommand):
-    def run(self, edit, **kwargs):
-        def f(view, s):
-            if (s.a <= s.b and
-                self.view.substr(sublime.Region(self.view.line(s.a).a, s.a)).isspace()):
-                    bol = self.view.line(s.a).a
-                    return sublime.Region(bol, s.b)
-            else:
-                return s
-
-        regions_transformer(self.view, f)
-
-
 class _vi_e_post_every_motion(sublime_plugin.TextCommand):
     """Use only with ``vi_e``.
 
@@ -623,46 +493,6 @@ class _vi_underscore_post_motion(sublime_plugin.TextCommand):
                     return sublime.Region(s.a, view.full_line(s.b).b)
 
             return s
-
-        regions_transformer(self.view, f)
-
-
-class _vi_j_pre_motion(sublime_plugin.TextCommand):
-    # Assume NORMAL_MODE / _MODE_INTERNAL_NORMAL
-    # This code is probably duplicated.
-    def run(self, edit):
-        def f(view, s):
-            line = view.line(s.b)
-            if view.substr(s.b) == '\n':
-                return sublime.Region(line.a, line.a + 1)
-            else:
-                return sublime.Region(line.a, line.b)
-
-        regions_transformer(self.view, f)
-
-
-class _vi_j_post_motion(sublime_plugin.TextCommand):
-    # Assume NORMAL_MODE / _MODE_INTERNAL_NORMAL
-    # This code is probably duplicated.
-    def run(self, edit):
-        def f(view, s):
-            a = view.line(s.a).a
-            b = view.line(s.b - 1).b
-            return sublime.Region(a, b + 1)
-
-        regions_transformer(self.view, f)
-
-
-class _vi_k_pre_motion(sublime_plugin.TextCommand):
-    # Assume NORMAL_MODE / _MODE_INTERNAL_NORMAL
-    # This code is probably duplicated.
-    def run(self, edit):
-        def f(view, s):
-            line = view.line(s.b)
-            if view.substr(s.b) == '\n':
-                return sublime.Region(line.b + 1, line.b)
-            else:
-                return sublime.Region(line.b + 1, line.a)
 
         regions_transformer(self.view, f)
 
