@@ -1,6 +1,7 @@
 import sublime
 
 from Vintageous.vi.constants import MODE_NORMAL, MODE_NORMAL_INSERT, MODE_INSERT, ACTIONS_EXITING_TO_INSERT_MODE, MODE_VISUAL_LINE, MODE_VISUAL, MODE_SELECT
+from Vintageous.vi.constants import MODE_VISUAL_BLOCK
 from Vintageous.vi import constants
 from Vintageous.vi import utils
 from Vintageous.vi.constants import action_to_namespace
@@ -91,6 +92,10 @@ class KeyContext(object):
         value = self.state.mode == MODE_NORMAL_INSERT
         return self._check(value, operator, operand, match_all)
 
+    def vi_mode_visual_block(self, key, operator, operand, match_all):
+        value = self.state.mode == MODE_VISUAL_BLOCK
+        return self._check(value, operator, operand, match_all)
+
     def vi_mode_cannot_push_zero(self, key, operator, operand, match_all):
         value = False
         if operator == sublime.OP_EQUAL:
@@ -100,7 +105,7 @@ class KeyContext(object):
         return self._check(value, operator, operand, match_all)
 
     def vi_mode_visual_any(self, key, operator, operand, match_all):
-        value = self.state.mode in (MODE_VISUAL_LINE, MODE_VISUAL)
+        value = self.state.mode in (MODE_VISUAL_LINE, MODE_VISUAL, MODE_VISUAL_BLOCK)
         return self._check(value, operator, operand, match_all)
 
     def vi_mode_select(self, key, operator, operand, match_all):
@@ -129,6 +134,7 @@ class KeyContext(object):
         # correctly with VISUALLINE.
         normal = self.vi_mode_normal(key, operator, operand, match_all)
         visual = self.vi_mode_visual(key, operator, operand, match_all)
+        visual = visual or self.vi_mode_visual_block(key, operator, operand, match_all)
         return self._check((normal or visual), operator, operand, match_all)
 
     def vi_mode_normal_or_any_visual(self, key, operator, operand, match_all):

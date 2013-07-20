@@ -28,6 +28,7 @@ from Vintageous.vi.constants import MODE_SELECT
 from Vintageous.vi.constants import mode_to_str
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
+from Vintageous.vi.constants import MODE_VISUAL_BLOCK
 from Vintageous.vi.constants import MOTION_TRANSLATION_TABLE
 from Vintageous.vi.constants import STASH
 from Vintageous.vi.contexts import KeyContext
@@ -171,6 +172,9 @@ class VintageState(object):
 
     def enter_visual_mode(self):
         self.mode = MODE_VISUAL
+
+    def enter_visual_block_mode(self):
+        self.mode = MODE_VISUAL_BLOCK
 
     def enter_normal_insert_mode(self):
         # This is the mode we enter when we give i a count, as in 5ifoobar<CR><ESC>.

@@ -8,6 +8,7 @@ from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
+from Vintageous.vi.constants import MODE_VISUAL_BLOCK
 from Vintageous.vi.constants import regions_transformer
 from Vintageous.vi.text_objects import get_text_object_region
 
@@ -611,7 +612,7 @@ class _vi_l(sublime_plugin.TextCommand):
                 x_limit = max(0, x_limit)
                 return sublime.Region(s.a, x_limit)
 
-            if mode == MODE_VISUAL:
+            if mode in (MODE_VISUAL, MODE_VISUAL_BLOCK):
                 if s.a < s.b:
                     x_limit = min(view.full_line(s.b - 1).b, s.b + count)
                     return sublime.Region(s.a, x_limit)
@@ -639,8 +640,13 @@ class _vi_h(sublime_plugin.TextCommand):
                 x_limit = max(view.line(s.b).a, s.b - count)
                 return sublime.Region(s.a, x_limit)
 
-            elif mode == MODE_VISUAL:
+            # TODO: Split handling of the two modes for clarity.
+            elif mode in (MODE_VISUAL, MODE_VISUAL_BLOCK):
+
                 if s.a < s.b:
+                    if mode == MODE_VISUAL_BLOCK and self.view.rowcol(s.b - 1)[1] == baseline:
+                        return s
+
                     x_limit = max(view.line(s.b - 1).a + 1, s.b - count)
                     if view.line(s.a) == view.line(s.b - 1) and count >= s.size():
                         x_limit = max(view.line(s.b - 1).a, s.b - count - 1)
@@ -657,6 +663,22 @@ class _vi_h(sublime_plugin.TextCommand):
 
             # XXX: We should never reach this.
             return s
+
+        # For jagged selections (on the rhs), only those sticking out need to move leftwards.
+        # Example ([] denotes the selection):
+        #
+        #   10 foo bar foo [bar]
+        #   11 foo bar foo [bar foo bar]
+        #   12 foo bar foo [bar foo]
+        #
+        #  Only lines 11 and 12 should move when we press h.
+        baseline = 0
+        if mode == MODE_VISUAL_BLOCK:
+            sel = self.view.sel()[0]
+            if sel.a < sel.b:
+                min_ = min(self.view.rowcol(r.b - 1)[1] for r in self.view.sel())
+                if any(self.view.rowcol(r.b - 1)[1] != min_ for r in self.view.sel()):
+                    baseline = min_
 
         regions_transformer(self.view, f)
 
@@ -768,6 +790,30 @@ class _vi_j(sublime_plugin.TextCommand):
 
             return s
 
+        if mode == MODE_VISUAL_BLOCK:
+            # Don't do anything if we have reversed selections.
+            if any((r.b < r.a) for r in self.view.sel()):
+                return
+            # FIXME: When there are multiple rectangular selections, S3 considers sel 0 to be the
+            # active one in all cases, so we can't know the 'direction' of such a selection and,
+            # therefore, we can't shrink it when we press k or j. We can only easile expand it.
+            # We could, however, have some more global state to keep track of the direction of
+            # visual block selections.
+            row, rect_b = self.view.rowcol(self.view.sel()[-1].b - 1)
+            # Don't do anything if the next row is empty or too short. Vim does a crazy thing: it
+            # doesn't select it and it doesn't include it in actions, but you have to still navigate
+            # your way through them.
+            # TODO: Match Vim's behavior.
+            next_line = self.view.line(self.view.text_point(row + 1, 0))
+            if next_line.empty() or self.view.rowcol(next_line.b)[1] < rect_b:
+                return
+
+            max_size = max(r.size() for r in self.view.sel())
+            row, col = self.view.rowcol(self.view.sel()[-1].a)
+            start = self.view.text_point(row + 1, col)
+            self.view.sel().add(sublime.Region(start, start + max_size))
+            return
+
         regions_transformer(self.view, f)
 
 
@@ -872,6 +918,25 @@ class _vi_k(sublime_plugin.TextCommand):
                     target_pt = view.text_point(target_row, 0)
 
                     return sublime.Region(s.a, view.full_line(target_pt).a)
+
+        if mode == MODE_VISUAL_BLOCK:
+            # Don't do anything if we have reversed selections.
+            if any((r.b < r.a) for r in self.view.sel()):
+                return
+
+            rect_b = max(self.view.rowcol(r.b - 1)[1] for r in self.view.sel())
+            row, rect_a = self.view.rowcol(self.view.sel()[0].a)
+            previous_line = self.view.line(self.view.text_point(row - 1, 0))
+            # Don't do anything if previous row is empty. Vim does crazy stuff in that case.
+            # Don't do anything either if the previous line can't accomodate a rectangular selection
+            # of the required size.
+            if (previous_line.empty() or
+                self.view.rowcol(previous_line.b)[1] < rect_b):
+                    return
+            rect_size = max(r.size() for r in self.view.sel())
+            rect_a_pt = self.view.text_point(row - 1, rect_a)
+            self.view.sel().add(sublime.Region(rect_a_pt, rect_a_pt + rect_size))
+            return
 
         regions_transformer(self.view, f)
 

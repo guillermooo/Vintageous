@@ -235,6 +235,9 @@
 	{ "keys": ["q"], "command": "_vi_q", 								   "context": [{"key": "vi_is_recording_macro"}] },
 	{ "keys": ["@"], "command": "set_action", "args": {"action": "vi_at"}, "context": [{"key": "vi_mode_normal"}] },
 
+	// Put this before ctrlw+w namespace keys to avoid conflicts.
+	{ "keys": ["ctrl+v"], "command": "set_action", "args": {"action": "vi_enter_visual_block_mode"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "vi_mode_normal"}]},
+
 	// Pane management
 	{ "keys": ["ctrl+w"], "command": "set_action", "args": {"action": "vi_ctrl_w_action"}, "context": [{"key": "setting.command_mode"}]},
 	// TODO: The action name is misleading.
@@ -251,7 +254,6 @@
 
 	{ "keys": ["ctrl+a"], "command": "set_action", "args": {"action": "vi_ctrl_a"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "setting.command_mode"}]},
 	{ "keys": ["ctrl+x"], "command": "set_action", "args": {"action": "vi_ctrl_x"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "setting.command_mode"}]},
-
 
 	// Cmdline mode commands ======================================================================================================
 	{ "keys": [":"], "command": "vi_colon_input",                                     "context": [{"key": "setting.command_mode"}, {"key": "vi_enable_cmdline_mode"}] },

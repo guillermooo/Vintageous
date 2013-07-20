@@ -17,6 +17,7 @@ from Vintageous.vi.constants import MODE_REPLACE
 from Vintageous.vi.constants import MODE_SELECT
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
+from Vintageous.vi.constants import MODE_VISUAL_BLOCK
 
 
 def vi_enter_visual_mode(vi_cmd_data):
@@ -46,6 +47,13 @@ def vi_enter_visual_line_mode(vi_cmd_data):
     vi_cmd_data['action']['command'] = 'vi_enter_visual_line_mode'
     vi_cmd_data['action']['args'] = {}
     vi_cmd_data['post_action'] = ['visual_extend_to_full_line',]
+    return vi_cmd_data
+
+
+def vi_enter_visual_block_mode(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['action']['command'] = 'vi_enter_visual_block_mode'
+    vi_cmd_data['action']['args'] = {}
     return vi_cmd_data
 
 
@@ -766,7 +774,7 @@ def vi_esc(vi_cmd_data):
         vi_cmd_data['action']['args'] = {}
         vi_cmd_data['motion']['command'] = 'no_op'
         vi_cmd_data['motion']['args'] = {}
-    elif vi_cmd_data['mode'] in (MODE_VISUAL, MODE_VISUAL_LINE,):
+    elif vi_cmd_data['mode'] in (MODE_VISUAL, MODE_VISUAL_LINE, MODE_VISUAL_BLOCK):
         vi_cmd_data['action']['command'] = 'vi_enter_normal_mode'
         vi_cmd_data['action']['args'] = {}
         vi_cmd_data['motion']['command'] = 'no_op'

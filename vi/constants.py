@@ -20,6 +20,7 @@ MODE_NORMAL_INSERT = 1 << 4
 _MODE_INTERNAL_NORMAL = 1 << 5
 MODE_REPLACE = 1 << 6
 MODE_SELECT = 1 << 7
+MODE_VISUAL_BLOCK = 1 << 8
 
 
 DIGRAPH_ACTION = 1
@@ -155,6 +156,8 @@ def mode_to_str(mode):
         return "SELECT"
     elif mode == MODE_NORMAL_INSERT:
         return "INSERT"
+    elif mode == MODE_VISUAL_BLOCK:
+        return "VISUAL BLOCK"
     elif mode == MODE_REPLACE:
         # XXX: I'm not sure whether Vim prints to the status bar in this case, but since Sublime
         # Text won't let us use a block cursor, let's give some feeback to the user.

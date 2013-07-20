@@ -297,6 +297,18 @@ class ViEnterVisualMode(sublime_plugin.TextCommand):
         self.view.run_command('extend_to_minimal_width')
 
 
+class ViEnterVisualBlockMode(sublime_plugin.TextCommand):
+    def run(self, edit):
+        # Handling multiple visual blocks seems quite hard, so ensure we only have one.
+        first = list(self.view.sel())[0]
+        self.view.sel().clear()
+        self.view.sel().add(first)
+
+        state = VintageState(self.view)
+        state.enter_visual_block_mode()
+        self.view.run_command('extend_to_minimal_width')
+
+
 class ViEnterSelectMode(sublime_plugin.TextCommand):
     def run(self, edit):
         state = VintageState(self.view)
