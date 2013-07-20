@@ -1,3 +1,7 @@
+1.6.0 - 20/7/2013
+
+	- Add basic visual block mode.
+
 1.5.0 - 19/7/2013
 
 	- Improve indentation handling with S command.
