@@ -7,6 +7,7 @@ from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
+from Vintageous.vi.constants import MODE_VISUAL_BLOCK
 
 
 # $
@@ -49,9 +50,13 @@ def vi_gg(vi_cmd_data):
         vi_cmd_data['motion']['command'] = 'vi_go_to_line'
         vi_cmd_data['motion']['args'] = {'line': target, 'mode': vi_cmd_data['mode']}
     else:
-        vi_cmd_data['motion']['command'] = 'move_to'
-        vi_cmd_data['motion']['args'] = {'to': 'bof'}
-        vi_cmd_data['post_motion'] = [['clip_end_to_line',],]
+        if vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
+            vi_cmd_data['motion']['command'] = 'no_op'
+            vi_cmd_data['motion']['args'] = {}
+        else:
+            vi_cmd_data['motion']['command'] = 'move_to'
+            vi_cmd_data['motion']['args'] = {'to': 'bof'}
+            vi_cmd_data['post_motion'] = [['clip_end_to_line',],]
 
     if vi_cmd_data['mode'] == MODE_VISUAL:
         vi_cmd_data['motion']['args']['extend'] = True
@@ -84,6 +89,9 @@ def vi_zero(vi_cmd_data):
             vi_cmd_data['motion']['args']['extend'] = True
         elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
             vi_cmd_data['motion']['args']['extend'] = True
+        elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
+            vi_cmd_data['motion']['command'] = 'no_op'
+            vi_cmd_data['motion']['args'] = {}
 
         # TODO: Unify handling of the 'extend' argument. All VISUAL modes need it, so either include
         # it by default at some point, or let each command decide, as we do here.
@@ -107,6 +115,9 @@ def vi_underscore(vi_cmd_data):
             vi_cmd_data['motion']['args'] = {}
             vi_cmd_data['pre_motion'] = ['move_to', {'to': 'hardbol', 'extend': True}]
             vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion',],]
+        elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
+            vi_cmd_data['motion']['command'] = 'vi_no_op'
+            vi_cmd_data['motion']['args'] = {}
         else:
             vi_cmd_data['motion']['command'] = 'move_to'
             vi_cmd_data['pre_motion'] = ['_vi_underscore_pre_motion', {'mode': vi_cmd_data['mode']}]
@@ -132,6 +143,9 @@ def vi_underscore(vi_cmd_data):
         elif vi_cmd_data['mode'] == MODE_VISUAL:
             vi_cmd_data['motion']['args']['extend'] = True
             vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion', {'mode': vi_cmd_data['mode'], 'extend': True}],]
+        elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
+            vi_cmd_data['motion']['command'] = 'vi_no_op'
+            vi_cmd_data['motion']['args'] = {}
 
     return vi_cmd_data
 
@@ -226,10 +240,13 @@ def vi_w(vi_cmd_data):
         vi_cmd_data['pre_every_motion'] = ['_vi_w_pre_every_motion',]
         vi_cmd_data['motion']['args']['extend'] = True
         vi_cmd_data['post_every_motion'] = ['_vi_w_post_every_motion',]
-
     elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
         vi_cmd_data['last_motion'] = ['_vi_w_last_motion', {'mode': vi_cmd_data['mode']}]
         vi_cmd_data['motion']['args']['extend'] = True
+    elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
+        vi_cmd_data['motion']['command'] = 'vi_no_op'
+        vi_cmd_data['motion']['args'] = {}
+
 
     return vi_cmd_data
 
@@ -245,6 +262,9 @@ def vi_b(vi_cmd_data):
         vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode'],}]
         vi_cmd_data['post_every_motion'] = ['_vi_b_post_every_motion', {'mode': vi_cmd_data['mode']}]
         vi_cmd_data['motion']['args']['extend'] = True
+    elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
+        vi_cmd_data['motion']['command'] = 'vi_no_op'
+        vi_cmd_data['motion']['args'] = {}
 
     return vi_cmd_data
 
@@ -273,6 +293,10 @@ def vi_e(vi_cmd_data):
         vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
         vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
 
+    elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
+        vi_cmd_data['motion']['command'] = 'vi_no_op'
+        vi_cmd_data['motion']['args'] = {}
+
     return vi_cmd_data
 
 
@@ -295,6 +319,10 @@ def vi_g_e(vi_cmd_data):
         vi_cmd_data['motion']['args']['extend'] = True
         vi_cmd_data['pre_motion'] = ['_vi_g_e_pre_motion', {'mode': vi_cmd_data['mode']}]
         vi_cmd_data['post_motion'] = [['_vi_g_e_post_motion', {'mode': vi_cmd_data['mode']}]]
+
+    elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
+        vi_cmd_data['motion']['command'] = 'vi_no_op'
+        vi_cmd_data['motion']['args'] = {}
 
     return vi_cmd_data
 
@@ -446,6 +474,10 @@ def vi_big_w(vi_cmd_data):
         vi_cmd_data['last_motion'] = ['_vi_big_w_last_motion', {'mode': vi_cmd_data['mode']}]
         vi_cmd_data['motion']['args']['extend'] = True
 
+    elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
+        vi_cmd_data['motion']['command'] = 'vi_no_op'
+        vi_cmd_data['motion']['args'] = {}
+
     return vi_cmd_data
 
 
@@ -473,6 +505,10 @@ def vi_big_e(vi_cmd_data):
         vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
         vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
 
+    elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
+        vi_cmd_data['motion']['command'] = 'vi_no_op'
+        vi_cmd_data['motion']['args'] = {}
+
     return vi_cmd_data
 
 
@@ -489,6 +525,10 @@ def vi_big_b(vi_cmd_data):
         vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode']}]
         vi_cmd_data['motion']['args']['extend'] = True
         vi_cmd_data['post_every_motion'] = ['_vi_b_post_every_motion', {'mode': vi_cmd_data['mode']}]
+
+    elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
+        vi_cmd_data['motion']['command'] = 'vi_no_op'
+        vi_cmd_data['motion']['args'] = {}
 
     return vi_cmd_data
 
@@ -557,6 +597,9 @@ def vi_ctrl_f(vi_cmd_data):
     elif vi_cmd_data['mode'] != MODE_NORMAL:
         # TODO: Sublime Text seems to ignore the 'extend' param to Ctrl+f, so disable it.
         # vi_cmd_data['motion']['args']['extend'] = True
+        vi_cmd_data['motion']['command'] = 'vi_no_op'
+        vi_cmd_data['motion']['args'] = {}
+    elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
         vi_cmd_data['motion']['command'] = 'vi_no_op'
         vi_cmd_data['motion']['args'] = {}
 
