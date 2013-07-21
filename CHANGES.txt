@@ -1,7 +1,7 @@
 1.7.0 - 21/7/2013
 
 	- Improve select mode (gh).
-	- Reimplement motion to avoid using built-in Sublime Text command.
+	- Reimplement w motion to avoid using built-in Sublime Text command.
 	- Improve aw text object.
 	- Improve redo.
 
