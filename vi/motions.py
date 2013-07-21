@@ -236,6 +236,12 @@ def vi_w(vi_cmd_data):
     # XXX What's clip_to_line doing?
     vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_begin': True, 'punct_begin': True, 'empty_line': True, 'forward': True, 'clip_to_line': True}
 
+
+    if vi_cmd_data['mode'] == MODE_NORMAL:
+        vi_cmd_data['__reorient_caret'] = False
+        vi_cmd_data['motion']['command'] = '_vi_w'
+        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+        vi_cmd_data['count'] = 1
     if vi_cmd_data['mode'] == MODE_VISUAL:
         vi_cmd_data['pre_every_motion'] = ['_vi_w_pre_every_motion',]
         vi_cmd_data['motion']['args']['extend'] = True

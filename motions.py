@@ -76,6 +76,7 @@ from Vintageous.vi.search import reverse_search_by_pt
 from Vintageous.vi.search import find_in_range
 from Vintageous.vi.search import find_wrapping
 from Vintageous.vi.search import reverse_find_wrapping
+from Vintageous.vi import units
 
 import Vintageous.state
 
@@ -1382,6 +1383,17 @@ class _vi_big_s_motion(sublime_plugin.TextCommand):
                 row, _ = view.rowcol(s.b)
                 target_line = view.text_point(row + count - 1, 0)
                 return sublime.Region(view.line(s.b).a, view.line(target_line).b)
+            return s
+
+        regions_transformer(self.view, f)
+
+
+class _vi_w(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, count=1):
+        def f(view, s):
+            if mode == MODE_NORMAL:
+                pt = units.words(view, start=s.b, count=count)
+                return sublime.Region(pt, pt)
             return s
 
         regions_transformer(self.view, f)
