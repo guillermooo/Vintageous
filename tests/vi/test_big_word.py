@@ -10,7 +10,7 @@ from Vintageous.tests.commands import set_text
 from Vintageous.tests.commands import add_selection
 
 from Vintageous.vi.units import next_big_word_start
-from Vintageous.vi.units import words
+from Vintageous.vi.units import big_words
 from Vintageous.vi.units import CLASS_VI_INTERNAL_BIG_WORD_START
 from Vintageous.vi.units import CLASS_VI_BIG_WORD_START
 
@@ -230,26 +230,115 @@ class Test_next_big_word_start_InNormalMode(BufferTest):
         pt = next_big_word_start(self.view, r.b)
         self.assertEqual(pt, 8)
 
-    # # Perhaps this one depends on the user configuration ('word_separators').
-    # def testMoveToNextWordSkippingUnderscores(self):
-    #     set_text(self.view, 'foo_bar foo bar\n')
-    #     r = self.R((0, 0), (0, 0))
-    #     add_selection(self.view, r)
-    #     pt = next_big_word_start(self.view, r.b)
-    #     self.assertEqual(pt, 8)
+    # Perhaps this one depends on the user configuration ('word_separators').
+    def testMoveToNextWordSkippingUnderscores(self):
+        set_text(self.view, 'foo_bar foo bar\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 8)
 
 
-# class Test_big_words_InNormalMode(BufferTest):
-#     def testMoveToNextAlphabeticWord(self):
-#         set_text(self.view, 'foo bar foo bar\n')
-#         r = self.R((0, 0), (0, 0))
-#         add_selection(self.view, r)
+class Test_big_words_InNormalMode(BufferTest):
+    def testMoveToNextAlphabeticWord(self):
+        # FIXME: Sublime Text bug: can't classify at BOF.
+        set_text(self.view, ' (foo)... bar... foo bar\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
 
-#         pt = words(self.view, r.b, count=2, punctuation=False)
-#         self.assertEqual(pt, 8)
+        pt = big_words(self.view, r.b, count=2)
+        self.assertEqual(pt, 17)
 
 
-# class Test_next_big_word_start_InInternalMode(BufferTest):
+class Test_next_big_word_start_InInternalMode(BufferTest):
+    def testFromPunctuationStartToNextWord(self):
+        set_text(self.view, ' (foo) bar\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 7)
+
+    def testFromPunctuationStartToNextPunctuation(self):
+        set_text(self.view, ' (foo) (bar)\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 7)
+
+    def testFromWordStartToNextPunctuation(self):
+        set_text(self.view, 'foo (bar)\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 4)
+
+    def testFromWordStartToToNextWord(self):
+        set_text(self.view, 'foo, bar\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 5)
+
+    def testFromWordToToNextWord(self):
+        set_text(self.view, 'foo, bar\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 5)
+
+    def testFromWordToToNextPunctuation(self):
+        set_text(self.view, 'foo (bar)\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 4)
+
+    def testFromSpaceToNextPunctuation(self):
+        set_text(self.view, '  (bar)\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 2)
+
+    def testFromEmptyLineToNextPunctuation(self):
+        set_text(self.view, '\n...\n\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 1)
+
+    def testFromEmptyLineToNextPunctuationLedByWhiteSpace(self):
+        set_text(self.view, '\n  ...\n\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 3)
+
+    def testFromWhitespaceLineToNextPunctuation(self):
+        set_text(self.view, '   \n...\n\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 3)
+
+    @unittest.skip("FIXME: Sublime Text bug in classify at BOF.")
+    def testFromPunctuationStartAtBofToNextWord(self):
+        set_text(self.view, '(foo) bar\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 15)
 #     def testMoveToNextAlphabeticWord(self):
 #         set_text(self.view, 'Xoo bar\n')
 #         r = self.R((0, 0), (0, 0))

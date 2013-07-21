@@ -10,6 +10,7 @@ $includeFiles = @(
         "*.py",
         "*.sublime-keymap",
         "*.sublime-settings",
+        "LICENSE.txt",
         "Default.sublime-commands",
         "README.md",
         "*.tmLanguage"
@@ -23,8 +24,7 @@ $excludeFiles = @(
 $includeDirs = @(
         "vi",
         "tests",
-        "ex",
-        "licenses"
+        "ex"
     )
 
 $excludeDirs = @(

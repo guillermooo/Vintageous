@@ -25,6 +25,14 @@ CLASS_VI_INTERNAL_BIG_WORD_START = (CLASS_WORD_START | CLASS_LINE_END |
 def at_eol(view, pt):
     return view.classify(pt) & CLASS_LINE_END == CLASS_LINE_END
 
+def at_punctuation(view, pt):
+    # FIXME: Not very reliable?
+    is_at_eol = at_eol(view, pt)
+    is_at_word = at_word(view, pt)
+    is_white_space = view.substr(pt).isspace()
+    is_at_eof = pt == view.size()
+    return not any((is_at_eol, is_at_word, is_white_space, is_at_eof))
+
 def at_punctuation_end(view, pt):
     return view.classify(pt) & CLASS_PUNCTUATION_END == CLASS_PUNCTUATION_END
 
@@ -40,7 +48,7 @@ def at_word(view, pt):
 
 def skip_word(view, pt):
     while True:
-        if at_punctuation_start(view, pt):
+        if at_punctuation(view, pt):
             pt = view.find_by_class(pt, forward=True, classes=CLASS_PUNCTUATION_END)
         elif at_word(view, pt):
             pt = view.find_by_class(pt, forward=True, classes=CLASS_WORD_END)
@@ -69,8 +77,6 @@ def next_big_word_start(view, start, classes=CLASS_VI_BIG_WORD_START):
     pt = view.find_by_class(pt, forward=True, classes=classes,
                             separators=seps)
 
-    if at_word_start(view, pt) and at_punctuation_end(view, pt):
-        pass
     if classes != CLASS_VI_INTERNAL_BIG_WORD_START:
         while not (view.line(pt).empty() or
                    view.substr(view.line(pt)).strip()):
