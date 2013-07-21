@@ -41,6 +41,8 @@ To use this development version, you should:
 Documentation
 -------------
 
+Refer to the [wiki](https://github.com/guillermooo/Vintageous/wiki).
+
 **The following documentation applies only in part to Vintageous.**
 
 * [Vintage Mode Overview](http://www.sublimetext.com/docs/3/vintage.html)
