@@ -408,10 +408,10 @@ class Test_words_InInternalNormalMode(BufferTest):
         pt = words(self.view, r.b, count=3, internal=True)
         self.assertEqual(pt, 12)
 
-    def testFromWordIncludeLastNewLineIfMovingLineWiseAndHitsEol(self):
-        set_text(self.view, 'xxx\nfoo bar\n   xxx yyy')
+    def testFromEmptyLineDontEatUpWhiteSpaceIfMovingOne(self):
+        set_text(self.view, '\n   foo bar\n')
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = words(self.view, r.b, count=3, internal=True)
-        self.assertEqual(pt, 12)
+        pt = words(self.view, r.b, count=1, internal=True)
+        self.assertEqual(pt, 1)
