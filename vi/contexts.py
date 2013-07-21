@@ -42,6 +42,11 @@ class KeyContext(object):
         if self.state.mode != MODE_NORMAL:
             return True
 
+        # Clear non-empty selections if there any.
+        # For example, this will be the case when we've used select mode (gh).
+        if not all(r.empty() for r in self.state.view.sel()):
+            return True
+
         # XXX Actually, if we already are in normal mode, we still need to perform certain
         # cleanup tasks, so let the command run anyway.
         if self.state.view.get_regions('vi_search'):

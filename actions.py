@@ -253,8 +253,8 @@ class ViEnterNormalMode(sublime_plugin.TextCommand):
             state.store_visual_selections()
 
         # When returning to normal mode from select mode, we want to keep the non-Vintageous
-        # selections just created.
-        if state.mode != MODE_SELECT:
+        # selections just created unless it's the last one.
+        if not (state.mode == MODE_SELECT and len(self.view.sel()) > 1):
             self.view.run_command('collapse_to_direction')
             self.view.run_command('dont_stay_on_eol_backward')
         state.enter_normal_mode()
@@ -959,3 +959,15 @@ class _vi_big_s_action(sublime_plugin.TextCommand):
             return s
 
         regions_transformer(self.view, f)
+
+
+class ViSoftUndo(IrreversibleTextCommand):
+    """Belongs to the non-standard selection mode of Vintageous (gh).
+    """
+    def run(self):
+        # Don't deselect the last instance. If the user really wants to destroy the visual
+        # selection, he can just press Esc or move the caret.
+        if len(self.view.sel()) == 1:
+            return
+
+        self.view.run_command('soft_undo')

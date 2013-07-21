@@ -27,7 +27,7 @@
 
 	// Non-standard Vim commands.
 	{ "keys": ["j"], "command": "find_under_expand",      "context": [{"key": "vi_mode_select"}] },
-	{ "keys": ["k"], "command": "soft_undo",              "context": [{"key": "vi_mode_select"}] },
+	{ "keys": ["k"], "command": "vi_soft_undo",           "context": [{"key": "vi_mode_select"}] },
 	{ "keys": ["l"], "command": "find_under_expand_skip", "context": [{"key": "vi_mode_select"}] },
 	{ "keys": ["A"], "command": "find_all_under",         "context": [{"key": "vi_mode_select"}] },
 	
