@@ -162,6 +162,7 @@ class _ptTestDataDispatcher(sublime_plugin.EventListener):
                     w.run_command('prev_view')
                     TestsState.view.set_scratch(True)
                     w.run_command('close')
+                    w.run_command('next_view')
                     # Ugly hack to return focus to the results view.
                     w.run_command('show_panel', {'panel': 'console', 'toggle': True})
                     w.run_command('show_panel', {'panel': 'console', 'toggle': True})
