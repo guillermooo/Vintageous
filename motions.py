@@ -1394,6 +1394,13 @@ class _vi_w(sublime_plugin.TextCommand):
             if mode == MODE_NORMAL:
                 pt = units.words(view, start=s.b, count=count)
                 return sublime.Region(pt, pt)
+            if mode == MODE_VISUAL:
+                pt = units.words(view, start=s.b, count=count)
+                if s.a > s.b and pt >= s.a:
+                    return sublime.Region(s.a - 1, pt + 1)
+                elif s.a > s.b:
+                    return sublime.Region(s.a, pt)
+                return sublime.Region(s.a, pt + 1)
             return s
 
         regions_transformer(self.view, f)
