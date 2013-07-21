@@ -1,3 +1,7 @@
+1.7.1 - 21/7/2013
+
+	- Reimplement W motion in normal and visual mode.
+
 1.7.0 - 21/7/2013
 
 	- Improve select mode (gh).
