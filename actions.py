@@ -658,6 +658,23 @@ class _vi_repeat(IrreversibleTextCommand):
         self.view.run_command('vi_enter_normal_mode')
 
 
+class _vi_redo(IrreversibleTextCommand):
+    #  !!! This is a special command that does not go through the usual processing. !!!
+    #  !!! It must skip the undo stack. !!!
+
+    # TODO: It must be possible store or retrieve the actual position of the caret before the
+    # visual selection performed by the user.
+    def run(self):
+        state = VintageState(self.view)
+        for i in range(state.count):
+            self.view.run_command('redo')
+
+        state.update_xpos()
+        # Ensure that we wipe the count, if any.
+        state.reset()
+        self.view.run_command('vi_enter_normal_mode')
+
+
 class _vi_ctrl_w_v_action(sublime_plugin.TextCommand):
     def run(self, edit):
         self.view.window().run_command('new_pane', {})

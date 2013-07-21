@@ -27,7 +27,7 @@
 
 	// Non-standard Vim commands.
 	{ "keys": ["j"], "command": "find_under_expand",      "context": [{"key": "vi_mode_select"}] },
-	{ "keys": ["k"], "command": "soft_undo",              "context": [{"key": "vi_mode_select"}] },
+	{ "keys": ["k"], "command": "vi_soft_undo",           "context": [{"key": "vi_mode_select"}] },
 	{ "keys": ["l"], "command": "find_under_expand_skip", "context": [{"key": "vi_mode_select"}] },
 	{ "keys": ["A"], "command": "find_all_under",         "context": [{"key": "vi_mode_select"}] },
 	
@@ -110,7 +110,7 @@
 	// TODO: Does it take counts?
 	{ "keys": ["u"], "command": "_vi_undo", "context": [{"key": "vi_mode_normal"}] },
 	// TODO: implement counts for redo and make it go through all the normal machinery.
-	{ "keys": ["ctrl+r"], "command": "redo", "context": [{"key": "vi_mode_normal"}, {"key": "vi_use_ctrl_keys"}] },
+	{ "keys": ["ctrl+r"], "command": "_vi_redo", "context": [{"key": "vi_mode_normal"}, {"key": "vi_use_ctrl_keys"}] },
 
 	// TODO: Do we really want to use the built-in jump list? Do we have are own?
 	{ "keys": ["ctrl+o"], "command": "jump_back",    "context": [{"key": "vi_mode_normal"}, {"key": "vi_use_ctrl_keys"}] },
