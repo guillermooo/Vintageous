@@ -231,31 +231,12 @@ def vi_k(vi_cmd_data):
 
 
 def vi_w(vi_cmd_data):
-    vi_cmd_data['__reorient_caret'] = True
-    vi_cmd_data['motion']['command'] = 'move'
-    # XXX What's clip_to_line doing?
-    vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_begin': True, 'punct_begin': True, 'empty_line': True, 'forward': True, 'clip_to_line': True}
-
-
-    if vi_cmd_data['mode'] == MODE_NORMAL:
-        vi_cmd_data['__reorient_caret'] = False
-        vi_cmd_data['motion']['command'] = '_vi_w'
-        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-        vi_cmd_data['count'] = 1
-    if vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['__reorient_caret'] = False
-        vi_cmd_data['motion']['command'] = '_vi_w'
-        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-        vi_cmd_data['count'] = 1
-    elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-        vi_cmd_data['last_motion'] = ['_vi_w_last_motion', {'mode': vi_cmd_data['mode']}]
-        vi_cmd_data['motion']['args']['extend'] = True
-    elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
-        vi_cmd_data['motion']['command'] = 'vi_no_op'
-        vi_cmd_data['motion']['args'] = {}
-
+    vi_cmd_data['motion']['command'] = '_vi_w'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['count'] = 1
 
     return vi_cmd_data
+
 
 def vi_b(vi_cmd_data):
     # FIXME: b is a huge mess. Fix it.

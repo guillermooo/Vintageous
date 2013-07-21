@@ -796,7 +796,7 @@ class _vi_j(sublime_plugin.TextCommand):
                 return
             # FIXME: When there are multiple rectangular selections, S3 considers sel 0 to be the
             # active one in all cases, so we can't know the 'direction' of such a selection and,
-            # therefore, we can't shrink it when we press k or j. We can only easile expand it.
+            # therefore, we can't shrink it when we press k or j. We can only easily expand it.
             # We could, however, have some more global state to keep track of the direction of
             # visual block selections.
             row, rect_b = self.view.rowcol(self.view.sel()[-1].b - 1)
