@@ -59,6 +59,7 @@ TESTS_CMDS_ACTION_VI_CC = 'Vintageous.tests.commands.test__vi_cc'
 TESTS_CMDS_ACTION_VI_BIG_S = 'Vintageous.tests.commands.test__vi_big_s'
 
 TESTS_UNITS_WORD = 'Vintageous.tests.vi.test_word'
+TESTS_UNITS_BIG_WORD = 'Vintageous.tests.vi.test_big_word'
 
 TESTS_CMDS_ALL_SUPPORT = [TESTS_CMDS_SET_ACTION, TESTS_CMDS_SET_MOTION]
 
@@ -77,6 +78,7 @@ TESTS_CMDS_ALL_MOTIONS = [TESTS_CMDS_MOTION_VI_L,
                           ]
 
 TESTS_UNITS_ALL = [TESTS_UNITS_WORD,
+                   TESTS_UNITS_BIG_WORD,
                   ]
 
 TESTS_CMDS_ALL = TESTS_CMDS_ALL_MOTIONS + TESTS_CMDS_ALL_ACTIONS + TESTS_CMDS_ALL_SUPPORT

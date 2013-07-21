@@ -453,10 +453,18 @@ def vi_big_w(vi_cmd_data):
     vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_begin': True, 'empty_line': True, 'separators': '', 'forward': True}
     vi_cmd_data['post_every_motion'] = ['_vi_w_post_every_motion',]
 
+    if vi_cmd_data['mode'] == MODE_NORMAL:
+        vi_cmd_data['__reorient_caret'] = False
+        vi_cmd_data['motion']['command'] = '_vi_big_w'
+        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+        vi_cmd_data['post_every_motion'] = []
+        vi_cmd_data['count'] = 1
     if vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['pre_every_motion'] = ['_vi_w_pre_every_motion',]
-        vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['post_every_motion'] = ['_vi_w_post_every_motion',]
+        vi_cmd_data['__reorient_caret'] = False
+        vi_cmd_data['motion']['command'] = '_vi_big_w'
+        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+        vi_cmd_data['post_every_motion'] = []
+        vi_cmd_data['count'] = 1
 
     elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
         vi_cmd_data['last_motion'] = ['_vi_big_w_last_motion', {'mode': vi_cmd_data['mode']}]
