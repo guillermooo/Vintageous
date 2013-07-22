@@ -60,7 +60,8 @@ def skip_word(view, pt):
 def next_word_start(view, start, classes=CLASS_VI_WORD_START):
     pt = view.find_by_class(start, forward=True, classes=classes)
     if classes != CLASS_VI_INTERNAL_WORD_START:
-        while not (view.line(pt).empty() or
+        while not (view.size() == pt or
+                   view.line(pt).empty() or
                    view.substr(view.line(pt)).strip()):
             pt = next_word_start(view, pt)
     return pt

@@ -1393,6 +1393,9 @@ class _vi_w(sublime_plugin.TextCommand):
         def f(view, s):
             if mode == MODE_NORMAL:
                 pt = units.words(view, start=s.b, count=count)
+                if ((pt == view.size()) and (not view.line(pt).empty())):
+                    pt = utils.previous_non_white_space_char(view, pt - 1,
+                                                            white_space='\n')
                 return sublime.Region(pt, pt)
             elif mode == MODE_VISUAL:
                 pt = units.words(view, start=s.b - 1, count=count)
@@ -1400,6 +1403,8 @@ class _vi_w(sublime_plugin.TextCommand):
                     return sublime.Region(s.a - 1, pt + 1)
                 elif s.a > s.b:
                     return sublime.Region(s.a, pt)
+                elif (view.size() == pt):
+                    pt -= 1
                 return sublime.Region(s.a, pt + 1)
             elif mode == _MODE_INTERNAL_NORMAL:
                 a = s.a
