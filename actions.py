@@ -793,10 +793,7 @@ class _vi_ctrl_x(sublime_plugin.TextCommand):
                 new_digit = (sign * int(amount)) - count
                 view.replace(edit, word, str(new_digit) + suffix)
 
-                offset = 0
-                if sign == -1:
-                    offset += 0
-                offset += len(str(new_digit))
+                offset = len(str(new_digit))
                 # FIXME: Deal with multiple sels as we should.
                 if len(view.sel()) == 1:
                     return sublime.Region(word.a + offset - 1)
@@ -968,7 +965,7 @@ class _vi_cc_action(sublime_plugin.TextCommand):
 class _vi_big_s_action(sublime_plugin.TextCommand):
     def run(self, edit, mode=None):
         def f(view, s):
-            # We've made a selection with _vi_cc_motion just before this.
+            # We've made a selection with _vi_big_s_motion just before this.
             if mode == _MODE_INTERNAL_NORMAL:
                 pt = utils.next_non_white_space_char(view, s.a, white_space=' \t')
                 view.erase(edit, sublime.Region(pt, view.line(s.b).b))

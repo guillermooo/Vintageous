@@ -96,14 +96,14 @@ class Test_next_big_word_start_InNormalMode(BufferTest):
         pt = next_big_word_start(self.view, r.b)
         self.assertEqual(pt, 4)
 
-    @unittest.skip("FIXME: Sublime Text bug in classify at BOF.")
+    # @unittest.skip("FIXME: Sublime Text bug in classify at BOF.")
     def testFromPunctuationStartAtBofToNextWord(self):
         set_text(self.view, '(foo) bar\n')
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
         pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 15)
+        self.assertEqual(pt, 6)
 
     def testMoveToNextAlphabeticWord(self):
         set_text(self.view, 'foo bar\n')
