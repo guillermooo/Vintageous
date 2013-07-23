@@ -117,7 +117,6 @@ def words(view, start, count=1, internal=False):
         (not view.line(pt).empty()) and at_eol(view, pt)):
             pt += 1
 
-
     return pt
 
 
