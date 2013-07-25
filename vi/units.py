@@ -11,15 +11,19 @@ from Vintageous.vi.utils import next_non_white_space_char
 
 import re
 
+
 word_pattern = re.compile('\w')
 
-
+# Places at which regular words start (for Vim).
 CLASS_VI_WORD_START = CLASS_WORD_START | CLASS_PUNCTUATION_START | CLASS_LINE_START
+# Places at which *sometimes* words start. Called 'internal' because it's a notion Vim has; not
+# obvious.
 CLASS_VI_INTERNAL_WORD_START = CLASS_WORD_START | CLASS_PUNCTUATION_START | CLASS_LINE_END
 
 
 def at_eol(view, pt):
-    return view.classify(pt) & CLASS_LINE_END == CLASS_LINE_END
+    return (view.classify(pt) & CLASS_LINE_END) == CLASS_LINE_END
+
 
 def at_punctuation(view, pt):
     # FIXME: Not very reliable?
@@ -29,23 +33,13 @@ def at_punctuation(view, pt):
     is_at_eof = pt == view.size()
     return not any((is_at_eol, is_at_word, is_white_space, is_at_eof))
 
-def at_punctuation_end(view, pt):
-    return view.classify(pt) & CLASS_PUNCTUATION_END == CLASS_PUNCTUATION_END
-
-def at_punctuation_start(view, pt):
-    return view.classify(pt) & CLASS_PUNCTUATION_START == CLASS_PUNCTUATION_START
 
 def at_word_start(view, pt):
-    return view.classify(pt) & CLASS_WORD_START == CLASS_WORD_START
+    return (view.classify(pt) & CLASS_WORD_START) == CLASS_WORD_START
+
 
 def at_word(view, pt):
     return at_word_start(view, pt) or word_pattern.match(view.substr(pt))
-
-
-def skip_whitespace_lines(view, pt):
-    while pt < view.size() and view.substr(view.line(pt)).isspace():
-        pt = view.full_line(pt).b
-    return pt
 
 
 def skip_word(view, pt):
@@ -68,11 +62,6 @@ def next_word_start(view, start, classes=CLASS_VI_WORD_START):
     return pt
 
 
-def prev_punctuation_start(view, start):
-    pt = view.find_by_class(start, forward=False, classes=CLASS_PUNCTUATION_START)
-    return pt
-
-
 def next_big_word_start(view, start, classes=CLASS_VI_WORD_START):
     pt = skip_word(view, start)
     seps = ''
@@ -89,13 +78,17 @@ def word_starts(view, start, count=1, internal=False):
 
     pt = start
     for i in range(count):
-        if internal and i == count -1 and view.line(start) == view.line(pt):
-            if view.substr(pt) == '\n':
-                return pt + 1
-            return next_word_start(view, pt, classes=CLASS_VI_INTERNAL_WORD_START)
+        # On the last motion iteration, we must do some special stuff if we are still on the
+        # starting line of the motion.
+        if (internal and (i == count - 1) and
+            (view.line(start) == view.line(pt))):
+                if view.substr(pt) == '\n':
+                    return pt + 1
+                return next_word_start(view, pt,
+                                       classes=CLASS_VI_INTERNAL_WORD_START)
 
         pt = next_word_start(view, pt, classes=CLASS_VI_WORD_START)
-        if not internal or i != count - 1:
+        if not internal or (i != count - 1):
             pt = next_non_white_space_char(view, pt, white_space=' \t')
             while not (view.size() == pt or
                        view.line(pt).empty() or
