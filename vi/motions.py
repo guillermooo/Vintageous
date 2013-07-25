@@ -263,23 +263,27 @@ def vi_e(vi_cmd_data):
     #
     # _MODE_INTERNAL_NORMAL
     #
-    vi_cmd_data['motion']['command'] = 'move'
-    vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_end': True, 'punct_end': True, 'empty_line': False, 'forward': True}
-    vi_cmd_data['__reorient_caret'] = True
+    # vi_cmd_data['motion']['command'] = 'move'
+    # vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_end': True, 'punct_end': True, 'empty_line': False, 'forward': True}
+    # vi_cmd_data['__reorient_caret'] = True
 
     if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
-        vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
+        vi_cmd_data['motion']['command'] = '_vi_e'
+        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+        vi_cmd_data['count'] = 1
+        vi_cmd_data['__reorient_caret'] = False
 
     elif vi_cmd_data['mode'] == MODE_NORMAL:
-        vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
-        vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
+        vi_cmd_data['motion']['command'] = '_vi_e'
+        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+        vi_cmd_data['count'] = 1
+        vi_cmd_data['__reorient_caret'] = False
 
     elif vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
-        vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
+        vi_cmd_data['motion']['command'] = '_vi_e'
+        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+        vi_cmd_data['count'] = 1
+        vi_cmd_data['__reorient_caret'] = False
 
     elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
         vi_cmd_data['motion']['command'] = 'vi_no_op'

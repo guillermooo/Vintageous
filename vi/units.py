@@ -19,6 +19,8 @@ CLASS_VI_WORD_START = CLASS_WORD_START | CLASS_PUNCTUATION_START | CLASS_LINE_ST
 # Places at which *sometimes* words start. Called 'internal' because it's a notion Vim has; not
 # obvious.
 CLASS_VI_INTERNAL_WORD_START = CLASS_WORD_START | CLASS_PUNCTUATION_START | CLASS_LINE_END
+CLASS_VI_WORD_END = CLASS_WORD_END | CLASS_PUNCTUATION_END
+CLASS_VI_INTERNAL_WORD_END = CLASS_WORD_END | CLASS_PUNCTUATION_END
 
 
 def at_eol(view, pt):
@@ -69,6 +71,15 @@ def next_big_word_start(view, start, internal=False):
     if internal and at_eol(view, pt):
         return pt
     pt = view.find_by_class(pt, forward=True, classes=classes, separators=seps)
+    return pt
+
+
+def next_word_end(view, start, internal=False):
+    classes = CLASS_VI_WORD_END if not internal else CLASS_VI_INTERNAL_WORD_END
+    pt = view.find_by_class(start, forward=True, classes=classes)
+    if internal and at_eol(view, pt):
+        # Unreachable?
+        return pt
     return pt
 
 
@@ -127,5 +138,36 @@ def big_word_starts(view, start, count=1, internal=False):
        (start != view.line(start).a and not view.substr(view.line(pt - 1)).isspace()) and
          at_eol(view, pt - 1)):
             pt -= 1
+
+    return pt
+
+
+def word_ends(view, start, count=1, internal=False):
+    assert start >= 0
+    assert count > 0
+
+    pt = start
+    for i in range(count):
+        # On the last motion iteration, we must do some special stuff if we are still on the
+        # starting line of the motion.
+        # if (internal and (i == count - 1) and
+        #     (view.line(start) == view.line(pt))):
+        #         if view.substr(pt) == '\n':
+        #             return pt + 1
+        #         return next_word_start(view, pt, internal=True)
+
+        pt = next_word_end(view, pt + 1) - 1
+        # if not internal or (i != count - 1):
+        #     pt = next_non_white_space_char(view, pt, white_space=' \t')
+        #     while not (view.size() == pt or
+        #                view.line(pt).empty() or
+        #                view.substr(view.line(pt)).strip()):
+        #         pt = next_word_start(view, pt)
+        #         pt = next_non_white_space_char(view, pt, white_space=' \t')
+
+    # if (internal and (view.line(start) != view.line(pt)) and
+    #    (start != view.line(start).a and not view.substr(view.line(pt - 1)).isspace()) and
+    #      at_eol(view, pt - 1)):
+    #         pt -= 1
 
     return pt
