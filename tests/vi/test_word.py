@@ -745,10 +745,58 @@ class Test_words_InInternalNormalMode_FromOneWordLine(BufferTest):
     # We can assume the stuff tested for normal mode applies to internal normal mode, so we
     # don't bother with that. Instead, we only test the differing behavior when advancing by
     # word starts in internal normal.
-    def testMove2ToLineWithLeadingWhiteSpace(self):
-        set_text(self.view, 'foo\n\nbar fizz\n')
+    def testMove2ToLineWithLeadingWhiteSpaceFromWordStart(self):
+        set_text(self.view, 'foo\n\nbar\n')
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
         pt = word_starts(self.view, r.b, internal=True, count=2)
         self.assertEqual(pt, 5)
+
+    def testMove2ToEmptyLineFromWord(self):
+        set_text(self.view, 'foo\n\nbar\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = word_starts(self.view, r.b, internal=True, count=2)
+        self.assertEqual(pt, 4)
+
+    def testMove2ToOneWordLineFromWordStart(self):
+        set_text(self.view, 'foo\nbar\nccc\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = word_starts(self.view, r.b, internal=True, count=2)
+        self.assertEqual(pt, 8)
+
+    def testMove2ToOneWordLineFromWord(self):
+        set_text(self.view, 'foo\nbar\nccc\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = word_starts(self.view, r.b, internal=True, count=2)
+        self.assertEqual(pt, 7)
+
+    def testMove2ToWhitespaceline(self):
+        set_text(self.view, 'foo\n  \nccc\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = word_starts(self.view, r.b, internal=True, count=2)
+        self.assertEqual(pt, 10)
+
+    def testMove2ToWhitespacelineFollowedByLeadingWhitespaceFromWord(self):
+        set_text(self.view, 'foo\n  \n ccc\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = word_starts(self.view, r.b, internal=True, count=2)
+        self.assertEqual(pt, 11)
+
+    def testMove2ToWhitespacelineFollowedByLeadingWhitespaceFromWordStart(self):
+        set_text(self.view, 'foo\n  \n ccc\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = word_starts(self.view, r.b, internal=True, count=2)
+        self.assertEqual(pt, 12)

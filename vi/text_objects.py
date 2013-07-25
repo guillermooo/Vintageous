@@ -118,7 +118,10 @@ def a_word(view, pt, inclusive=True, count=1):
     start = current_word_start(view, pt)
     end = pt
     if inclusive:
-        end = units.word_starts(view, end, count=count, internal=True)
+        end = units.word_starts(view, start, count=count, internal=True)
+        # Vim does some inconsistent stuff here...
+        if count > 1 and view.substr(end) == '\n':
+            end += 1
         return sublime.Region(start, end)
 
     for x in range(count):

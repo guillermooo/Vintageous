@@ -46,6 +46,12 @@ def at_word(view, pt):
     return at_word_start(view, pt) or word_pattern.match(view.substr(pt))
 
 
+def skip_whitespace_lines(view, pt):
+    while pt < view.size() and view.substr(view.line(pt)).isspace():
+        pt = view.full_line(pt).b
+    return pt
+
+
 def skip_word(view, pt):
     while True:
         if at_punctuation(view, pt):
@@ -63,7 +69,7 @@ def next_word_start(view, start, classes=CLASS_VI_WORD_START):
         while not (view.size() == pt or
                    view.line(pt).empty() or
                    view.substr(view.line(pt)).strip()):
-            pt = next_word_start(view, pt)
+            pt = next_word_start(view, pt, classes=classes)
     return pt
 
 
@@ -108,15 +114,21 @@ def word_starts(view, start, count=1, internal=False):
 
         pt = next_word_start(view, pt, classes=classes)
 
-        if (internal and
-            (i != count - 1) and
-            at_eol(view, pt) and
-            (start == view.line(start).a)):
-                pt = next_non_white_space_char(view, pt + 1,
-                                               white_space=' \t')
+        if internal:
+            if ((i != count -1) and at_eol(view, pt) and
+                pt + 1 < view.size() and view.line(pt+1).empty()):
+                    pass
+            elif ((i != count -1) and at_eol(view, pt) and
+                  pt + 1 < view.size() and view.substr(view.line(pt+1)).isspace()):
+                    pt = skip_whitespace_lines(view, pt + 1)
+                    pt = next_non_white_space_char(view, pt, white_space=' \t')
+            elif ((i != count - 1) and at_eol(view, pt) and
+                  not view.line(pt).empty()):
+                    pt = next_non_white_space_char(view, pt + 1,
+                                                   white_space=' \t')
 
     if (internal and (view.line(start) != view.line(pt)) and
-        (not view.line(pt).empty()) and
+       (start == view.line(start).a or view.substr(view.line(start)).isspace()) and
          at_eol(view, pt)):
             pt += 1
 
