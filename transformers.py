@@ -23,6 +23,17 @@ class ClipEndToLine(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
+class DontStayOnEolBackward(sublime_plugin.TextCommand):
+    def run(self, edit, **kwargs):
+        def f(view, s):
+            if is_at_eol(self.view, s) and not self.view.line(s.b).empty():
+                return back_one_char(s)
+            else:
+                return s
+
+        regions_transformer(self.view, f)
+
+
 class _vi_d_post_action(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
         def f(view, s):

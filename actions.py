@@ -1,3 +1,4 @@
+            self.view.run_command('dont_stay_on_eol_backward')
 """Sublime Text commands performing vim actions.
 
    If you are implementing a new action command, stick it here.
