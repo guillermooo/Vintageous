@@ -579,6 +579,21 @@ class ViBigM(sublime_plugin.TextCommand):
 
 
 class ViStar(sublime_plugin.TextCommand):
+    # TODO: implement searchiliter baseclass?
+    def hilite(self, pattern):
+        # TODO: Implement smartcase?
+        flags = sublime.IGNORECASE | sublime.LITERAL
+        regs = self.view.find_all(pattern, flags)
+        if not regs:
+            self.view.erase_regions('vi_search')
+            return
+
+        state = VintageState(self.view)
+        if not state.settings.vi['hlsearch']:
+            return
+
+        self.view.add_regions('vi_search', regs, 'comment', '', sublime.DRAW_NO_FILL)
+
     def run(self, edit, mode=None, extend=False, exact_word=True):
         def f(view, s):
 
@@ -617,12 +632,28 @@ class ViStar(sublime_plugin.TextCommand):
         # TODO: make sure we swallow any leading white space.
         query = self.view.substr(self.view.word(self.view.sel()[0].end()))
         if query:
+            self.hilite(query)
             state.last_buffer_search = query
 
         regions_transformer(self.view, f)
 
 
 class ViOctothorp(sublime_plugin.TextCommand):
+    # TODO: implement searchiliter baseclass?
+    def hilite(self, pattern):
+        # TODO: Implement smartcase?
+        flags = sublime.IGNORECASE | sublime.LITERAL
+        regs = self.view.find_all(pattern, flags)
+        if not regs:
+            self.view.erase_regions('vi_search')
+            return
+
+        state = VintageState(self.view)
+        if not state.settings.vi['hlsearch']:
+            return
+
+        self.view.add_regions('vi_search', regs, 'comment', '', sublime.DRAW_NO_FILL)
+
     def run(self, edit, mode=None, extend=False, exact_word=True):
         def f(view, s):
 
@@ -661,6 +692,7 @@ class ViOctothorp(sublime_plugin.TextCommand):
         # TODO: make sure we swallow any leading white space.
         query = self.view.substr(self.view.word(self.view.sel()[0].end()))
         if query:
+            self.hilite(query)
             state.last_buffer_search = query
 
         current_sel = self.view.sel()[0]
