@@ -1334,9 +1334,11 @@ class _vi_dollar(sublime_plugin.TextCommand):
             elif mode == MODE_VISUAL:
                 current_line_pt = (s.b - 1) if (s.a < s.b) else s.b
                 if count > 1:
-                    end = view.line(target_row_pt).b
+                    end = view.full_line(target_row_pt).b
                 else:
-                    end = view.line(s.b).b
+                    end = s.end()
+                    if not end == view.full_line(s.b - 1).b:
+                        end = view.full_line(s.b).b
                 end = end if (s.a < end) else (end - 1)
                 start = s.a if ((s.a < s.b) or (end < s.a)) else s.a - 1
                 return sublime.Region(start, end)
