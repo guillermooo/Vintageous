@@ -4,6 +4,8 @@ from sublime import CLASS_PUNCTUATION_START
 from sublime import CLASS_PUNCTUATION_END
 from sublime import CLASS_EMPTY_LINE
 from sublime import CLASS_LINE_END
+from sublime import CLASS_LINE_START
+
 
 from Vintageous.vi.utils import next_non_white_space_char
 
@@ -13,7 +15,7 @@ word_pattern = re.compile('\w')
 
 
 CLASS_VI_WORD_START = (CLASS_WORD_START | CLASS_PUNCTUATION_START |
-                       CLASS_EMPTY_LINE)
+                       CLASS_LINE_START)
 CLASS_VI_INTERNAL_WORD_START = (CLASS_WORD_START | CLASS_PUNCTUATION_START |
                                 CLASS_LINE_END)
 CLASS_VI_BIG_WORD_START = (CLASS_WORD_START | CLASS_EMPTY_LINE |
@@ -65,11 +67,6 @@ def skip_word(view, pt):
 
 def next_word_start(view, start, classes=CLASS_VI_WORD_START):
     pt = view.find_by_class(start, forward=True, classes=classes)
-    if classes != CLASS_VI_INTERNAL_WORD_START:
-        while not (view.size() == pt or
-                   view.line(pt).empty() or
-                   view.substr(view.line(pt)).strip()):
-            pt = next_word_start(view, pt, classes=classes)
     return pt
 
 
@@ -95,42 +92,26 @@ def word_starts(view, start, count=1, internal=False):
     assert start >= 0
     assert count > 0
 
-    classes = (CLASS_VI_WORD_START if not internal
-                                   else CLASS_VI_INTERNAL_WORD_START)
-
     pt = start
     for i in range(count):
-        # Special case. Don't eat up next leading white space if moving from empty line in
-        # internal mode.
-        # For example, dw (starting in line 1):
-        #
-        #   1|
-        #   2|  foo bar
-        #
-        if (internal and (i == count - 1) and view.line(pt).empty() and
-            (pt < view.size())):
-                pt += 1
-                continue
+        if internal and count == 1:
+            if view.substr(pt) == '\n':
+                return pt + 1
+            return next_word_start(view, pt, classes=CLASS_VI_INTERNAL_WORD_START)
 
-        pt = next_word_start(view, pt, classes=classes)
-
-        if internal:
-            if ((i != count -1) and at_eol(view, pt) and
-                pt + 1 < view.size() and view.line(pt+1).empty()):
-                    pass
-            elif ((i != count -1) and at_eol(view, pt) and
-                  pt + 1 < view.size() and view.substr(view.line(pt+1)).isspace()):
-                    pt = skip_whitespace_lines(view, pt + 1)
-                    pt = next_non_white_space_char(view, pt, white_space=' \t')
-            elif ((i != count - 1) and at_eol(view, pt) and
-                  not view.line(pt).empty()):
-                    pt = next_non_white_space_char(view, pt + 1,
-                                                   white_space=' \t')
+        pt = next_word_start(view, pt, classes=CLASS_VI_WORD_START)
+        if not internal or i != count - 1:
+            pt = next_non_white_space_char(view, pt, white_space=' \t')
+            while not (view.size() == pt or
+                       view.line(pt).empty() or
+                       view.substr(view.line(pt)).strip()):
+                pt = next_word_start(view, pt, classes=CLASS_VI_WORD_START)
+                pt = next_non_white_space_char(view, pt, white_space=' \t')
 
     if (internal and (view.line(start) != view.line(pt)) and
-       (start == view.line(start).a or view.substr(view.line(start)).isspace()) and
-         at_eol(view, pt)):
-            pt += 1
+       (start != view.line(start).a and not view.substr(view.line(pt - 1)).isspace()) and
+         at_eol(view, pt - 1)):
+            pt -= 1
 
     return pt
 

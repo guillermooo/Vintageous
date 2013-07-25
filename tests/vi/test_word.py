@@ -45,7 +45,7 @@ class Test_next_word_start_InNormalMode_FromWhitespace(BufferTest):
         add_selection(self.view, r)
 
         pt = next_word_start(self.view, r.b)
-        self.assertEqual(pt, 6)
+        self.assertEqual(pt, 3)
 
     def testToEofWithNewline(self):
         set_text(self.view, '  \n')
@@ -77,7 +77,7 @@ class Test_next_word_start_InNormalMode_FromWhitespace(BufferTest):
         add_selection(self.view, r)
 
         pt = next_word_start(self.view, r.b)
-        self.assertEqual(pt, 5)
+        self.assertEqual(pt, 4)
 
     def testToOneCharWord(self):
         set_text(self.view, '  a foo bar\n')
@@ -101,7 +101,7 @@ class Test_next_word_start_InNormalMode_FromWhitespace(BufferTest):
         add_selection(self.view, r)
 
         pt = next_word_start(self.view, r.b)
-        self.assertEqual(pt, 4)
+        self.assertEqual(pt, 3)
 
 
 class Test_next_word_start_InNormalMode_FromWordStart(BufferTest):
@@ -135,7 +135,7 @@ class Test_next_word_start_InNormalMode_FromWordStart(BufferTest):
         add_selection(self.view, r)
 
         pt = next_word_start(self.view, r.b)
-        self.assertEqual(pt, 7)
+        self.assertEqual(pt, 4)
 
     def testToEofWithNewline(self):
         set_text(self.view, 'foo\n')
@@ -167,7 +167,7 @@ class Test_next_word_start_InNormalMode_FromWordStart(BufferTest):
         add_selection(self.view, r)
 
         pt = next_word_start(self.view, r.b)
-        self.assertEqual(pt, 5)
+        self.assertEqual(pt, 4)
 
     def testToOneCharWord(self):
         set_text(self.view, 'foo a bar\n')
@@ -191,7 +191,7 @@ class Test_next_word_start_InNormalMode_FromWordStart(BufferTest):
         add_selection(self.view, r)
 
         pt = next_word_start(self.view, r.b)
-        self.assertEqual(pt, 5)
+        self.assertEqual(pt, 4)
 
 
 class Test_next_word_start_InNormalMode_FromWord(BufferTest):
@@ -225,7 +225,7 @@ class Test_next_word_start_InNormalMode_FromWord(BufferTest):
         add_selection(self.view, r)
 
         pt = next_word_start(self.view, r.b)
-        self.assertEqual(pt, 7)
+        self.assertEqual(pt, 4)
 
     def testToEofWithNewline(self):
         set_text(self.view, 'foo\n')
@@ -257,7 +257,7 @@ class Test_next_word_start_InNormalMode_FromWord(BufferTest):
         add_selection(self.view, r)
 
         pt = next_word_start(self.view, r.b)
-        self.assertEqual(pt, 5)
+        self.assertEqual(pt, 4)
 
     def testToOneCharWord(self):
         set_text(self.view, 'foo a bar\n')
@@ -281,7 +281,7 @@ class Test_next_word_start_InNormalMode_FromWord(BufferTest):
         add_selection(self.view, r)
 
         pt = next_word_start(self.view, r.b)
-        self.assertEqual(pt, 5)
+        self.assertEqual(pt, 4)
 
 
 class Test_next_word_start_InNormalMode_FromPunctuationStart(BufferTest):
@@ -315,7 +315,7 @@ class Test_next_word_start_InNormalMode_FromPunctuationStart(BufferTest):
         add_selection(self.view, r)
 
         pt = next_word_start(self.view, r.b)
-        self.assertEqual(pt, 5)
+        self.assertEqual(pt, 2)
 
     def testToEofWithNewline(self):
         set_text(self.view, ':\n')
@@ -347,7 +347,7 @@ class Test_next_word_start_InNormalMode_FromPunctuationStart(BufferTest):
         add_selection(self.view, r)
 
         pt = next_word_start(self.view, r.b)
-        self.assertEqual(pt, 3)
+        self.assertEqual(pt, 2)
 
     def testToOneCharWord(self):
         set_text(self.view, ':a bar\n')
@@ -371,7 +371,7 @@ class Test_next_word_start_InNormalMode_FromPunctuationStart(BufferTest):
         add_selection(self.view, r)
 
         pt = next_word_start(self.view, r.b)
-        self.assertEqual(pt, 3)
+        self.assertEqual(pt, 2)
 
 
 class Test_next_word_start_InNormalMode_FromEmptyLine(BufferTest):
@@ -389,7 +389,7 @@ class Test_next_word_start_InNormalMode_FromEmptyLine(BufferTest):
         add_selection(self.view, r)
 
         pt = next_word_start(self.view, r.b)
-        self.assertEqual(pt, 2)
+        self.assertEqual(pt, 1)
 
     def testToEmptyLine(self):
         set_text(self.view, '\n\n\n')
@@ -405,7 +405,7 @@ class Test_next_word_start_InNormalMode_FromEmptyLine(BufferTest):
         add_selection(self.view, r)
 
         pt = next_word_start(self.view, r.b)
-        self.assertEqual(pt, 4)
+        self.assertEqual(pt, 1)
 
     def testToEofWithNewline(self):
         set_text(self.view, '\n')
@@ -437,7 +437,7 @@ class Test_next_word_start_InNormalMode_FromEmptyLine(BufferTest):
         add_selection(self.view, r)
 
         pt = next_word_start(self.view, r.b)
-        self.assertEqual(pt, 2)
+        self.assertEqual(pt, 1)
 
     def testToOneCharWord(self):
         set_text(self.view, '\na bar\n')
@@ -461,7 +461,7 @@ class Test_next_word_start_InNormalMode_FromEmptyLine(BufferTest):
         add_selection(self.view, r)
 
         pt = next_word_start(self.view, r.b)
-        self.assertEqual(pt, 2)
+        self.assertEqual(pt, 1)
 
 
 class Test_next_word_start_InNormalMode_FromPunctuation(BufferTest):
@@ -495,7 +495,7 @@ class Test_next_word_start_InNormalMode_FromPunctuation(BufferTest):
         add_selection(self.view, r)
 
         pt = next_word_start(self.view, r.b)
-        self.assertEqual(pt, 6)
+        self.assertEqual(pt, 3)
 
     def testToEofWithNewline(self):
         set_text(self.view, '::\n')
@@ -527,7 +527,7 @@ class Test_next_word_start_InNormalMode_FromPunctuation(BufferTest):
         add_selection(self.view, r)
 
         pt = next_word_start(self.view, r.b)
-        self.assertEqual(pt, 4)
+        self.assertEqual(pt, 3)
 
     def testToOneCharWord(self):
         set_text(self.view, '::a bar\n')
@@ -551,7 +551,7 @@ class Test_next_word_start_InNormalMode_FromPunctuation(BufferTest):
         add_selection(self.view, r)
 
         pt = next_word_start(self.view, r.b)
-        self.assertEqual(pt, 4)
+        self.assertEqual(pt, 3)
 
 
 class Test_next_word_start_InInternalNormalMode_FromWhitespace(BufferTest):
