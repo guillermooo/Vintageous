@@ -1464,7 +1464,7 @@ class _vi_e(sublime_plugin.TextCommand):
         def f(view, s):
             if mode == MODE_NORMAL:
                 pt = units.word_ends(view, start=s.b, count=count)
-                if ((pt == view.size()) and (not view.line(pt).empty())):
+                if ((pt == view.size() - 1) and (not view.line(pt).empty())):
                     pt = utils.previous_non_white_space_char(view, pt - 1,
                                                             white_space='\n')
                 return sublime.Region(pt, pt)

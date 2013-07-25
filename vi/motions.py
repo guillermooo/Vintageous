@@ -258,36 +258,9 @@ def vi_b(vi_cmd_data):
 
 
 def vi_e(vi_cmd_data):
-    # NORMAL mode movement:
-    #   ST does what Vim does (TODO: always?).
-    #
-    # _MODE_INTERNAL_NORMAL
-    #
-    # vi_cmd_data['motion']['command'] = 'move'
-    # vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_end': True, 'punct_end': True, 'empty_line': False, 'forward': True}
-    # vi_cmd_data['__reorient_caret'] = True
-
-    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-        vi_cmd_data['motion']['command'] = '_vi_e'
-        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-        vi_cmd_data['count'] = 1
-        vi_cmd_data['__reorient_caret'] = False
-
-    elif vi_cmd_data['mode'] == MODE_NORMAL:
-        vi_cmd_data['motion']['command'] = '_vi_e'
-        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-        vi_cmd_data['count'] = 1
-        vi_cmd_data['__reorient_caret'] = False
-
-    elif vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['motion']['command'] = '_vi_e'
-        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-        vi_cmd_data['count'] = 1
-        vi_cmd_data['__reorient_caret'] = False
-
-    elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
-        vi_cmd_data['motion']['command'] = 'vi_no_op'
-        vi_cmd_data['motion']['args'] = {}
+    vi_cmd_data['motion']['command'] = '_vi_e'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['count'] = 1
 
     return vi_cmd_data
 
