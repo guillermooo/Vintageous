@@ -53,21 +53,21 @@ def skip_word(view, pt):
     return pt
 
 
-def next_word_start(view, start, classes=CLASS_VI_WORD_START):
+def next_word_start(view, start, internal=False):
+    classes = CLASS_VI_WORD_START if not internal else CLASS_VI_INTERNAL_WORD_START
     pt = view.find_by_class(start, forward=True, classes=classes)
-    if classes == CLASS_VI_INTERNAL_WORD_START:
+    if internal and at_eol(view, pt):
         # Unreachable?
-        if at_eol(view, pt):
-            return pt
+        return pt
     return pt
 
 
-def next_big_word_start(view, start, classes=CLASS_VI_WORD_START):
+def next_big_word_start(view, start, internal=False):
+    classes = CLASS_VI_WORD_START if not internal else CLASS_VI_INTERNAL_WORD_START
     pt = skip_word(view, start)
     seps = ''
-    if classes == CLASS_VI_INTERNAL_WORD_START:
-        if at_eol(view, pt):
-            return pt
+    if internal and at_eol(view, pt):
+        return pt
     pt = view.find_by_class(pt, forward=True, classes=classes, separators=seps)
     return pt
 
@@ -84,16 +84,15 @@ def word_starts(view, start, count=1, internal=False):
             (view.line(start) == view.line(pt))):
                 if view.substr(pt) == '\n':
                     return pt + 1
-                return next_word_start(view, pt,
-                                       classes=CLASS_VI_INTERNAL_WORD_START)
+                return next_word_start(view, pt, internal=True)
 
-        pt = next_word_start(view, pt, classes=CLASS_VI_WORD_START)
+        pt = next_word_start(view, pt)
         if not internal or (i != count - 1):
             pt = next_non_white_space_char(view, pt, white_space=' \t')
             while not (view.size() == pt or
                        view.line(pt).empty() or
                        view.substr(view.line(pt)).strip()):
-                pt = next_word_start(view, pt, classes=CLASS_VI_WORD_START)
+                pt = next_word_start(view, pt)
                 pt = next_non_white_space_char(view, pt, white_space=' \t')
 
     if (internal and (view.line(start) != view.line(pt)) and
@@ -113,15 +112,15 @@ def big_word_starts(view, start, count=1, internal=False):
         if internal and i == count - 1 and view.line(start) == view.line(pt):
             if view.substr(pt) == '\n':
                 return pt + 1
-            return next_big_word_start(view, pt, classes=CLASS_VI_INTERNAL_WORD_START)
+            return next_big_word_start(view, pt, internal=True)
 
-        pt = next_big_word_start(view, pt, classes=CLASS_VI_WORD_START)
+        pt = next_big_word_start(view, pt)
         if not internal or i != count - 1:
             pt = next_non_white_space_char(view, pt, white_space=' \t')
             while not (view.size() == pt or
                        view.line(pt).empty() or
                        view.substr(view.line(pt)).strip()):
-                pt = next_big_word_start(view, pt, classes=CLASS_VI_WORD_START)
+                pt = next_big_word_start(view, pt)
                 pt = next_non_white_space_char(view, pt, white_space=' \t')
 
     if (internal and (view.line(start) != view.line(pt)) and
