@@ -985,3 +985,27 @@ class ViSoftUndo(IrreversibleTextCommand):
             return
 
         self.view.run_command('soft_undo')
+
+
+class _vi_ctrl_e(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None):
+        # TODO: Implement this motion properly; don't use built-in commands.
+        # We're using an action because we don't care too much right now and we don't want the
+        # motion to blink every time we issue it (it does because the selections don't change and
+        # Vintageous rightfully thinks it has failed.)
+        if mode == MODE_VISUAL_LINE:
+            return
+        extend = True if mode == MODE_VISUAL else False
+        self.view.run_command('scroll_lines', {'amount': -1, 'extend': extend})
+
+
+class _vi_ctrl_y(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None):
+        # TODO: Implement this motion properly; don't use built-in commands.
+        # We're using an action because we don't care too much right now and we don't want the
+        # motion to blink every time we issue it (it does because the selections don't change and
+        # Vintageous rightfully thinks it has failed.)
+        if mode == MODE_VISUAL_LINE:
+            return
+        extend = True if mode == MODE_VISUAL else False
+        self.view.run_command('scroll_lines', {'amount': 1, 'extend': extend})

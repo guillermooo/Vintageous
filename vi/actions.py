@@ -964,3 +964,23 @@ def vi_g_tilde_g_tilde(vi_cmd_data):
     vi_cmd_data['post_action'] = ['collapse_to_a',]
 
     return vi_cmd_data
+
+# TODO: This is wrong. They must be motions.
+def vi_ctrl_e(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['_repeat_action'] = True
+    vi_cmd_data['action']['command'] = '_vi_ctrl_e'
+    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
+
+    return vi_cmd_data
+
+
+# TODO: This is wrong. They must be motions.
+def vi_ctrl_y(vi_cmd_data):
+    vi_cmd_data['motion_required'] = False
+    vi_cmd_data['_repeat_action'] = True
+    vi_cmd_data['action']['command'] = '_vi_ctrl_y'
+    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
+
+    return vi_cmd_data
+
