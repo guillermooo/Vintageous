@@ -9,7 +9,7 @@ from sublime import CLASS_LINE_START
 
 from Vintageous.vi.search import reverse_search_by_pt
 from Vintageous.vi.search import find_in_range
-from Vintageous.vi.units import words
+from Vintageous.vi import units
 
 
 ANCHOR_NEXT_WORD_BOUNDARY = CLASS_WORD_START | CLASS_PUNCTUATION_START | CLASS_LINE_END
@@ -118,7 +118,7 @@ def a_word(view, pt, inclusive=True, count=1):
     start = current_word_start(view, pt)
     end = pt
     if inclusive:
-        end = words(view, end, count=count, internal=True)
+        end = units.word_starts(view, end, count=count, internal=True)
         return sublime.Region(start, end)
 
     for x in range(count):

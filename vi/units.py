@@ -85,7 +85,7 @@ def next_big_word_start(view, start, classes=CLASS_VI_BIG_WORD_START):
     return pt
 
 
-def words(view, start, count=1, internal=False):
+def word_starts(view, start, count=1, internal=False):
     assert start >= 0
     assert count > 0
 
@@ -107,11 +107,13 @@ def words(view, start, count=1, internal=False):
                 continue
 
         pt = next_word_start(view, pt, classes=classes)
-        if internal:
-            if (i != count - 1):
-                if (not view.line(pt).empty()) and at_eol(view, pt):
-                    pt += 1
-                    pt = next_non_white_space_char(view, pt, white_space=' \t')
+
+        if (internal and
+            (i != count - 1) and
+            at_eol(view, pt) and
+            not view.line(pt).empty()):
+                pt = next_non_white_space_char(view, pt + 1,
+                                               white_space=' \t')
 
     if (internal and (view.line(start) != view.line(pt)) and
         (not view.line(pt).empty()) and at_eol(view, pt)):

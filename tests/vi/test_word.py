@@ -10,7 +10,7 @@ from Vintageous.tests.commands import set_text
 from Vintageous.tests.commands import add_selection
 
 from Vintageous.vi.units import next_word_start
-from Vintageous.vi.units import words
+from Vintageous.vi.units import word_starts
 from Vintageous.vi.units import CLASS_VI_INTERNAL_WORD_START
 
 
@@ -668,7 +668,7 @@ class Test_words_InNormalMode(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = words(self.view, r.b)
+        pt = word_starts(self.view, r.b)
         self.assertEqual(pt, 4)
 
     def testMove2(self):
@@ -676,7 +676,7 @@ class Test_words_InNormalMode(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = words(self.view, r.b, count=2)
+        pt = word_starts(self.view, r.b, count=2)
         self.assertEqual(pt, 8)
 
     def testMove10(self):
@@ -684,23 +684,58 @@ class Test_words_InNormalMode(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = words(self.view, r.b, count=9)
+        pt = word_starts(self.view, r.b, count=9)
         self.assertEqual(pt, 36)
 
 
-class Test_words_InInternalNormalMode(BufferTest):
-    def testMove1FromEmptyLineToLineWithLeadingWhiteSpace(self):
+class Test_words_InInternalNormalMode_FromEmptyLine(BufferTest):
+    # We can assume the stuff tested for normal mode applies to internal normal mode, so we
+    # don't bother with that. Instead, we only test the differing behavior when advancing by
+    # word starts in internal normal.
+    def testMove1ToLineWithLeadingWhiteSpace(self):
         set_text(self.view, '\n bar\n')
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = words(self.view, r.b, internal=True)
+        pt = word_starts(self.view, r.b, internal=True)
         self.assertEqual(pt, 1)
 
-    def testMove2FromEmptyLineToLineWithLeadingWhiteSpace(self):
+    def testMove2ToLineWithLeadingWhiteSpace(self):
         set_text(self.view, '\n bar')
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = words(self.view, r.b, count=2, internal=True)
+        pt = word_starts(self.view, r.b, count=2, internal=True)
         self.assertEqual(pt, 6)
+
+    def testMove1ToWhitespaceLine(self):
+        set_text(self.view, '\n  \n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = word_starts(self.view, r.b, count=1, internal=True)
+        self.assertEqual(pt, 1)
+
+    def testMove2ToOneWordLine(self):
+        set_text(self.view, '\nfoo\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = word_starts(self.view, r.b, internal=True, count=2)
+        self.assertEqual(pt, 5)
+
+    def testMove3AndSwallowLastNewlineChar(self):
+        set_text(self.view, '\nfoo\n bar\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = word_starts(self.view, r.b, internal=True, count=3)
+        self.assertEqual(pt, 10)
+
+    def testMove2ToLineWithLeadingWhiteSpace(self):
+        set_text(self.view, '\nfoo\n  \n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = word_starts(self.view, r.b, internal=True, count=2)
+        self.assertEqual(pt, 5)
