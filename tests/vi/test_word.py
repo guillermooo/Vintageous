@@ -745,6 +745,14 @@ class Test_words_InInternalNormalMode_FromOneWordLine(BufferTest):
     # We can assume the stuff tested for normal mode applies to internal normal mode, so we
     # don't bother with that. Instead, we only test the differing behavior when advancing by
     # word starts in internal normal.
+    def testMove1ToEol(self):
+        set_text(self.view, 'foo\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = word_starts(self.view, r.b, internal=True, count=1)
+        self.assertEqual(pt, 3)
+
     def testMove2ToLineWithLeadingWhiteSpaceFromWordStart(self):
         set_text(self.view, 'foo\n\nbar\n')
         r = self.R((0, 0), (0, 0))
@@ -800,3 +808,13 @@ class Test_words_InInternalNormalMode_FromOneWordLine(BufferTest):
 
         pt = word_starts(self.view, r.b, internal=True, count=2)
         self.assertEqual(pt, 12)
+
+
+class Test_words_InInternalNormalMode_FromLine(BufferTest):
+    def testMove2ToEol(self):
+        set_text(self.view, 'foo bar\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = word_starts(self.view, r.b, internal=True, count=2)
+        self.assertEqual(pt, 7)

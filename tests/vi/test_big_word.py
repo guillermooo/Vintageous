@@ -15,89 +15,98 @@ from Vintageous.vi.units import CLASS_VI_INTERNAL_BIG_WORD_START
 from Vintageous.vi.units import CLASS_VI_BIG_WORD_START
 
 
-class Test_next_big_word_start_InNormalMode(BufferTest):
-    def testFromPunctuationStartToNextWord(self):
-        set_text(self.view, ' (foo) bar\n')
-        r = self.R((0, 1), (0, 1))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 7)
-
-    def testFromPunctuationStartToNextPunctuation(self):
-        set_text(self.view, ' (foo) (bar)\n')
-        r = self.R((0, 1), (0, 1))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 7)
-
-    def testFromWordStartToNextPunctuation(self):
-        set_text(self.view, 'foo (bar)\n')
-        r = self.R((0, 1), (0, 1))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 4)
-
-    def testFromWordStartToToNextWord(self):
-        set_text(self.view, 'foo, bar\n')
-        r = self.R((0, 0), (0, 0))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 5)
-
-    def testFromWordToToNextWord(self):
-        set_text(self.view, 'foo, bar\n')
-        r = self.R((0, 1), (0, 1))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 5)
-
-    def testFromWordToToNextPunctuation(self):
-        set_text(self.view, 'foo (bar)\n')
-        r = self.R((0, 1), (0, 1))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 4)
-
-    def testFromSpaceToNextPunctuation(self):
-        set_text(self.view, '  (bar)\n')
+class Test_next_big_word_start_InNormalMode_FromWhitespace(BufferTest):
+    def testToWordStart(self):
+        set_text(self.view, '  foo bar\n')
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
         pt = next_big_word_start(self.view, r.b)
         self.assertEqual(pt, 2)
 
-    def testFromEmptyLineToNextPunctuation(self):
-        set_text(self.view, '\n...\n\n')
+    def testToPunctuationStart(self):
+        set_text(self.view, '  (foo)\n')
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
         pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 1)
+        self.assertEqual(pt, 2)
 
-    def testFromEmptyLineToNextPunctuationLedByWhiteSpace(self):
-        set_text(self.view, '\n  ...\n\n')
+    def testToEmptyLine(self):
+        set_text(self.view, '  \n\n\n')
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
         pt = next_big_word_start(self.view, r.b)
         self.assertEqual(pt, 3)
 
-    def testFromWhitespaceLineToNextPunctuation(self):
-        set_text(self.view, '   \n...\n\n')
+    def testToWhitespaceLine(self):
+        set_text(self.view, '  \n  \n\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 3)
+
+    def testToEofWithNewline(self):
+        set_text(self.view, '  \n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 3)
+
+    def testToEof(self):
+        set_text(self.view, '   ')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 3)
+
+    def testToOneWordLine(self):
+        set_text(self.view, '   \nfoo\nbar')
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
         pt = next_big_word_start(self.view, r.b)
         self.assertEqual(pt, 4)
 
-    # @unittest.skip("FIXME: Sublime Text bug in classify at BOF.")
-    def testFromPunctuationStartAtBofToNextWord(self):
+    def testToOneWordLineWithLeadingWhitespace(self):
+        set_text(self.view, '   \n foo\nbar')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 4)
+
+    def testToOneCharWord(self):
+        set_text(self.view, '  a foo bar\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 2)
+
+    def testToOneCharLine(self):
+        set_text(self.view, '  \na\n\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 3)
+
+    def testToOneCharLineWithLeadingWhitespace(self):
+        set_text(self.view, '  \n a\n\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 3)
+
+
+class Test_next_big_word_start_InNormalMode_FromWordStart(BufferTest):
+    def testToWordStart(self):
         set_text(self.view, '(foo) bar\n')
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
@@ -105,492 +114,708 @@ class Test_next_big_word_start_InNormalMode(BufferTest):
         pt = next_big_word_start(self.view, r.b)
         self.assertEqual(pt, 6)
 
-    def testMoveToNextAlphabeticWord(self):
+    def testToPunctuationStart(self):
+        set_text(self.view, '(foo) (bar)\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+    def testToEmptyLine(self):
+        set_text(self.view, '(foo)\n\n\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+    def testToWhitespaceLine(self):
+        set_text(self.view, '(foo)\n  \n\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+    def testToEofWithNewline(self):
+        set_text(self.view, '(foo)\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+    def testToEof(self):
+        set_text(self.view, '(foo)')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 5)
+
+    def testToOneWordLine(self):
+        set_text(self.view, '(foo)\nbar\nbaz')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+    def testToOneWordLineWithLeadingWhitespace(self):
+        set_text(self.view, '(foo)\n bar\nbaz')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+    def testToOneCharWord(self):
+        set_text(self.view, '(foo) a bar\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+    def testToOneCharLine(self):
+        set_text(self.view, '(foo)\na\n\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+    def testToOneCharLineWithLeadingWhitespace(self):
+        set_text(self.view, '(foo)\n a\n\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+
+class Test_next_big_word_start_InNormalMode_FromWord(BufferTest):
+    def testToWordStart(self):
+        set_text(self.view, '(foo) bar\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+    def testToPunctuationStart(self):
+        set_text(self.view, '(foo) (bar)\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+    def testToEmptyLine(self):
+        set_text(self.view, '(foo)\n\n\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+    def testToWhitespaceLine(self):
+        set_text(self.view, '(foo)\n  \n\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+    def testToEofWithNewline(self):
+        set_text(self.view, '(foo)\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+    def testToEof(self):
+        set_text(self.view, '(foo)')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 5)
+
+    def testToOneWordLine(self):
+        set_text(self.view, '(foo)\nbar\nbaz')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+    def testToOneWordLineWithLeadingWhitespace(self):
+        set_text(self.view, '(foo)\n bar\nbaz')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+    def testToOneCharWord(self):
+        set_text(self.view, '(foo) a bar\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+    def testToOneCharLine(self):
+        set_text(self.view, '(foo)\na\n\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+    def testToOneCharLineWithLeadingWhitespace(self):
+        set_text(self.view, '(foo)\n a\n\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+
+class Test_next_big_word_start_InNormalMode_FromPunctuationStart(BufferTest):
+    def testToWordStart(self):
+        set_text(self.view, ':foo\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 5)
+
+    def testToPunctuationStart(self):
+        set_text(self.view, ': (foo)\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 2)
+
+    def testToEmptyLine(self):
+        set_text(self.view, ':\n\n\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 2)
+
+    def testToWhitespaceLine(self):
+        set_text(self.view, ':\n  \n\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 2)
+
+    def testToEofWithNewline(self):
+        set_text(self.view, ':\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 2)
+
+    def testToEof(self):
+        set_text(self.view, ':')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 1)
+
+    def testToOneWordLine(self):
+        set_text(self.view, ':\nbar\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 2)
+
+    def testToOneWordLineWithLeadingWhitespace(self):
+        set_text(self.view, ':\n bar\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 2)
+
+    def testToOneCharWord(self):
+        set_text(self.view, ':a bar\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 3)
+
+    def testToOneCharLine(self):
+        set_text(self.view, ':\na\n\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 2)
+
+    def testToOneCharLineWithLeadingWhitespace(self):
+        set_text(self.view, ':\n a\n\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 2)
+
+
+class Test_next_big_word_start_InNormalMode_FromEmptyLine(BufferTest):
+    def testToWordStart(self):
+        set_text(self.view, '\nfoo\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 1)
+
+    def testToPunctuationStart(self):
+        set_text(self.view, '\n (foo)\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 1)
+
+    def testToEmptyLine(self):
+        set_text(self.view, '\n\n\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 1)
+
+    def testToWhitespaceLine(self):
+        set_text(self.view, '\n  \n\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 1)
+
+    def testToEofWithNewline(self):
+        set_text(self.view, '\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 1)
+
+    def testToEof(self):
+        set_text(self.view, '')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 0)
+
+    def testToOneWordLine(self):
+        set_text(self.view, '\nbar\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 1)
+
+    def testToOneWordLineWithLeadingWhitespace(self):
+        set_text(self.view, '\n bar\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 1)
+
+    def testToOneCharWord(self):
+        set_text(self.view, '\na bar\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 1)
+
+    def testToOneCharLine(self):
+        set_text(self.view, '\na\n\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 1)
+
+    def testToOneCharLineWithLeadingWhitespace(self):
+        set_text(self.view, '\n a\n\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 1)
+
+
+class Test_next_big_word_start_InNormalMode_FromPunctuation(BufferTest):
+    def testToWordStart(self):
+        set_text(self.view, '::foo\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+    def testToPunctuationStart(self):
+        set_text(self.view, ':: (foo)\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 3)
+
+    def testToEmptyLine(self):
+        set_text(self.view, '::\n\n\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 3)
+
+    def testToWhitespaceLine(self):
+        set_text(self.view, '::\n  \n\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 3)
+
+    def testToEofWithNewline(self):
+        set_text(self.view, '::\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 3)
+
+    def testToEof(self):
+        set_text(self.view, '::')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 2)
+
+    def testToOneWordLine(self):
+        set_text(self.view, '::\nbar\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 3)
+
+    def testToOneWordLineWithLeadingWhitespace(self):
+        set_text(self.view, '::\n bar\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 3)
+
+    def testToOneCharWord(self):
+        set_text(self.view, '::a bar\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 4)
+
+    def testToOneCharLine(self):
+        set_text(self.view, '::\na\n\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 3)
+
+    def testToOneCharLineWithLeadingWhitespace(self):
+        set_text(self.view, '::\n a\n\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b)
+        self.assertEqual(pt, 3)
+
+
+class Test_next_big_word_start_InInternalNormalMode_FromWhitespace(BufferTest):
+    def testToWhitespaceLine(self):
+        set_text(self.view, '  \n  ')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 2)
+
+    def testToOneWordLineWithLeadingWhitespace(self):
+        set_text(self.view, '  \n foo')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 2)
+
+
+class Test_next_big_word_start_InInternalNormalMode_FromWordStart(BufferTest):
+    def testToWhitespaceLine(self):
+        set_text(self.view, 'foo\n  ')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 3)
+
+    def testToOneWordLineWithLeadingWhitespace(self):
+        set_text(self.view, 'foo\n bar')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 3)
+
+
+class Test_next_big_word_start_InInternalNormalMode_FromWord(BufferTest):
+    def testToWhitespaceLine(self):
+        set_text(self.view, '(foo)\n  ')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 5)
+
+    def testToOneWordLineWithLeadingWhitespace(self):
+        set_text(self.view, '(foo)\n bar')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 5)
+
+
+class Test_next_big_word_start_InInternalNormalMode_FromPunctuationStart(BufferTest):
+    def testToWhitespaceLine(self):
+        set_text(self.view, '.\n  ')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 1)
+
+    def testToOneWordLineWithLeadingWhitespace(self):
+        set_text(self.view, '.\n bar')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 1)
+
+
+class Test_next_big_word_start_InInternalNormalMode_FromPunctuation(BufferTest):
+    def testToWhitespaceLine(self):
+        set_text(self.view, '::\n  ')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 2)
+
+    def testToOneWordLineWithLeadingWhitespace(self):
+        set_text(self.view, '::\n bar')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 2)
+
+
+class Test_next_big_word_start_InInternalNormalMode_FromEmptyLine(BufferTest):
+    def testToWhitespaceLine(self):
+        set_text(self.view, '\n  ')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 0)
+
+    def testToOneWordLineWithLeadingWhitespace(self):
+        set_text(self.view, '\n bar')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        self.assertEqual(pt, 0)
+
+
+class Test_big_words_InNormalMode(BufferTest):
+    def testMove1(self):
+        set_text(self.view, '(foo) bar\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = big_words(self.view, r.b)
+        self.assertEqual(pt, 6)
+
+    def testMove2(self):
+        set_text(self.view, '(foo) bar fizz\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = big_words(self.view, r.b, count=2)
+        self.assertEqual(pt, 10)
+
+    def testMove10(self):
+        set_text(self.view, ''.join(('(foo) bar\n',) * 5))
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = big_words(self.view, r.b, count=9)
+        self.assertEqual(pt, 46)
+
+
+class Test_big_words_InInternalNormalMode_FromEmptyLine(BufferTest):
+    # We can assume the stuff tested for normal mode applies to internal normal mode, so we
+    # don't bother with that. Instead, we only test the differing behavior when advancing by
+    # word starts in internal normal.
+    def testMove1ToLineWithLeadingWhiteSpace(self):
+        set_text(self.view, '\n (bar)\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = big_words(self.view, r.b, internal=True)
+        self.assertEqual(pt, 1)
+
+    def testMove2ToLineWithLeadingWhiteSpace(self):
+        set_text(self.view, '\n (bar)')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = big_words(self.view, r.b, count=2, internal=True)
+        self.assertEqual(pt, 6)
+
+    def testMove1ToWhitespaceLine(self):
+        set_text(self.view, '\n  \n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = big_words(self.view, r.b, count=1, internal=True)
+        self.assertEqual(pt, 1)
+
+    def testMove2ToOneWordLine(self):
+        set_text(self.view, '\n(foo)\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = big_words(self.view, r.b, internal=True, count=2)
+        self.assertEqual(pt, 7)
+
+    def testMove3AndSwallowLastNewlineChar(self):
+        set_text(self.view, '\nfoo\n (bar)\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = big_words(self.view, r.b, internal=True, count=3)
+        self.assertEqual(pt, 12)
+
+    def testMove2ToLineWithLeadingWhiteSpace(self):
+        set_text(self.view, '\n(foo)\n  \n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = big_words(self.view, r.b, internal=True, count=2)
+        self.assertEqual(pt, 7)
+
+
+class Test_big_words_InInternalNormalMode_FromOneWordLine(BufferTest):
+    # We can assume the stuff tested for normal mode applies to internal normal mode, so we
+    # don't bother with that. Instead, we only test the differing behavior when advancing by
+    # word starts in internal normal.
+    def testMove2ToEol(self):
+        set_text(self.view, 'foo\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = big_words(self.view, r.b, internal=True, count=1)
+        self.assertEqual(pt, 3)
+
+    def testMove2ToLineWithLeadingWhiteSpaceFromWordStart(self):
+        set_text(self.view, '(foo)\n\nbar\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = big_words(self.view, r.b, internal=True, count=2)
+        self.assertEqual(pt, 7)
+
+    def testMove2ToEmptyLineFromWord(self):
+        set_text(self.view, '(foo)\n\nbar\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = big_words(self.view, r.b, internal=True, count=2)
+        self.assertEqual(pt, 6)
+
+    def testMove2ToOneWordLineFromWordStart(self):
+        set_text(self.view, '(foo)\nbar\nccc\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = big_words(self.view, r.b, internal=True, count=2)
+        self.assertEqual(pt, 10)
+
+    def testMove2ToOneWordLineFromWord(self):
+        set_text(self.view, '(foo)\nbar\nccc\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = big_words(self.view, r.b, internal=True, count=2)
+        self.assertEqual(pt, 9)
+
+    def testMove2ToWhitespaceline(self):
+        set_text(self.view, '(foo)\n  \nccc\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = big_words(self.view, r.b, internal=True, count=2)
+        self.assertEqual(pt, 12)
+
+    def testMove2ToWhitespacelineFollowedByLeadingWhitespaceFromWord(self):
+        set_text(self.view, '(foo)\n  \n ccc\n')
+        r = self.R((0, 1), (0, 1))
+        add_selection(self.view, r)
+
+        pt = big_words(self.view, r.b, internal=True, count=2)
+        self.assertEqual(pt, 13)
+
+    def testMove2ToWhitespacelineFollowedByLeadingWhitespaceFromWordStart(self):
+        set_text(self.view, '(foo)\n  \n ccc\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = big_words(self.view, r.b, internal=True, count=2)
+        self.assertEqual(pt, 14)
+
+
+class Test_big_words_InInternalNormalMode_FromLine(BufferTest):
+    def testMove2ToEol(self):
         set_text(self.view, 'foo bar\n')
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 4)
-
-    def testMoveToNextNumericWord(self):
-        set_text(self.view, 'foo 123\n')
-        r = self.R((0, 0), (0, 0))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 4)
-
-    def testMoveToNextAlphaNumericWord(self):
-        set_text(self.view, 'foo bar123\n')
-        r = self.R((0, 0), (0, 0))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 4)
-
-    def testMoveToNextAlphabeticWordSkippingWhiteSpace(self):
-        set_text(self.view, 'foo  \tbar\n')
-        r = self.R((0, 0), (0, 0))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, 0)
-        self.assertEqual(pt, 6)
-
-    def testMoveToNextWordAtEol(self):
-        set_text(self.view, 'foo bar\nfoo bar\n')
-        r = self.R((0, 4), (0, 4))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 8)
-
-    def testMoveToNextWordAtEolSkippingWhiteSpaceInNextLine(self):
-        set_text(self.view, 'foo bar\n  foo bar\n')
-        r = self.R((0, 4), (0, 4))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 10)
-
-    def testMoveToNextWordAtEolSkippingWhiteSpaceInCurrentLine(self):
-        set_text(self.view, 'foo bar  \nfoo bar\n')
-        r = self.R((0, 4), (0, 4))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 10)
-
-    def testMoveToNextWordAtEolSkippingWhiteSpaceInBothLines(self):
-        set_text(self.view, 'foo bar  \n  foo bar\n')
-        r = self.R((0, 4), (0, 4))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 12)
-
-    def testSkipNextPunctuationFromAlphanumericWord(self):
-        set_text(self.view, 'foo, bar\n')
-        r = self.R((0, 0), (0, 0))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 5)
-
-    def testMoveToNextPunctuationFromPunctuation(self):
-        set_text(self.view, 'foo, (bar)\n')
-        r = self.R((0, 3), (0, 3))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 5)
-
-    def testMoveToNextEmptyLine(self):
-        set_text(self.view, 'foo bar\n\nfoo bar')
-        r = self.R((0, 4), (0, 4))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 8)
-
-    def testMoveToNextWordFromWhiteSpace(self):
-        set_text(self.view, '  foo bar\n')
-        r = self.R((0, 1), (0, 1))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 2)
-
-    def testMoveToNextEmptyLineFromWhiteSpace(self):
-        set_text(self.view, '  \n\nfoo bar\n')
-        r = self.R((0, 1), (0, 1))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 3)
-
-    def testMoveToNextWordSkippingWhiteSpaceOnlyLine(self):
-        set_text(self.view, 'foo bar\n\t  \nfoo bar')
-        r = self.R((0, 5), (0, 5))
-        add_selection(self.view, r)
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 12)
-
-    def testMoveToNextEmptyLineSkippingWhiteSpaceOnlyLine(self):
-        set_text(self.view, 'foo bar\n\t  \n\nfoo bar')
-        r = self.R((0, 5), (0, 5))
-        add_selection(self.view, r)
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 12)
-
-    def testSkipNextInterpunctuation(self):
-        set_text(self.view, 'foo-bar\nfoo')
-        r = self.R((0, 0), (0, 0))
-        add_selection(self.view, r)
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 8)
-
-    # Perhaps this one depends on the user configuration ('word_separators').
-    def testMoveToNextWordSkippingUnderscores(self):
-        set_text(self.view, 'foo_bar foo bar\n')
-        r = self.R((0, 0), (0, 0))
-        add_selection(self.view, r)
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 8)
-
-
-class Test_big_words_InNormalMode(BufferTest):
-    def testMoveToNextAlphabeticWord(self):
-        # FIXME: Sublime Text bug: can't classify at BOF.
-        set_text(self.view, ' (foo)... bar... foo bar\n')
-        r = self.R((0, 1), (0, 1))
-        add_selection(self.view, r)
-
-        pt = big_words(self.view, r.b, count=2)
-        self.assertEqual(pt, 17)
-
-
-class Test_next_big_word_start_InInternalMode(BufferTest):
-    def testFromPunctuationStartToNextWord(self):
-        set_text(self.view, ' (foo) bar\n')
-        r = self.R((0, 1), (0, 1))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        pt = big_words(self.view, r.b, internal=True, count=2)
         self.assertEqual(pt, 7)
-
-    def testFromPunctuationStartToNextPunctuation(self):
-        set_text(self.view, ' (foo) (bar)\n')
-        r = self.R((0, 1), (0, 1))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-        self.assertEqual(pt, 7)
-
-    def testFromWordStartToNextPunctuation(self):
-        set_text(self.view, 'foo (bar)\n')
-        r = self.R((0, 1), (0, 1))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-        self.assertEqual(pt, 4)
-
-    def testFromWordStartToToNextWord(self):
-        set_text(self.view, 'foo, bar\n')
-        r = self.R((0, 0), (0, 0))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-        self.assertEqual(pt, 5)
-
-    def testFromWordToToNextWord(self):
-        set_text(self.view, 'foo, bar\n')
-        r = self.R((0, 1), (0, 1))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-        self.assertEqual(pt, 5)
-
-    def testFromWordToToNextPunctuation(self):
-        set_text(self.view, 'foo (bar)\n')
-        r = self.R((0, 1), (0, 1))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-        self.assertEqual(pt, 4)
-
-    def testFromSpaceToNextPunctuation(self):
-        set_text(self.view, '  (bar)\n')
-        r = self.R((0, 0), (0, 0))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-        self.assertEqual(pt, 2)
-
-    def testFromEmptyLineToNextPunctuation(self):
-        set_text(self.view, '\n...\n\n')
-        r = self.R((0, 0), (0, 0))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-        self.assertEqual(pt, 1)
-
-    def testFromEmptyLineToNextPunctuationLedByWhiteSpace(self):
-        set_text(self.view, '\n  ...\n\n')
-        r = self.R((0, 0), (0, 0))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-        self.assertEqual(pt, 3)
-
-    def testFromWhitespaceLineToNextPunctuation(self):
-        set_text(self.view, '   \n...\n\n')
-        r = self.R((0, 0), (0, 0))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-        self.assertEqual(pt, 3)
-
-    @unittest.skip("FIXME: Sublime Text bug in classify at BOF.")
-    def testFromPunctuationStartAtBofToNextWord(self):
-        set_text(self.view, '(foo) bar\n')
-        r = self.R((0, 0), (0, 0))
-        add_selection(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-        self.assertEqual(pt, 15)
-#     def testMoveToNextAlphabeticWord(self):
-#         set_text(self.view, 'Xoo bar\n')
-#         r = self.R((0, 0), (0, 0))
-#         add_selection(self.view, r)
-
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 4)
-
-#     def testMoveToNextNumericWord(self):
-#         set_text(self.view, 'Xoo 123\n')
-#         r = self.R((0, 0), (0, 0))
-#         add_selection(self.view, r)
-
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 4)
-
-#     def testMoveToNextAlphanumericWord(self):
-#         set_text(self.view, 'Xoo bar123\n')
-#         r = self.R((0, 0), (0, 0))
-#         add_selection(self.view, r)
-
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 4)
-
-#     def testMoveToNextAlphabeticWordSkippingWhiteSpace(self):
-#         set_text(self.view, 'Xoo  \tbar\n')
-#         r = self.R((0, 0), (0, 0))
-#         add_selection(self.view, r)
-
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 6)
-
-#     def testMoveToEolIfAtLastWordInLine(self):
-#         set_text(self.view, 'foo Xar\nfoo bar\n')
-#         r = self.R((0, 4), (0, 4))
-#         add_selection(self.view, r)
-
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 7)
-
-#     def testMoveToEolIfNextLineLedByWhiteSpace(self):
-#         set_text(self.view, 'foo Xar\n  foo bar\n')
-#         r = self.R((0, 4), (0, 4))
-#         add_selection(self.view, r)
-
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 7)
-
-#     def testMoveToEolIfTrailingWhiteSpaceInCurrentLine(self):
-#         set_text(self.view, 'foo Xar  \nfoo bar\n')
-#         r = self.R((0, 4), (0, 4))
-#         add_selection(self.view, r)
-
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 9)
-
-#     def testMoveToEolIfTrailingWhiteSpaceInCurrentLineAndLeadingWhiteSpaceInNextLine(self):
-#         set_text(self.view, 'foo Xar  \n  foo bar\n')
-#         r = self.R((0, 4), (0, 4))
-#         add_selection(self.view, r)
-
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 9)
-
-#     def testSkipNextPunctuationFromAlphanumericWord(self):
-#         set_text(self.view, 'Xoo, bar\n')
-#         r = self.R((0, 0), (0, 0))
-#         add_selection(self.view, r)
-
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 5)
-
-#     def testMoveToNextPunctuationFromPunctuation(self):
-#         set_text(self.view, 'foo, (bar)\n')
-#         r = self.R((0, 3), (0, 3))
-#         add_selection(self.view, r)
-
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 5)
-
-#     def testMoveToNextEmptyLine(self):
-#         set_text(self.view, 'foo Xar\n\nfoo bar')
-#         r = self.R((0, 4), (0, 4))
-#         add_selection(self.view, r)
-
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 7)
-
-#     def testMoveToNextWordFromWhiteSpace(self):
-#         set_text(self.view, '  foo bar\n')
-#         r = self.R((0, 1), (0, 1))
-#         add_selection(self.view, r)
-
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 2)
-
-#     def testMoveToEolFromWhiteSpaceLineFollowedByNonEmptyLineFollowedByNonWhiteSpaceLine(self):
-#         set_text(self.view, '  \n\nfoo bar\n')
-#         r = self.R((0, 1), (0, 1))
-#         add_selection(self.view, r)
-
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 2)
-
-#     def testMoveToEolIfFollowedByWhiteSpaceOnlyLine(self):
-#         set_text(self.view, 'foo bXr\n\t  \nfoo bar')
-#         r = self.R((0, 5), (0, 5))
-#         add_selection(self.view, r)
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 7)
-
-#     def testMoveToEolIfWhiteSpaceOnlyLineFollowedByEmptyLine(self):
-#         set_text(self.view, 'foo bXr\n\t  \n\nfoo bar')
-#         r = self.R((0, 5), (0, 5))
-#         add_selection(self.view, r)
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 7)
-
-#     def testSkipNextInterpunctuation(self):
-#         set_text(self.view, 'Xoo-bar foo\n')
-#         r = self.R((0, 0), (0, 0))
-#         add_selection(self.view, r)
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 7)
-
-#     # Perhaps this one depends on the user configuration ('word_separators').
-#     def testMoveToNextWordSkippingUnderscores(self):
-#         set_text(self.view, 'Xoo_bar foo bar\n')
-#         r = self.R((0, 0), (0, 0))
-#         add_selection(self.view, r)
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 8)
-
-#     def testMoveToEolIfAtLastNonWhiteSpaceCharacterInLine(self):
-#         set_text(self.view, 'foo baX\n')
-#         r = self.R((0, 6), (0, 6))
-#         add_selection(self.view, r)
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 7)
-
-#     def testMoveToEndOfInterPunctuationIfAtInterpunctuation(self):
-#         set_text(self.view, 'foo-bar\n')
-#         r = self.R((0, 3), (0, 3))
-#         add_selection(self.view, r)
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 4)
-
-#     def testMoveToEndOfLongInterPunctuationIfAtInterpunctuation(self):
-#         set_text(self.view, 'foo-.!?bar\n')
-#         r = self.R((0, 3), (0, 3))
-#         add_selection(self.view, r)
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 7)
-
-#     def testMoveToEndOfLineIfEmptyLine(self):
-#         set_text(self.view, '\n')
-#         r = self.R((0, 0), (0, 0))
-#         add_selection(self.view, r)
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 1)
-
-#     def testMoveToEndOfLineIfEmptyLineFollowedByEmptyLine(self):
-#         set_text(self.view, '\n\n')
-#         r = self.R((0, 0), (0, 0))
-#         add_selection(self.view, r)
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 1)
-
-#     def testMoveToEndOfLineIfEmptyLineBetweenEmptyLines(self):
-#         set_text(self.view, '\n\n\n')
-#         r = self.R((0, 1), (0, 1))
-#         add_selection(self.view, r)
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 2)
-
-#     def testMoveToEolIfWhiteSpaceOnlyLine(self):
-#         set_text(self.view, '  \t\n')
-#         r = self.R((0, 0), (0, 0))
-#         add_selection(self.view, r)
-#         pt = next_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
-#         self.assertEqual(pt, 3)
-
-
-# class Test_big_words_InInternalNormalMode(BufferTest):
-#     def testAdvanceTwoWordsInSameLine(self):
-#         set_text(self.view, 'foo bar foo bar\n')
-#         r = self.R((0, 0), (0, 0))
-#         add_selection(self.view, r)
-
-#         pt = words(self.view, r.b, count=2, internal=True)
-#         self.assertEqual(pt, 8)
-
-#     def testAdvanceThreeWordsInSameLine(self):
-#         set_text(self.view, 'foo bar foo bar\n')
-#         r = self.R((0, 0), (0, 0))
-#         add_selection(self.view, r)
-
-#         pt = words(self.view, r.b, count=3, internal=True)
-#         self.assertEqual(pt, 12)
-
-#     def testFromLastWordInLineToNextWord(self):
-#         set_text(self.view, 'foo bar\nfoo bar\n')
-#         r = self.R((0, 5), (0, 5))
-#         add_selection(self.view, r)
-
-#         pt = words(self.view, r.b, count=2, internal=True)
-#         self.assertEqual(pt, 12)
-
-#     def testFromLastWordInLineFollowedByWhiteSpaceToNextWord(self):
-#         set_text(self.view, 'foo bar  \nxxx yyy\n')
-#         r = self.R((0, 4), (0, 4))
-#         add_selection(self.view, r)
-
-#         pt = words(self.view, r.b, count=2, internal=True)
-#         self.assertEqual(pt, 14)
-
-#     def testFromLastWordInLineToNextWordLedByWhiteSpace(self):
-#         set_text(self.view, 'foo bar\n  xxx yyy\n')
-#         r = self.R((0, 4), (0, 4))
-#         add_selection(self.view, r)
-
-#         pt = words(self.view, r.b, count=2, internal=True)
-#         self.assertEqual(pt, 14)
-
-#     def testTreatEmptyLinesAsWords(self):
-#         set_text(self.view, '\n\n\n')
-#         r = self.R((0, 0), (0, 0))
-#         add_selection(self.view, r)
-
-#         pt = words(self.view, r.b, count=2, internal=True)
-#         self.assertEqual(pt, 2)
-
-#     def testSkipWhiteSpaceInLineIfCountGreaterThanOne(self):
-#         set_text(self.view, '   \n\n\n')
-#         r = self.R((0, 0), (0, 0))
-#         add_selection(self.view, r)
-
-#         pt = words(self.view, r.b, count=2, internal=True)
-#         self.assertEqual(pt, 5)
-
-#     def testFromWhiteSpaceIncludeLastNewLineIfMovingLineWiseAndHitsEol(self):
-#         set_text(self.view, '   \nfoo bar\n   xxx yyy')
-#         r = self.R((0, 0), (0, 0))
-#         add_selection(self.view, r)
-
-#         pt = words(self.view, r.b, count=3, internal=True)
-#         self.assertEqual(pt, 12)
-
-#     def testFromEmptyLineDontEatUpWhiteSpaceIfMovingOne(self):
-#         set_text(self.view, '\n   foo bar\n')
-#         r = self.R((0, 0), (0, 0))
-#         add_selection(self.view, r)
-
-#         pt = words(self.view, r.b, count=1, internal=True)
-#         self.assertEqual(pt, 1)

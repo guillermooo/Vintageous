@@ -1423,6 +1423,9 @@ class _vi_big_w(sublime_plugin.TextCommand):
         def f(view, s):
             if mode == MODE_NORMAL:
                 pt = units.big_words(view, start=s.b, count=count)
+                if ((pt == view.size()) and (not view.line(pt).empty())):
+                    pt = utils.previous_non_white_space_char(view, pt - 1,
+                                                            white_space='\n')
                 return sublime.Region(pt, pt)
             elif mode == MODE_VISUAL:
                 pt = units.big_words(view, start=s.b - 1, count=count)
@@ -1430,14 +1433,16 @@ class _vi_big_w(sublime_plugin.TextCommand):
                     return sublime.Region(s.a - 1, pt + 1)
                 elif s.a > s.b:
                     return sublime.Region(s.a, pt)
+                elif (view.size() == pt):
+                    pt -= 1
                 return sublime.Region(s.a, pt + 1)
-            # elif mode == _MODE_INTERNAL_NORMAL:
-            #     a = s.a
-            #     pt = units.words(view, start=s.b, count=count, internal=True)
-            #     if (not view.substr(view.line(s.a)).strip() and
-            #         (view.line(s.b) != view.line(pt))):
-            #             a = view.line(s.a).a
-            #     return sublime.Region(a, pt)
+            elif mode == _MODE_INTERNAL_NORMAL:
+                a = s.a
+                pt = units.big_words(view, start=s.b, count=count, internal=True)
+                if (not view.substr(view.line(s.a)).strip() and
+                    (view.line(s.b) != view.line(pt))):
+                        a = view.line(s.a).a
+                return sublime.Region(a, pt)
             return s
 
         regions_transformer(self.view, f)
