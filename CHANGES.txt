@@ -1,3 +1,11 @@
+1.7.2 - 25/7/2013
+
+	- Improve w motion.
+	- Improve W motion.
+	- Fix $ motion with multiple selections.
+	- Improve aw text object.
+	- Improve e motion.
+
 1.7.1 - 21/7/2013
 
 	- Reimplement W motion in normal and visual mode.
