@@ -111,12 +111,13 @@ def word_starts(view, start, count=1, internal=False):
         if (internal and
             (i != count - 1) and
             at_eol(view, pt) and
-            not view.line(pt).empty()):
+            (start == view.line(start).a)):
                 pt = next_non_white_space_char(view, pt + 1,
                                                white_space=' \t')
 
     if (internal and (view.line(start) != view.line(pt)) and
-        (not view.line(pt).empty()) and at_eol(view, pt)):
+        (not view.line(pt).empty()) and
+         at_eol(view, pt)):
             pt += 1
 
     return pt
