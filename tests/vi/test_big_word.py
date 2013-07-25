@@ -11,8 +11,7 @@ from Vintageous.tests.commands import add_selection
 
 from Vintageous.vi.units import next_big_word_start
 from Vintageous.vi.units import big_words
-from Vintageous.vi.units import CLASS_VI_INTERNAL_BIG_WORD_START
-from Vintageous.vi.units import CLASS_VI_BIG_WORD_START
+from Vintageous.vi.units import CLASS_VI_INTERNAL_WORD_START
 
 
 class Test_next_big_word_start_InNormalMode_FromWhitespace(BufferTest):
@@ -561,7 +560,7 @@ class Test_next_big_word_start_InInternalNormalMode_FromWhitespace(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_WORD_START)
         self.assertEqual(pt, 2)
 
     def testToOneWordLineWithLeadingWhitespace(self):
@@ -569,7 +568,7 @@ class Test_next_big_word_start_InInternalNormalMode_FromWhitespace(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_WORD_START)
         self.assertEqual(pt, 2)
 
 
@@ -579,7 +578,7 @@ class Test_next_big_word_start_InInternalNormalMode_FromWordStart(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_WORD_START)
         self.assertEqual(pt, 3)
 
     def testToOneWordLineWithLeadingWhitespace(self):
@@ -587,7 +586,7 @@ class Test_next_big_word_start_InInternalNormalMode_FromWordStart(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_WORD_START)
         self.assertEqual(pt, 3)
 
 
@@ -597,7 +596,7 @@ class Test_next_big_word_start_InInternalNormalMode_FromWord(BufferTest):
         r = self.R((0, 1), (0, 1))
         add_selection(self.view, r)
 
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_WORD_START)
         self.assertEqual(pt, 5)
 
     def testToOneWordLineWithLeadingWhitespace(self):
@@ -605,7 +604,7 @@ class Test_next_big_word_start_InInternalNormalMode_FromWord(BufferTest):
         r = self.R((0, 1), (0, 1))
         add_selection(self.view, r)
 
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_WORD_START)
         self.assertEqual(pt, 5)
 
 
@@ -615,7 +614,7 @@ class Test_next_big_word_start_InInternalNormalMode_FromPunctuationStart(BufferT
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_WORD_START)
         self.assertEqual(pt, 1)
 
     def testToOneWordLineWithLeadingWhitespace(self):
@@ -623,7 +622,7 @@ class Test_next_big_word_start_InInternalNormalMode_FromPunctuationStart(BufferT
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_WORD_START)
         self.assertEqual(pt, 1)
 
 
@@ -633,7 +632,7 @@ class Test_next_big_word_start_InInternalNormalMode_FromPunctuation(BufferTest):
         r = self.R((0, 1), (0, 1))
         add_selection(self.view, r)
 
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_WORD_START)
         self.assertEqual(pt, 2)
 
     def testToOneWordLineWithLeadingWhitespace(self):
@@ -641,7 +640,7 @@ class Test_next_big_word_start_InInternalNormalMode_FromPunctuation(BufferTest):
         r = self.R((0, 1), (0, 1))
         add_selection(self.view, r)
 
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_WORD_START)
         self.assertEqual(pt, 2)
 
 
@@ -651,7 +650,7 @@ class Test_next_big_word_start_InInternalNormalMode_FromEmptyLine(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_WORD_START)
         self.assertEqual(pt, 0)
 
     def testToOneWordLineWithLeadingWhitespace(self):
@@ -659,7 +658,7 @@ class Test_next_big_word_start_InInternalNormalMode_FromEmptyLine(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_BIG_WORD_START)
+        pt = next_big_word_start(self.view, r.b, classes=CLASS_VI_INTERNAL_WORD_START)
         self.assertEqual(pt, 0)
 
 
