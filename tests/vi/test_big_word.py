@@ -10,7 +10,7 @@ from Vintageous.tests.commands import set_text
 from Vintageous.tests.commands import add_selection
 
 from Vintageous.vi.units import next_big_word_start
-from Vintageous.vi.units import big_words
+from Vintageous.vi.units import big_word_starts
 from Vintageous.vi.units import CLASS_VI_INTERNAL_WORD_START
 
 
@@ -662,13 +662,13 @@ class Test_next_big_word_start_InInternalNormalMode_FromEmptyLine(BufferTest):
         self.assertEqual(pt, 0)
 
 
-class Test_big_words_InNormalMode(BufferTest):
+class Test_big_word_starts_InNormalMode(BufferTest):
     def testMove1(self):
         set_text(self.view, '(foo) bar\n')
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = big_words(self.view, r.b)
+        pt = big_word_starts(self.view, r.b)
         self.assertEqual(pt, 6)
 
     def testMove2(self):
@@ -676,7 +676,7 @@ class Test_big_words_InNormalMode(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = big_words(self.view, r.b, count=2)
+        pt = big_word_starts(self.view, r.b, count=2)
         self.assertEqual(pt, 10)
 
     def testMove10(self):
@@ -684,11 +684,11 @@ class Test_big_words_InNormalMode(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = big_words(self.view, r.b, count=9)
+        pt = big_word_starts(self.view, r.b, count=9)
         self.assertEqual(pt, 46)
 
 
-class Test_big_words_InInternalNormalMode_FromEmptyLine(BufferTest):
+class Test_big_word_starts_InInternalNormalMode_FromEmptyLine(BufferTest):
     # We can assume the stuff tested for normal mode applies to internal normal mode, so we
     # don't bother with that. Instead, we only test the differing behavior when advancing by
     # word starts in internal normal.
@@ -697,7 +697,7 @@ class Test_big_words_InInternalNormalMode_FromEmptyLine(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = big_words(self.view, r.b, internal=True)
+        pt = big_word_starts(self.view, r.b, internal=True)
         self.assertEqual(pt, 1)
 
     def testMove2ToLineWithLeadingWhiteSpace(self):
@@ -705,7 +705,7 @@ class Test_big_words_InInternalNormalMode_FromEmptyLine(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = big_words(self.view, r.b, count=2, internal=True)
+        pt = big_word_starts(self.view, r.b, count=2, internal=True)
         self.assertEqual(pt, 6)
 
     def testMove1ToWhitespaceLine(self):
@@ -713,7 +713,7 @@ class Test_big_words_InInternalNormalMode_FromEmptyLine(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = big_words(self.view, r.b, count=1, internal=True)
+        pt = big_word_starts(self.view, r.b, count=1, internal=True)
         self.assertEqual(pt, 1)
 
     def testMove2ToOneWordLine(self):
@@ -721,7 +721,7 @@ class Test_big_words_InInternalNormalMode_FromEmptyLine(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = big_words(self.view, r.b, internal=True, count=2)
+        pt = big_word_starts(self.view, r.b, internal=True, count=2)
         self.assertEqual(pt, 7)
 
     def testMove3AndSwallowLastNewlineChar(self):
@@ -729,7 +729,7 @@ class Test_big_words_InInternalNormalMode_FromEmptyLine(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = big_words(self.view, r.b, internal=True, count=3)
+        pt = big_word_starts(self.view, r.b, internal=True, count=3)
         self.assertEqual(pt, 12)
 
     def testMove2ToLineWithLeadingWhiteSpace(self):
@@ -737,11 +737,11 @@ class Test_big_words_InInternalNormalMode_FromEmptyLine(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = big_words(self.view, r.b, internal=True, count=2)
+        pt = big_word_starts(self.view, r.b, internal=True, count=2)
         self.assertEqual(pt, 7)
 
 
-class Test_big_words_InInternalNormalMode_FromOneWordLine(BufferTest):
+class Test_big_word_starts_InInternalNormalMode_FromOneWordLine(BufferTest):
     # We can assume the stuff tested for normal mode applies to internal normal mode, so we
     # don't bother with that. Instead, we only test the differing behavior when advancing by
     # word starts in internal normal.
@@ -750,7 +750,7 @@ class Test_big_words_InInternalNormalMode_FromOneWordLine(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = big_words(self.view, r.b, internal=True, count=1)
+        pt = big_word_starts(self.view, r.b, internal=True, count=1)
         self.assertEqual(pt, 3)
 
     def testMove2ToLineWithLeadingWhiteSpaceFromWordStart(self):
@@ -758,7 +758,7 @@ class Test_big_words_InInternalNormalMode_FromOneWordLine(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = big_words(self.view, r.b, internal=True, count=2)
+        pt = big_word_starts(self.view, r.b, internal=True, count=2)
         self.assertEqual(pt, 7)
 
     def testMove2ToEmptyLineFromWord(self):
@@ -766,7 +766,7 @@ class Test_big_words_InInternalNormalMode_FromOneWordLine(BufferTest):
         r = self.R((0, 1), (0, 1))
         add_selection(self.view, r)
 
-        pt = big_words(self.view, r.b, internal=True, count=2)
+        pt = big_word_starts(self.view, r.b, internal=True, count=2)
         self.assertEqual(pt, 6)
 
     def testMove2ToOneWordLineFromWordStart(self):
@@ -774,7 +774,7 @@ class Test_big_words_InInternalNormalMode_FromOneWordLine(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = big_words(self.view, r.b, internal=True, count=2)
+        pt = big_word_starts(self.view, r.b, internal=True, count=2)
         self.assertEqual(pt, 10)
 
     def testMove2ToOneWordLineFromWord(self):
@@ -782,7 +782,7 @@ class Test_big_words_InInternalNormalMode_FromOneWordLine(BufferTest):
         r = self.R((0, 1), (0, 1))
         add_selection(self.view, r)
 
-        pt = big_words(self.view, r.b, internal=True, count=2)
+        pt = big_word_starts(self.view, r.b, internal=True, count=2)
         self.assertEqual(pt, 9)
 
     def testMove2ToWhitespaceline(self):
@@ -790,7 +790,7 @@ class Test_big_words_InInternalNormalMode_FromOneWordLine(BufferTest):
         r = self.R((0, 1), (0, 1))
         add_selection(self.view, r)
 
-        pt = big_words(self.view, r.b, internal=True, count=2)
+        pt = big_word_starts(self.view, r.b, internal=True, count=2)
         self.assertEqual(pt, 12)
 
     def testMove2ToWhitespacelineFollowedByLeadingWhitespaceFromWord(self):
@@ -798,7 +798,7 @@ class Test_big_words_InInternalNormalMode_FromOneWordLine(BufferTest):
         r = self.R((0, 1), (0, 1))
         add_selection(self.view, r)
 
-        pt = big_words(self.view, r.b, internal=True, count=2)
+        pt = big_word_starts(self.view, r.b, internal=True, count=2)
         self.assertEqual(pt, 13)
 
     def testMove2ToWhitespacelineFollowedByLeadingWhitespaceFromWordStart(self):
@@ -806,15 +806,15 @@ class Test_big_words_InInternalNormalMode_FromOneWordLine(BufferTest):
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = big_words(self.view, r.b, internal=True, count=2)
+        pt = big_word_starts(self.view, r.b, internal=True, count=2)
         self.assertEqual(pt, 14)
 
 
-class Test_big_words_InInternalNormalMode_FromLine(BufferTest):
+class Test_big_word_starts_InInternalNormalMode_FromLine(BufferTest):
     def testMove2ToEol(self):
         set_text(self.view, 'foo bar\n')
         r = self.R((0, 0), (0, 0))
         add_selection(self.view, r)
 
-        pt = big_words(self.view, r.b, internal=True, count=2)
+        pt = big_word_starts(self.view, r.b, internal=True, count=2)
         self.assertEqual(pt, 7)

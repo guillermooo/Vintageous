@@ -111,7 +111,7 @@ def word_starts(view, start, count=1, internal=False):
     return pt
 
 
-def big_words(view, start, count=1, internal=False):
+def big_word_starts(view, start, count=1, internal=False):
     assert start >= 0
     assert count > 0
 
