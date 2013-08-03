@@ -329,7 +329,7 @@ class ViGoToLine(sublime_plugin.TextCommand):
             if mode == MODE_NORMAL:
                 return sublime.Region(dest, dest)
             elif mode == _MODE_INTERNAL_NORMAL:
-                return sublime.Region(s.a, dest)
+                return sublime.Region(view.line(s.a).a, view.line(dest).b)
             elif mode == MODE_VISUAL:
                 if dest < s.a and s.a < s.b:
                     return sublime.Region(s.a + 1, dest)
