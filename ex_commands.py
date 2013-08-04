@@ -6,26 +6,21 @@ import re
 import subprocess
 import sys
 
-from Vintageous.ex.plat.windows import get_oem_cp
-from Vintageous.ex.plat.windows import get_startup_info
 from Vintageous.ex import ex_error
 from Vintageous.ex import ex_range
-from Vintageous.ex import shell
 from Vintageous.ex import parsers
-from Vintageous.vi.constants import MODE_NORMAL
+from Vintageous.ex import shell
+from Vintageous.ex.plat.windows import get_oem_cp
+from Vintageous.ex.plat.windows import get_startup_info
 from Vintageous.state import VintageState
+from Vintageous.vi.constants import MODE_NORMAL
+from Vintageous.vi.sublime import has_dirty_buffers
 
 
 GLOBAL_RANGES = []
 CURRENT_LINE_RANGE = {'left_ref': '.', 'left_offset': 0,
                       'left_search_offsets': [], 'right_ref': None,
                       'right_offset': 0, 'right_search_offsets': []}
-
-
-def is_any_buffer_dirty(window):
-    for v in window.views():
-        if v.is_dirty():
-            return True
 
 
 def gather_buffer_info(v):
@@ -415,7 +410,7 @@ class ExOnly(sublime_plugin.TextCommand):
     """
     def run(self, edit, forced=False):
         if not forced:
-            if is_any_buffer_dirty(self.view.window()):
+            if has_dirty_buffers(self.view.window()):
                 ex_error.display_error(ex_error.ERR_OTHER_BUFFER_HAS_CHANGES)
                 return
 
@@ -613,12 +608,6 @@ class ExPrint(sublime_plugin.TextCommand):
             v.insert(edit, v.size(), (str(r) + ' ' + t + '\n').lstrip())
 
 
-# TODO: General note for all :q variants:
-#   ST has a notion of hot_exit, whereby it preserves all buffers so that they
-#   can be restored next time you open ST. With this option on, all :q
-#   commands should probably execute silently even if there are unsaved buffers.
-#   Sticking to Vim's behavior closely here makes for a worse experience
-#   because typically you don't start ST as many times.
 class ExQuitCommand(sublime_plugin.WindowCommand):
     """Ex command(s): :quit
     Closes the window.
@@ -653,7 +642,7 @@ class ExQuitAllCommand(sublime_plugin.WindowCommand):
             for v in self.window.views():
                 if v.is_dirty():
                     v.set_scratch(True)
-        elif is_any_buffer_dirty(self.window):
+        elif has_dirty_buffers(self.window):
             sublime.status_message("There are unsaved changes!")
             return
 
