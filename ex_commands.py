@@ -90,6 +90,7 @@ class ExShellOut(sublime_plugin.TextCommand):
             if line_range['text_range']:
                 shell.filter_thru_shell(
                                 view=self.view,
+                                edit=edit,
                                 regions=get_region_by_range(self.view, line_range=line_range),
                                 cmd=shell_cmd)
             else:

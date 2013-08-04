@@ -30,7 +30,7 @@ def filter_region(view, txt, command):
         contents.close()
 
         script = tempfile.NamedTemporaryFile(suffix='.bat', delete=False)
-        script.write('@echo off\ntype %s | %s' % (contents.name, command))
+        script.write(('@echo off\ntype %s | %s' % (contents.name, command)).encode('utf-8'))
         script.close()
 
         p = subprocess.Popen([script.name],
