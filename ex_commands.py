@@ -750,9 +750,16 @@ class ExListRegisters(sublime_plugin.TextCommand):
     """
 
     def run(self, edit):
+        def show_lines(line_count):
+            lines_display = '... [+{0}]'.format(line_count - 1)
+            return lines_display if line_count > 1 else ''
+
         state = VintageState(self.view)
-        pairs = ['"{0}   {1}'.format(k, v) for k, v in state.registers.to_dict().items() if v]
-        self.view.window().show_quick_panel(pairs, self.on_done)
+        pairs = [(k, v) for (k, v) in state.registers.to_dict().items() if v]
+        pairs = [(k, repr(v[0]), len(v)) for (k, v) in pairs]
+        pairs = ['"{0}\t{1}\t{2}'.format(k, v, show_lines(lines)) for (k, v, lines) in pairs]
+
+        self.view.window().show_quick_panel(pairs, self.on_done, flags=sublime.MONOSPACE_FONT)
 
     def on_done(self, idx):
         """Save selected value to `"` register."""
