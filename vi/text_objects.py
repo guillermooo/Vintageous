@@ -201,7 +201,7 @@ def get_text_object_region(view, s, text_object, inclusive=False, count=1):
         return sublime.Region(opening.a + 1, closing.b - 1)
 
     if type_ == QUOTE:
-        # FIXME: Escape sequences like \" are probably syn  tax-dependant.
+        # FIXME: Escape sequences like \" are probably syntax-dependant.
         prev_quote = reverse_search_by_pt(view, '(?<!\\\\)' + delims[0],
                                           start=0, end=s.b)
 
