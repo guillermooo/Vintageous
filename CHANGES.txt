@@ -1,3 +1,10 @@
+1.8.0 - 4/8/2013
+
+	- Improve redo.
+	- Improve G motion in actions.
+	- Improve i text objects.
+	- Fix initialization on OSX.
+
 1.7.2 - 25/7/2013
 
 	- Improve w motion.
