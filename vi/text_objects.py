@@ -201,15 +201,12 @@ def get_text_object_region(view, s, text_object, inclusive=False, count=1):
         return sublime.Region(opening.a + 1, closing.b - 1)
 
     if type_ == QUOTE:
-        prev_quote = reverse_search_by_pt(view, delims[0],
-                                                start=0,
-                                                end=s.b,
-                                                flags=sublime.IGNORECASE)
+        # FIXME: Escape sequences like \" are probably syn  tax-dependant.
+        prev_quote = reverse_search_by_pt(view, '(?<!\\\\)' + delims[0],
+                                          start=0, end=s.b)
 
-        next_quote = find_in_range(view, delims[0],
-                                         start=s.b,
-                                         end=view.size(),
-                                         flags=sublime.IGNORECASE)
+        next_quote = find_in_range(view, '(?<!\\\\)' + delims[0],
+                                   start=s.b, end=view.size())
 
         if not (prev_quote and next_quote):
             return s
