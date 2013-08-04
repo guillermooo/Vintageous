@@ -22,22 +22,10 @@ CURRENT_LINE_RANGE = {'left_ref': '.', 'left_offset': 0,
                       'right_offset': 0, 'right_search_offsets': []}
 
 
-class VintageousExState(object):
-    # When repeating searches, determines which search term to use: the current
-    # word or the latest search term.
-    # Values: find_under, search_pattern
-    search_buffer_type = 'find_under'
-
-
 def is_any_buffer_dirty(window):
     for v in window.views():
         if v.is_dirty():
             return True
-
-
-# TODO: this code must be shared with Vintageous, not reimplemented here.
-def set_register(text, register):
-    return None
 
 
 def gather_buffer_info(v):
@@ -524,7 +512,9 @@ class ExDelete(sublime_plugin.TextCommand):
             # needed for lines without a newline character
             if not text.endswith('\n'):
                 text = text + '\n'
-            set_register(text, register)
+
+            state = VintageState(self.view)
+            state.registers[register] = [text]
 
         self.view.run_command('split_selection_into_lines')
         self.view.run_command('run_macro_file',
