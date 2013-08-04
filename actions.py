@@ -21,6 +21,7 @@ from Vintageous.vi.constants import MODE_SELECT
 from Vintageous.vi.constants import regions_transformer
 from Vintageous.vi.constants import regions_transformer_reversed
 from Vintageous.vi.registers import REG_EXPRESSION
+from Vintageous.vi.sublime import restoring_sels
 
 import re
 
@@ -665,17 +666,10 @@ class _vi_redo(IrreversibleTextCommand):
     # TODO: It must be possible store or retrieve the actual position of the caret before the
     # visual selection performed by the user.
     def run(self):
-        old_sels = list(self.view.sel())
-
-        state = VintageState(self.view)
-        for i in range(state.count):
-            self.view.run_command('redo')
-
-        # TODO: Improve this.
-        self.view.sel().clear()
-        for s in old_sels:
-            # XXX: If the buffer has changed, this won't work well.
-            self.view.sel().add(s)
+        with restoring_sels(self.view):
+            state = VintageState(self.view)
+            for i in range(state.count):
+                self.view.run_command('redo')
 
         state.update_xpos()
         # Ensure that we wipe the count, if any.

@@ -107,7 +107,7 @@ class Registers(object):
         if name == REG_BLACK_HOLE:
             return
 
-        assert isinstance(values, list)
+        assert isinstance(values, list), "Register values must be inside a list."
         # Coerce all values into strings.
         values = [str(v) for v in values]
 

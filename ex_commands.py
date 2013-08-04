@@ -782,11 +782,15 @@ class ExYank(sublime_plugin.TextCommand):
     def run(self, edit, line_range, register=None, count=None):
         if not register:
             register = '"'
+
         regs = get_region_by_range(self.view, line_range)
-        text = '\n'.join([self.view.substr(line) for line in regs])
-        g_registers[register] = text
+        text = '\n'.join([self.view.substr(line) for line in regs]) + '\n'
+
+        state = VintageState(self.view)
+        state.registers[register] = [text]
         if register == '"':
-            g_registers['0'] = text
+            state.registers['0'] = [text]
+
 
 
 class TabControlCommand(sublime_plugin.WindowCommand):
