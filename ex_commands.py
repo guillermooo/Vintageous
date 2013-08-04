@@ -1,17 +1,10 @@
 import sublime
 import sublime_plugin
 
-import sys
 import os
-
-# We use several commands implemented in Vintange, so make it available here.
-sys.path.append(os.path.join(sublime.packages_path(), 'Vintage'))
-
 import re
 import subprocess
-
-# TODO: This is not available. Integrate with Vintageous instead.
-# from Vintage.vintage import g_registers
+import sys
 
 from Vintageous.ex.plat.windows import get_oem_cp
 from Vintageous.ex.plat.windows import get_startup_info
@@ -22,10 +15,11 @@ from Vintageous.ex import parsers
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.state import VintageState
 
-GLOBAL_RANGES = []
 
-CURRENT_LINE_RANGE = {'left_ref': '.', 'left_offset': 0, 'left_search_offsets': [],
-                      'right_ref': None, 'right_offset': 0, 'right_search_offsets': []}
+GLOBAL_RANGES = []
+CURRENT_LINE_RANGE = {'left_ref': '.', 'left_offset': 0,
+                      'left_search_offsets': [], 'right_ref': None,
+                      'right_offset': 0, 'right_search_offsets': []}
 
 
 class VintageousExState(object):
