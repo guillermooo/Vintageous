@@ -166,7 +166,8 @@ class VintageState(object):
             # here if the view reports back as clean.
             if not self.view.is_dirty():
                 self.view.run_command('unmark_undo_groups_for_gluing')
-            self.view.run_command('glue_marked_undo_groups')
+            else:
+                self.view.run_command('glue_marked_undo_groups')
 
         self.mode = MODE_NORMAL
 
