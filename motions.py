@@ -714,9 +714,10 @@ class ViBufferSearch(IrreversibleTextCommand):
         state = VintageState(self.view)
         state.motion = 'vi_forward_slash'
 
+        # If s is empty, we must repeat the last search.
+
         # The next time we set .user_input, the vi_forward_slash input parser will kick in. We
         # therefore need to ensure we only set .user_input once.
-        # Equivalent to /<CR>, which must repeat the last search.
         state.user_input = s or state.last_buffer_search
         state.last_buffer_search = s or state.last_buffer_search
 
@@ -762,9 +763,10 @@ class ViBufferReverseSearch(IrreversibleTextCommand):
         state = VintageState(self.view)
         state.motion = 'vi_question_mark'
 
+        # If s is empty, we must repeat the last search.
+
         # The next time we set .user_input, the vi_question_mark input parser will kick in. We
         # therefore need to ensure we only set .user_input once.
-        # Equivalent to ?<CR>, which must repeat the last search.
         state.user_input = s or state.last_buffer_search
         state.last_buffer_search = s or state.last_buffer_search
 
