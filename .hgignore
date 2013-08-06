@@ -11,4 +11,3 @@ syntax: glob
 dist/
 
 *.sublime-workspace
-*.sublime-project
