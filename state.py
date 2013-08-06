@@ -155,6 +155,11 @@ class VintageState(object):
         else:
             # Either we haven't been in any visual mode or we've modified the buffer while in
             # any visual mode.
+            # However, there might be cases where we have a clean buffer. For example, we might
+            # have undone our changes, or saved via standard commands. Assume Sublime Text knows
+            # better than us.
+            if not self.view.is_dirty():
+                self.view.run_command('unmark_undo_groups_for_gluing')
             self.view.run_command('glue_marked_undo_groups')
 
         self.mode = MODE_NORMAL

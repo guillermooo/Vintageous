@@ -287,15 +287,13 @@ class ExWriteFile(sublime_plugin.TextCommand):
             self.view.replace(edit, sublime.Region(start_deleting,
                                         self.view.size()), '')
         else:
-            if self.view.is_dirty():
-                self.view.run_command('save')
+            self.view.run_command('save')
 
 
 class ExWriteAll(sublime_plugin.TextCommand):
     def run(self, edit, forced=False):
         for v in self.view.window().views():
-            if v.is_dirty():
-                v.run_command('save')
+            v.run_command('save')
 
 
 class ExNewFile(sublime_plugin.TextCommand):
