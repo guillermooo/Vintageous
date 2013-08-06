@@ -76,7 +76,9 @@ class ExGoto(sublime_plugin.TextCommand):
         state = VintageState(self.view)
         # FIXME: In Visual mode, goto line does some weird stuff.
         if state.mode == MODE_NORMAL:
+            self.view.window().run_command('vi_add_to_jump_list')
             self.view.run_command('vi_go_to_line', {'line': b, 'mode': MODE_NORMAL})
+            self.view.window().run_command('vi_add_to_jump_list')
             self.view.show(self.view.sel()[0])
 
 
