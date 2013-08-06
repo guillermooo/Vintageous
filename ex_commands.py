@@ -15,6 +15,7 @@ from Vintageous.ex.plat.windows import get_startup_info
 from Vintageous.state import VintageState
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.sublime import has_dirty_buffers
+from Vintageous.state import IrreversibleTextCommand
 
 
 GLOBAL_RANGES = []
@@ -675,19 +676,18 @@ class ExBrowse(sublime_plugin.TextCommand):
         self.view.window().run_command('prompt_open_file')
 
 
-class ExEdit(sublime_plugin.TextCommand):
-    def run_(self, args):
-        self.run(args)
+class ExEdit(IrreversibleTextCommand):
+    """Ex command(s): :e
 
+    Reverts unsaved changes to the buffer.
+    """
     def run(self, forced=False):
-        # todo: restore active line_nr too
         if forced or not self.view.is_dirty():
             self.view.run_command('revert')
             return
         elif self.view.is_dirty():
             ex_error.display_error(ex_error.ERR_UNSAVED_CHANGES)
             return
-
         ex_error.handle_not_implemented()
 
 
