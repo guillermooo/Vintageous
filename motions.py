@@ -717,13 +717,9 @@ class ViBufferSearch(IrreversibleTextCommand):
         # The next time we set .user_input, the vi_forward_slash input parser will kick in. We
         # therefore need to ensure we only set .user_input once.
         # Equivalent to /<CR>, which must repeat the last search.
-        if s == '':
-            state.user_input = state.last_buffer_search
-        else:
-            state.user_input = s
+        state.user_input = s or state.last_buffer_search
+        state.last_buffer_search = s or state.last_buffer_search
 
-        if s != '':
-            state.last_buffer_search = s
         state.eval()
 
     def on_change(self, s):
@@ -769,13 +765,9 @@ class ViBufferReverseSearch(IrreversibleTextCommand):
         # The next time we set .user_input, the vi_question_mark input parser will kick in. We
         # therefore need to ensure we only set .user_input once.
         # Equivalent to ?<CR>, which must repeat the last search.
-        if s == '':
-            state.user_input = state.last_buffer_search
-        else:
-            state.user_input = s
+        state.user_input = s or state.last_buffer_search
+        state.last_buffer_search = s or state.last_buffer_search
 
-        if s != '':
-            state.last_buffer_search = s
         state.eval()
 
     def on_change(self, s):
