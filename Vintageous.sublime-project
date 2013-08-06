@@ -1,0 +1,26 @@
+{
+	"build_systems":
+	[
+		{
+			"name": "Debug (Vintageous)",
+			"working_dir": "${project_path}",
+			"shell_cmd": "./build.sh",
+			"windows": { "shell_cmd": "powershell -noninteractive -file \"$project_path\\bin\\Build.ps1\"" }
+		},
+
+		{
+			"name": "Release (Vintageous)",
+			"working_dir": "${project_path}",
+			"shell_cmd": "./build.sh --release release",
+			"windows": { "shell_cmd": "powershell -noninteractive -file \"$project_path\\bin\\Build.ps1\" -release -dontupload" }
+		}
+	],
+	
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": "."
+		}
+	]
+}
