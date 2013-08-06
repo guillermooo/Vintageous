@@ -155,9 +155,15 @@ class VintageState(object):
         else:
             # Either we haven't been in any visual mode or we've modified the buffer while in
             # any visual mode.
+            #
             # However, there might be cases where we have a clean buffer. For example, we might
             # have undone our changes, or saved via standard commands. Assume Sublime Text knows
             # better than us.
+            #
+            # NOTE: There's an issue in S3 where 'glue_marked_undo_groups' will mark the buffer as
+            # dirty even if there are no intervening changes between the 'mark_groups_for_gluing'
+            # and 'glue_marked_undo_groups' calls. That's why we need to explicitly unmark groups
+            # here if the view reports back as clean.
             if not self.view.is_dirty():
                 self.view.run_command('unmark_undo_groups_for_gluing')
             self.view.run_command('glue_marked_undo_groups')
