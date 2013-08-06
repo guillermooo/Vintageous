@@ -949,7 +949,10 @@ class ViFocusRestorerEvent(sublime_plugin.EventListener):
     def __init__(self):
         self.timer = None
 
-    def do_init(self, view):
+    def action(self):
+        self.timer = None
+
+    def on_activated(self, view):
         if self.timer:
             self.timer.cancel()
             # Switching to a different view; enter normal mode.
@@ -958,23 +961,17 @@ class ViFocusRestorerEvent(sublime_plugin.EventListener):
             # Switching back from another application. Ignore.
             pass
 
-    def action(self):
-        self.timer = None
-
-    def on_activated(self, view):
-        self.do_init(view)
-
     def on_new(self, view):
         # Without this, on OS X Vintageous might not initialize correctly if the user leaves
         # the application in a windowless state and then creates a new buffer.
         if sublime.platform() == 'osx':
-            self.do_init(view)
+            _init_vintageous(view)
 
     def on_load(self, view):
         # Without this, on OS X Vintageous might not initialize correctly if the user leaves
         # the application in a windowless state and then creates a new buffer.
         if sublime.platform() == 'osx':
-            self.do_init(view)
+            _init_vintageous(view)
 
     def on_deactivated(self, view):
         self.timer = threading.Timer(0.25, self.action)
