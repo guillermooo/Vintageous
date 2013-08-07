@@ -1,6 +1,7 @@
 from fnmatch import fnmatch
 from itertools import chain
 from zipfile import ZipFile
+from zipfile import ZIP_DEFLATED
 import argparse
 import glob
 import json
@@ -48,7 +49,7 @@ def build(target_dir="./dist", release="dev"):
     if os.path.exists(target_file):
         os.unlink(target_file)
 
-    with ZipFile(target_file, 'a') as package:
+    with ZipFile(target_file, 'a', compression=ZIP_DEFLATED) as package:
         for fn in ifind_files(manifest['include'][release]):
             package.write(fn)
 

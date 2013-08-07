@@ -2,7 +2,13 @@
 	"name": "Vintageous",
 	"include": {
 		"dev": [
-			["*.*", ["*builder.py", "*.ps1", "*.hg*", "*manifest.json"]],
+			["*.*", ["*builder.py",
+					 "*.sublime-workspace",
+					 "*.sublime-project",
+					 "*.ps1",
+					 "*.hg*",
+					 "*manifest.json"]
+			],
 			["./ex/*.py", []],
 			["./ex/parsers/*.py", []],
 			["./ex/plat/*.py", []],
@@ -17,7 +23,16 @@
 			["./tests/vi/*.py", []]
 		],
 		"release": [
-			["*.*", ["*builder.py", "*.ps1", "*.hg*", "*manifest.json", "*.sublime-commands", "*test_runner.py"]],
+			["*.*", ["*builder.py",
+					 "*build.sh",
+					 "*.sublime-workspace",
+					 "*.sublime-project",
+					 "*.ps1",
+					 "*.hg*",
+					 "*manifest.json",
+					 "*.sublime-commands",
+					 "*test_runner.py"]
+			],
 			["./ex/*.py", []],
 			["./ex/parsers/*.py", []],
 			["./ex/plat/*.py", []],
