@@ -1,3 +1,9 @@
+1.8.4 - 7/8/2013 
+
+	- Enable :e command.
+	- Integrate :<count> (goto) command with jump list.	
+	- Improve : (goto) command.
+
 1.8.3 - 6/8/2013 
 
 	- Improve handling of undo groups.
