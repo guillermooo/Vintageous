@@ -14,6 +14,8 @@ from Vintageous.ex.plat.windows import get_oem_cp
 from Vintageous.ex.plat.windows import get_startup_info
 from Vintageous.state import VintageState
 from Vintageous.vi.constants import MODE_NORMAL
+from Vintageous.vi.constants import MODE_VISUAL
+from Vintageous.vi.constants import MODE_VISUAL_LINE
 from Vintageous.vi.sublime import has_dirty_buffers
 from Vintageous.state import IrreversibleTextCommand
 
@@ -76,10 +78,21 @@ class ExGoto(sublime_plugin.TextCommand):
         state = VintageState(self.view)
         # FIXME: In Visual mode, goto line does some weird stuff.
         if state.mode == MODE_NORMAL:
+            # TODO: push all this code down to ViGoToLine?
             self.view.window().run_command('vi_add_to_jump_list')
             self.view.run_command('vi_go_to_line', {'line': b, 'mode': MODE_NORMAL})
             self.view.window().run_command('vi_add_to_jump_list')
             self.view.show(self.view.sel()[0])
+        elif state.mode in (MODE_VISUAL, MODE_VISUAL_LINE) and line_range['right_offset']:
+            # TODO: push all this code down to ViGoToLine?
+            self.view.run_command('vi_enter_normal_mode')
+            self.view.window().run_command('vi_add_to_jump_list')
+            # FIXME: The parser fails with '<,'>100. 100 is not the right_offset, but an argument.
+            b = self.view.rowcol(self.view.sel()[0].b - 1)[0] + line_range['right_offset'] + 1
+            self.view.run_command('vi_go_to_line', {'line': b, 'mode': MODE_NORMAL})
+            self.view.window().run_command('vi_add_to_jump_list')
+            self.view.show(self.view.sel()[0])
+            state.display_partial_command()
 
 
 class ExShellOut(sublime_plugin.TextCommand):

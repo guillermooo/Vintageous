@@ -289,7 +289,8 @@ EX_COMMANDS = {
                                 ),
     (':', ':'): ex_cmd_data(
                         command='ex_goto',
-                        invocations=(),
+                        invocations=(re.compile(r'^$'),
+                        ),
                         error_on=(),
                         ),
     ('!', '!'): ex_cmd_data(
