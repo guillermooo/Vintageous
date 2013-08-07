@@ -14,4 +14,5 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 get-process "sublime_text" | stop-process
+start-sleep -milliseconds 250
 sss
