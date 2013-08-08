@@ -1,3 +1,7 @@
+1.8.5 - 8/8/2013 
+
+	- Fix: Esc resets state when expecting user input.
+
 1.8.4 - 7/8/2013 
 
 	- Enable :e command.
