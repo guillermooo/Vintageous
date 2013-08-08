@@ -31,6 +31,6 @@
 	// (Disabled.)
 	"vintageous_autoindent": true,
 
-	// If true, copy actions will always populate the system clipboard.
+	// If true, copy actions will always propagate to the system clipboard.
 	"vintageous_use_sys_clipboard": false
 }
