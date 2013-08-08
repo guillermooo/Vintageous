@@ -26,6 +26,9 @@ class KeyContext(object):
             # state.
             return False
 
+        if self.state.expecting_user_input:
+            True
+
         # If we have primed counts, we have to clear the state.
         if self.state.user_provided_count or self.state.motion or self.state.action:
             return True
