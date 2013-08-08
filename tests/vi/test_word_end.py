@@ -811,9 +811,6 @@ class Test_words_InInternalNormalMode_FromOneWordLine(BufferTest):
 
 
 class Test_words_InInternalNormalMode_FromOneCharLongWord(BufferTest):
-    # We can assume the stuff tested for normal mode applies to internal normal mode, so we
-    # don't bother with that. Instead, we only test the differing behavior when advancing by
-    # word starts in internal normal.
     def testMove1ToEol(self):
         set_text(self.view, 'x\n')
         r = self.R((0, 0), (0, 0))

@@ -810,6 +810,16 @@ class Test_words_InInternalNormalMode_FromOneWordLine(BufferTest):
         self.assertEqual(pt, 12)
 
 
+class Test_words_InInternalNormalMode_FromOneCharLongWord(BufferTest):
+    def testMove1ToEol(self):
+        set_text(self.view, 'x\n')
+        r = self.R((0, 0), (0, 0))
+        add_selection(self.view, r)
+
+        pt = word_starts(self.view, r.b, internal=True, count=1)
+        self.assertEqual(pt, 1)
+
+
 class Test_words_InInternalNormalMode_FromLine(BufferTest):
     def testMove2ToEol(self):
         set_text(self.view, 'foo bar\n')
