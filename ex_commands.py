@@ -727,7 +727,7 @@ class ExExit(sublime_plugin.TextCommand):
         w.run_command('close')
 
         if len(w.views()) == 0:
-            w.run_command('close')
+            w.run_command('exit')
 
 
 class ExListRegisters(sublime_plugin.TextCommand):
