@@ -906,3 +906,23 @@ class ExCdCommand(sublime_plugin.WindowCommand):
         # editor and can be changed (for example by a plugin) at any time.
         os.chdir(path)
         sublime.status_message("Vintageous: %s" % os.getcwd())
+
+
+class ExCddCommand(sublime_plugin.TextCommand):
+    """Ex command(s) [non-standard]: :cdd
+
+    Non-standard command to change the current directory the the active
+    view's path.
+
+    In Sublime Text, the current directory doesn't follow the active view, so
+    it's convenient to be able to align both easily.
+
+    (This command may be removed at any time.)
+    """
+    def run(self, forced=False):
+        path = os.path.dirname(self.view.file_name())
+        try:
+            os.chdir(path)
+            sublime.status_message("Vintageous: %s" % os.getcwd())
+        except IOError:
+            print('Vintageous: Could not change current directory.')
