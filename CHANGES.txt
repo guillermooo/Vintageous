@@ -1,4 +1,4 @@
-1.8.5 - 9/8/2013 
+1.8.6 - 9/8/2013 
 
 	- Improve :w command.
 	- Implement ZZ, ZQ actions.
