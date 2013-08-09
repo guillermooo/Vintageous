@@ -274,6 +274,4 @@
 	// XXX: Seems to need to come after every other key binding so it will catch every character. Investigate this.
 	// FIXME: Won't capture '\n'... Perhaps it's a limitation of Sublime Text?
 	{ "keys": ["<character>"], "command": "collect_user_input", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_user_input"}] },
-
-
 ]
