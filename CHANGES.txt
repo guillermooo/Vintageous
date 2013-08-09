@@ -1,3 +1,8 @@
+1.8.5 - 9/8/2013 
+
+	- Improve :w command.
+	- Implement ZZ, ZQ actions.
+
 1.8.5 - 8/8/2013 
 
 	- Fix: Esc resets state when expecting user input.
