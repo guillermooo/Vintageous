@@ -282,16 +282,48 @@ class ExWriteFile(sublime_plugin.TextCommand):
         content = get_region_by_range(self.view, line_range=line_range) if a_range else \
                         [sublime.Region(0, self.view.size())]
 
-        if target_redirect or file_name:
+        if target_redirect:
             target = self.view.window().new_file()
-            target.set_name(target_redirect or file_name)
+            target.set_name(target_redirect)
+        elif file_name:
+
+            def report_error(msg):
+                sublime.status_message('Vintageous: %s' % msg)
+
+            file_path = os.path.abspath(os.path.expanduser(file_name))
+
+            if os.path.exists(file_path) and (file_path != self.view.file_name()):
+                # TODO add w! flag
+                # TODO: Hook this up with ex error handling (ex/errors.py).
+                msg = "File '{0}' already exists.".format(file_path)
+                report_error(msg)
+                return
+
+            if not os.path.exists(os.path.dirname(file_path)):
+                msg = "Directory '{0}' does not exist.".format(os.path.dirname(file_path))
+                report_error(msg)
+                return
+
+            try:
+                with open(file_path, 'w+') as temp_file:
+                    for frag in reversed(content):
+                        temp_file.write(self.view.substr(frag))
+                    temp_file.close()
+            except IOError as e:
+                report_error( "Failed to create file '%s'." % file_name )
+                return
+
+            window = self.view.window()
+
+            window.open_file(file_path)
+            return
         else:
             target = self.view
 
         start = 0 if not appending else target.size()
         prefix = '\n' if appending and target.size() > 0 else ''
 
-        if appending or target_redirect or file_name:
+        if appending or target_redirect:
             for frag in reversed(content):
                 target.insert(edit, start, prefix + self.view.substr(frag) + '\n')
         elif a_range:
