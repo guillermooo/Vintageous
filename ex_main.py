@@ -1,9 +1,16 @@
 import sublime
 import sublime_plugin
 
+import os
+
 from Vintageous.ex.ex_command_parser import parse_command
 from Vintageous.ex.ex_command_parser import EX_COMMANDS
 from Vintageous.ex import ex_error
+from Vintageous.ex_completions import escape
+from Vintageous.ex_completions import unescape
+from Vintageous.ex_completions import parse
+from Vintageous.ex_completions import iter_paths
+from Vintageous.ex_completions import wants_fs_completions
 
 
 COMPLETIONS = sorted([x[0] for x in EX_COMMANDS.keys()])
@@ -24,6 +31,7 @@ def update_command_line_history(item, slot_name):
 
 
 class ViColonInput(sublime_plugin.WindowCommand):
+    receiving_user_input = True
     def is_enabled(self):
         return len(self.window.views()) > 0
 
@@ -37,10 +45,21 @@ class ViColonInput(sublime_plugin.WindowCommand):
             self.on_done(cmd_line)
             return
         v = self.window.show_input_panel('', initial_text,
-                                                    self.on_done, None, None)
+                                         self.on_done,
+                                         self.on_change,
+                                         None)
         v.set_syntax_file('Packages/Vintageous/VintageousEx Cmdline.tmLanguage')
         v.settings().set('gutter', False)
         v.settings().set('rulers', [])
+
+    def on_change(self, s):
+        if ViColonInput.receiving_user_input:
+            cmd, prefix, only_dirs = parse(unescape(s))
+            if not cmd:
+                return
+            FsCompletion.current_prefix = prefix
+            FsCompletion.must_recalculate = True
+        ViColonInput.receiving_user_input = True
 
     def on_done(self, cmd_line):
         if not getattr(self, 'non_interactive', None):
@@ -117,3 +136,67 @@ class HistoryIndexRestorer(sublime_plugin.EventListener):
         # call won't yield the desired results.
         if view.score_selector(0, 'text.excmdline') > 0:
             CycleCmdlineHistory.HISTORY_INDEX = None
+
+
+class WriteFsCompletion(sublime_plugin.TextCommand):
+    def run(self, edit, cmd, completion):
+        ViColonInput.receiving_user_input = False
+        self.view.sel().clear()
+        self.view.replace(edit, sublime.Region(0, self.view.size()),
+                          cmd + ' ' + escape(completion))
+        self.view.sel().add(sublime.Region(self.view.size()))
+
+
+class FsCompletion(sublime_plugin.TextCommand):
+    current_prefix = ''
+    must_recalculate = False
+    dirs = None
+
+    def run(self, edit):
+        if self.view.score_selector(0, 'text.excmdline') == 0:
+            return
+
+        cmd, prefix, only_dirs = parse(self.view.substr(self.view.line(0)))
+        if not cmd:
+            return
+        if not FsCompletion.current_prefix and prefix:
+            FsCompletion.current_prefix = prefix
+            FsCompletion.must_recalculate = True
+        elif not FsCompletion.current_prefix:
+            FsCompletion.current_prefix = os.getcwd() + '/'
+
+        if not FsCompletion.dirs or FsCompletion.must_recalculate:
+            print("XXX", only_dirs)
+            FsCompletion.dirs = iter_paths(FsCompletion.current_prefix,
+                                           only_dirs=only_dirs)
+            FsCompletion.must_recalculate = False
+
+        try:
+            self.view.run_command('write_fs_completion',
+                                  { 'cmd': cmd,
+                                    'completion': next(FsCompletion.dirs)})
+        except StopIteration:
+            try:
+                FsCompletion.dirs = iter_paths(FsCompletion.current_prefix,
+                                               only_dirs=only_dirs)
+                self.view.run_command('write_fs_completion',
+                                      { 'cmd': cmd,
+                                        'completion': next(FsCompletion.dirs)})
+            except StopIteration:
+                return
+
+
+class SomeContextProvider(sublime_plugin.EventListener):
+    def on_query_context(self, view, key, operator, operand, match_all):
+        if view.score_selector(0, 'text.excmdline') == 0:
+            return
+
+        if key == 'ex_at_fs_completion':
+            line = view.substr(view.line(0))
+            value = wants_fs_completions(line)
+            value = value and view.sel()[0].b == view.size()
+            if operator == sublime.OP_EQUAL:
+                if operand == True:
+                    return value
+                elif operand == False:
+                    return not value
