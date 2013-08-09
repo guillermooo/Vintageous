@@ -157,10 +157,12 @@ def word_ends(view, start, count=1, internal=False):
     pt = start
 
     for i in range(count):
-        # TODO: In Vim, cw on the last char at eol deletes up to the new line (exclusive). However,
-        # ce at the same position deletes up to the next word's end. Remember that normally cw is
-        # translated to ce. In order to be 100% Vim-compatible, we need to know that the
-        # translation has taken place. For the moment, just unify 'e' and 'w' behavior at eol.
+        # TODO: In Vim, cw on the last word char deletes up to the current word's end or eol
+        # (exclusive). However, ce at the same position deletes up to the next word's end. Remember
+        # that normally cw is translated to ce. In order to be 100% Vim-compatible, we need to know
+        # that the translation has taken place. For the moment, just unify 'e' and 'w' behavior at
+        # the word's last char. Also, it seems that 'ce' translates to a especial motion, not
+        # simply 'cw'. That should be easier to implement.
         offset = 1
         if internal:
             offset = 1 if not (at_word_end(view, pt + 1) or
