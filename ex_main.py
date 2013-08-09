@@ -6,8 +6,6 @@ import os
 from Vintageous.ex.ex_command_parser import parse_command
 from Vintageous.ex.ex_command_parser import EX_COMMANDS
 from Vintageous.ex import ex_error
-from Vintageous.ex_completions import escape
-from Vintageous.ex_completions import unescape
 from Vintageous.ex_completions import parse
 from Vintageous.ex_completions import iter_paths
 from Vintageous.ex_completions import wants_fs_completions
@@ -54,7 +52,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
 
     def on_change(self, s):
         if ViColonInput.receiving_user_input:
-            cmd, prefix, only_dirs = parse(unescape(s))
+            cmd, prefix, only_dirs = parse(s)
             if not cmd:
                 return
             FsCompletion.current_prefix = prefix
@@ -143,7 +141,7 @@ class WriteFsCompletion(sublime_plugin.TextCommand):
         ViColonInput.receiving_user_input = False
         self.view.sel().clear()
         self.view.replace(edit, sublime.Region(0, self.view.size()),
-                          cmd + ' ' + escape(completion))
+                          cmd + ' ' + completion)
         self.view.sel().add(sublime.Region(self.view.size()))
 
 
@@ -166,7 +164,6 @@ class FsCompletion(sublime_plugin.TextCommand):
             FsCompletion.current_prefix = os.getcwd() + '/'
 
         if not FsCompletion.dirs or FsCompletion.must_recalculate:
-            print("XXX", only_dirs)
             FsCompletion.dirs = iter_paths(FsCompletion.current_prefix,
                                            only_dirs=only_dirs)
             FsCompletion.must_recalculate = False
