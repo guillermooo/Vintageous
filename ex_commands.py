@@ -724,18 +724,25 @@ class ExBrowse(sublime_plugin.TextCommand):
 
 
 class ExEdit(IrreversibleTextCommand):
-    """Ex command(s): :e
+    """Ex command(s): :e <file_name>
 
     Reverts unsaved changes to the buffer.
+
+    If there's a <file_name>, open it for editing.
     """
-    def run(self, forced=False):
+    def run(self, forced=False, file_name=None):
+        if not file_name:
+            if forced or not self.view.is_dirty():
+                self.view.run_command('revert')
+                return
+            elif not file_name and self.view.is_dirty():
+                ex_error.display_error(ex_error.ERR_UNSAVED_CHANGES)
+                return
+
         if forced or not self.view.is_dirty():
-            self.view.run_command('revert')
+            self.view.window().open_file(file_name)
             return
-        elif self.view.is_dirty():
-            ex_error.display_error(ex_error.ERR_UNSAVED_CHANGES)
-            return
-        ex_error.handle_not_implemented()
+        ex_error.display_error(ex_error.ERR_UNSAVED_CHANGES)
 
 
 class ExCquit(sublime_plugin.TextCommand):

@@ -246,7 +246,9 @@ EX_COMMANDS = {
                                 ),
     ('edit', 'e'): ex_cmd_data(
                                 command='ex_edit',
-                                invocations=(re.compile(r"^$"),),
+                                invocations=(re.compile(r"^$"),
+                                             re.compile(r"^(?P<file_name>.+)$"),
+                                ),
                                 error_on=(ex_error.ERR_NO_RANGE_ALLOWED,)
                                 ),
     ('cquit', 'cq'): ex_cmd_data(
