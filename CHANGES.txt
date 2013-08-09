@@ -1,3 +1,10 @@
+1.9.0 - 9/8/2013 
+
+	- Add file system completion for :w, :e and :cd.
+	- Improve e: command.	
+	- Implement non-standard :cdd command (changes current directory to view's).
+	- Add navigation keys for command line: ctrl+a, ctrl+e, ctrl+b, ctrl+f.
+
 1.8.6 - 9/8/2013 
 
 	- Improve :w command.
