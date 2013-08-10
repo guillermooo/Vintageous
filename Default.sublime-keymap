@@ -274,6 +274,7 @@
 	{ "keys": ["ctrl+b"], "command": "move",    		"args": {"by": "characters", "forward": false}, "context": [{"key": "vi_is_cmdline"},] },
 	{ "keys": ["ctrl+e"], "command": "move_to", 		"args": {"to": "eol"},							"context": [{"key": "vi_is_cmdline"},] },
 	{ "keys": ["ctrl+a"], "command": "_vi_cmd_line_a",													"context": [{"key": "vi_is_cmdline"},] },
+	{ "keys": ["ctrl+k"], "command": "_vi_cmd_line_k",													"context": [{"key": "vi_is_cmdline"},] },
 	// =============================================================================================================================
 
 	{ "keys": ["<character>"], "command": "set_register", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_register"}] },
