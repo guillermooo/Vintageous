@@ -146,9 +146,10 @@ class WriteFsCompletion(sublime_plugin.TextCommand):
 
 
 class FsCompletion(sublime_plugin.TextCommand):
+    # Last user-provided path string.
     current_prefix = ''
     must_recalculate = False
-    dirs = None
+    items = None
 
     def run(self, edit):
         if self.view.score_selector(0, 'text.excmdline') == 0:
@@ -163,22 +164,22 @@ class FsCompletion(sublime_plugin.TextCommand):
         elif not FsCompletion.current_prefix:
             FsCompletion.current_prefix = os.getcwd() + '/'
 
-        if not FsCompletion.dirs or FsCompletion.must_recalculate:
-            FsCompletion.dirs = iter_paths(FsCompletion.current_prefix,
-                                           only_dirs=only_dirs)
+        if not FsCompletion.items or FsCompletion.must_recalculate:
+            FsCompletion.items = iter_paths(FsCompletion.current_prefix,
+                                            only_dirs=only_dirs)
             FsCompletion.must_recalculate = False
 
         try:
             self.view.run_command('write_fs_completion',
                                   { 'cmd': cmd,
-                                    'completion': next(FsCompletion.dirs)})
+                                    'completion': next(FsCompletion.items)})
         except StopIteration:
             try:
-                FsCompletion.dirs = iter_paths(FsCompletion.current_prefix,
-                                               only_dirs=only_dirs)
+                FsCompletion.items = iter_paths(FsCompletion.current_prefix,
+                                                only_dirs=only_dirs)
                 self.view.run_command('write_fs_completion',
                                       { 'cmd': cmd,
-                                        'completion': next(FsCompletion.dirs)})
+                                        'completion': next(FsCompletion.items)})
             except StopIteration:
                 return
 
