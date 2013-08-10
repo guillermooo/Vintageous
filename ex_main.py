@@ -56,7 +56,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
             if not cmd:
                 return
             FsCompletion.prefix = prefix
-            FsCompletion.must_recalculate = True
+            FsCompletion.is_stale = True
         ViColonInput.receiving_user_input = True
 
     def on_done(self, cmd_line):
@@ -155,7 +155,7 @@ class WriteFsCompletion(sublime_plugin.TextCommand):
 class FsCompletion(sublime_plugin.TextCommand):
     # Last user-provided path string.
     prefix = ''
-    must_recalculate = False
+    is_stale = False
     items = None
 
     def run(self, edit):
@@ -167,14 +167,14 @@ class FsCompletion(sublime_plugin.TextCommand):
             return
         if not FsCompletion.prefix and prefix:
             FsCompletion.prefix = prefix
-            FsCompletion.must_recalculate = True
+            FsCompletion.is_stale = True
         elif not FsCompletion.prefix:
             FsCompletion.prefix = os.getcwd() + '/'
 
-        if not FsCompletion.items or FsCompletion.must_recalculate:
+        if not FsCompletion.items or FsCompletion.is_stale:
             FsCompletion.items = iter_paths(FsCompletion.prefix,
                                             only_dirs=only_dirs)
-            FsCompletion.must_recalculate = False
+            FsCompletion.is_stale = False
 
         try:
             self.view.run_command('write_fs_completion',
