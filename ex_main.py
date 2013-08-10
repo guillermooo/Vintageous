@@ -183,14 +183,16 @@ class FsCompletion(sublime_plugin.TextCommand):
                 return
 
 
-class SomeContextProvider(sublime_plugin.EventListener):
+class CmdlineContextProvider(sublime_plugin.EventListener):
+    """
+    Provides contexts for the cmdline input panel.
+    """
     def on_query_context(self, view, key, operator, operand, match_all):
         if view.score_selector(0, 'text.excmdline') == 0:
             return
 
-        if key == 'ex_at_fs_completion':
-            line = view.substr(view.line(0))
-            value = wants_fs_completions(line)
+        if key == 'vi_cmdline_at_fs_completion':
+            value = wants_fs_completions(view.substr(view.line(0)))
             value = value and view.sel()[0].b == view.size()
             if operator == sublime.OP_EQUAL:
                 if operand == True:
