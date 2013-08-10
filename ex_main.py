@@ -6,9 +6,9 @@ import os
 from Vintageous.ex import ex_error
 from Vintageous.ex.ex_command_parser import EX_COMMANDS
 from Vintageous.ex.ex_command_parser import parse_command
-from Vintageous.ex_completions import iter_paths
-from Vintageous.ex_completions import parse
-from Vintageous.ex_completions import wants_fs_completions
+from Vintageous.ex.completions import iter_paths
+from Vintageous.ex.completions import parse
+from Vintageous.ex.completions import wants_fs_completions
 from Vintageous.vi.sublime import show_ipanel
 
 
