@@ -3,11 +3,11 @@ import sublime_plugin
 
 import os
 
-from Vintageous.ex.ex_command_parser import parse_command
-from Vintageous.ex.ex_command_parser import EX_COMMANDS
 from Vintageous.ex import ex_error
-from Vintageous.ex_completions import parse
+from Vintageous.ex.ex_command_parser import EX_COMMANDS
+from Vintageous.ex.ex_command_parser import parse_command
 from Vintageous.ex_completions import iter_paths
+from Vintageous.ex_completions import parse
 from Vintageous.ex_completions import wants_fs_completions
 
 
@@ -55,7 +55,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
             cmd, prefix, only_dirs = parse(s)
             if not cmd:
                 return
-            FsCompletion.current_prefix = prefix
+            FsCompletion.prefix = prefix
             FsCompletion.must_recalculate = True
         ViColonInput.receiving_user_input = True
 
@@ -82,10 +82,12 @@ class ViColonInput(sublime_plugin.WindowCommand):
 
 class ViColonRepeatLast(sublime_plugin.WindowCommand):
     def is_enabled(self):
-        return (len(self.window.views()) > 0) and (len(EX_HISTORY['cmdline']) > 0)
+        return ((len(self.window.views()) > 0) and
+                (len(EX_HISTORY['cmdline']) > 0))
 
     def run(self):
-        self.window.run_command('vi_colon_input', {'cmd_line': EX_HISTORY['cmdline'][-1]})
+        self.window.run_command('vi_colon_input',
+                                {'cmd_line': EX_HISTORY['cmdline'][-1]})
 
 
 class ExCompletionsProvider(sublime_plugin.EventListener):
@@ -102,10 +104,12 @@ class ExCompletionsProvider(sublime_plugin.EventListener):
         if prefix and prefix in self.CACHED_COMPLETION_PREFIXES:
             return self.CACHED_COMPLETIONS
 
-        compls = [x for x in COMPLETIONS if x.startswith(prefix) and x != prefix]
+        compls = [x for x in COMPLETIONS if x.startswith(prefix) and
+                                            x != prefix]
         self.CACHED_COMPLETION_PREFIXES = [prefix] + compls
         # S3 can only handle lists, not iterables.
-        self.CACHED_COMPLETIONS = list(zip([prefix] + compls, compls + [prefix]))
+        self.CACHED_COMPLETIONS = list(zip([prefix] + compls,
+                                           compls + [prefix]))
 
         return self.CACHED_COMPLETIONS
 
@@ -138,6 +142,9 @@ class HistoryIndexRestorer(sublime_plugin.EventListener):
 
 class WriteFsCompletion(sublime_plugin.TextCommand):
     def run(self, edit, cmd, completion):
+        if self.view.score_selector(0, 'text.excmdline') == 0:
+            return
+
         ViColonInput.receiving_user_input = False
         self.view.sel().clear()
         self.view.replace(edit, sublime.Region(0, self.view.size()),
@@ -147,7 +154,7 @@ class WriteFsCompletion(sublime_plugin.TextCommand):
 
 class FsCompletion(sublime_plugin.TextCommand):
     # Last user-provided path string.
-    current_prefix = ''
+    prefix = ''
     must_recalculate = False
     items = None
 
@@ -158,28 +165,28 @@ class FsCompletion(sublime_plugin.TextCommand):
         cmd, prefix, only_dirs = parse(self.view.substr(self.view.line(0)))
         if not cmd:
             return
-        if not FsCompletion.current_prefix and prefix:
-            FsCompletion.current_prefix = prefix
+        if not FsCompletion.prefix and prefix:
+            FsCompletion.prefix = prefix
             FsCompletion.must_recalculate = True
-        elif not FsCompletion.current_prefix:
-            FsCompletion.current_prefix = os.getcwd() + '/'
+        elif not FsCompletion.prefix:
+            FsCompletion.prefix = os.getcwd() + '/'
 
         if not FsCompletion.items or FsCompletion.must_recalculate:
-            FsCompletion.items = iter_paths(FsCompletion.current_prefix,
+            FsCompletion.items = iter_paths(FsCompletion.prefix,
                                             only_dirs=only_dirs)
             FsCompletion.must_recalculate = False
 
         try:
             self.view.run_command('write_fs_completion',
-                                  { 'cmd': cmd,
-                                    'completion': next(FsCompletion.items)})
+                                  {'cmd': cmd,
+                                   'completion': next(FsCompletion.items)})
         except StopIteration:
             try:
-                FsCompletion.items = iter_paths(FsCompletion.current_prefix,
+                FsCompletion.items = iter_paths(FsCompletion.prefix,
                                                 only_dirs=only_dirs)
                 self.view.run_command('write_fs_completion',
-                                      { 'cmd': cmd,
-                                        'completion': next(FsCompletion.items)})
+                                      {'cmd': cmd,
+                                       'completion': next(FsCompletion.items)})
             except StopIteration:
                 return
 

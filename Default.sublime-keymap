@@ -268,7 +268,7 @@
 	{ "keys": ["up"],   "command": "cycle_cmdline_history", "args": {"backwards": true }, "context": [{"key": "vi_is_cmdline"}] },
  	{ "keys": ["down"], "command": "cycle_cmdline_history",								  "context": [{"key": "vi_is_cmdline"}] },
  	
-	{ "keys": ["tab"],   "command": "fs_completion", "context": [{"key": "vi_is_cmdline"}, {"key": "ex_at_fs_completion"}] },
+	{ "keys": ["tab"],   "command": "fs_completion", "context": [{"key": "vi_is_cmdline"}, {"key": "vi_cmdline_at_fs_completion"}] },
 
 	{ "keys": ["ctrl+f"], "command": "move",    		"args": {"by": "characters", "forward": true},  "context": [{"key": "vi_is_cmdline"},] },
 	{ "keys": ["ctrl+b"], "command": "move",    		"args": {"by": "characters", "forward": false}, "context": [{"key": "vi_is_cmdline"},] },
