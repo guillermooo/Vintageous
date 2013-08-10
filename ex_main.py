@@ -29,7 +29,8 @@ def update_command_line_history(item, slot_name):
 
 
 class ViColonInput(sublime_plugin.WindowCommand):
-    receiving_user_input = True
+    # Indicates whether the user issued the call.
+    interactive_call = True
     def is_enabled(self):
         return len(self.window.views()) > 0
 
@@ -51,13 +52,13 @@ class ViColonInput(sublime_plugin.WindowCommand):
         v.settings().set('rulers', [])
 
     def on_change(self, s):
-        if ViColonInput.receiving_user_input:
+        if ViColonInput.interactive_call:
             cmd, prefix, only_dirs = parse(s)
             if not cmd:
                 return
             FsCompletion.prefix = prefix
             FsCompletion.is_stale = True
-        ViColonInput.receiving_user_input = True
+        ViColonInput.interactive_call = True
 
     def on_done(self, cmd_line):
         if not getattr(self, 'non_interactive', None):
@@ -145,7 +146,7 @@ class WriteFsCompletion(sublime_plugin.TextCommand):
         if self.view.score_selector(0, 'text.excmdline') == 0:
             return
 
-        ViColonInput.receiving_user_input = False
+        ViColonInput.interactive_call = False
         self.view.sel().clear()
         self.view.replace(edit, sublime.Region(0, self.view.size()),
                           cmd + ' ' + completion)
