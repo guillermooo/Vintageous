@@ -21,6 +21,6 @@ def has_dirty_buffers(window):
 
 def show_ipanel(window, caption='', initial_text='', on_done=None,
                 on_change=None, on_cancel=None):
-    v = window.show_input_panel('', initial_text, on_done, on_change,
+    v = window.show_input_panel(caption, initial_text, on_done, on_change,
                                 on_cancel)
     return v
