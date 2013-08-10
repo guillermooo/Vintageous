@@ -9,6 +9,7 @@ from Vintageous.ex.ex_command_parser import parse_command
 from Vintageous.ex_completions import iter_paths
 from Vintageous.ex_completions import parse
 from Vintageous.ex_completions import wants_fs_completions
+from Vintageous.vi.sublime import show_ipanel
 
 
 COMPLETIONS = sorted([x[0] for x in EX_COMMANDS.keys()])
@@ -43,10 +44,8 @@ class ViColonInput(sublime_plugin.WindowCommand):
             self.non_interactive = True
             self.on_done(cmd_line)
             return
-        v = self.window.show_input_panel('', initial_text,
-                                         self.on_done,
-                                         self.on_change,
-                                         None)
+        v = show_ipanel(self.window, initial_text=initial_text,
+                        on_done=self.on_done, on_change=self.on_change)
         v.set_syntax_file('Packages/Vintageous/VintageousEx Cmdline.tmLanguage')
         v.settings().set('gutter', False)
         v.settings().set('rulers', [])

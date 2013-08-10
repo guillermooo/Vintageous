@@ -17,3 +17,10 @@ def has_dirty_buffers(window):
     for v in window.views():
         if v.is_dirty():
             return True
+
+
+def show_ipanel(window, caption='', initial_text='', on_done=None,
+                on_change=None, on_cancel=None):
+    v = window.show_input_panel('', initial_text, on_done, on_change,
+                                on_cancel)
+    return v
