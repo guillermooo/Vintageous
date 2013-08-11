@@ -195,7 +195,7 @@ class ExReadShellOut(sublime_plugin.TextCommand):
             target_line = self.view.line(self.view.text_point(range, 0))
         target_point = min(target_line.b + 1, self.view.size())
 
-        # cheat a little bit to get the parsing right:
+        # Cheat a little bit to get the parsing right:
         #   - forced == True means we need to execute a command
         if forced:
             if sublime.platform() == 'linux':
@@ -213,7 +213,7 @@ class ExReadShellOut(sublime_plugin.TextCommand):
                         print(e)
                         sublime.status_message("Vintageous: Error while executing command through shell.")
                         return
-                    self.view.insert(edit, s.begin(), p.communicate()[0][:-1])
+                    self.view.insert(edit, s.begin(), p.communicate()[0][:-1].decode('utf-8'))
             elif sublime.platform() == 'windows':
                 for s in self.view.sel():
                     p = subprocess.Popen(['cmd.exe', '/C', name],
