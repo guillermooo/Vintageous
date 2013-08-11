@@ -12,13 +12,13 @@ from Vintageous.ex import parsers
 from Vintageous.ex import shell
 from Vintageous.ex.plat.windows import get_oem_cp
 from Vintageous.ex.plat.windows import get_startup_info
+from Vintageous.ex_main import FsCompletion
+from Vintageous.state import IrreversibleTextCommand
 from Vintageous.state import VintageState
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
 from Vintageous.vi.sublime import has_dirty_buffers
-from Vintageous.state import IrreversibleTextCommand
-from Vintageous.ex_main import FsCompletion
 
 
 GLOBAL_RANGES = []
