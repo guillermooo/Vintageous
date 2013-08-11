@@ -125,7 +125,19 @@ class ExShellOut(sublime_plugin.TextCommand):
                                 regions=get_region_by_range(self.view, line_range=line_range),
                                 cmd=shell_cmd)
             else:
-                shell.run_and_wait(self.view, shell_cmd)
+                # TODO: Read output into output panel.
+                # shell.run_and_wait(self.view, shell_cmd)
+                out = shell.run_and_read(self.view, shell_cmd)
+
+                output_view = self.view.window().create_output_panel('vi_out')
+                output_view.settings().set("line_numbers", False)
+                output_view.settings().set("gutter", False)
+                output_view.settings().set("scroll_past_end", False)
+                output_view = self.view.window().create_output_panel('vi_out')
+                output_view.run_command('append', {'characters': out,
+                                                   'force': True,
+                                                   'scroll_to_end': True})
+                self.view.window().run_command("show_panel", {"panel": "output.vi_out"})
         except NotImplementedError:
             ex_error.handle_not_implemented()
 

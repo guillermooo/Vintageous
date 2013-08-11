@@ -1,4 +1,5 @@
 import subprocess
+from subprocess import PIPE
 import os
 import tempfile
 
@@ -21,6 +22,17 @@ def get_startup_info():
 
 def run_and_wait(view, cmd):
     subprocess.Popen(['cmd.exe', '/c', cmd + '&& pause']).wait()
+
+
+def run_and_read(view, cmd):
+    out, err = subprocess.Popen(['cmd.exe', '/c', cmd],
+                                stdout=PIPE,
+                                shell=True,
+                                startupinfo=get_startup_info()).communicate()
+    try:
+        return (out or err).decode(get_oem_cp()).replace('\r\n', '\n')
+    except AttributeError:
+        return ''
 
 
 def filter_region(view, txt, command):

@@ -1,5 +1,6 @@
 import os
 import subprocess
+from subprocess import PIPE
 
 
 def run_and_wait(view, cmd):
@@ -8,6 +9,14 @@ def run_and_wait(view, cmd):
     subprocess.Popen([
             term, '-e',
             "bash -c \"%s; read -p 'Press RETURN to exit.'\"" % cmd]).wait()
+
+
+def run_and_read(view, cmd):
+    out, err = subprocess.Popen([cmd], stdout=PIPE, shell=True).communicate()
+    try:
+        return (out or err).decode('utf-8')
+    except AttributeError:
+        return ''
 
 
 def filter_region(view, text, command):

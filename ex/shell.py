@@ -15,6 +15,17 @@ def run_and_wait(view, cmd):
         raise NotImplementedError
 
 
+def run_and_read(view, cmd):
+    if plat.HOST_PLATFORM == plat.WINDOWS:
+        return plat.windows.run_and_read(view, cmd)
+    elif plat.HOST_PLATFORM == plat.LINUX:
+        return plat.linux.run_and_read(view, cmd)
+    elif plat.HOST_PLATFORM == plat.OSX:
+        plat.osx.run_and_wait(view, cmd)
+    else:
+        raise NotImplementedError
+
+
 def filter_thru_shell(view, edit, regions, cmd):
     # XXX: make this a ShellFilter class instead
     if plat.HOST_PLATFORM == plat.WINDOWS:
