@@ -18,12 +18,24 @@ from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
 from Vintageous.vi.sublime import has_dirty_buffers
 from Vintageous.state import IrreversibleTextCommand
+from Vintageous.ex_main import FsCompletion
 
 
 GLOBAL_RANGES = []
 CURRENT_LINE_RANGE = {'left_ref': '.', 'left_offset': 0,
                       'left_search_offsets': [], 'right_ref': None,
                       'right_offset': 0, 'right_search_offsets': []}
+
+
+def changing_cd(f, *args, **kwargs):
+    def inner(*args, **kwargs):
+        state = VintageState(args[0].view)
+        try:
+            os.chdir(state.settings.vi['_cmdline_cd'])
+            f(*args, **kwargs)
+        finally:
+            os.chdir(state.settings.vi['_cmdline_actual_cd'])
+    return inner
 
 
 def gather_buffer_info(v):
@@ -101,6 +113,8 @@ class ExShellOut(sublime_plugin.TextCommand):
     Run cmd in a system's shell or filter selected regions through external
     command.
     """
+
+    @changing_cd
     def run(self, edit, line_range=None, shell_cmd=''):
         try:
             if line_range['text_range']:
@@ -115,7 +129,7 @@ class ExShellOut(sublime_plugin.TextCommand):
             ex_error.handle_not_implemented()
 
 
-class ExShell(sublime_plugin.TextCommand):
+class ExShell(IrreversibleTextCommand):
     """Ex command(s): :shell
 
     Opens a shell at the current view's directory. Sublime Text keeps a virtual
@@ -124,10 +138,10 @@ class ExShell(sublime_plugin.TextCommand):
     current view's directory, but it isn't accessible through the API.
     """
     def open_shell(self, command):
-        view_dir = os.path.dirname(self.view.file_name())
-        return subprocess.Popen(command, cwd=view_dir)
+        return subprocess.Popen(command, cwd=os.getcwd())
 
-    def run(self, edit):
+    @changing_cd
+    def run(self):
         if sublime.platform() == 'linux':
             term = self.view.settings().get('VintageousEx_linux_terminal')
             term = term or os.environ.get('COLORTERM') or os.environ.get("TERM")
@@ -160,6 +174,7 @@ class ExShell(sublime_plugin.TextCommand):
 
 
 class ExReadShellOut(sublime_plugin.TextCommand):
+    @changing_cd
     def run(self, edit, line_range=None, name='', plusplus_args='', forced=False):
         target_line = self.view.line(self.view.sel()[0].begin())
         if line_range['text_range']:
@@ -257,20 +272,23 @@ class ExAbbreviate(sublime_plugin.TextCommand):
                                     {'file': "${packages}/User/%s" % abbs_file_name})
 
 
-class ExPrintWorkingDir(sublime_plugin.TextCommand):
-    def run(self, edit):
+class ExPrintWorkingDir(IrreversibleTextCommand):
+    @changing_cd
+    def run(self):
+        state = VintageState(self.view)
         sublime.status_message(os.getcwd())
 
 
-class ExWriteFile(sublime_plugin.TextCommand):
-    def run(self, edit,
-                line_range=None,
-                forced=False,
-                file_name='',
-                plusplus_args='',
-                operator='',
-                target_redirect='',
-                subcmd=''):
+class ExWriteFile(IrreversibleTextCommand):
+    @changing_cd
+    def run(self,
+            line_range=None,
+            forced=False,
+            file_name='',
+            plusplus_args='',
+            operator='',
+            target_redirect='',
+            subcmd=''):
 
         if file_name and target_redirect:
             sublime.status_message('Vintageous: Too many arguments.')
@@ -305,16 +323,18 @@ class ExWriteFile(sublime_plugin.TextCommand):
                 return
 
             try:
+                # FIXME: We need to do some work with encodings here, don't we?
                 with open(file_path, 'w+') as temp_file:
                     for frag in reversed(content):
                         temp_file.write(self.view.substr(frag))
                     temp_file.close()
+                    sublime.status_message("Vintageous: Saved {0}".format(file_path))
+                    return
             except IOError as e:
                 report_error( "Failed to create file '%s'." % file_name )
                 return
 
             window = self.view.window()
-
             window.open_file(file_path)
             return
         else:
@@ -339,12 +359,14 @@ class ExWriteFile(sublime_plugin.TextCommand):
 
 
 class ExWriteAll(sublime_plugin.TextCommand):
+    @changing_cd
     def run(self, edit, forced=False):
         for v in self.view.window().views():
             v.run_command('save')
 
 
 class ExNewFile(sublime_plugin.TextCommand):
+    @changing_cd
     def run(self, edit, forced=False):
         self.view.window().run_command('new_file')
 
@@ -362,7 +384,7 @@ class ExFile(sublime_plugin.TextCommand):
         if self.view.is_read_only():
             attrs = 'readonly'
 
-        if self.view.is_scratch():
+        if self.view.is_dirty():
             attrs = 'modified'
 
         lines = 'no lines in the buffer'
@@ -730,6 +752,7 @@ class ExEdit(IrreversibleTextCommand):
 
     If there's a <file_name>, open it for editing.
     """
+    @changing_cd
     def run(self, forced=False, file_name=None):
         if not file_name:
             if forced or not self.view.is_dirty():
@@ -804,6 +827,7 @@ class ExNew(sublime_plugin.TextCommand):
 
     TODO: Create new buffer by splitting the screen.
     """
+    @changing_cd
     def run(self, edit, line_range=None):
         self.view.window().run_command('new_file')
 
@@ -898,18 +922,20 @@ class ExCdCommand(IrreversibleTextCommand):
             ex_error.display_error(ex_error.ERR_UNSAVED_CHANGES)
             return
 
+        state = VintageState(self.view)
+
         if not path:
-            os.chdir(os.path.expanduser("~"))
-            sublime.status_message("Vintageous: {0}".format(os.path.expanduser("~")))
+            state.settings.vi['_cmdline_cd'] = os.path.expanduser("~")
+            self.view.run_command('ex_print_working_dir')
             return
 
         # TODO: It seems there a few symbols that are always substituted when they represent a
         # filename. We should have a global method of substiting them.
         if path == '%:h':
-            fname = self.window.active_view().file_name()
+            fname = self.view.file_name()
             if fname:
-                os.chdir(os.path.dirname(fname))
-                sublime.status_message("Vintageous: %s" % os.getcwd())
+                state.settings.vi['_cmdline_cd'] = os.path.dirname(fname)
+                self.view.run_command('ex_print_working_dir')
             return
 
         path = os.path.realpath(os.path.expandvars(os.path.expanduser(path)))
@@ -918,13 +944,11 @@ class ExCdCommand(IrreversibleTextCommand):
             ex_error.display_error(ex_error.ERR_CANT_FIND_DIR_IN_CDPATH)
             return
 
-        # Note: :cd is almost meaningless in S3 since the current dir isn't maintained by the
-        # editor and can be changed (for example by a plugin) at any time.
-        os.chdir(path)
-        sublime.status_message("Vintageous: %s" % os.getcwd())
+        state.settings.vi['_cmdline_cd'] = path
+        self.view.run_command('ex_print_working_dir')
 
 
-class ExCddCommand(sublime_plugin.TextCommand):
+class ExCddCommand(IrreversibleTextCommand):
     """Ex command(s) [non-standard]: :cdd
 
     Non-standard command to change the current directory the the active
@@ -936,9 +960,13 @@ class ExCddCommand(sublime_plugin.TextCommand):
     (This command may be removed at any time.)
     """
     def run(self, forced=False):
+        if self.view.is_dirty() and not forced:
+            ex_error.display_error(ex_error.ERR_UNSAVED_CHANGES)
+            return
         path = os.path.dirname(self.view.file_name())
+        state = VintageState(self.view)
         try:
-            os.chdir(path)
-            sublime.status_message("Vintageous: %s" % os.getcwd())
+            state.settings.vi['_cmdline_cd'] = path
+            self.view.run_command('ex_print_working_dir')
         except IOError:
-            print('Vintageous: Could not change current directory.')
+            ex_error.display_error(ex_error.ERR_CANT_FIND_DIR_IN_CDPATH)

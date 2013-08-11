@@ -4,6 +4,8 @@ vi_user_setting = collections.namedtuple('vi_editor_setting', 'scope values defa
 
 WINDOW_SETTINGS = [
     'last_buffer_search',
+    '_cmdline_cd',
+    '_cmdline_actual_cd'
 ]
 
 

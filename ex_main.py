@@ -10,6 +10,15 @@ from Vintageous.ex.completions import iter_paths
 from Vintageous.ex.completions import parse
 from Vintageous.ex.completions import wants_fs_completions
 from Vintageous.vi.sublime import show_ipanel
+from Vintageous.state import VintageState
+
+
+def plugin_loaded():
+    v = sublime.active_window().active_view()
+    state = VintageState(v)
+    d = os.path.dirname(v.file_name()) if v.file_name() else os.getcwd()
+    state.settings.vi['_cmdline_cd'] = d
+    state.settings.vi['_cmdline_actual_cd'] = os.getcwd()
 
 
 COMPLETIONS = sorted([x[0] for x in EX_COMMANDS.keys()])
@@ -158,6 +167,12 @@ class FsCompletion(sublime_plugin.TextCommand):
     is_stale = False
     items = None
 
+    @staticmethod
+    def invalidate():
+        FsCompletion.prefix = ''
+        is_stale = True
+        items = None
+
     def run(self, edit):
         if self.view.score_selector(0, 'text.excmdline') == 0:
             return
@@ -169,7 +184,8 @@ class FsCompletion(sublime_plugin.TextCommand):
             FsCompletion.prefix = prefix
             FsCompletion.is_stale = True
         elif not FsCompletion.prefix:
-            FsCompletion.prefix = os.getcwd() + '/'
+            state = VintageState(self.view)
+            FsCompletion.prefix = state.settings.vi['_cmdline_cd'] + '/'
 
         if not FsCompletion.items or FsCompletion.is_stale:
             FsCompletion.items = iter_paths(FsCompletion.prefix,
