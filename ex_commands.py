@@ -886,20 +886,36 @@ class ExTabOnlyCommand(sublime_plugin.WindowCommand):
         self.window.run_command("tab_control", {"command": "only", "forced": forced, }, )
 
 
-class ExCdCommand(sublime_plugin.WindowCommand):
-    """Ex command(s): :cd
+class ExCdCommand(IrreversibleTextCommand):
+    """Ex command(s): :cd [<path>|%:h]
 
     Print or change the current directory.
+
+    :cd without an argument behaves as in Unix for all platforms.
     """
-    def run(self, path=None):
+    def run(self, path=None, forced=False):
+        if self.view.is_dirty() and not forced:
+            ex_error.display_error(ex_error.ERR_UNSAVED_CHANGES)
+            return
+
         if not path:
-            sublime.status_message("Vintageous: {0}".format(os.getcwd()))
+            os.chdir(os.path.expanduser("~"))
+            sublime.status_message("Vintageous: {0}".format(os.path.expanduser("~")))
+            return
+
+        # TODO: It seems there a few symbols that are always substituted when they represent a
+        # filename. We should have a global method of substiting them.
+        if path == '%:h':
+            fname = self.window.active_view().file_name()
+            if fname:
+                os.chdir(os.path.dirname(fname))
+                sublime.status_message("Vintageous: %s" % os.getcwd())
             return
 
         path = os.path.realpath(os.path.expandvars(os.path.expanduser(path)))
         if not os.path.exists(path):
             # TODO: Add error number in ex_error.py.
-            sublime.status_message("Vintageous: Error can't find directory {0}".format(path))
+            ex_error.display_error(ex_error.ERR_CANT_FIND_DIR_IN_CDPATH)
             return
 
         # Note: :cd is almost meaningless in S3 since the current dir isn't maintained by the
