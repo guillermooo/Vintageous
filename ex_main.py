@@ -18,7 +18,6 @@ def plugin_loaded():
     state = VintageState(v)
     d = os.path.dirname(v.file_name()) if v.file_name() else os.getcwd()
     state.settings.vi['_cmdline_cd'] = d
-    state.settings.vi['_cmdline_actual_cd'] = os.getcwd()
 
 
 COMPLETIONS = sorted([x[0] for x in EX_COMMANDS.keys()])

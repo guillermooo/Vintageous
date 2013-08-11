@@ -30,11 +30,12 @@ CURRENT_LINE_RANGE = {'left_ref': '.', 'left_offset': 0,
 def changing_cd(f, *args, **kwargs):
     def inner(*args, **kwargs):
         state = VintageState(args[0].view)
+        old = os.getcwd()
         try:
             os.chdir(state.settings.vi['_cmdline_cd'])
             f(*args, **kwargs)
         finally:
-            os.chdir(state.settings.vi['_cmdline_actual_cd'])
+            os.chdir(old)
     return inner
 
 
@@ -329,6 +330,13 @@ class ExWriteFile(IrreversibleTextCommand):
                         temp_file.write(self.view.substr(frag))
                     temp_file.close()
                     sublime.status_message("Vintageous: Saved {0}".format(file_path))
+
+                    row, col = self.view.rowcol(self.view.sel()[0].b)
+                    encoded_fn = "{0}:{1}:{2}".format(file_path, row + 1, col + 1)
+                    self.view.set_scratch(True)
+                    w = self.view.window()
+                    w.run_command('close')
+                    w.open_file(encoded_fn, sublime.ENCODED_POSITION)
                     return
             except IOError as e:
                 report_error( "Failed to create file '%s'." % file_name )
