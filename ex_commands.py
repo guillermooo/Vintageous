@@ -937,6 +937,7 @@ class ExCdCommand(IrreversibleTextCommand):
 
     :cd without an argument behaves as in Unix for all platforms.
     """
+    @changing_cd
     def run(self, path=None, forced=False):
         if self.view.is_dirty() and not forced:
             ex_error.display_error(ex_error.ERR_UNSAVED_CHANGES)
