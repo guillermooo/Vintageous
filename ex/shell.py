@@ -21,7 +21,7 @@ def run_and_read(view, cmd):
     elif plat.HOST_PLATFORM == plat.LINUX:
         return plat.linux.run_and_read(view, cmd)
     elif plat.HOST_PLATFORM == plat.OSX:
-        return plat.osx.run_and_wait(view, cmd)
+        return plat.osx.run_and_read(view, cmd)
     else:
         raise NotImplementedError
 
