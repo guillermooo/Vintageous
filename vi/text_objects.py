@@ -201,12 +201,19 @@ def get_text_object_region(view, s, text_object, inclusive=False, count=1):
         return sublime.Region(opening.a + 1, closing.b - 1)
 
     if type_ == QUOTE:
+        # Vim only operates on the current line.
+        line = view.line(s)
         # FIXME: Escape sequences like \" are probably syntax-dependant.
         prev_quote = reverse_search_by_pt(view, '(?<!\\\\)' + delims[0],
-                                          start=0, end=s.b)
+                                          start=line.a, end=s.b)
 
         next_quote = find_in_range(view, '(?<!\\\\)' + delims[0],
-                                   start=s.b, end=view.size())
+                                   start=s.b, end=line.b)
+
+        if next_quote and not prev_quote:
+            prev_quote = next_quote
+            next_quote = find_in_range(view, '(?<!\\\\)' + delims[0],
+                                       start=prev_quote.b, end=line.b)
 
         if not (prev_quote and next_quote):
             return s
