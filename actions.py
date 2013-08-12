@@ -644,9 +644,11 @@ class _vi_repeat(IrreversibleTextCommand):
             self.view.run_command(cmd, args)
         elif cmd == 'sequence':
             for i, _ in enumerate(args['commands']):
-                # Access this shape: {"commands":[['vi_run', {"foo": 100}],...]}
-                args['commands'][i][1]['next_mode'] = MODE_NORMAL
-                args['commands'][i][1]['follow_up_mode'] = 'vi_enter_normal_mode'
+                # We can have either 'vi_run' commands or plain insert mode commands.
+                if args['commands'][i][0] == 'vi_run':
+                    # Access this shape: {"commands":[['vi_run', {"foo": 100}],...]}
+                    args['commands'][i][1]['next_mode'] = MODE_NORMAL
+                    args['commands'][i][1]['follow_up_mode'] = 'vi_enter_normal_mode'
 
             # TODO: Implement counts properly for 'sequence' command.
             for i in range(state.count):
@@ -666,10 +668,9 @@ class _vi_redo(IrreversibleTextCommand):
     # TODO: It must be possible store or retrieve the actual position of the caret before the
     # visual selection performed by the user.
     def run(self):
-        with restoring_sels(self.view):
-            state = VintageState(self.view)
-            for i in range(state.count):
-                self.view.run_command('redo')
+        state = VintageState(self.view)
+        for i in range(state.count):
+            self.view.run_command('redo')
 
         state.update_xpos()
         # Ensure that we wipe the count, if any.

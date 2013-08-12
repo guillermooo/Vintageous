@@ -1,3 +1,8 @@
+2.0.1 - 12/08/2013 
+
+	- Improve 'repeat' action.
+	- Undo previous changes to 'redo' action.
+
 2.0.0 - 11/08/2013 
 
 	- Add ctrl+k key binding to cmdline.
