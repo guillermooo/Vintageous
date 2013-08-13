@@ -5,9 +5,9 @@ import glob
 import os
 import re
 
-RX_CMD_LINE_CD = re.compile(r'^(?P<cmd>:\s*cd)\s+(?P<path>.*)$')
-RX_CMD_LINE_WRITE = re.compile(r'^(?P<cmd>:\s*w)\s+(?P<path>.*)$')
-RX_CMD_LINE_EDIT = re.compile(r'^(?P<cmd>:\s*e)\s+(?P<path>.*)$')
+RX_CMD_LINE_CD = re.compile(r'^(?P<cmd>:\s*cd!?)\s+(?P<path>.*)$')
+RX_CMD_LINE_WRITE = re.compile(r'^(?P<cmd>:\s*w(?:write)?!?)\s+(?P<path>.*)$')
+RX_CMD_LINE_EDIT = re.compile(r'^(?P<cmd>:\s*e(?:dit)?!?)\s+(?P<path>.*)$')
 
 COMPLETIONS_FILE = 1
 COMPLETIONS_DIRECTORY = 2
