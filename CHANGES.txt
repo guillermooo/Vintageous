@@ -1,3 +1,9 @@
+2.0.2 - 13/08/2013 
+
+	- Colorize command line.
+	- Improve :<count> command.
+	- Improve command line completions when forcing (!) commands.
+
 2.0.1 - 12/08/2013 
 
 	- Improve 'repeat' action.
