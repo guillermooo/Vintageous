@@ -156,7 +156,7 @@ class VimParser(ParserBase):
                     signs = signs[:-1] if signs else []
                 subtotal = 0
                 for item in signs:
-                    subtotal += 1 if item == '+' else -1 
+                    subtotal += 1 if item == '+' else -1
                 offsets.append(subtotal)
             elif self.c.isdigit():
                 nr = self.consume_while_match('^[0-9]')
@@ -184,7 +184,7 @@ class VimParser(ParserBase):
 
 class CommandLineParser(ParserBase):
     def __init__(self, source, *args, **kwargs):
-        ParserBase.__init__(self, source, *args, **kwargs)     
+        ParserBase.__init__(self, source, *args, **kwargs)
         self.range_parser = VimParser(source)
         self.result = dict(range=None, commands=[], errors=[])
 
@@ -308,7 +308,7 @@ class AddressParser(ParserBase):
                     signs = signs[:-1] if signs else []
                 subtotal = 0
                 for item in signs:
-                    subtotal += 1 if item == '+' else -1 
+                    subtotal += 1 if item == '+' else -1
                 offsets.append(subtotal)
             elif self.c.isdigit():
                 nr = self.consume_while_match('^[0-9]')
