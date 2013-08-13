@@ -88,6 +88,9 @@ class ExGoto(sublime_plugin.TextCommand):
             return
         ranges, _ = ex_range.new_calculate_range(self.view, line_range)
         a, b = ranges[0]
+        # FIXME: This should be handled by the parser.
+        # FIXME: In Vim, 0 seems to equal 1 in ranges.
+        b = b if line_range['text_range'] != '0' else 1
         state = VintageState(self.view)
         # FIXME: In Visual mode, goto line does some weird stuff.
         if state.mode == MODE_NORMAL:
