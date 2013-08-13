@@ -3,8 +3,10 @@
 	"include": {
 		"dev": [
 			["*.*", ["*builder.py",
+					 "*toplist.py",
 					 "*.sublime-workspace",
 					 "*.sublime-project",
+					 "*.JSON-tmLanguage",
 					 "*.ps1",
 					 "*.hg*",
 					 "*manifest.json"]
@@ -24,12 +26,14 @@
 		],
 		"release": [
 			["*.*", ["*builder.py",
+					 "*toplist.py",
 					 "*build.sh",
 					 "*.sublime-workspace",
 					 "*.sublime-project",
 					 "*.ps1",
 					 "*.hg*",
 					 "*manifest.json",
+					 "*.JSON-tmLanguage",
 					 "*.sublime-commands",
 					 "*test_runner.py"]
 			],
