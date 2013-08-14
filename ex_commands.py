@@ -29,7 +29,11 @@ CURRENT_LINE_RANGE = {'left_ref': '.', 'left_offset': 0,
 
 def changing_cd(f, *args, **kwargs):
     def inner(*args, **kwargs):
-        state = VintageState(args[0].view)
+        try:
+            state = VintageState(args[0].view)
+        except AttributeError:
+            state = VintageState(args[0].window.active_view())
+
         old = os.getcwd()
         try:
             os.chdir(state.settings.vi['_cmdline_cd'])
@@ -295,7 +299,7 @@ class ExPrintWorkingDir(IrreversibleTextCommand):
         sublime.status_message(os.getcwd())
 
 
-class ExWriteFile(IrreversibleTextCommand):
+class ExWriteFile(sublime_plugin.WindowCommand):
     @changing_cd
     def run(self,
             line_range=None,
@@ -311,13 +315,13 @@ class ExWriteFile(IrreversibleTextCommand):
             return
 
         appending = operator == '>>'
-        # FIXME: reversed? -- what's going on here!!
         a_range = line_range['text_range']
+        self.view = self.window.active_view()
         content = get_region_by_range(self.view, line_range=line_range) if a_range else \
                         [sublime.Region(0, self.view.size())]
 
         if target_redirect:
-            target = self.view.window().new_file()
+            target = self.window.new_file()
             target.set_name(target_redirect)
         elif file_name:
 
@@ -349,7 +353,7 @@ class ExWriteFile(IrreversibleTextCommand):
                     row, col = self.view.rowcol(self.view.sel()[0].b)
                     encoded_fn = "{0}:{1}:{2}".format(file_path, row + 1, col + 1)
                     self.view.set_scratch(True)
-                    w = self.view.window()
+                    w = self.window
                     w.run_command('close')
                     w.open_file(encoded_fn, sublime.ENCODED_POSITION)
                     return
@@ -357,7 +361,7 @@ class ExWriteFile(IrreversibleTextCommand):
                 report_error( "Failed to create file '%s'." % file_name )
                 return
 
-            window = self.view.window()
+            window = self.window
             window.open_file(file_path)
             return
         else:
@@ -368,17 +372,26 @@ class ExWriteFile(IrreversibleTextCommand):
 
         if appending or target_redirect:
             for frag in reversed(content):
-                target.insert(edit, start, prefix + self.view.substr(frag) + '\n')
+                target.run_command('append', {'characters': prefix + self.view.substr(frag) + '\n'})
         elif a_range:
             start_deleting = 0
+            text = ''
             for frag in content:
-                text = self.view.substr(frag) + '\n'
-                self.view.insert(edit, 0, text)
-                start_deleting += len(text)
-            self.view.replace(edit, sublime.Region(start_deleting,
-                                        self.view.size()), '')
+                text += self.view.substr(frag) + '\n'
+            start_deleting = len(text)
+            self.view.run_command('ex_replace_file', {'start': 0, 'end': 0, 'with_what': text})
         else:
-            self.view.run_command('save')
+            self.window.run_command('save')
+
+        state = VintageState(self.window.active_view())
+        state.enter_normal_mode()
+        self.window.run_command('vi_enter_normal_mode')
+
+
+class ExReplaceFile(sublime_plugin.TextCommand):
+    def run(self, edit, start, end, with_what):
+        self.view.replace(edit, sublime.Region(0, self.view.size()), '')
+        self.view.insert(edit, 0, with_what)
 
 
 class ExWriteAll(sublime_plugin.TextCommand):
