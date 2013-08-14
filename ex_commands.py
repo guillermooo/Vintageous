@@ -390,21 +390,20 @@ class ExWriteFile(sublime_plugin.WindowCommand):
 
 class ExReplaceFile(sublime_plugin.TextCommand):
     def run(self, edit, start, end, with_what):
-        self.view.replace(edit, sublime.Region(0, self.view.size()), '')
-        self.view.insert(edit, 0, with_what)
+        self.view.replace(edit, sublime.Region(0, self.view.size()), with_what)
 
 
-class ExWriteAll(sublime_plugin.TextCommand):
+class ExWriteAll(sublime_plugin.WindowCommand):
     @changing_cd
-    def run(self, edit, forced=False):
-        for v in self.view.window().views():
+    def run(self, forced=False):
+        for v in self.window.views():
             v.run_command('save')
 
 
-class ExNewFile(sublime_plugin.TextCommand):
+class ExNewFile(sublime_plugin.WindowCommand):
     @changing_cd
-    def run(self, edit, forced=False):
-        self.view.window().run_command('new_file')
+    def run(self, forced=False):
+        self.window.run_command('new_file')
 
 
 class ExFile(sublime_plugin.TextCommand):
