@@ -492,22 +492,17 @@ class ExFile(sublime_plugin.TextCommand):
         sublime.status_message('Vintageous: %s' % msg)
 
 
-class ExMove(sublime_plugin.TextCommand):
-    def run(self, edit, line_range=None, forced=False, address=''):
+class ExMove(ExTextCommandBase, ExAddressableCommandMixin):
+    def run_ex_command(self, edit, line_range=CURRENT_LINE_RANGE, forced=False, address=''):
         # make sure we have a default range
-        if not line_range['text_range']:
+        if ('text_range' not in line_range) or not line_range['text_range']:
             line_range['text_range'] = '.'
-        address_parser = parsers.cmd_line.AddressParser(address)
-        parsed_address = address_parser.parse()
-        address = ex_range.calculate_address(self.view, parsed_address)
+
+        address = self.get_address(address)
         if address is None:
             ex_error.display_error(ex_error.ERR_INVALID_ADDRESS)
             return
 
-        line_block = get_region_by_range(self.view, line_range=line_range)
-        line_block = [self.view.substr(r) for r in line_block]
-
-        text = '\n'.join(line_block) + '\n'
         if address != 0:
             dest = self.view.line(self.view.text_point(address, 0)).end() + 1
         else:
@@ -519,6 +514,7 @@ class ExMove(sublime_plugin.TextCommand):
                 ex_error.display_error(ex_error.ERR_CANT_MOVE_LINES_ONTO_THEMSELVES)
                 return
 
+        text = self.line_range_to_text(line_range)
         if dest > self.view.size():
             dest = self.view.size()
             text = '\n' + text[:-1]
@@ -526,6 +522,13 @@ class ExMove(sublime_plugin.TextCommand):
 
         for r in reversed(get_region_by_range(self.view, line_range)):
             self.view.erase(edit, self.view.full_line(r))
+
+        new_address = address
+        if address < self.view.rowcol(self.view.sel()[0].b)[0]:
+            new_pt = self.view.text_point(new_address + 1, 0)
+            new_address = self.view.rowcol(new_pt + len(text) - 1)[0]
+        next_sel = self.view.text_point(new_address, 0)
+        self.set_next_sel([(next_sel, next_sel)])
 
 
 class ExCopy(ExTextCommandBase, ExAddressableCommandMixin):
