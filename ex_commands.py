@@ -36,7 +36,11 @@ def changing_cd(f, *args, **kwargs):
 
         old = os.getcwd()
         try:
-            os.chdir(state.settings.vi['_cmdline_cd'])
+            # FIXME: Under some circumstances, like when switching projects to
+            # a file whose _cmdline_cd has not been set, _cmdline_cd might
+            # return 'None'. In such cases, change to the actual current
+            # directory as a last measure. (We should probably fix this anyway).
+            os.chdir(state.settings.vi['_cmdline_cd'] or old)
             f(*args, **kwargs)
         finally:
             os.chdir(old)

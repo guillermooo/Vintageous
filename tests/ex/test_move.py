@@ -17,7 +17,7 @@ from Vintageous.tests.commands import BufferTest
 from Vintageous.ex_commands import CURRENT_LINE_RANGE
 
 
-class Test_ex_move_Copying_InNormalMode_SingleLine_DefaultStart(BufferTest):
+class Test_ex_move_Moving_InNormalMode_SingleLine_DefaultStart(BufferTest):
     def testCanMoveDefaultLineRange(self):
         set_text(self.view, 'abc\nxxx\nabc\nabc')
         add_selection(self.view, self.R((1, 0), (1, 0)))
