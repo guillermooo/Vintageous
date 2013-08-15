@@ -85,7 +85,7 @@ def get_region_by_range(view, line_range=None, as_lines=False):
             return vim_range.blocks()
 
 
-class ExViewCommandBase(sublime_plugin.TextCommand):
+class ExTextCommandBase(sublime_plugin.TextCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -106,8 +106,8 @@ class ExViewCommandBase(sublime_plugin.TextCommand):
         self.view.sel().clear()
         self.view.sel().add_all([sublime.Region(b) for (a, b) in sel])
 
-    def set_next_sel(self):
-        self.view.settings().set('ex_data', {'next_sel': [(cursor_dest, cursor_dest)]})
+    def set_next_sel(self, data):
+        self.view.settings().set('ex_data', {'next_sel': data})
 
     def set_mode(self):
         state = VintageState(self.view)
@@ -123,6 +123,9 @@ class ExViewCommandBase(sublime_plugin.TextCommand):
 
 class ExAddressableCommandMixin(object):
     def get_address(self, address):
+        # FIXME: We must fix the parser.
+        if address == '0':
+            return 0
         address_parser = parsers.cmd_line.AddressParser(address)
         parsed_address = address_parser.parse()
         address = ex_range.calculate_address(self.view, parsed_address)
@@ -525,11 +528,12 @@ class ExMove(sublime_plugin.TextCommand):
             self.view.erase(edit, self.view.full_line(r))
 
 
-class ExCopy(ExViewCommandBase, ExAddressableCommandMixin):
+class ExCopy(ExTextCommandBase, ExAddressableCommandMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def run_ex_command(self, edit, line_range=CURRENT_LINE_RANGE, forced=False, address=''):
+    def run_ex_command(self, edit, line_range=CURRENT_LINE_RANGE,
+                       forced=False, address=''):
         address = self.get_address(address)
         if address is None:
             ex_error.display_error(ex_error.ERR_INVALID_ADDRESS)
