@@ -85,6 +85,50 @@ def get_region_by_range(view, line_range=None, as_lines=False):
             return vim_range.blocks()
 
 
+class ExViewCommandBase(sublime_plugin.TextCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def line_range_to_text(self, line_range):
+        line_block = get_region_by_range(self.view, line_range=line_range)
+        line_block = [self.view.substr(r) for r in line_block]
+        return '\n'.join(line_block) + '\n'
+
+    def serialize_sel(self):
+        sels = [(r.a, r.b) for r in list(self.view.sel())]
+        self.view.settings().set('ex_data', {'prev_sel': sels})
+
+    def deserialize_sel(self, name='next_sel'):
+        return self.view.settings().get('ex_data')[name] or []
+
+    def set_sel(self):
+        sel = self.deserialize_sel()
+        self.view.sel().clear()
+        self.view.sel().add_all([sublime.Region(b) for (a, b) in sel])
+
+    def set_next_sel(self):
+        self.view.settings().set('ex_data', {'next_sel': [(cursor_dest, cursor_dest)]})
+
+    def set_mode(self):
+        state = VintageState(self.view)
+        state.enter_normal_mode()
+        self.view.run_command('vi_enter_normal_mode')
+
+    def run(self, edit, *args, **kwargs):
+        self.serialize_sel()
+        self.run_ex_command(edit, *args, **kwargs)
+        self.set_sel()
+        self.set_mode()
+
+
+class ExAddressableCommandMixin(object):
+    def get_address(self, address):
+        address_parser = parsers.cmd_line.AddressParser(address)
+        parsed_address = address_parser.parse()
+        address = ex_range.calculate_address(self.view, parsed_address)
+        return address
+
+
 class ExGoto(sublime_plugin.TextCommand):
     def run(self, edit, line_range=None):
         if not line_range['text_range']:
@@ -481,32 +525,30 @@ class ExMove(sublime_plugin.TextCommand):
             self.view.erase(edit, self.view.full_line(r))
 
 
-class ExCopy(sublime_plugin.TextCommand):
-    # todo: do null ranges always default to '.'?
-    def run(self, edit, line_range=CURRENT_LINE_RANGE, forced=False, address=''):
-        address_parser = parsers.cmd_line.AddressParser(address)
-        parsed_address = address_parser.parse()
-        address = ex_range.calculate_address(self.view, parsed_address)
+class ExCopy(ExViewCommandBase, ExAddressableCommandMixin):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def run_ex_command(self, edit, line_range=CURRENT_LINE_RANGE, forced=False, address=''):
+        address = self.get_address(address)
         if address is None:
             ex_error.display_error(ex_error.ERR_INVALID_ADDRESS)
             return
 
-        line_block = get_region_by_range(self.view, line_range=line_range)
-        line_block = [self.view.substr(r) for r in line_block]
-
-        text = '\n'.join(line_block) + '\n'
         if address != 0:
             dest = self.view.line(self.view.text_point(address, 0)).end() + 1
         else:
             dest = address
+
+        text = self.line_range_to_text(line_range)
         if dest > self.view.size():
             dest = self.view.size()
             text = '\n' + text[:-1]
+
         self.view.insert(edit, dest, text)
 
-        self.view.sel().clear()
         cursor_dest = self.view.line(dest + len(text) - 1).begin()
-        self.view.sel().add(sublime.Region(cursor_dest, cursor_dest))
+        self.set_next_sel([(cursor_dest, cursor_dest)])
 
 
 class ExOnly(sublime_plugin.TextCommand):
