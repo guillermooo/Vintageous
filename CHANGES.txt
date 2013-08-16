@@ -1,8 +1,15 @@
+2.1.0 - 16/08/2013 
+
+	- Improve :delete command.
+	- Improve :copy command.
+	- Improve :move command.
+	- Fix bug in command-line current directory management.
+
 2.0.2 - 13/08/2013 
 
-	- Colorize command line.
+	- Colorize command-line.
 	- Improve :<count> command.
-	- Improve command line completions when forcing (!) commands.
+	- Improve command-line completions when forcing (!) commands.
 
 2.0.1 - 12/08/2013 
 
@@ -11,8 +18,8 @@
 
 2.0.0 - 11/08/2013 
 
-	- Add ctrl+k key binding to cmdline.
-	- Assorted fixes to several command line commands.
+	- Add ctrl+k key binding to command-line.
+	- Assorted fixes to several command-line commands.
 	- Maintain virtual current directory.
 
 1.9.0 - 9/8/2013 
@@ -20,7 +27,7 @@
 	- Add file system completion for :w, :e and :cd.
 	- Improve e: command.	
 	- Implement non-standard :cdd command (changes current directory to view's).
-	- Add navigation keys for command line: ctrl+a, ctrl+e, ctrl+b, ctrl+f.
+	- Add navigation keys for command-line: ctrl+a, ctrl+e, ctrl+b, ctrl+f.
 
 1.8.6 - 9/8/2013 
 
@@ -93,7 +100,7 @@
 	- Add :cd command.
 	- Improve Ctrl-x action.
 	- Improve cc action.
-	- Enable top-level completions in command line.
+	- Enable top-level completions in command-line.
 
 1.4.8 - 16/7/2013
 
@@ -139,7 +146,7 @@
 1.4.0 - 4/7/2013
 
 	- Improve aW, iW, aw, iw text objects.
-	- Fix goto line command when issued from the command line.
+	- Fix goto line command when issued from the command-line.
 
 1.3.5 - 4/7/2013
 
@@ -270,9 +277,9 @@
 
 0.9.6 - 20/04/2013
 
-	- Add command line mode (':' command).
-	- Make command line mode optional.
-	- Esc closes command line mode.
+	- Add command-line mode (':' command).
+	- Make command-line mode optional.
+	- Esc closes command-line mode.
 	- Enable :substitute ex command.
 
 0.9.5 - 19/04/2013
