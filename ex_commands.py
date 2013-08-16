@@ -647,30 +647,41 @@ class ExSubstitute(sublime_plugin.TextCommand):
             self.view.replace(edit, self.view.line(r), rv)
 
 
-class ExDelete(sublime_plugin.TextCommand):
-    def run(self, edit, line_range=None, register='', count=''):
-        # XXX somewhat different to vim's behavior
-        rs = get_region_by_range(self.view, line_range=line_range)
+class ExDelete(ExTextCommandBase):
+    def select(self, regions, register):
         self.view.sel().clear()
-
         to_store = []
-        for r in rs:
+        for r in regions:
             self.view.sel().add(r)
             if register:
                 to_store.append(self.view.substr(self.view.full_line(r)))
 
         if register:
             text = ''.join(to_store)
-            # needed for lines without a newline character
             if not text.endswith('\n'):
                 text = text + '\n'
 
             state = VintageState(self.view)
             state.registers[register] = [text]
 
+    def run_ex_command(self, edit, line_range=None, register='', count=''):
+        # XXX somewhat different to vim's behavior
+        line_range = line_range if line_range else CURRENT_LINE_RANGE
+        if line_range['text_range'] == '0':
+            # FIXME: This seems to be a bug in the parser or get_region_by_range.
+            # We should be settings 'left_ref', not 'left_offset'.
+            line_range['left_offset'] = 1
+            line_range['text_range'] = '1'
+        rs = get_region_by_range(self.view, line_range=line_range)
+
+        self.select(rs, register)
+
         self.view.run_command('split_selection_into_lines')
-        self.view.run_command('run_macro_file',
-                        {'file': 'Packages/Default/Delete Line.sublime-macro'})
+        self.view.run_command(
+                    'run_macro_file',
+                    {'file': 'Packages/Default/Delete Line.sublime-macro'})
+
+        self.set_next_sel([(rs[0].a, rs[0].a)])
 
 
 class ExGlobal(sublime_plugin.TextCommand):
