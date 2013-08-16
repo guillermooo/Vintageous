@@ -1232,6 +1232,7 @@ class _vi_g_e_post_motion(sublime_plugin.TextCommand):
 
 class _vi_ctrl_d(sublime_plugin.TextCommand):
     def next_half_page(self, count):
+
         origin = self.view.sel()[0]
 
         visible = self.view.visible_region()
@@ -1265,11 +1266,11 @@ class _vi_ctrl_d(sublime_plugin.TextCommand):
 
         next, scroll_amount = self.next_half_page(count)
         regions_transformer(self.view, f)
-        self.view.run_command('scroll_lines', {'amount': -scroll_amount})
 
 
 class _vi_ctrl_u(sublime_plugin.TextCommand):
     def prev_half_page(self, count):
+
         origin = self.view.sel()[0]
 
         visible = self.view.visible_region()
@@ -1303,7 +1304,6 @@ class _vi_ctrl_u(sublime_plugin.TextCommand):
 
         previous, scroll_amount = self.prev_half_page(count)
         regions_transformer(self.view, f)
-        self.view.run_command('scroll_lines', {'amount': scroll_amount})
 
 
 class _vi_g__(sublime_plugin.TextCommand):
