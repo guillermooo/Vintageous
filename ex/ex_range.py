@@ -22,7 +22,9 @@ class VimRange(object):
         for a, b in regions:
             r = sublime.Region(self.view.text_point(a - 1, 0),
                                self.view.line(self.view.text_point(b - 1, 0)).end())
-            if self.view.substr(r)[-1] == "\n":
+            if self.view.substr(r) == '':
+                pass
+            elif self.view.substr(r)[-1] == "\n":
                 if r.begin() != r.end():
                     r = sublime.Region(r.begin(), r.end() - 1)
             blocks.append(r)
