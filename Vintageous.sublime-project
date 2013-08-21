@@ -15,7 +15,13 @@
 			"windows": { "shell_cmd": "powershell -noninteractive -file \"$project_path\\bin\\Build.ps1\" -release -dontupload" }
 		}
 	],
-	
+
+	"settings":
+	{
+		"ensure_new_line_at_eof_on_save": true,
+		"trim_trailing_white_space_on_save": true
+	},
+
 	"folders":
 	[
 		{
