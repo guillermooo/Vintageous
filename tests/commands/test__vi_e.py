@@ -17,35 +17,28 @@ from Vintageous.tests.commands import BufferTest
 class Test_vi_e_InNormalMode(BufferTest):
     def testMoveToEndOfWord_OnLastLine(self):
         set_text(self.view, 'abc\nabc\nabc')
-        r = self.R((2, 0), (2, 0))
-        add_selection(self.view, a=r.a, b=r.b)
+        self.view.sel().add(self.R((2, 0), (2, 0)))
 
         self.view.run_command('_vi_e', {'mode': MODE_NORMAL, 'count': 1})
 
-        expected = self.R((2, 2), (2, 2))
-        self.assertEqual(expected, first_sel(self.view))
+        self.assertEqual(self.R((2, 2), (2, 2)), first_sel(self.view))
 
     def testMoveToEndOfWord_OnMiddleLine_WithTrailingWhitespace(self):
         set_text(self.view, 'abc\nabc   \nabc')
-        r = self.R((1, 2), (1, 2))
-        add_selection(self.view, a=r.a, b=r.b)
+        self.view.sel().add(self.R((1, 2), (1, 2)))
 
         self.view.run_command('_vi_e', {'mode': MODE_NORMAL, 'count': 1})
 
-        expected = self.R((2, 2), (2, 2))
-        self.assertEqual(expected, first_sel(self.view))
+        self.assertEqual(self.R((2, 2), (2, 2)), first_sel(self.view))
 
     def testMoveToEndOfWord_OnLastLine_WithTrailingWhitespace(self):
         set_text(self.view, 'abc\nabc\nabc   ')
-        r = self.R((2, 0), (2, 0))
-        add_selection(self.view, a=r.a, b=r.b)
+        self.view.sel().add(self.R((2, 0), (2, 0)))
 
         self.view.run_command('_vi_e', {'mode': MODE_NORMAL, 'count': 1})
 
-        expected = self.R((2, 2), (2, 2))
-        self.assertEqual(expected, first_sel(self.view))
+        self.assertEqual(self.R((2, 2), (2, 2)), first_sel(self.view))
 
         self.view.run_command('_vi_e', {'mode': MODE_NORMAL, 'count': 1})
 
-        expected = self.R((2, 5), (2, 5))
-        self.assertEqual(expected, first_sel(self.view))
+        self.assertEqual(self.R((2, 5), (2, 5)), first_sel(self.view))
