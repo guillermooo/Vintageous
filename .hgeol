@@ -1,6 +1,0 @@
-[patterns]
-**.py = native
-**.sh = native
-
-[repository]
-native = LF
