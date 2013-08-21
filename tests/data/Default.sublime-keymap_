@@ -266,7 +266,15 @@
  	{ "keys": [":"], "command": "vi_colon_input", "args": {"initial_text": ":'<,'>"}, "context": [{"key": "setting.command_mode"}, {"key": "selection_empty", "operator": "equal", "operand": false }, {"key": "vi_enable_cmdline_mode"}] },
 
 	{ "keys": ["up"],   "command": "cycle_cmdline_history", "args": {"backwards": true }, "context": [{"key": "vi_is_cmdline"}] },
- 	{ "keys": ["down"], "command": "cycle_cmdline_history", "context": [{"key": "vi_is_cmdline"}] },
+ 	{ "keys": ["down"], "command": "cycle_cmdline_history",								  "context": [{"key": "vi_is_cmdline"}] },
+ 	
+	{ "keys": ["tab"],   "command": "fs_completion", "context": [{"key": "vi_is_cmdline"}, {"key": "vi_cmdline_at_fs_completion"}] },
+
+	{ "keys": ["ctrl+f"], "command": "move",    		"args": {"by": "characters", "forward": true},  "context": [{"key": "vi_is_cmdline"},] },
+	{ "keys": ["ctrl+b"], "command": "move",    		"args": {"by": "characters", "forward": false}, "context": [{"key": "vi_is_cmdline"},] },
+	{ "keys": ["ctrl+e"], "command": "move_to", 		"args": {"to": "eol"},							"context": [{"key": "vi_is_cmdline"},] },
+	{ "keys": ["ctrl+a"], "command": "_vi_cmd_line_a",													"context": [{"key": "vi_is_cmdline"},] },
+	{ "keys": ["ctrl+k"], "command": "_vi_cmd_line_k",													"context": [{"key": "vi_is_cmdline"},] },
 	// =============================================================================================================================
 
 	{ "keys": ["<character>"], "command": "set_register", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_register"}] },
