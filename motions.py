@@ -1497,7 +1497,9 @@ class _vi_e(sublime_plugin.TextCommand):
             if mode == MODE_NORMAL:
                 pt = units.word_ends(view, start=s.b, count=count)
 
-                if(view.line(pt).empty()):
+                if (view.substr(pt) == '\n' and not view.line(pt).empty()):
+                    return sublime.Region(pt - 1, pt - 1)
+                elif (view.line(pt).empty()):
                     return s
 
                 return sublime.Region(pt, pt)
