@@ -857,20 +857,24 @@ class ExEdit(IrreversibleTextCommand):
     @changing_cd
     def run(self, forced=False, file_name=None):
         if file_name:
+            if self.view.is_dirty() and not forced:
+                ex_error.display_error(ex_error.ERR_UNSAVED_CHANGES)
+                return
             file_name = os.path.expanduser(file_name)
             if os.path.isdir(file_name):
-                sublime.status_message('Vintageous: "%s" is a directory' % file_name)
+                sublime.status_message('Vintageous: "{0}" is a directory'.format(file_name))
                 return
-            message = ""
+            message = ''
             if not os.path.exists(file_name):
-                message = "[New File]"
+                message = '[New File]'
                 path = os.path.dirname(file_name)
                 if path and not os.path.exists(path):
-                    message = "[New DIRECTORY]"
+                    message = '[New DIRECTORY]'
                 self.view.window().open_file(file_name)
 
+                # TODO: Collect message and show at the end of the command.
                 def show_message():
-                    sublime.status_message('Vintageous: "%s" %s' % (file_name, message))
+                    sublime.status_message('Vintageous: "{0}" {1}'.format((file_name, message)))
                 sublime.set_timeout(show_message, 250)
                 return
         else:
