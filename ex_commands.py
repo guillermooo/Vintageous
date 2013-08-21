@@ -432,6 +432,9 @@ class ExWriteFile(sublime_plugin.WindowCommand):
             start_deleting = len(text)
             self.view.run_command('ex_replace_file', {'start': 0, 'end': 0, 'with_what': text})
         else:
+            dirname = os.path.dirname(self.view.file_name())
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
             self.window.run_command('save')
 
         state = VintageState(self.window.active_view())
@@ -853,7 +856,24 @@ class ExEdit(IrreversibleTextCommand):
     """
     @changing_cd
     def run(self, forced=False, file_name=None):
-        if not file_name:
+        if file_name:
+            file_name = os.path.expanduser(file_name)
+            if os.path.isdir(file_name):
+                sublime.status_message('Vintageous: "%s" is a directory' % file_name)
+                return
+            message = ""
+            if not os.path.exists(file_name):
+                message = "[New File]"
+                path = os.path.dirname(file_name)
+                if path and not os.path.exists(path):
+                    message = "[New DIRECTORY]"
+                self.view.window().open_file(file_name)
+
+                def show_message():
+                    sublime.status_message('Vintageous: "%s" %s' % (file_name, message))
+                sublime.set_timeout(show_message, 250)
+                return
+        else:
             if forced or not self.view.is_dirty():
                 self.view.run_command('revert')
                 return
@@ -1051,8 +1071,8 @@ class ExCdCommand(IrreversibleTextCommand):
 class ExCddCommand(IrreversibleTextCommand):
     """Ex command(s) [non-standard]: :cdd
 
-    Non-standard command to change the current directory the the active
-    view's path.
+    Non-standard command to change the current directory to the active
+    view's path.:
 
     In Sublime Text, the current directory doesn't follow the active view, so
     it's convenient to be able to align both easily.
