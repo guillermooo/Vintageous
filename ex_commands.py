@@ -1094,3 +1094,32 @@ class ExCddCommand(IrreversibleTextCommand):
             self.view.run_command('ex_print_working_dir')
         except IOError:
             ex_error.display_error(ex_error.ERR_CANT_FIND_DIR_IN_CDPATH)
+
+
+class ExVsplit(sublime_plugin.WindowCommand):
+    LAYOUT_DATA = {
+        1: {"cells": [[0,0, 1, 1]], "rows": [0.0, 1.0], "cols": [0.0, 1.0]},
+        2: {"cells": [[0,0, 1, 1], [1, 0, 2, 1]], "rows": [0.0, 1.0], "cols": [0.0, 0.5, 1.0]},
+        3: {"cells": [[0,0, 1, 1], [1, 0, 2, 1], [2, 0, 3, 1]], "rows": [0.0, 1.0], "cols": [0.0, 0.33, 0.66, 1.0]},
+        4: {"cells": [[0,0, 1, 1], [1, 0, 2, 1], [2, 0, 3, 1], [3,0, 4, 1]], "rows": [0.0, 1.0], "cols": [0.0, 0.25, 0.50, 0.75, 1.0]},
+    }
+    def run(self, filename=None):
+        groups = self.window.num_groups()
+        if groups >= 4:
+            sublime.status_message("Vintageous: Can't create more groups.")
+            return
+
+        self.window.run_command('set_layout', ExVsplit.LAYOUT_DATA[groups + 1])
+
+        if filename:
+            self.window.open_file(filename)
+
+
+class ExUnvsplit(sublime_plugin.WindowCommand):
+    def run(self):
+        groups = self.window.num_groups()
+        if groups == 1:
+            sublime.status_message("Vintageous: Can't delete more groups.")
+            return
+
+        self.window.run_command('set_layout', ExVsplit.LAYOUT_DATA[groups - 1])
