@@ -1,58 +1,63 @@
-2.1.1 - 16/08/2013 
+2.1.2 - 24/08/2013
+
+	- Improve :edit command.
+	- Implement basic :vsplit command (and non-standard :unvsplit).
+
+2.1.1 - 16/08/2013
 
 	- Improve e motion.
 
-2.1.0 - 16/08/2013 
+2.1.0 - 16/08/2013
 
 	- Improve :delete command.
 	- Improve :copy command.
 	- Improve :move command.
 	- Fix bug in command-line current directory management.
 
-2.0.2 - 13/08/2013 
+2.0.2 - 13/08/2013
 
 	- Colorize command-line.
 	- Improve :<count> command.
 	- Improve command-line completions when forcing (!) commands.
 
-2.0.1 - 12/08/2013 
+2.0.1 - 12/08/2013
 
 	- Improve 'repeat' action.
 	- Undo previous changes to 'redo' action.
 
-2.0.0 - 11/08/2013 
+2.0.0 - 11/08/2013
 
 	- Add ctrl+k key binding to command-line.
 	- Assorted fixes to several command-line commands.
 	- Maintain virtual current directory.
 
-1.9.0 - 9/8/2013 
+1.9.0 - 9/8/2013
 
 	- Add file system completion for :w, :e and :cd.
-	- Improve e: command.	
+	- Improve e: command.
 	- Implement non-standard :cdd command (changes current directory to view's).
 	- Add navigation keys for command-line: ctrl+a, ctrl+e, ctrl+b, ctrl+f.
 
-1.8.6 - 9/8/2013 
+1.8.6 - 9/8/2013
 
 	- Improve :w command.
 	- Implement ZZ, ZQ actions.
 
-1.8.5 - 8/8/2013 
+1.8.5 - 8/8/2013
 
 	- Fix: Esc resets state when expecting user input.
 
-1.8.4 - 7/8/2013 
+1.8.4 - 7/8/2013
 
 	- Enable :e command.
-	- Integrate :<count> (goto) command with jump list.	
+	- Integrate :<count> (goto) command with jump list.
 	- Improve : (goto) command.
 
-1.8.3 - 6/8/2013 
+1.8.3 - 6/8/2013
 
 	- Improve handling of undo groups.
 
-1.8.2 - 6/8/2013 
+1.8.2 - 6/8/2013
 
 	- Fix ? and / motions when used without argument.
 	- Fix initialization on OS X.
@@ -117,7 +122,7 @@
 	- Re-enable " action in visual mode.
 
 1.4.6 - 15/7/2013
-	
+
 	- Improve G motion.
 	- Improve j motion.
 	- Improve k motion.
@@ -156,7 +161,7 @@
 
 	- Implement g_ motion.
 	- Improve gg and G when they're given a count.
-	- Improve 'a' text object. 
+	- Improve 'a' text object.
 
 1.3.4 - 2/7/2013
 
@@ -174,9 +179,9 @@
 
 	- Make * and # wrap around the buffer ends.
 	- Really implement g~g~ and g~~.
-	
+
 1.3.1 - 30/5/2013
-	
+
 	- Implement g~g~ and g~~ commands.
 	- Properly abort invalid commands like gl, gx.
 
@@ -207,11 +212,11 @@
 	- Improve '(', '[', '{' text objects.
 
 1.1.4 - 21/5/2013
-	
+
 	- Implement tag text object ('vit', 'vat', etc.).
 
 1.1.3 - 13/5/2013
-	
+
 	- Implement ~, g~ commands (thanks @davecoates).
 
 1.1.2 - 11/5/2013
@@ -225,12 +230,12 @@
 1.1 - 8/5/2013
 
 	- Improve % motion.
-	- Abort macro execution as soon as a motion fails.	
+	- Abort macro execution as soon as a motion fails.
 
 1.0.2 - 6/5/2013
 
 	- Improve minimal scrolling when moving up by lines.
-	
+
 1.0.1 - 5/5/2013
 
 	- Implement ge motion.
@@ -265,7 +270,7 @@
 0.9.9 - 25/04/2013
 
 	- Abort S and C actions if any caret is at EOL.
-	- Improve feedback when motion fails.	
+	- Improve feedback when motion fails.
 	- Incremental search shows next match if it's off the visible region.
 
 0.9.8 - 22/04/2013
@@ -295,7 +300,7 @@
 	- Define 'enter' motion, 'space' motion and 'ctrl+space' motion.
 
 0.9.3 - 18/04/2013
-	
+
 	- Add basic incremental search functionality to '?' motion.
 
 0.9.2 - 18/04/2013
@@ -312,7 +317,7 @@
 0.9 - 11/04/2013
 
 	- Improve macros: Enable arbitrary register names.
-	
+
 0.8.11 - 10/04/2013
 
 	- Improve b and B motions.
@@ -320,13 +325,13 @@
 
 0.8.9
 	- Cumulative code changes and small bug fixes.
-	
+
 0.8.4
 	- Basic implementation of macro recording: Enable q and @ and a single macro register.
 
 0.8.3
 	- Improve count handling in . command.
-	
+
 0.8.2
 	- Add count support for . and u.
 	- Improve D action when given counts.
@@ -340,10 +345,10 @@
 
 0.7.5
 	- Enable repetition of v,e,d (example) when the global repeat command is in null state.
-	
+
 0.7.4
 	- Fix typos that were causing undo/redo to fail.
-	
+
 0.7.3
 	- Improved undo/redo feature when using visual mode.
 
@@ -352,7 +357,7 @@
 	- Fix behavior of b in visual mode.
 
 0.7.1
-	- 5ifoo<Esc>-type commands use .command_history() instead of macros.	
+	- 5ifoo<Esc>-type commands use .command_history() instead of macros.
 	- Improved '' command. Attempting to jump forward from unknown position causes to jump back
 	  again.
 	- j, k scroll one line at a time when they move off the visible region.
@@ -361,7 +366,7 @@
 	- Cumulative release, I guess.
 
 0.6.8
-	- Enable repetition of commands issues in visual modes.	
+	- Enable repetition of commands issues in visual modes.
 
 0.6.7
 	- Improve pasting in visual line mode.
@@ -370,20 +375,20 @@
 0.6.6
 	- Improve '' command.
 	- Implement counts for / and ? motions.
-	
+
 0.6.5
 	- Truly enable ability to repeat commands globally.
-	
+
 0.6.4
 	- Keep the expected mode after repeating a command, then switching tabs.
-	
+
 0.6.3
 	- 'Repeat' (.) stores the latest modifying command globally.
 
 0.6.2
 	- Remember current position before  jumping.
 	- Improve f, t, F, T and , and ;.
-	
+
 0.6.1
 	- Jumps integrate with Sublime Text's jump list.
 	- Basic implementation of '' command (jump back/forward from current position).
@@ -397,16 +402,16 @@
 0.5.6
 	- Fix bug in 'repeat' code.
 	- << command understands counts == 2.
-	
+
 0.5.5
 	- Fix repeat command (.).
 	- Fix redo command (Ctrl+r).
 	- Reopen unnamed buffers only when they aren't the current buffer.
-	
+
 0.5.4
 	- Commands like rx. don't leave non-empty selections behind.
 	- Marks can be put in unnamed buffers.
-	- yy synthesizes new line character at EOF so p behaves linewise after that.	
+	- yy synthesizes new line character at EOF so p behaves linewise after that.
 
 0.5.3
 	- Implement =, ==.
@@ -423,6 +428,6 @@
 	- Improve W motion at EOL.
 	- Implement gd, gD (goto definition).
 	- Implement Ctrl+o, Ctrl+i (jumplist navigation).
-	
+
 0.5
 	- Use version numbers.
