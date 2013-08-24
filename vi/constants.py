@@ -7,14 +7,16 @@ MODE_VISUAL = 1 << 2
 MODE_VISUAL_LINE = 1 << 3
 # The mode you enter when giving i a count.
 MODE_NORMAL_INSERT = 1 << 4
-# Vintageous always runs actions based on selections. Some Vim commands, however, behave
-# differently depending on whether the current mode is NORMAL or VISUAL. To differentiate NORMAL
-# mode operations (involving only an action, or a motion plus an action) from VISUAL mode, we
-# need to add an additional mode for handling selections that won't interfere with the actual
+# Vintageous always runs actions based on selections. Some Vim commands,
+# however, behave differently depending on whether the current mode is NORMAL
+# or VISUAL. To differentiate NORMAL mode operations (involving only an
+# action, or a motion plus an action) from VISUAL mode, we need to add an
+# additional mode for handling selections that won't interfere with the actual
 # VISUAL mode.
 #
-# This is _MODE_INTERNAL_NORMAL's job. We consider _MODE_INTERNAL_NORMAL a pseudomode, because
-# global state's .mode property should never set to it, yet it's set in vi_cmd_data often.
+# This is _MODE_INTERNAL_NORMAL's job. We consider _MODE_INTERNAL_NORMAL a
+# pseudomode, because global state's .mode property should never set to it,
+# yet it's set in vi_cmd_data often.
 #
 # Note that for pure motions we still use plain NORMAL mode.
 _MODE_INTERNAL_NORMAL = 1 << 5
@@ -55,9 +57,10 @@ digraphs = {
     ('vi_g_action', 'vi_g_q'): ('vi_g_q', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_v'): ('vi_g_v', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_h'): ('vi_enter_select_mode', DIGRAPH_ACTION),
-    # Because the order in which commands appear in the key map file, we can take advantage of
-    # vi_t without creating a g<stuff>-specific 't' binding.
-    # TODO: We should be able to do the same with all the other key bindings prefixed with 'g'.
+    # Because the order in which commands appear in the key map file, we can
+    # take advantage of vi_t without creating a g<stuff>-specific 't' binding.
+    # TODO: We should be able to do the same with all the other key bindings
+    # prefixed with 'g'.
     ('vi_g_action', 'vi_t'): ('vi_g_t', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_big_t'): ('vi_g_big_t', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_e'): ('vi_g_e', DIGRAPH_MOTION),
@@ -159,15 +162,19 @@ def mode_to_str(mode):
     elif mode == MODE_VISUAL_BLOCK:
         return "VISUAL BLOCK"
     elif mode == MODE_REPLACE:
-        # XXX: I'm not sure whether Vim prints to the status bar in this case, but since Sublime
-        # Text won't let us use a block cursor, let's give some feeback to the user.
+        # XXX: I'm not sure whether Vim prints to the status bar in this case,
+        # but since Sublime Text won't let us use a block cursor, let's give
+        # some feeback to the user.
         return "REPLACE"
     return "<unknown>"
 
 
-# TODO: Move this to somewhere where it's easy to import from and use it for transformers.
+# TODO: Move this to somewhere where it's easy to import from and use it for
+# transformers.
 def regions_transformer(view, f):
-    """Applies ``f`` to every selection region in ``view`` and replaces the existing selections.
+    """
+    Applies ``f`` to every selection region in ``view`` and replaces the
+    existing selections.
     """
     sels = list(view.sel())
 
@@ -180,7 +187,9 @@ def regions_transformer(view, f):
         view.sel().add(s)
 
 def regions_transformer_reversed(view, f):
-    """Applies ``f`` to every selection region in ``view`` and replaces the existing selections.
+    """
+    Applies ``f`` to every selection region in ``view`` and replaces the
+    existing selections.
     """
     sels = reversed(list(view.sel()))
 

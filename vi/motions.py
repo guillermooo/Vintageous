@@ -301,7 +301,7 @@ def vi_octothorp(vi_cmd_data):
 
 def vi_star(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'vi_star'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'exact_word': True}
 
     return vi_cmd_data
 

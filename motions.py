@@ -81,6 +81,7 @@ from Vintageous.vi import units
 import Vintageous.state
 
 from itertools import chain
+import re
 
 
 class ViMoveToHardBol(sublime_plugin.TextCommand):
@@ -580,10 +581,14 @@ class ViBigM(sublime_plugin.TextCommand):
 
 class ViStar(sublime_plugin.TextCommand):
     # TODO: implement searchiliter baseclass?
-    def hilite(self, pattern):
+    def hilite(self, pattern, exact_word=False):
         # TODO: Implement smartcase?
-        flags = sublime.IGNORECASE | sublime.LITERAL
-        regs = self.view.find_all(pattern, flags)
+        if exact_word:
+            flags = sublime.IGNORECASE
+            regs = self.view.find_all(r'\b{0}\b'.format(re.escape(pattern)), flags)
+        else:
+            flags = sublime.IGNORECASE | sublime.LITERAL
+            regs = self.view.find_all(pattern, flags)
         if not regs:
             self.view.erase_regions('vi_search')
             return
@@ -598,7 +603,7 @@ class ViStar(sublime_plugin.TextCommand):
         def f(view, s):
 
             if exact_word:
-                pattern = r'\b{0}\b'.format(query)
+                pattern = r'\b{0}\b'.format(re.escape(query))
             else:
                 pattern = query
 
@@ -609,14 +614,14 @@ class ViStar(sublime_plugin.TextCommand):
                                       term=pattern,
                                       start=view.word(s.end()).end(),
                                       end=view.size(),
-                                      flags=0,
+                                      flags=flags,
                                       times=1)
             else:
                 match = find_wrapping(view,
                                       term=pattern,
                                       start=view.word(s.end()).end(),
                                       end=view.size(),
-                                      flags=0,
+                                      flags=flags,
                                       times=1)
 
             if match:
@@ -632,7 +637,7 @@ class ViStar(sublime_plugin.TextCommand):
         # TODO: make sure we swallow any leading white space.
         query = self.view.substr(self.view.word(self.view.sel()[0].end()))
         if query:
-            self.hilite(query)
+            self.hilite(query, exact_word=exact_word)
             state.last_buffer_search = query
 
         regions_transformer(self.view, f)
@@ -640,10 +645,14 @@ class ViStar(sublime_plugin.TextCommand):
 
 class ViOctothorp(sublime_plugin.TextCommand):
     # TODO: implement searchiliter baseclass?
-    def hilite(self, pattern):
+    def hilite(self, pattern, exact_word=False):
         # TODO: Implement smartcase?
-        flags = sublime.IGNORECASE | sublime.LITERAL
-        regs = self.view.find_all(pattern, flags)
+        if exact_word:
+            flags = sublime.IGNORECASE
+            regs = self.view.find_all(r'\b{0}\b'.format(re.escape(pattern)), flags)
+        else:
+            flags = sublime.IGNORECASE | sublime.LITERAL
+            regs = self.view.find_all(pattern, flags)
         if not regs:
             self.view.erase_regions('vi_search')
             return
@@ -658,7 +667,7 @@ class ViOctothorp(sublime_plugin.TextCommand):
         def f(view, s):
 
             if exact_word:
-                pattern = r'\b{0}\b'.format(query)
+                pattern = r'\b{0}\b'.format(re.escape(query))
             else:
                 pattern = query
 
@@ -669,14 +678,14 @@ class ViOctothorp(sublime_plugin.TextCommand):
                                          term=pattern,
                                          start=0,
                                          end=current_sel.a,
-                                         flags=0,
+                                         flags=flags,
                                          times=1)
             else:
                 match = reverse_find_wrapping(view,
                                          term=pattern,
                                          start=0,
                                          end=current_sel.a,
-                                         flags=0,
+                                         flags=flags,
                                          times=1)
 
             if match:
@@ -692,7 +701,7 @@ class ViOctothorp(sublime_plugin.TextCommand):
         # TODO: make sure we swallow any leading white space.
         query = self.view.substr(self.view.word(self.view.sel()[0].end()))
         if query:
-            self.hilite(query)
+            self.hilite(query, exact_word=exact_word)
             state.last_buffer_search = query
 
         current_sel = self.view.sel()[0]
