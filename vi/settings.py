@@ -54,8 +54,8 @@ def opt_rulers_parser(value):
 
 VI_OPTIONS = {
     # TODO: BUG - unrelated to this code: D,p,u,redo doesn't do what we want.
-    'hlsearch': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=False),
-    'incsearch': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=None, action=set_generic_view_setting, noable=False),
+    'hlsearch': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
+    'incsearch': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
     'autoindent': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=None, action=set_generic_view_setting, noable=False),
     'showminimap': vi_user_setting(scope=SCOPE_WINDOW, values=(True, False, '0', '1'), default=True, parser=None, action=set_minimap, noable=True),
     'rulers': vi_user_setting(scope=SCOPE_VIEW, values=None, default=[], parser=opt_rulers_parser, action=set_generic_view_setting, noable=False),
@@ -64,21 +64,29 @@ VI_OPTIONS = {
 
 # For completions.
 def iter_settings(prefix=''):
-    for k in sorted(VI_OPTIONS.keys()):
-        if (prefix == '') or k.startswith(prefix):
-            yield k
+    if prefix.startswith('no'):
+        for item in (x for (x, y) in VI_OPTIONS.items() if y.noable):
+            if ('no' + item).startswith(prefix):
+                yield 'no' + item
+    else:
+        for k in sorted(VI_OPTIONS.keys()):
+            if (prefix == '') or k.startswith(prefix):
+                yield k
 
 
 def set_local(view, name, value):
     try:
         opt = VI_OPTIONS[name]
+        if not value and opt.noable:
+            opt.action(view, name, '1', opt)
+            return
         opt.action(view, name, value, opt)
     except KeyError as e:
         if name.startswith('no'):
             try:
                 opt = VI_OPTIONS[name[2:]]
                 if opt.noable:
-                    opt.action(view, name, value, opt)
+                    opt.action(view, name[2:], '0', opt)
                 return
             except KeyError:
                 pass
