@@ -1,3 +1,8 @@
+2.2.0 - 25/08/2013
+
+	- Implement basic :setlocal command.
+	- Implement basic modelines support.
+
 2.1.3 - 25/08/2013
 
 	- Improve * and # motions.

@@ -3,6 +3,7 @@ License
 
 Vintageous is made available under the MIT license:
 
+Copyright (c) 2010 Guillermo López-Anglada (SublimeModelines)
 Copyright (c) 2011 Sublime HQ Pty Ltd (Vintage)
 Copyright (c) 2011 Guillermo López-Anglada (VintageEx)
 Copyright (c) 2013 Guillermo López-Anglada (Vintageous)
