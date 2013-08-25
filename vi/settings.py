@@ -55,6 +55,7 @@ def opt_rulers_parser(value):
 VI_OPTIONS = {
     # TODO: BUG - unrelated to this code: D,p,u,redo doesn't do what we want.
     'hlsearch': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
+    'magic': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
     'incsearch': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
     'autoindent': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=None, action=set_generic_view_setting, noable=False),
     'showminimap': vi_user_setting(scope=SCOPE_WINDOW, values=(True, False, '0', '1'), default=True, parser=None, action=set_minimap, noable=True),
