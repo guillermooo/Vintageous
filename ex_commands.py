@@ -19,6 +19,7 @@ from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
 from Vintageous.vi.sublime import has_dirty_buffers
+from Vintageous.vi.settings import set_local
 
 
 GLOBAL_RANGES = []
@@ -1123,3 +1124,16 @@ class ExUnvsplit(sublime_plugin.WindowCommand):
             return
 
         self.window.run_command('set_layout', ExVsplit.LAYOUT_DATA[groups - 1])
+
+
+class ExSetLocal(IrreversibleTextCommand):
+    def run(self, option=None, operator=None, value=None):
+        if option.endswith('?'):
+            ex_error.handle_not_implemented()
+            return
+        try:
+            set_local(self.view, option, value)
+        except KeyError:
+            sublime.status_message("Vintageuos: No such option.")
+        except ValueError:
+            sublime.status_message("Vintageous: Invalid value for option.")

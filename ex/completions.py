@@ -10,6 +10,7 @@ RX_CMD_LINE_WRITE = re.compile(r'^(?P<cmd>:\s*w(?:write)?!?)\s+(?P<path>.*)$')
 RX_CMD_LINE_EDIT = re.compile(r'^(?P<cmd>:\s*e(?:dit)?!?)\s+(?P<path>.*)$')
 RX_CMD_LINE_VSPLIT = re.compile(r'^(?P<cmd>:\s*vs(?:plit)?!?)\s+(?P<path>.*)$')
 
+
 COMPLETIONS_FILE = 1
 COMPLETIONS_DIRECTORY = 2
 
@@ -18,6 +19,13 @@ completion_types = [
     (RX_CMD_LINE_WRITE, True),
     (RX_CMD_LINE_EDIT, False),
     (RX_CMD_LINE_VSPLIT, False),
+]
+
+RX_CMD_LINE_SET_LOCAL = re.compile(r'^(?P<cmd>:\s*setl(?:ocal)?\??)\s+(?P<setting>.*)$')
+
+
+completion_settings = [
+    (RX_CMD_LINE_SET_LOCAL, None),
 ]
 
 
@@ -48,3 +56,16 @@ def unescape(path):
 
 def wants_fs_completions(text):
     return parse(text)[0] is not None
+
+
+def parse_for_setting(text):
+    found = None
+    for (pattern, _) in completion_settings:
+        found = pattern.search(text)
+        if found:
+            return found.groupdict()['cmd'], found.groupdict().get('setting'), None
+    return (None, None, None)
+
+
+def wants_setting_completions(text):
+    return parse_for_setting(text)[0] is not None

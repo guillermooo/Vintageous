@@ -8,7 +8,10 @@ from Vintageous.ex.ex_command_parser import EX_COMMANDS
 from Vintageous.ex.ex_command_parser import parse_command
 from Vintageous.ex.completions import iter_paths
 from Vintageous.ex.completions import parse
+from Vintageous.ex.completions import parse_for_setting
 from Vintageous.ex.completions import wants_fs_completions
+from Vintageous.ex.completions import wants_setting_completions
+from Vintageous.vi.settings import iter_settings
 from Vintageous.vi.sublime import show_ipanel
 from Vintageous.state import VintageState
 
@@ -61,10 +64,16 @@ class ViColonInput(sublime_plugin.WindowCommand):
     def on_change(self, s):
         if ViColonInput.interactive_call:
             cmd, prefix, only_dirs = parse(s)
+            if cmd:
+                FsCompletion.prefix = prefix
+                FsCompletion.is_stale = True
+            cmd, prefix, _ = parse_for_setting(s)
+            if cmd:
+                ViSettingCompletion.prefix = prefix
+                ViSettingCompletion.is_stale = True
+
             if not cmd:
                 return
-            FsCompletion.prefix = prefix
-            FsCompletion.is_stale = True
         ViColonInput.interactive_call = True
 
     def on_done(self, cmd_line):
@@ -206,6 +215,49 @@ class FsCompletion(sublime_plugin.TextCommand):
                 return
 
 
+class ViSettingCompletion(sublime_plugin.TextCommand):
+    # Last user-provided path string.
+    prefix = ''
+    is_stale = False
+    items = None
+
+    @staticmethod
+    def invalidate():
+        ViSettingCompletion.prefix = ''
+        is_stale = True
+        items = None
+
+    def run(self, edit):
+        if self.view.score_selector(0, 'text.excmdline') == 0:
+            return
+
+        cmd, prefix, _ = parse_for_setting(self.view.substr(self.view.line(0)))
+        if not cmd:
+            return
+        if (ViSettingCompletion.prefix is None) and prefix:
+            ViSettingCompletion.prefix = prefix
+            ViSettingCompletion.is_stale = True
+        elif ViSettingCompletion.prefix is None:
+            ViSettingCompletion.items = iter_settings('')
+            ViSettingCompletion.is_stale = False
+
+        if not ViSettingCompletion.items or ViSettingCompletion.is_stale:
+            ViSettingCompletion.items = iter_settings(ViSettingCompletion.prefix)
+            ViSettingCompletion.is_stale = False
+
+        try:
+            self.view.run_command('write_fs_completion',
+                                  {'cmd': cmd,
+                                   'completion': next(ViSettingCompletion.items)})
+        except StopIteration:
+            try:
+                ViSettingCompletion.items = iter_settings(ViSettingCompletion.prefix)
+                self.view.run_command('write_fs_completion',
+                                      {'cmd': cmd,
+                                       'completion': next(ViSettingCompletion.items)})
+            except StopIteration:
+                return
+
 class CmdlineContextProvider(sublime_plugin.EventListener):
     """
     Provides contexts for the cmdline input panel.
@@ -216,6 +268,15 @@ class CmdlineContextProvider(sublime_plugin.EventListener):
 
         if key == 'vi_cmdline_at_fs_completion':
             value = wants_fs_completions(view.substr(view.line(0)))
+            value = value and view.sel()[0].b == view.size()
+            if operator == sublime.OP_EQUAL:
+                if operand == True:
+                    return value
+                elif operand == False:
+                    return not value
+
+        if key == 'vi_cmdline_at_setting_completion':
+            value = wants_setting_completions(view.substr(view.line(0)))
             value = value and view.sel()[0].b == view.size()
             if operator == sublime.OP_EQUAL:
                 if operand == True:

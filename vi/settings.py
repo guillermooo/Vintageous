@@ -1,6 +1,7 @@
 import collections
+import json
 
-vi_user_setting = collections.namedtuple('vi_editor_setting', 'scope values default parser')
+vi_user_setting = collections.namedtuple('vi_editor_setting', 'scope values default parser action noable')
 
 WINDOW_SETTINGS = [
     'last_buffer_search',
@@ -10,14 +11,78 @@ WINDOW_SETTINGS = [
 
 SCOPE_WINDOW = 1
 SCOPE_VIEW = 2
+SCOPE_VI_VIEW = 3
+SCOPE_VI_WINDOW = 4
+
+
+def set_generic_view_setting(view, name, value, opt):
+    if opt.scope == SCOPE_VI_VIEW:
+        name = 'vintageous_' + name
+    if not opt.parser:
+        view.settings().set(name, value)
+        return
+    else:
+        view.settings().set(name, opt.parser(value))
+        return
+    raise ValueError("Vintageous: bad option value")
+
+
+def set_minimap(view, name, value, opt):
+    # TODO: Ensure the minimap gets hidden when so desired.
+    view.window().run_command('toggle_minimap')
+
+
+def opt_bool_parser(value):
+    if value.lower() in ('false', 'true', '0', '1', 'yes', 'no'):
+        if value.lower() in ('true', '1', 'yes'):
+            return True
+        return False
+
+
+def opt_rulers_parser(value):
+    try:
+        converted = json.loads(value)
+        if isinstance(converted, list):
+            return converted
+        else:
+            raise ValueError
+    except ValueError:
+        raise
+    except TypeError:
+        raise ValueError
 
 
 VI_OPTIONS = {
     # TODO: BUG - unrelated to this code: D,p,u,redo doesn't do what we want.
-    'hlsearch': vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=True, parser=None),
-    'incsearch': vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=True, parser=None),
-    'autoindent': vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=True, parser=None),
+    'hlsearch': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=False),
+    'incsearch': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=None, action=set_generic_view_setting, noable=False),
+    'autoindent': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=None, action=set_generic_view_setting, noable=False),
+    'showminimap': vi_user_setting(scope=SCOPE_WINDOW, values=(True, False, '0', '1'), default=True, parser=None, action=set_minimap, noable=True),
+    'rulers': vi_user_setting(scope=SCOPE_VIEW, values=None, default=[], parser=opt_rulers_parser, action=set_generic_view_setting, noable=False),
 }
+
+
+# For completions.
+def iter_settings(prefix=''):
+    for k in sorted(VI_OPTIONS.keys()):
+        if (prefix == '') or k.startswith(prefix):
+            yield k
+
+
+def set_local(view, name, value):
+    try:
+        opt = VI_OPTIONS[name]
+        opt.action(view, name, value, opt)
+    except KeyError as e:
+        if name.startswith('no'):
+            try:
+                opt = VI_OPTIONS[name[2:]]
+                if opt.noable:
+                    opt.action(view, name, value, opt)
+                return
+            except KeyError:
+                pass
+        raise
 
 
 def get_option(view, name):

@@ -362,6 +362,10 @@ EX_COMMANDS = {
                               error_on=(ex_error.ERR_NO_RANGE_ALLOWED,
                                         ex_error.ERR_TRAILING_CHARS,)
                               ),
+    ('setlocal', 'setl'): ex_cmd_data(command='ex_set_local',
+                                  invocations=(re.compile(r'^(?P<option>\w+\??)(?:(?P<operator>[+-^]?=)(?P<value>.*))?$'),),
+                                  error_on=(ex_error.ERR_NO_RANGE_ALLOWED,)
+                                  ),
 }
 
 
