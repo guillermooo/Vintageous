@@ -7,7 +7,12 @@ from Vintageous.vi.settings import VI_OPTIONS
 from Vintageous.vi.settings import vi_user_setting
 from Vintageous.vi.settings import VintageSettings
 from Vintageous.vi.settings import SCOPE_VIEW
+from Vintageous.vi.settings import SCOPE_VI_VIEW
 from Vintageous.vi.settings import SCOPE_WINDOW
+from Vintageous.vi.settings import set_generic_view_setting
+from Vintageous.vi.settings import opt_bool_parser
+from Vintageous.vi.settings import set_minimap
+from Vintageous.vi.settings import opt_rulers_parser
 
 
 class TestSublimeSettings(unittest.TestCase):
@@ -83,17 +88,23 @@ class TestViEditorSettings(unittest.TestCase):
 	def testKnowsAllSettings(self):
 		all_settings = [
 			'hlsearch',
+			'magic',
 			'incsearch',
-			'autoindent'
+			'autoindent',
+			'showminimap',
+			'rulers',
 		]
 
 		self.assertEqual(sorted(all_settings), sorted(list(VI_OPTIONS.keys())))
 
 	def testSettingsAreCorrectlyDefined(self):
 		KNOWN_OPTIONS = {
-			'hlsearch': vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=True, parser=None),
-			'incsearch': vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=True, parser=None),
-			'autoindent': vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default=True, parser=None),
+			'hlsearch': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
+			'magic': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
+			'incsearch': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
+			'autoindent': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=None, action=set_generic_view_setting, noable=False),
+			'showminimap': vi_user_setting(scope=SCOPE_WINDOW, values=(True, False, '0', '1'), default=True, parser=None, action=set_minimap, noable=True),
+			'rulers': vi_user_setting(scope=SCOPE_VIEW, values=None, default=[], parser=opt_rulers_parser, action=set_generic_view_setting, noable=False),
 		}
 
 		self.assertEqual(len(KNOWN_OPTIONS), len(VI_OPTIONS))
@@ -109,7 +120,7 @@ class TestViEditorSettings(unittest.TestCase):
 
 	def testCanRetrieveWindowLevelSettings(self):
 		# TODO: use mock to patch dict
-		VI_OPTIONS['foo'] = vi_user_setting(scope=SCOPE_WINDOW, values=(100,), default='bar', parser=None)
+		VI_OPTIONS['foo'] = vi_user_setting(scope=SCOPE_WINDOW, values=(100,), default='bar', parser=None, action=None, noable=False)
 		self.settsman.view.window().settings().set('vintageous_foo', 100)
 		self.assertEqual(self.settsman['foo'], 100)
 		del VI_OPTIONS['foo']
@@ -130,36 +141,36 @@ class Test_get_option(unittest.TestCase):
 		self.vi_settings = VintageSettings(view=TestsState.view)
 
 	def testDefaultScopeIsView(self):
-		VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100,), default='bar', parser=None)
+		VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100,), default='bar', parser=None, action=None, noable=False)
 		self.vi_settings.view.settings().set('vintageous_foo', 100)
 		self.assertEqual(self.vi_settings['foo'], 100)
 		del VI_OPTIONS['foo']
 
 	def testReturnsDefaultValueIfUnset(self):
-		VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100,), default='bar', parser=None)
+		VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100,), default='bar', parser=None, action=None, noable=False)
 		self.assertEqual(self.vi_settings['foo'], 'bar')
 		del VI_OPTIONS['foo']
 
 	def testReturnsDefaultValueIfSetToWrongValue(self):
-		VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100,), default='bar', parser=None)
+		VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100,), default='bar', parser=None, action=None, noable=False)
 		self.vi_settings.view.settings().set('vintageous_foo', 'maraca')
 		self.assertEqual(self.vi_settings['foo'], 'bar')
 		del VI_OPTIONS['foo']
 
 	def testReturnsCorrectValue(self):
-		VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100, 200), default='bar', parser=None)
+		VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100, 200), default='bar', parser=None, action=None, noable=False)
 		self.vi_settings.view.settings().set('vintageous_foo', 200)
 		self.assertEqual(self.vi_settings['foo'], 200)
 		del VI_OPTIONS['foo']
 
 	def testCanReturnWindowLevelSetting(self):
-		VI_OPTIONS['foo'] = vi_user_setting(scope=SCOPE_WINDOW, values=(100,), default='bar', parser=None)
+		VI_OPTIONS['foo'] = vi_user_setting(scope=SCOPE_WINDOW, values=(100,), default='bar', parser=None, action=None, noable=False)
 		self.vi_settings.view.window().settings().set('vintageous_foo', 100)
 		self.assertEqual(self.vi_settings['foo'], 100)
 		del VI_OPTIONS['foo']
 
 	def testCanReturnViewLevelSetting(self):
-		VI_OPTIONS['foo'] = vi_user_setting(scope=SCOPE_VIEW, values=(100,), default='bar', parser=None)
+		VI_OPTIONS['foo'] = vi_user_setting(scope=SCOPE_VIEW, values=(100,), default='bar', parser=None, action=None, noable=False)
 		self.vi_settings.view.settings().set('vintageous_foo', 100)
 		self.assertEqual(self.vi_settings['foo'], 100)
 		del VI_OPTIONS['foo']
