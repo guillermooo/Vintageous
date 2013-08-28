@@ -3,7 +3,7 @@ import unittest
 import sublime
 
 from Vintageous.test_runner import TestsState
-from Vintageous.tests.borrowed import mock
+from unittest import mock
 from Vintageous.vi.constants import MODE_INSERT
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL

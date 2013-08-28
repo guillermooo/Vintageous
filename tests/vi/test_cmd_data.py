@@ -2,7 +2,7 @@ import unittest
 
 import sublime
 
-from Vintageous.tests.borrowed import mock
+from unittest import mock
 from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
 from Vintageous.vi.constants import MODE_INSERT
 from Vintageous.vi.constants import MODE_NORMAL

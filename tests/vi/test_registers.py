@@ -3,7 +3,7 @@ import builtins
 
 import sublime
 
-from Vintageous.tests.borrowed import mock
+from unittest import mock
 from Vintageous.test_runner import TestsState
 from Vintageous.vi import registers
 from Vintageous.vi.registers import Registers

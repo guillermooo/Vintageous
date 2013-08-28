@@ -5,7 +5,7 @@ import sublime
 import sublime_plugin
 
 
-from Vintageous.tests.borrowed import mock
+from unittest import mock
 from Vintageous.tests.borrowed.mock import call
 from Vintageous.run import ViExecutionState
 from Vintageous.run import ViRunCommand

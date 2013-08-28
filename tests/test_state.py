@@ -2,8 +2,8 @@ import unittest
 
 import sublime
 
-from Vintageous.tests.borrowed import mock
-from Vintageous.tests.borrowed.mock import call
+from unittest import mock
+from unittest.mock import call
 from Vintageous.state import VintageState
 from Vintageous.test_runner import TestsState
 from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
