@@ -30,12 +30,12 @@
 	{ "keys": ["k"], "command": "vi_soft_undo",           "context": [{"key": "vi_mode_select"}] },
 	{ "keys": ["l"], "command": "find_under_expand_skip", "context": [{"key": "vi_mode_select"}] },
 	{ "keys": ["A"], "command": "find_all_under",         "context": [{"key": "vi_mode_select"}] },
-	
+
 	{ "keys": ["down"], "command": "set_motion", "args": {"motion": "vi_j"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["up"],   "command": "set_motion", "args": {"motion": "vi_k"},   "context": [{"key": "setting.command_mode"}] },
 
 	{ "keys": ["left"],  "command": "set_motion", "args": {"motion": "vi_h"},  "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["right"], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "vi_mode_normal_or_visual"}] }, 
+	{ "keys": ["right"], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 
 	{ "keys": [" "],           "command": "set_motion", "args": {"motion": "vi_l"},           "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["enter"],       "command": "set_motion", "args": {"motion": "vi_enter"},       "context": [{"key": "vi_mode_normal_or_any_visual"}] },
@@ -218,7 +218,7 @@
 	{ "keys": ["a"], "command": "vi_i", "args": {"inclusive": true}, "context": [{"key": "vi_mode_visual"},] },
 
 	{ "keys": ["r"], "command": "set_action", "args": {"action": "vi_r"},     "context": [{"key": "vi_mode_normal"}] },
-	
+
 	{ "keys": [">"], "command": "set_action", "args": {"action": "vi_lambda"},     "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["<"], "command": "set_action", "args": {"action": "vi_antilambda"}, "context": [{"key": "setting.command_mode"}] },
 
@@ -267,8 +267,9 @@
 
 	{ "keys": ["up"],   "command": "cycle_cmdline_history", "args": {"backwards": true }, "context": [{"key": "vi_is_cmdline"}] },
  	{ "keys": ["down"], "command": "cycle_cmdline_history",								  "context": [{"key": "vi_is_cmdline"}] },
- 	
+
 	{ "keys": ["tab"],   "command": "fs_completion", "context": [{"key": "vi_is_cmdline"}, {"key": "vi_cmdline_at_fs_completion"}] },
+	{ "keys": ["tab"],   "command": "vi_setting_completion", "context": [{"key": "vi_is_cmdline"}, {"key": "vi_cmdline_at_setting_completion"}] },
 
 	{ "keys": ["ctrl+f"], "command": "move",    		"args": {"by": "characters", "forward": true},  "context": [{"key": "vi_is_cmdline"},] },
 	{ "keys": ["ctrl+b"], "command": "move",    		"args": {"by": "characters", "forward": false}, "context": [{"key": "vi_is_cmdline"},] },
