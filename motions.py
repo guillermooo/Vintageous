@@ -664,7 +664,7 @@ class ViOctothorp(ExactWordBufferSearchBase):
         regions_transformer(self.view, f)
 
 
-class ViBufferSearch(IrreversibleTextCommand):
+class ViBufferSearch(IrreversibleTextCommand, BufferSearchBase):
     def run(self):
         Vintageous.state._dont_reset_during_init = True
 
@@ -688,12 +688,7 @@ class ViBufferSearch(IrreversibleTextCommand):
         state.eval()
 
     def on_change(self, s):
-        flags = 0
-        if VintageState(self.view).settings.vi['magic'] == False:
-            if s.lower() == s or s.upper() == s:
-                flags = sublime.IGNORECASE | sublime.LITERAL
-            else:
-                flags = sublime.LITERAL
+        flags = self.calculate_flags()
         self.view.erase_regions('vi_inc_search')
         state = VintageState(self.view)
         next_hit = find_wrapping(self.view,
@@ -719,7 +714,7 @@ class ViBufferSearch(IrreversibleTextCommand):
             self.view.show(self.view.sel()[0])
 
 
-class ViBufferReverseSearch(IrreversibleTextCommand):
+class ViBufferReverseSearch(IrreversibleTextCommand, BufferSearchBase):
     def run(self):
         Vintageous.state._dont_reset_during_init = True
 
@@ -742,12 +737,7 @@ class ViBufferReverseSearch(IrreversibleTextCommand):
         state.eval()
 
     def on_change(self, s):
-        flags = 0
-        if VintageState(self.view).settings.vi['magic'] == False:
-            if s.lower() == s or s.upper() == s:
-                flags = sublime.IGNORECASE | sublime.LITERAL
-            else:
-                flags = sublime.LITERAL
+        flags = self.calculate_flags()
         self.view.erase_regions('vi_inc_search')
         state = VintageState(self.view)
         occurrence = reverse_find_wrapping(self.view,

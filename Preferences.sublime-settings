@@ -30,5 +30,8 @@
 	// If true, / and ? will use regular expressions.
 	// If false, smart case will be used instead: the pattern will be interpreted literally and, if
 	// it's either all lowercase or all uppercase, case will be ignored too.
-	"vintageous_magic": true
+	"vintageous_magic": true,
+
+	// If true, /, ?, * and # will always ignore case.
+	"vintageous_ignorecase": true
 }
