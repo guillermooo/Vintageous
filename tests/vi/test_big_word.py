@@ -5,9 +5,9 @@ from Vintageous.vi.constants import MODE_NORMAL
 # from Vintageous.vi.constants import MODE_VISUAL
 # from Vintageous.vi.constants import MODE_VISUAL_LINE
 
-from Vintageous.tests.commands import BufferTest
-from Vintageous.tests.commands import set_text
-from Vintageous.tests.commands import add_selection
+from Vintageous.tests import BufferTest
+from Vintageous.tests import set_text
+from Vintageous.tests import add_selection
 
 from Vintageous.vi.units import next_big_word_start
 from Vintageous.vi.units import big_word_starts

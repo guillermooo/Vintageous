@@ -5,11 +5,11 @@ from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
 
-from Vintageous.tests.commands import set_text
-from Vintageous.tests.commands import add_selection
-from Vintageous.tests.commands import get_sel
-from Vintageous.tests.commands import first_sel
-from Vintageous.tests.commands import BufferTest
+from Vintageous.tests import set_text
+from Vintageous.tests import add_selection
+from Vintageous.tests import get_sel
+from Vintageous.tests import first_sel
+from Vintageous.tests import BufferTest
 
 
 class Test_vi_dollar_InNormalMode(BufferTest):

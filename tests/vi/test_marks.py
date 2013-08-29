@@ -5,9 +5,9 @@ import sublime
 from Vintageous.test_runner import TestsState
 from Vintageous.vi import marks
 from Vintageous.state import VintageState
-from Vintageous.tests.commands import make_region
-from Vintageous.tests.commands import set_text
-from Vintageous.tests.commands import add_selection
+from Vintageous.tests import make_region
+from Vintageous.tests import set_text
+from Vintageous.tests import add_selection
 
 
 # XXX: Use the mock module instead?

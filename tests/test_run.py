@@ -6,7 +6,8 @@ import sublime_plugin
 
 
 from unittest import mock
-from Vintageous.tests.borrowed.mock import call
+from unittest.mock import call
+
 from Vintageous.run import ViExecutionState
 from Vintageous.run import ViRunCommand
 from Vintageous.vi.constants import MODE_NORMAL

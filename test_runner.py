@@ -79,7 +79,7 @@ TESTS_CMDS_ALL_MOTIONS = [TESTS_CMDS_MOTION_VI_L,
                           TESTS_CMDS_MOTION_VI_DOLLAR,
                           TESTS_CMDS_MOTION_VI_J,
                           TESTS_CMDS_MOTION_VI_K,
-                          TESTS_CMDS_MOTION_VI_E, 
+                          TESTS_CMDS_MOTION_VI_E,
                           TESTS_CMDS_MOTION_VI_BIG_F,
                           TESTS_CMDS_ACTION_VI_BIG_S,
                           ]
