@@ -3,7 +3,7 @@ import sublime
 
 def select_point(view, left_end, right_end=None):
     if right_end is None:
-        right_end = left_end 
+        right_end = left_end
 
     view.sel().clear()
     view.sel().add(sublime.Region(left_end, right_end))

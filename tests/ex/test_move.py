@@ -8,7 +8,7 @@ from Vintageous.vi.constants import MODE_VISUAL_LINE
 from Vintageous.state import VintageState
 
 from Vintageous.tests import set_text
-from Vintageous.tests import add_selection
+from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
 from Vintageous.tests import make_region_at_row
@@ -20,7 +20,7 @@ from Vintageous.ex_commands import CURRENT_LINE_RANGE
 class Test_ex_move_Moving_InNormalMode_SingleLine_DefaultStart(BufferTest):
     def testCanMoveDefaultLineRange(self):
         set_text(self.view, 'abc\nxxx\nabc\nabc')
-        add_selection(self.view, self.R((1, 0), (1, 0)))
+        add_sel(self.view, self.R((1, 0), (1, 0)))
 
         self.view.run_command('ex_move', {'address': '3'})
 
@@ -30,7 +30,7 @@ class Test_ex_move_Moving_InNormalMode_SingleLine_DefaultStart(BufferTest):
 
     def testCanMoveToEof(self):
         set_text(self.view, 'abc\nxxx\nabc\nabc')
-        add_selection(self.view, self.R((1, 0), (1, 0)))
+        add_sel(self.view, self.R((1, 0), (1, 0)))
 
         self.view.run_command('ex_move', {'address': '4'})
 
@@ -40,7 +40,7 @@ class Test_ex_move_Moving_InNormalMode_SingleLine_DefaultStart(BufferTest):
 
     def testCanMoveToBof(self):
         set_text(self.view, 'abc\nxxx\nabc\nabc')
-        add_selection(self.view, self.R((1, 0), (1, 0)))
+        add_sel(self.view, self.R((1, 0), (1, 0)))
 
         self.view.run_command('ex_move', {'address': '0'})
 
@@ -50,7 +50,7 @@ class Test_ex_move_Moving_InNormalMode_SingleLine_DefaultStart(BufferTest):
 
     def testCanMoveToEmptyLine(self):
         set_text(self.view, 'abc\nxxx\nabc\n\nabc')
-        add_selection(self.view, self.R((1, 0), (1, 0)))
+        add_sel(self.view, self.R((1, 0), (1, 0)))
 
         self.view.run_command('ex_move', {'address': '4'})
 
@@ -60,7 +60,7 @@ class Test_ex_move_Moving_InNormalMode_SingleLine_DefaultStart(BufferTest):
 
     def testCanMoveToSameLine(self):
         set_text(self.view, 'abc\nxxx\nabc\nabc')
-        add_selection(self.view, self.R((1, 0), (1, 0)))
+        add_sel(self.view, self.R((1, 0), (1, 0)))
 
         self.view.run_command('ex_move', {'address': '2'})
 
@@ -77,7 +77,7 @@ class Test_ex_move_Moveing_InNormalMode_MultipleLines(BufferTest):
 
     def testCanMoveDefaultLineRange(self):
         set_text(self.view, 'abc\nxxx\nxxx\nabc\nabc')
-        add_selection(self.view, self.R((1, 0), (1, 0)))
+        add_sel(self.view, self.R((1, 0), (1, 0)))
 
         self.view.run_command('ex_move', {'address': '4', 'line_range': self.range})
 
@@ -87,7 +87,7 @@ class Test_ex_move_Moveing_InNormalMode_MultipleLines(BufferTest):
 
     def testCanMoveToEof(self):
         set_text(self.view, 'abc\nxxx\nxxx\nabc\nabc')
-        add_selection(self.view, self.R((1, 0), (1, 0)))
+        add_sel(self.view, self.R((1, 0), (1, 0)))
 
         self.view.run_command('ex_move', {'address': '5', 'line_range': self.range})
 
@@ -97,7 +97,7 @@ class Test_ex_move_Moveing_InNormalMode_MultipleLines(BufferTest):
 
     def testCanMoveToBof(self):
         set_text(self.view, 'abc\nxxx\nxxx\nabc\nabc')
-        add_selection(self.view, self.R((1, 0), (1, 0)))
+        add_sel(self.view, self.R((1, 0), (1, 0)))
 
         self.view.run_command('ex_move', {'address': '0', 'line_range': self.range})
 
@@ -107,7 +107,7 @@ class Test_ex_move_Moveing_InNormalMode_MultipleLines(BufferTest):
 
     def testCanMoveToEmptyLine(self):
         set_text(self.view, 'abc\nxxx\nxxx\nabc\n\nabc')
-        add_selection(self.view, self.R((1, 0), (1, 0)))
+        add_sel(self.view, self.R((1, 0), (1, 0)))
 
         self.view.run_command('ex_move', {'address': '5', 'line_range': self.range})
 
@@ -118,7 +118,7 @@ class Test_ex_move_Moveing_InNormalMode_MultipleLines(BufferTest):
     @unittest.skip("Not implemented")
     def testCanMoveToSameLine(self):
         set_text(self.view, 'abc\nxxx\nxxx\nabc\nabc')
-        add_selection(self.view, self.R((1, 0), (1, 0)))
+        add_sel(self.view, self.R((1, 0), (1, 0)))
 
         self.view.run_command('ex_move', {'address': '2', 'line_range': self.range})
 
@@ -130,7 +130,7 @@ class Test_ex_move_Moveing_InNormalMode_MultipleLines(BufferTest):
 class Test_ex_move_InNormalMode_CaretPosition(BufferTest):
     def testCanRepositionCaret(self):
         set_text(self.view, 'abc\nxxx\nabc\nabc')
-        add_selection(self.view, self.R((1, 0), (1, 0)))
+        add_sel(self.view, self.R((1, 0), (1, 0)))
 
         self.view.run_command('ex_move', {'address': '3'})
 
@@ -144,7 +144,7 @@ class Test_ex_move_InNormalMode_CaretPosition(BufferTest):
 class Test_ex_move_ModeTransition(BufferTest):
     def testFromNormalModeToNormalMode(self):
         set_text(self.view, 'abc\nxxx\nabc\nabc')
-        add_selection(self.view, self.R((1, 0), (1, 0)))
+        add_sel(self.view, self.R((1, 0), (1, 0)))
 
         state = VintageState(self.view)
         state.enter_normal_mode()
@@ -160,7 +160,7 @@ class Test_ex_move_ModeTransition(BufferTest):
 
     def testFromVisualModeToNormalMode(self):
         set_text(self.view, 'abc\nxxx\nabc\nabc')
-        add_selection(self.view, self.R((1, 0), (1, 1)))
+        add_sel(self.view, self.R((1, 0), (1, 1)))
 
         state = VintageState(self.view)
         state.enter_visual_mode()

@@ -7,7 +7,7 @@ from Vintageous.vi import marks
 from Vintageous.state import VintageState
 from Vintageous.tests import make_region
 from Vintageous.tests import set_text
-from Vintageous.tests import add_selection
+from Vintageous.tests import add_sel
 
 
 # XXX: Use the mock module instead?

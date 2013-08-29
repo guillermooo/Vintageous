@@ -8,7 +8,7 @@ $typeOfBuild = if ($Release) {"release"} else {"dev"}
 & "py.exe" "-3.3" (join-path $script:thisDir "..\builder.py") "--release" $typeOfBuild
 
 if ($LASTEXITCODE -ne 0) {
-   write-error "Could not run py.exe." 
+   write-error "Could not run py.exe."
    exit 1
 }
 

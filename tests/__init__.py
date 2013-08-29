@@ -36,7 +36,7 @@ def set_text(view, text):
     view.run_command('write_to_buffer', {'text': text, 'file_name': view.file_name()})
 
 
-def add_selection(view, a=0, b=0):
+def add_sel(view, a=0, b=0):
     if isinstance(a, sublime.Region):
         view.sel().add(a)
         return

@@ -6,7 +6,7 @@ from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
 
 from Vintageous.tests import set_text
-from Vintageous.tests import add_selection
+from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
 from Vintageous.tests import BufferTest

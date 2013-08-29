@@ -20,7 +20,7 @@ from Vintageous.state import _init_vintageous
 from Vintageous.vi.cmd_data import CmdData
 from Vintageous.vi import utils
 from Vintageous.tests import set_text
-from Vintageous.tests import add_selection
+from Vintageous.tests import add_sel
 from Vintageous.tests import make_region
 import Vintageous.state
 

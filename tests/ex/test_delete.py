@@ -8,7 +8,7 @@ from Vintageous.vi.constants import MODE_VISUAL_LINE
 from Vintageous.state import VintageState
 
 from Vintageous.tests import set_text
-from Vintageous.tests import add_selection
+from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
 from Vintageous.tests import make_region_at_row
@@ -20,7 +20,7 @@ from Vintageous.ex_commands import CURRENT_LINE_RANGE
 class Test_ex_delete_Deleting_InNormalMode_SingleLine_DefaultStart(BufferTest):
     def testCanDeleteDefaultLineRange(self):
         set_text(self.view, 'abc\nxxx\nabc\nabc')
-        add_selection(self.view, self.R((1, 0), (1, 0)))
+        add_sel(self.view, self.R((1, 0), (1, 0)))
 
         self.view.run_command('ex_delete')
 
@@ -30,7 +30,7 @@ class Test_ex_delete_Deleting_InNormalMode_SingleLine_DefaultStart(BufferTest):
 
     def testCanDeleteAtEof_NoNewLine(self):
         set_text(self.view, 'abc\nabc\nabc\nxxx')
-        add_selection(self.view, self.R((3, 0), (3, 0)))
+        add_sel(self.view, self.R((3, 0), (3, 0)))
 
         r = CURRENT_LINE_RANGE.copy()
         r['left_ref'] = '4'
@@ -42,7 +42,7 @@ class Test_ex_delete_Deleting_InNormalMode_SingleLine_DefaultStart(BufferTest):
 
     def testCanDeleteAtEof_NewLine(self):
         set_text(self.view, 'abc\nabc\nabc\nxxx\n')
-        add_selection(self.view, self.R((3, 0), (3, 0)))
+        add_sel(self.view, self.R((3, 0), (3, 0)))
 
         r = CURRENT_LINE_RANGE.copy()
         r['left_ref'] = '4'
@@ -54,7 +54,7 @@ class Test_ex_delete_Deleting_InNormalMode_SingleLine_DefaultStart(BufferTest):
 
     def testCanDeleteZeroLineRange(self):
         set_text(self.view, 'xxx\nabc\nabc\nabc')
-        add_selection(self.view, self.R((1, 0), (1, 0)))
+        add_sel(self.view, self.R((1, 0), (1, 0)))
 
         r = CURRENT_LINE_RANGE.copy()
         r['text_range'] = '0'
@@ -68,7 +68,7 @@ class Test_ex_delete_Deleting_InNormalMode_SingleLine_DefaultStart(BufferTest):
 
     def testCanDeleteEmptyLine(self):
         set_text(self.view, 'abc\nabc\n\nabc')
-        add_selection(self.view, self.R((1, 0), (1, 0)))
+        add_sel(self.view, self.R((1, 0), (1, 0)))
 
         r = CURRENT_LINE_RANGE.copy()
         r['right_ref'] = None
@@ -92,7 +92,7 @@ class Test_ex_delete_Deleting_InNormalMode_MultipleLines(BufferTest):
 
     def testCanDeleteTwoLines(self):
         set_text(self.view, 'abc\nxxx\nxxx\nabc\nabc')
-        add_selection(self.view, self.R((0, 0), (0, 0)))
+        add_sel(self.view, self.R((0, 0), (0, 0)))
 
         self.range['left_offset'] = 2
         self.range['right_offset'] = 3
@@ -105,7 +105,7 @@ class Test_ex_delete_Deleting_InNormalMode_MultipleLines(BufferTest):
 
     def testCanDeleteThreeLines(self):
         set_text(self.view, 'abc\nxxx\nxxx\nxxx\nabc\nabc')
-        add_selection(self.view, self.R((0, 0), (0, 0)))
+        add_sel(self.view, self.R((0, 0), (0, 0)))
 
         self.range['left_offset'] = 2
         self.range['right_offset'] = 4
@@ -119,7 +119,7 @@ class Test_ex_delete_Deleting_InNormalMode_MultipleLines(BufferTest):
     # TODO: fix this
     def testCanDeleteMultipleEmptyLines(self):
         set_text(self.view, 'abc\n\n\n\nabc\nabc')
-        add_selection(self.view, self.R((0, 0), (0, 0)))
+        add_sel(self.view, self.R((0, 0), (0, 0)))
 
         self.range['left_offset'] = 2
         self.range['right_offset'] = 4
@@ -140,7 +140,7 @@ class Test_ex_delete_InNormalMode_CaretPosition(BufferTest):
 
     def testCanRepositionCaret(self):
         set_text(self.view, 'abc\nxxx\nabc\nabc')
-        add_selection(self.view, self.R((3, 0), (3, 0)))
+        add_sel(self.view, self.R((3, 0), (3, 0)))
 
         self.range['left_offset'] = 2
         self.range['text_range'] = '2,4'
@@ -162,7 +162,7 @@ class Test_ex_delete_ModeTransition(BufferTest):
 
     def testFromNormalModeToNormalMode(self):
         set_text(self.view, 'abc\nxxx\nabc\nabc')
-        add_selection(self.view, self.R((1, 0), (1, 0)))
+        add_sel(self.view, self.R((1, 0), (1, 0)))
 
         state = VintageState(self.view)
         state.enter_normal_mode()
@@ -180,7 +180,7 @@ class Test_ex_delete_ModeTransition(BufferTest):
 
     def testFromVisualModeToNormalMode(self):
         set_text(self.view, 'abc\nxxx\nabc\nabc')
-        add_selection(self.view, self.R((1, 0), (1, 1)))
+        add_sel(self.view, self.R((1, 0), (1, 1)))
 
         state = VintageState(self.view)
         state.enter_visual_mode()
