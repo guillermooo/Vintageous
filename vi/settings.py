@@ -1,3 +1,5 @@
+import sublime
+
 import collections
 import json
 
@@ -15,19 +17,29 @@ SCOPE_VI_VIEW = 3
 SCOPE_VI_WINDOW = 4
 
 
-def set_generic_view_setting(view, name, value, opt):
+def set_generic_view_setting(view, name, value, opt, globally=False):
     if opt.scope == SCOPE_VI_VIEW:
         name = 'vintageous_' + name
     if not opt.parser:
-        view.settings().set(name, value)
+        if not globally or (opt.scope not in (SCOPE_VI_VIEW, SCOPE_VI_WINDOW)):
+            view.settings().set(name, value)
+        else:
+            prefs = sublime.load_settings('Preferences.sublime-settings')
+            prefs.set(name, value)
+            sublime.save_settings('Preferences.sublime-settings')
         return
     else:
-        view.settings().set(name, opt.parser(value))
+        if not globally or (opt.scope not in (SCOPE_VI_VIEW, SCOPE_VI_WINDOW)):
+            view.settings().set(name, opt.parser(value))
+        else:
+            prefs = sublime.load_settings('Preferences.sublime-settings')
+            prefs.set(name, opt.parser(value))
+            sublime.save_settings('Preferences.sublime-settings')
         return
     raise ValueError("Vintageous: bad option value")
 
 
-def set_minimap(view, name, value, opt):
+def set_minimap(view, name, value, opt, globally=False):
     # TODO: Ensure the minimap gets hidden when so desired.
     view.window().run_command('toggle_minimap')
 
@@ -89,6 +101,25 @@ def set_local(view, name, value):
                 opt = VI_OPTIONS[name[2:]]
                 if opt.noable:
                     opt.action(view, name[2:], '0', opt)
+                return
+            except KeyError:
+                pass
+        raise
+
+
+def set_global(view, name, value):
+    try:
+        opt = VI_OPTIONS[name]
+        if not value and opt.noable:
+            opt.action(view, name, '1', opt, globally=True)
+            return
+        opt.action(view, name, value, opt, globally=True)
+    except KeyError as e:
+        if name.startswith('no'):
+            try:
+                opt = VI_OPTIONS[name[2:]]
+                if opt.noable:
+                    opt.action(view, name[2:], '0', opt, globally=True)
                 return
             except KeyError:
                 pass

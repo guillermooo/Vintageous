@@ -366,6 +366,10 @@ EX_COMMANDS = {
                                   invocations=(re.compile(r'^(?P<option>\w+\??)(?:(?P<operator>[+-^]?=)(?P<value>.*))?$'),),
                                   error_on=(ex_error.ERR_NO_RANGE_ALLOWED,)
                                   ),
+    ('set', 'se'): ex_cmd_data(command='ex_set',
+                                  invocations=(re.compile(r'^(?P<option>\w+\??)(?:(?P<operator>[+-^]?=)(?P<value>.*))?$'),),
+                                  error_on=(ex_error.ERR_NO_RANGE_ALLOWED,)
+                                  ),
 }
 
 

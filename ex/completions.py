@@ -22,10 +22,12 @@ completion_types = [
 ]
 
 RX_CMD_LINE_SET_LOCAL = re.compile(r'^(?P<cmd>:\s*setl(?:ocal)?\??)\s+(?P<setting>.*)$')
+RX_CMD_LINE_SET_GLOBAL = re.compile(r'^(?P<cmd>:\s*se(?:t)?\??)\s+(?P<setting>.*)$')
 
 
 completion_settings = [
     (RX_CMD_LINE_SET_LOCAL, None),
+    (RX_CMD_LINE_SET_GLOBAL, None),
 ]
 
 
