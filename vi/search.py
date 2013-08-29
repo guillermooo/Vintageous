@@ -1,4 +1,9 @@
 import sublime
+import sublime_plugin
+
+import re
+
+from Vintageous.state import VintageState
 
 
 def find_in_range(view, term, start, end, flags=0):
@@ -126,3 +131,46 @@ def reverse_search_by_pt(view, term, start, end, flags=0):
         if lo_line == hi_line:
             # we found the line we were looking for, now extract the match.
             return find_last_in_range(view, term, max(hi_line.a, start), min(hi_line.b, end), flags)
+
+
+# TODO: Test me.
+class BufferSearchBase(sublime_plugin.TextCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def calculate_flags(self):
+        # TODO: Implement smartcase?
+        if self.view.settings().get('vintageous_magic') == True:
+            return 0
+        return sublime.LITERAL
+
+    def build_pattern(self, query):
+        return query
+
+    def hilite(self, query):
+        flags = self.calculate_flags()
+        regs = self.view.find_all(self.build_pattern(query), flags)
+
+        if not regs:
+            self.view.erase_regions('vi_search')
+            return
+
+        if VintageState(self.view).settings.vi['hlsearch'] == False:
+            return
+
+        self.view.add_regions('vi_search', regs, 'comment', '',
+                              sublime.DRAW_NO_FILL)
+
+
+# TODO: Test me.
+class ExactWordBufferSearchBase(BufferSearchBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def get_query(self):
+        # TODO: make sure we swallow any leading white space.
+        query = self.view.substr(self.view.word(self.view.sel()[0].end()))
+        return query
+
+    def build_pattern(self, query):
+        return r'\b{0}\b'.format(re.escape(query))

@@ -76,6 +76,8 @@ from Vintageous.vi.search import reverse_search_by_pt
 from Vintageous.vi.search import find_in_range
 from Vintageous.vi.search import find_wrapping
 from Vintageous.vi.search import reverse_find_wrapping
+from Vintageous.vi.search import BufferSearchBase
+from Vintageous.vi.search import ExactWordBufferSearchBase
 from Vintageous.vi import units
 
 import Vintageous.state
@@ -579,35 +581,11 @@ class ViBigM(sublime_plugin.TextCommand):
         self.view.show(target)
 
 
-class ViStar(sublime_plugin.TextCommand):
-    # TODO: implement searchiliter baseclass?
-    def hilite(self, pattern, exact_word=False):
-        # TODO: Implement smartcase?
-        if exact_word:
-            flags = sublime.IGNORECASE
-            regs = self.view.find_all(r'\b{0}\b'.format(re.escape(pattern)), flags)
-        else:
-            flags = sublime.IGNORECASE | sublime.LITERAL
-            regs = self.view.find_all(pattern, flags)
-        if not regs:
-            self.view.erase_regions('vi_search')
-            return
-
-        state = VintageState(self.view)
-        if not state.settings.vi['hlsearch']:
-            return
-
-        self.view.add_regions('vi_search', regs, 'comment', '', sublime.DRAW_NO_FILL)
-
+class ViStar(ExactWordBufferSearchBase):
     def run(self, edit, mode=None, extend=False, exact_word=True):
         def f(view, s):
-
-            if exact_word:
-                pattern = r'\b{0}\b'.format(re.escape(query))
-            else:
-                pattern = query
-
-            flags = sublime.IGNORECASE
+            pattern = self.build_pattern(query)
+            flags = self.calculate_flags()
 
             if mode == _MODE_INTERNAL_NORMAL:
                 match = find_wrapping(view,
@@ -634,59 +612,36 @@ class ViStar(sublime_plugin.TextCommand):
             return s
 
         state = VintageState(self.view)
-        # TODO: make sure we swallow any leading white space.
-        query = self.view.substr(self.view.word(self.view.sel()[0].end()))
+
+        query = self.get_query()
         if query:
-            self.hilite(query, exact_word=exact_word)
-            state.last_buffer_search = query
+            self.hilite(query)
+            # Ensure n and N can repeat this search later.
+            state.last_buffer_search = self.build_pattern(query)
 
         regions_transformer(self.view, f)
 
 
-class ViOctothorp(sublime_plugin.TextCommand):
-    # TODO: implement searchiliter baseclass?
-    def hilite(self, pattern, exact_word=False):
-        # TODO: Implement smartcase?
-        if exact_word:
-            flags = sublime.IGNORECASE
-            regs = self.view.find_all(r'\b{0}\b'.format(re.escape(pattern)), flags)
-        else:
-            flags = sublime.IGNORECASE | sublime.LITERAL
-            regs = self.view.find_all(pattern, flags)
-        if not regs:
-            self.view.erase_regions('vi_search')
-            return
-
-        state = VintageState(self.view)
-        if not state.settings.vi['hlsearch']:
-            return
-
-        self.view.add_regions('vi_search', regs, 'comment', '', sublime.DRAW_NO_FILL)
-
+class ViOctothorp(ExactWordBufferSearchBase):
     def run(self, edit, mode=None, extend=False, exact_word=True):
         def f(view, s):
-
-            if exact_word:
-                pattern = r'\b{0}\b'.format(re.escape(query))
-            else:
-                pattern = query
-
-            flags = sublime.IGNORECASE
+            pattern = self.build_pattern(query)
+            flags = self.calculate_flags()
 
             if mode == _MODE_INTERNAL_NORMAL:
                 match = reverse_find_wrapping(view,
-                                         term=pattern,
-                                         start=0,
-                                         end=current_sel.a,
-                                         flags=flags,
-                                         times=1)
+                                              term=pattern,
+                                              start=0,
+                                              end=start_sel.a,
+                                              flags=flags,
+                                              times=1)
             else:
                 match = reverse_find_wrapping(view,
-                                         term=pattern,
-                                         start=0,
-                                         end=current_sel.a,
-                                         flags=flags,
-                                         times=1)
+                                              term=pattern,
+                                              start=0,
+                                              end=start_sel.a,
+                                              flags=flags,
+                                              times=1)
 
             if match:
                 if mode == _MODE_INTERNAL_NORMAL:
@@ -698,14 +653,14 @@ class ViOctothorp(sublime_plugin.TextCommand):
             return s
 
         state = VintageState(self.view)
-        # TODO: make sure we swallow any leading white space.
-        query = self.view.substr(self.view.word(self.view.sel()[0].end()))
+
+        query = self.get_query()
         if query:
-            self.hilite(query, exact_word=exact_word)
-            state.last_buffer_search = query
+            self.hilite(query)
+            # Ensure n and N can repeat this search later.
+            state.last_buffer_search = self.build_pattern(query)
 
-        current_sel = self.view.sel()[0]
-
+        start_sel = self.view.sel()[0]
         regions_transformer(self.view, f)
 
 
@@ -817,21 +772,7 @@ class ViBufferReverseSearch(IrreversibleTextCommand):
             self.view.show(self.view.sel()[0])
 
 
-class _vi_forward_slash(sublime_plugin.TextCommand):
-    def hilite(self, pattern):
-        # TODO: Implement smartcase?
-        flags = sublime.IGNORECASE | sublime.LITERAL
-        regs = self.view.find_all(pattern, flags)
-        if not regs:
-            self.view.erase_regions('vi_search')
-            return
-
-        state = VintageState(self.view)
-        if not state.settings.vi['hlsearch']:
-            return
-
-        self.view.add_regions('vi_search', regs, 'comment', '', sublime.DRAW_NO_FILL)
-
+class _vi_forward_slash(BufferSearchBase):
     def run(self, edit, search_string, mode=None, count=1, extend=False):
         def f(view, s):
             if mode == MODE_VISUAL:
@@ -859,7 +800,8 @@ class _vi_forward_slash(sublime_plugin.TextCommand):
 
         # TODO: What should we do here? Case-sensitive or case-insensitive search? Configurable?
         # Search wrapping around the end of the buffer.
-        flags = sublime.IGNORECASE | sublime.LITERAL
+        # flags = sublime.IGNORECASE | sublime.LITERAL
+        flags = self.calculate_flags()
         match = find_wrapping(self.view, search_string, start, wrapped_end, flags=flags, times=count)
         if not match:
             return
@@ -868,21 +810,7 @@ class _vi_forward_slash(sublime_plugin.TextCommand):
         self.hilite(search_string)
 
 
-class _vi_question_mark(sublime_plugin.TextCommand):
-    def hilite(self, pattern):
-        # TODO: Implement smartcase?
-        flags = sublime.IGNORECASE | sublime.LITERAL
-        regs = self.view.find_all(pattern, flags)
-        if not regs:
-            self.view.erase_regions('vi_search')
-            return
-
-        state = VintageState(self.view)
-        if not state.settings.vi['hlsearch']:
-            return
-
-        self.view.add_regions('vi_search', regs, 'comment', '', sublime.DRAW_NO_FILL)
-
+class _vi_question_mark(BufferSearchBase):
     def run(self, edit, search_string, mode=None, count=1, extend=False):
         def f(view, s):
             # FIXME: Readjust carets if we searched for '\n'.
@@ -905,7 +833,7 @@ class _vi_question_mark(sublime_plugin.TextCommand):
         if search_string is None:
             return
 
-        flags = sublime.IGNORECASE | sublime.LITERAL
+        flags = self.calculate_flags()
         # FIXME: What should we do here? Case-sensitive or case-insensitive search? Configurable?
         found = reverse_find_wrapping(self.view,
                                       term=search_string,
