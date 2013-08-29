@@ -17,7 +17,7 @@ from Vintageous.tests import BufferTest
 class Test_vi_e_InNormalMode(BufferTest):
     def testMoveToEndOfWord_OnLastLine(self):
         set_text(self.view, 'abc\nabc\nabc')
-        self.view.sel().add(self.R((2, 0), (2, 0)))
+        add_sel(self.view, self.R((2, 0), (2, 0)))
 
         self.view.run_command('_vi_e', {'mode': MODE_NORMAL, 'count': 1})
 
@@ -25,7 +25,7 @@ class Test_vi_e_InNormalMode(BufferTest):
 
     def testMoveToEndOfWord_OnMiddleLine_WithTrailingWhitespace(self):
         set_text(self.view, 'abc\nabc   \nabc')
-        self.view.sel().add(self.R((1, 2), (1, 2)))
+        add_sel(self.view, self.R((1, 2), (1, 2)))
 
         self.view.run_command('_vi_e', {'mode': MODE_NORMAL, 'count': 1})
 
@@ -33,7 +33,7 @@ class Test_vi_e_InNormalMode(BufferTest):
 
     def testMoveToEndOfWord_OnLastLine_WithTrailingWhitespace(self):
         set_text(self.view, 'abc\nabc\nabc   ')
-        self.view.sel().add(self.R((2, 0), (2, 0)))
+        add_sel(self.view, self.R((2, 0), (2, 0)))
 
         self.view.run_command('_vi_e', {'mode': MODE_NORMAL, 'count': 1})
 

@@ -9,7 +9,6 @@ from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
-from Vintageous.tests import make_region_at_row
 from Vintageous.tests import BufferTest
 
 
@@ -19,65 +18,65 @@ from Vintageous.tests import BufferTest
 class Test_vi_k_InNormalMode(BufferTest):
     def testMoveOne(self):
         set_text(self.view, 'abc\nabc\nabc')
-        add_sel(self.view, make_region_at_row(self.view, row=1, col=1, size=0))
+        add_sel(self.view, self.R((1, 1), (1, 1)))
 
         self.view.run_command('_vi_k', {'mode': MODE_NORMAL, 'count': 1, 'xpos': 1})
 
-        expected = make_region_at_row(self.view, row=0, col=1, size=0)
+        expected = self.R((0, 1), (0, 1))
         self.assertEqual(expected, first_sel(self.view))
 
     def testMoveMany(self):
         set_text(self.view, 'abc\nabc\nabc')
-        add_sel(self.view, make_region_at_row(self.view, row=2, col=1, size=0))
+        add_sel(self.view, self.R(2, 1), (2, 1))
 
         self.view.run_command('_vi_k', {'mode': MODE_NORMAL, 'count': 2, 'xpos': 1})
 
-        expected = make_region_at_row(self.view, row=0, col=1, size=0)
+        expected = self.R((0, 1), (0, 1))
         self.assertEqual(expected, first_sel(self.view))
 
     def testMoveOntoLongerLine(self):
         set_text(self.view, 'foo bar\nfoo')
-        add_sel(self.view, make_region_at_row(self.view, row=1, col=1, size=0))
+        add_sel(self.view, self.R((1, 1), (1, 1)))
 
         self.view.run_command('_vi_k', {'mode': MODE_NORMAL, 'count': 1, 'xpos': 1})
 
-        expected = make_region_at_row(self.view, row=0, col=1, size=0)
+        expected = self.R((0, 1), (0, 1))
         self.assertEqual(expected, first_sel(self.view))
 
     def testMoveOntoShorterLine(self):
         set_text(self.view, 'foo\nfoo bar')
-        add_sel(self.view, make_region_at_row(self.view, row=1, col=5, size=0))
+        add_sel(self.view, self.R((1, 5), (1, 5)))
 
         self.view.run_command('_vi_k', {'mode': MODE_NORMAL, 'count': 1, 'xpos': 5})
 
-        expected = make_region_at_row(self.view, row=0, col=2, size=0)
+        expected = self.R((0, 2), (0, 2))
         self.assertEqual(expected, first_sel(self.view))
 
     def testMoveFromEmptyLine(self):
         set_text(self.view, 'foo\n\n')
-        add_sel(self.view, make_region_at_row(self.view, row=1, col=0, size=0))
+        add_sel(self.view, self.R((1, 0), (1, 0)))
 
         self.view.run_command('_vi_k', {'mode': MODE_NORMAL, 'count': 1, 'xpos': 1})
 
-        expected = make_region_at_row(self.view, row=0, col=1, size=0)
+        expected = self.R((0, 1), (0, 1))
         self.assertEqual(expected, first_sel(self.view))
 
     def testMoveFromEmptyLineToEmptyLine(self):
         set_text(self.view, '\n\n\n')
-        add_sel(self.view, make_region_at_row(self.view, row=1, col=0, size=0))
+        add_sel(self.view, self.R((1, 0), (1, 0)))
 
         self.view.run_command('_vi_k', {'mode': MODE_NORMAL, 'count': 1, 'xpos': 0})
 
-        expected = make_region_at_row(self.view, row=0, col=0, size=0)
+        expected = self.R((0, 0), (0, 0))
         self.assertEqual(expected, first_sel(self.view))
 
     def testMoveTooFar(self):
         set_text(self.view, 'foo\nbar\nbaz\n')
-        add_sel(self.view, make_region_at_row(self.view, row=2, col=1, size=0))
+        add_sel(self.view, self.R((2, 1), (2, 1)))
 
         self.view.run_command('_vi_k', {'mode': MODE_NORMAL, 'count': 100, 'xpos': 1})
 
-        expected = make_region_at_row(self.view, row=0, col=1, size=0)
+        expected = self.R((0, 1), (0, 1))
         self.assertEqual(expected, first_sel(self.view))
 
 

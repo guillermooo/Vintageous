@@ -11,7 +11,6 @@ from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
-from Vintageous.tests import make_region_at_row
 from Vintageous.tests import BufferTest
 
 from Vintageous.ex_commands import CURRENT_LINE_RANGE
