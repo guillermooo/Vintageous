@@ -14,11 +14,6 @@ class BufferTest(unittest.TestCase):
         return make_region(self.view, a, b)
 
 
-def make_region_at_row(view, row=0, col=0, size=0):
-    pt = view.text_point(row, col)
-    return sublime.Region(pt, pt + size)
-
-
 def make_region(view, a, b):
     try:
         pt_a = view.text_point(*a)
