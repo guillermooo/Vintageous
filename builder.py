@@ -12,12 +12,6 @@ THIS_DIR = os.path.abspath(os.path.dirname(__file__))
 RESERVED = ['manifest.json', 'dist']
 
 
-parser = argparse.ArgumentParser(
-                    description="Builds .sublime-package archives.")
-parser.add_argument('-d', dest='target_dir', default='./dist',
-                    help="output directory")
-parser.add_argument('--release', dest='release', default='dev',
-                    help="type of build (e.g. 'dev', 'release'...)")
 
 
 def get_manifest():
@@ -55,5 +49,11 @@ def build(target_dir="./dist", release="dev"):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+                        description="Builds .sublime-package archives.")
+    parser.add_argument('-d', dest='target_dir', default='./dist',
+                        help="output directory")
+    parser.add_argument('--release', dest='release', default='dev',
+                        help="type of build (e.g. 'dev', 'release'...)")
     args = parser.parse_args()
     build(args.target_dir, args.release)
