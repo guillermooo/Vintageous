@@ -802,6 +802,11 @@ class ExQuitCommand(sublime_plugin.WindowCommand):
         self.window.run_command('close')
         if len(self.window.views()) == 0:
             self.window.run_command('close')
+            return
+
+        # Close the current group if there aren't any views left in it.
+        if not self.window.views_in_group(self.window.active_group()):
+            self.window.run_command('ex_unvsplit')
 
 
 class ExQuitAllCommand(sublime_plugin.WindowCommand):
