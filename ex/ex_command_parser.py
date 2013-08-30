@@ -213,7 +213,7 @@ EX_COMMANDS = {
                                 command='ex_vsplit',
                                 invocations=(
                                     re.compile(r'^$'),
-                                    re.compile(r'^\s*(?P<filename>.+)$'),
+                                    re.compile(r'^\s*(?P<file_name>.+)$'),
                                 ),
                                 error_on=(ex_error.ERR_NO_RANGE_ALLOWED,
                                           ex_error.ERR_NO_BANG_ALLOWED,)

@@ -1105,16 +1105,34 @@ class ExVsplit(sublime_plugin.WindowCommand):
         3: {"cells": [[0,0, 1, 1], [1, 0, 2, 1], [2, 0, 3, 1]], "rows": [0.0, 1.0], "cols": [0.0, 0.33, 0.66, 1.0]},
         4: {"cells": [[0,0, 1, 1], [1, 0, 2, 1], [2, 0, 3, 1], [3,0, 4, 1]], "rows": [0.0, 1.0], "cols": [0.0, 0.25, 0.50, 0.75, 1.0]},
     }
-    def run(self, filename=None):
+    def run(self, file_name=None):
         groups = self.window.num_groups()
         if groups >= 4:
             sublime.status_message("Vintageous: Can't create more groups.")
             return
 
+        old_view = self.window.active_view()
+        pos = ":{0}:{1}".format(*old_view.rowcol(old_view.sel()[0].b))
+        old_file_name = old_view.file_name() + pos
         self.window.run_command('set_layout', ExVsplit.LAYOUT_DATA[groups + 1])
 
-        if filename:
-            self.window.open_file(filename)
+        # TODO: rename this param.
+        if file_name:
+            existing = self.window.find_open_file(file_name)
+            pos = ''
+            if existing:
+                pos = ":{0}:{1}".format(*existing.rowcol(existing.sel()[0].b))
+            self.window.open_file(file_name + pos,
+                                  group=self.window.num_groups() - 1,
+                                  flags=sublime.FORCE_GROUP |
+                                        sublime.ENCODED_POSITION)
+            return
+
+        # No file name provided; clone current view into new group.
+        self.window.open_file(old_file_name,
+                              group=self.window.num_groups() - 1,
+                              flags=sublime.FORCE_GROUP |
+                                    sublime.ENCODED_POSITION)
 
 
 class ExUnvsplit(sublime_plugin.WindowCommand):
