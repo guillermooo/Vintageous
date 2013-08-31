@@ -1135,10 +1135,9 @@ class ExVsplit(sublime_plugin.WindowCommand):
         self.open_file(current_file_name)
 
     def open_file(self, file_name):
-        self.window.open_file(file_name,
-                              group=self.window.num_groups() - 1,
-                              flags=sublime.FORCE_GROUP |
-                                    sublime.ENCODED_POSITION)
+        flags = (sublime.FORCE_GROUP | sublime.ENCODED_POSITION)
+        self.window.open_file(file_name, group=(self.window.num_groups() - 1),
+                              flags=flags)
 
 
 class ExUnvsplit(sublime_plugin.WindowCommand):
