@@ -208,6 +208,13 @@ class FsCompletion(sublime_plugin.TextCommand):
             self.view.run_command('write_fs_completion', {
                                                     'cmd': cmd,
                                                     'completion': '../'})
+
+        if prefix == '~':
+            path = os.path.expanduser(prefix) + '/'
+            FsCompletion.prefix = path
+            self.view.run_command('write_fs_completion', {
+                                                    'cmd': cmd,
+                                                    'completion': path})
             return
 
         if (not FsCompletion.items) or FsCompletion.is_stale:
@@ -231,6 +238,10 @@ class FsCompletion(sublime_plugin.TextCommand):
                                         'completion': next(FsCompletion.items)
                                       })
             except StopIteration:
+                self.view.run_command('write_fs_completion', {
+                                        'cmd': cmd,
+                                        'completion': prefix
+                                      })
                 return
 
 

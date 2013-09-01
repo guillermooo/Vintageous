@@ -33,28 +33,23 @@ completion_settings = [
 
 def iter_paths(prefix=None, from_dir=None, only_dirs=False):
     if prefix:
-        if not prefix.startswith(("%", "$", "~")):
-
+        start_at = os.path.expandvars(os.path.expanduser(prefix))
+        # TODO: implement env var completion.
+        if not prefix.startswith(('%', '$', '~')):
             start_at = os.path.join(from_dir, prefix)
             start_at = os.path.expandvars(os.path.expanduser(start_at))
 
-            prefix_split = os.path.split(prefix)
-            prefix_len = len(prefix_split[1])
-            if ('/' in prefix and not prefix_split[0]):
-                prefix_len = 0
+        prefix_split = os.path.split(prefix)
+        prefix_len = len(prefix_split[1])
+        if ('/' in prefix and not prefix_split[0]):
+            prefix_len = 0
 
-            for path in glob.iglob(start_at + '*'):
-                if not only_dirs or os.path.isdir(path):
-                    suffix = ('/' if os.path.isdir(path) else '')
-                    item = os.path.split(path)[1]
-                    yield prefix + (item + suffix)[prefix_len:]
-        else:
-            start_at = os.path.join(from_dir, prefix)
-            start_at = os.path.expandvars(os.path.expanduser(start_at))
-
-            prefix_split = os.path.split(prefix)
-            prefix_len = len(prefix_split[1])
-     else:
+        for path in glob.iglob(start_at + '*'):
+            if not only_dirs or os.path.isdir(path):
+                suffix = ('/' if os.path.isdir(path) else '')
+                item = os.path.split(path)[1]
+                yield prefix + (item + suffix)[prefix_len:]
+    else:
         prefix = from_dir
         start_at = os.path.expandvars(os.path.expanduser(prefix))
         stuff = glob.iglob(start_at + "*")
