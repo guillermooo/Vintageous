@@ -191,34 +191,45 @@ class FsCompletion(sublime_plugin.TextCommand):
         if self.view.score_selector(0, 'text.excmdline') == 0:
             return
 
+        state = VintageState(self.view)
+        FsCompletion.frozen_dir = (FsCompletion.frozen_dir or
+                                   (state.settings.vi['_cmdline_cd'] + '/'))
+
         cmd, prefix, only_dirs = parse(self.view.substr(self.view.line(0)))
         if not cmd:
             return
+
         if not (FsCompletion.prefix or FsCompletion.items) and prefix:
             FsCompletion.prefix = prefix
             FsCompletion.is_stale = True
-        elif not FsCompletion.prefix:
-            state = VintageState(self.view)
-            FsCompletion.frozen_dir = state.settings.vi['_cmdline_cd'] + '/'
 
-        if not FsCompletion.items or FsCompletion.is_stale:
+        if prefix == '..':
+            FsCompletion.prefix = '../'
+            self.view.run_command('write_fs_completion', {
+                                                    'cmd': cmd,
+                                                    'completion': '../'})
+            return
+
+        if (not FsCompletion.items) or FsCompletion.is_stale:
             FsCompletion.items = iter_paths(from_dir=FsCompletion.frozen_dir,
                                             prefix=FsCompletion.prefix,
                                             only_dirs=only_dirs)
             FsCompletion.is_stale = False
 
         try:
-            self.view.run_command('write_fs_completion',
-                                  {'cmd': cmd,
-                                   'completion': next(FsCompletion.items)})
+            self.view.run_command('write_fs_completion', {
+                                    'cmd': cmd,
+                                    'completion': next(FsCompletion.items)
+                                 })
         except StopIteration:
             try:
                 FsCompletion.items = iter_paths(prefix=FsCompletion.prefix,
                                                 from_dir=FsCompletion.frozen_dir,
                                                 only_dirs=only_dirs)
-                self.view.run_command('write_fs_completion',
-                                      {'cmd': cmd,
-                                       'completion': next(FsCompletion.items)})
+                self.view.run_command('write_fs_completion', {
+                                        'cmd': cmd,
+                                        'completion': next(FsCompletion.items)
+                                      })
             except StopIteration:
                 return
 
