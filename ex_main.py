@@ -229,20 +229,13 @@ class FsCompletion(sublime_plugin.TextCommand):
                                     'completion': next(FsCompletion.items)
                                  })
         except StopIteration:
-            try:
-                FsCompletion.items = iter_paths(prefix=FsCompletion.prefix,
-                                                from_dir=FsCompletion.frozen_dir,
-                                                only_dirs=only_dirs)
-                self.view.run_command('write_fs_completion', {
-                                        'cmd': cmd,
-                                        'completion': next(FsCompletion.items)
-                                      })
-            except StopIteration:
-                self.view.run_command('write_fs_completion', {
-                                        'cmd': cmd,
-                                        'completion': prefix
-                                      })
-                return
+            FsCompletion.items = iter_paths(prefix=FsCompletion.prefix,
+                                            from_dir=FsCompletion.frozen_dir,
+                                            only_dirs=only_dirs)
+            self.view.run_command('write_fs_completion', {
+                                    'cmd': cmd,
+                                    'completion': FsCompletion.prefix
+                                  })
 
 
 class ViSettingCompletion(sublime_plugin.TextCommand):
