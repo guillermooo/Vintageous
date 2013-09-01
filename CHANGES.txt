@@ -1,3 +1,9 @@
+2.3.0 - 01/09/2013
+
+	- Improve command-line completion.
+	- Implement experimental feature "traning wheels".
+	- Improve :vsplit.
+
 2.2.1 - 29/08/2013
 
 	- Improve *, #, / and ? motions.
