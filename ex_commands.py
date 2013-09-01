@@ -864,6 +864,7 @@ class ExEdit(IrreversibleTextCommand):
     @changing_cd
     def run(self, forced=False, file_name=None):
         if file_name:
+            file_name = os.path.expanduser(os.path.expandvars(file_name))
             if self.view.is_dirty() and not forced:
                 ex_error.display_error(ex_error.ERR_UNSAVED_CHANGES)
                 return
@@ -1147,6 +1148,9 @@ class ExUnvsplit(sublime_plugin.WindowCommand):
             sublime.status_message("Vintageous: Can't delete more groups.")
             return
 
+        # If we don't do this, cloned views will be moved to the previous group and kept around.
+        # We want to close them instead.
+        self.window.run_command('close')
         self.window.run_command('set_layout', ExVsplit.LAYOUT_DATA[groups - 1])
 
 
