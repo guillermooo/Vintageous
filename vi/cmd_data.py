@@ -115,3 +115,5 @@ class CmdData(dict):
         self['populates_small_delete_register'] = False
         # Commands like the non-standard gk and gl use window commands.
         self['is_window_command'] = False
+        # Instructs Vintageous to briefly hihglight the region an action will operate on.
+        self['has_training_wheels'] = False

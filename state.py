@@ -851,6 +851,8 @@ class VintageState(object):
         self.expecting_user_input = False
         self.cancel_action = False
 
+        sublime.set_timeout(lambda: self.view.erase_regions('vi_training_wheels'), 300)
+
         # In MODE_NORMAL_INSERT, we temporarily exit NORMAL mode, but when we get back to
         # it, we need to know the repeat digits, so keep them. An example command for this case
         # would be 5ifoobar\n<esc> starting in NORMAL mode.

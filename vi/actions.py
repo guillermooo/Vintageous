@@ -402,6 +402,7 @@ def vi_cc(vi_cmd_data):
 
 def vi_y(vi_cmd_data):
     vi_cmd_data['motion_required'] = True
+    vi_cmd_data['has_training_wheels'] = True
     vi_cmd_data['can_yank'] = True
     vi_cmd_data['restore_original_carets'] = True
     # The yanked text will be put in the clipboard if needed. This command shouldn't do any action.
@@ -422,6 +423,7 @@ def vi_yy(vi_cmd_data):
     # Assume NORMALMODE.
     # FIXME: Cannot copy (or maybe pasting is the problem) one empty line only.
     vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
+    vi_cmd_data['has_training_wheels'] = True
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['restore_original_carets'] = True
 
@@ -462,6 +464,7 @@ def vi_g_action(vi_cmd_data):
 
 def vi_g_big_u(vi_cmd_data):
     vi_cmd_data['motion_required'] = True
+    vi_cmd_data['has_training_wheels'] = True
     vi_cmd_data['action']['command'] = 'upper_case'
     vi_cmd_data['action']['args'] = {}
     vi_cmd_data['post_action'] = ['collapse_to_a',]
@@ -472,6 +475,7 @@ def vi_g_big_u(vi_cmd_data):
 
 def vi_g_u(vi_cmd_data):
     vi_cmd_data['motion_required'] = True
+    vi_cmd_data['has_training_wheels'] = True
     vi_cmd_data['action']['command'] = 'lower_case'
     vi_cmd_data['action']['args'] = {}
     vi_cmd_data['post_action'] = ['collapse_to_a',]

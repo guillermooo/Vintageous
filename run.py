@@ -254,6 +254,12 @@ class ViRunCommand(sublime_plugin.TextCommand):
             # > in visual mode.
             i = vi_cmd_data['count'] if vi_cmd_data['_repeat_action'] else 1
             runner = self.view if not vi_cmd_data['is_window_command'] else self.view.window()
+            if (vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL and
+                vi_cmd_data['has_training_wheels']):
+                    # TODO: Make this optional.
+                    sels = list(self.view.sel())
+                    sublime.set_timeout(lambda: self.view.erase_regions('vi_training_wheels'), 350)
+                    self.view.add_regions('vi_training_wheels', sels, 'comment', '', sublime.DRAW_NO_FILL)
             for t in range(i):
                 runner.run_command(cmd, args)
 
