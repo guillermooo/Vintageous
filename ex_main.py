@@ -55,6 +55,9 @@ class ViColonInput(sublime_plugin.WindowCommand):
             self.non_interactive = True
             self.on_done(cmd_line)
             return
+
+        FsCompletion.invalidate()
+
         v = show_ipanel(self.window, initial_text=initial_text,
                         on_done=self.on_done, on_change=self.on_change)
         v.set_syntax_file('Packages/Vintageous/VintageousEx Cmdline.tmLanguage')
@@ -172,14 +175,17 @@ class WriteFsCompletion(sublime_plugin.TextCommand):
 class FsCompletion(sublime_plugin.TextCommand):
     # Last user-provided path string.
     prefix = ''
+    frozen_dir = ''
     is_stale = False
     items = None
 
     @staticmethod
     def invalidate():
         FsCompletion.prefix = ''
-        is_stale = True
-        items = None
+        FsCompletion.frozen_dir = ''
+        FsCompletion.is_stale = True
+        FsCompletion.items = None
+
 
     def run(self, edit):
         if self.view.score_selector(0, 'text.excmdline') == 0:
@@ -188,15 +194,16 @@ class FsCompletion(sublime_plugin.TextCommand):
         cmd, prefix, only_dirs = parse(self.view.substr(self.view.line(0)))
         if not cmd:
             return
-        if not FsCompletion.prefix and prefix:
+        if not (FsCompletion.prefix or FsCompletion.items) and prefix:
             FsCompletion.prefix = prefix
             FsCompletion.is_stale = True
         elif not FsCompletion.prefix:
             state = VintageState(self.view)
-            FsCompletion.prefix = state.settings.vi['_cmdline_cd'] + '/'
+            FsCompletion.frozen_dir = state.settings.vi['_cmdline_cd'] + '/'
 
         if not FsCompletion.items or FsCompletion.is_stale:
-            FsCompletion.items = iter_paths(FsCompletion.prefix,
+            FsCompletion.items = iter_paths(from_dir=FsCompletion.frozen_dir,
+                                            prefix=FsCompletion.prefix,
                                             only_dirs=only_dirs)
             FsCompletion.is_stale = False
 
@@ -206,7 +213,8 @@ class FsCompletion(sublime_plugin.TextCommand):
                                    'completion': next(FsCompletion.items)})
         except StopIteration:
             try:
-                FsCompletion.items = iter_paths(FsCompletion.prefix,
+                FsCompletion.items = iter_paths(prefix=FsCompletion.prefix,
+                                                from_dir=FsCompletion.frozen_dir,
                                                 only_dirs=only_dirs)
                 self.view.run_command('write_fs_completion',
                                       {'cmd': cmd,

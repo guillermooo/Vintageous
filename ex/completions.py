@@ -31,12 +31,20 @@ completion_settings = [
 ]
 
 
-def iter_paths(prefix=None, only_dirs=False):
-    start_at = os.path.expandvars(os.path.expanduser(prefix))
-    stuff = glob.iglob(start_at + "*")
-    for path in glob.iglob(start_at + '*'):
-        if not only_dirs or os.path.isdir(path):
-            yield path
+def iter_paths(prefix=None, from_dir=None, only_dirs=False):
+    prefix = prefix or from_dir
+    if prefix != from_dir:
+        start_at = os.path.expandvars(os.path.expanduser(prefix))
+        stuff = glob.iglob(start_at + "*")
+        for path in glob.iglob(start_at + '*'):
+            if not only_dirs or os.path.isdir(path):
+                yield path + ('' if not os.path.isdir(path) else '/')
+    else:
+        start_at = os.path.expandvars(os.path.expanduser(prefix))
+        stuff = glob.iglob(start_at + "*")
+        for path in glob.iglob(start_at + '*'):
+            if not only_dirs or os.path.isdir(path):
+                yield path[len(start_at):] + ('' if not os.path.isdir(path) else '/')
 
 
 def parse(text):
