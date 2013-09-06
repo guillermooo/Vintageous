@@ -330,7 +330,8 @@ class ViGoToLine(sublime_plugin.TextCommand):
 
         def f(view, s):
             if mode == MODE_NORMAL:
-                return sublime.Region(dest, dest)
+                non_ws = utils.next_non_white_space_char(view, dest)
+                return sublime.Region(non_ws, non_ws)
             elif mode == _MODE_INTERNAL_NORMAL:
                 return sublime.Region(view.line(s.a).a, view.line(dest).b)
             elif mode == MODE_VISUAL:
