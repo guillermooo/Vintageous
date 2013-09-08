@@ -635,6 +635,11 @@ class _vi_repeat(IrreversibleTextCommand):
             # Unreachable.
             return
 
+        # Signal that we're not simply issuing an interactive command, but rather repeating one.
+        # This is necessary, for example, to notify _vi_k that it should become _vi_j instead
+        # if the former was run in visual mode.
+        state.settings.vi['_is_repeating'] = True
+
         if not cmd:
             return
         elif cmd == 'vi_run':
@@ -659,6 +664,7 @@ class _vi_repeat(IrreversibleTextCommand):
         # XXX: Needed here? Maybe enter_... type commands should be IrreversibleTextCommands so we
         # must/can call them whenever we need them withouth affecting the undo stack.
         self.view.run_command('vi_enter_normal_mode')
+        state.settings.vi['_is_repeating'] = False
 
 
 class _vi_redo(IrreversibleTextCommand):
