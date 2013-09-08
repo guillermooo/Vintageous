@@ -557,9 +557,19 @@ class _vi_r(sublime_plugin.TextCommand):
             pt = view.text_point(next_row, 0)
             return sublime.Region(pt, pt)
 
+        def ff(view, s):
+            # no ending \n
+            if view.substr(s.end() - 1) == '\n':
+                s = sublime.Region(s.begin(), s.end() - 1)
+            view.replace(edit, s, character * s.size())
+            return sublime.Region(s.begin(), s.begin())
+
         if mode == _MODE_INTERNAL_NORMAL:
             for s in self.view.sel():
                 self.view.replace(edit, s, character * s.size())
+        elif mode in (MODE_VISUAL, MODE_VISUAL_LINE):
+            regions_transformer(self.view, ff)
+            return
 
         if character == '\n':
             regions_transformer(self.view, f)

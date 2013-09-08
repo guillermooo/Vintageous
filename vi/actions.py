@@ -607,8 +607,9 @@ def vi_r(vi_cmd_data):
     # TODO: If count > len(line), r should abort. We'd need _p_post_every_motion hook and tell
     # ViRun to cancel if selections didn't change.
     vi_cmd_data['motion_required'] = False
-    vi_cmd_data['motion']['command'] = 'move'
-    vi_cmd_data['motion']['args'] = {'by': 'characters', 'extend': True, 'forward': True}
+    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
+        vi_cmd_data['motion']['command'] = 'move'
+        vi_cmd_data['motion']['args'] = {'by': 'characters', 'extend': True, 'forward': True}
     vi_cmd_data['action']['command'] = '_vi_r'
     vi_cmd_data['action']['args'] = {'character': vi_cmd_data['user_action_input'], 'mode': vi_cmd_data['mode']}
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
