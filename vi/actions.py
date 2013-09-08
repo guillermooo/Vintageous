@@ -22,6 +22,7 @@ from Vintageous.vi.constants import MODE_VISUAL_BLOCK
 
 def vi_enter_visual_mode(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
+    vi_cmd_data['keep_selection_as_is'] = True
     vi_cmd_data['action']['command'] = 'vi_enter_visual_mode'
     vi_cmd_data['action']['args'] = {}
     return vi_cmd_data
@@ -29,6 +30,7 @@ def vi_enter_visual_mode(vi_cmd_data):
 
 def vi_enter_select_mode(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
+    vi_cmd_data['keep_selection_as_is'] = True
     vi_cmd_data['action']['command'] = 'vi_enter_select_mode'
     vi_cmd_data['action']['args'] = {}
     return vi_cmd_data
@@ -36,6 +38,7 @@ def vi_enter_select_mode(vi_cmd_data):
 
 def vi_enter_normal_mode(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
+    vi_cmd_data['keep_selection_as_is'] = True
     vi_cmd_data['action']['command'] = 'vi_enter_normal_mode'
     vi_cmd_data['action']['args'] = {}
     return vi_cmd_data
@@ -44,6 +47,7 @@ def vi_enter_normal_mode(vi_cmd_data):
 def vi_enter_visual_line_mode(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
     # TODO: This seems to be duplicated during this command's full run.
+    vi_cmd_data['keep_selection_as_is'] = True
     vi_cmd_data['action']['command'] = 'vi_enter_visual_line_mode'
     vi_cmd_data['action']['args'] = {}
     vi_cmd_data['post_action'] = ['visual_extend_to_full_line',]
@@ -52,6 +56,7 @@ def vi_enter_visual_line_mode(vi_cmd_data):
 
 def vi_enter_visual_block_mode(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
+    vi_cmd_data['keep_selection_as_is'] = True
     vi_cmd_data['action']['command'] = 'vi_enter_visual_block_mode'
     vi_cmd_data['action']['args'] = {}
     return vi_cmd_data
