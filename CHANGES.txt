@@ -1,3 +1,11 @@
+2.3.1 - 12/09/2013
+
+	- Improve :unvsplit.
+	- Improve 'goto line' actions: G, gg, :.
+	- Basic motion mirroring when repeating motions made in visual mode.
+	- Actions normally operate with all selection .a < .b.
+	- Enable r action in visual modes.
+
 2.3.0 - 01/09/2013
 
 	- Improve command-line completion.
