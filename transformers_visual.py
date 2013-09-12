@@ -701,7 +701,7 @@ class _vi_h(sublime_plugin.TextCommand, AntonymAwarenessMixin):
         regions_transformer(self.view, f)
 
 
-class _vi_j(sublime_plugin.TextCommand):
+class _vi_j(sublime_plugin.TextCommand, AntonymAwarenessMixin):
     def folded_rows(self, pt):
         folds = self.view.folded_regions()
         try:
@@ -725,7 +725,7 @@ class _vi_j(sublime_plugin.TextCommand):
             pass
         return pt
 
-    def run(self, edit, count=None, mode=None, xpos=0):
+    def run(self, edit, count=None, mode=None, xpos=0, no_translation=False):
         def f(view, s):
             if mode == MODE_NORMAL:
                 current_row = view.rowcol(s.b)[0]
@@ -808,6 +808,14 @@ class _vi_j(sublime_plugin.TextCommand):
 
             return s
 
+        # 'no_translation' avoids an inifinite loop.
+        if self.must_run_antonym(mode=mode) and not no_translation:
+            self.view.run_command('_vi_k', {'count': count,
+                                            'mode': mode,
+                                            'xpos': xpos,
+                                            'no_translation': True})
+            return
+
         if mode == MODE_VISUAL_BLOCK:
             # Don't do anything if we have reversed selections.
             if any((r.b < r.a) for r in self.view.sel()):
@@ -848,7 +856,7 @@ class _vi_k(sublime_plugin.TextCommand, AntonymAwarenessMixin):
             pass
         return pt
 
-    def run(self, edit, count=None, mode=None, xpos=0):
+    def run(self, edit, count=None, mode=None, xpos=0, no_translation=False):
         def f(view, s):
             if mode == MODE_NORMAL:
                 current_row = view.rowcol(s.b)[0]
@@ -937,10 +945,12 @@ class _vi_k(sublime_plugin.TextCommand, AntonymAwarenessMixin):
 
                     return sublime.Region(s.a, view.full_line(target_pt).a)
 
-        if self.must_run_antonym(mode=mode):
+        # 'no_translation' avoids an inifinite loop.
+        if self.must_run_antonym(mode=mode) and not no_translation:
             self.view.run_command('_vi_j', {'count': count,
                                             'mode': mode,
-                                            'xpos': xpos})
+                                            'xpos': xpos,
+                                            'no_translation': True})
             return
 
         if mode == MODE_VISUAL_BLOCK:
