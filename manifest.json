@@ -21,6 +21,7 @@
 			["./tests/borrowed/*.py", []],
 			["./tests/commands/*.py", []],
 			["./tests/data/*.*", []],
+			["./tests/sel/*.*", []],
 			["./tests/ex/*.py", []],
 			["./tests/vi/*.py", []]
 		],
