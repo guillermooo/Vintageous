@@ -59,6 +59,8 @@ known_keys = [
     'is_window_command',
     'user_motion_input',
     'user_action_input',
+    'has_training_wheels',
+    'keep_selection_as_is',
 ]
 
 
@@ -129,6 +131,8 @@ class Test_CmdData(unittest.TestCase):
         self.assertEqual(self.cmd_data['_mark_groups_for_gluing'], True)
         self.assertEqual(self.cmd_data['populates_small_delete_register'], False)
         self.assertEqual(self.cmd_data['is_window_command'], False)
+        self.assertEqual(self.cmd_data['has_training_wheels'], False)
+        self.assertEqual(self.cmd_data['keep_selection_as_is'], False)
 
     def testCurrentModeIsCarriedOver(self):
         self.state.mode = MODE_VISUAL

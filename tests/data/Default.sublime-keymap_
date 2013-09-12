@@ -217,7 +217,7 @@
 	{ "keys": ["a"], "command": "vi_i", "args": {"inclusive": true}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_action"}] },
 	{ "keys": ["a"], "command": "vi_i", "args": {"inclusive": true}, "context": [{"key": "vi_mode_visual"},] },
 
-	{ "keys": ["r"], "command": "set_action", "args": {"action": "vi_r"},     "context": [{"key": "vi_mode_normal"}] },
+	{ "keys": ["r"], "command": "set_action", "args": {"action": "vi_r"},     "context": [{"key": "vi_mode_normal_or_any_visual"}] },
 
 	{ "keys": [">"], "command": "set_action", "args": {"action": "vi_lambda"},     "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["<"], "command": "set_action", "args": {"action": "vi_antilambda"}, "context": [{"key": "setting.command_mode"}] },
