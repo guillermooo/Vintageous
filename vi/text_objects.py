@@ -36,6 +36,8 @@ PAIRS = {
     ']': (('\\[', '\\]'), BRACKET),
     '{': (('\\{', '\\}'), BRACKET),
     '}': (('\\{', '\\}'), BRACKET),
+    '<': (('<', '>'), BRACKET),
+    '>': (('<', '>'), BRACKET),
     't': (None, TAG),
     'w': (None, WORD),
     'W': (None, BIG_WORD),
