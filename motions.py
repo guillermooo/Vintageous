@@ -504,7 +504,8 @@ class _vi_big_h(sublime_plugin.TextCommand):
     def run(self, edit, count=None, extend=False, mode=None):
         def f(view, s):
             if mode == MODE_NORMAL:
-                return sublime.Region(target, target)
+                non_ws = utils.next_non_white_space_char(view, target)
+                return sublime.Region(non_ws, non_ws)
             elif mode == _MODE_INTERNAL_NORMAL:
                 return sublime.Region(s.a + 1, target)
             elif mode == MODE_VISUAL:
@@ -527,7 +528,8 @@ class ViBigL(sublime_plugin.TextCommand):
     def run(self, edit, count=None, extend=False, mode=None):
         def f(view, s):
             if mode == MODE_NORMAL:
-                return sublime.Region(target, target)
+                non_ws = utils.next_non_white_space_char(view, target)
+                return sublime.Region(non_ws, non_ws)
             elif mode == _MODE_INTERNAL_NORMAL:
                 if s.b >= target:
                     return sublime.Region(s.a + 1, target)
@@ -557,7 +559,8 @@ class ViBigM(sublime_plugin.TextCommand):
     def run(self, edit, count=None, extend=False, mode=None):
         def f(view, s):
             if mode == MODE_NORMAL:
-                return sublime.Region(target, target)
+                non_ws = utils.next_non_white_space_char(view, target)
+                return sublime.Region(non_ws, non_ws)
             elif mode == _MODE_INTERNAL_NORMAL:
                 if s.b >= target:
                     return sublime.Region(s.a + 1, target)
