@@ -400,6 +400,10 @@ class VintageState(object):
         # the catch-all key binding for user input should have intercepted it.
         if self.expecting_user_input and name == 'vi_enter':
             self.view.run_command('collect_user_input', {'character': '\n'})
+        # XXX: The user pressed backspace. This won't work if the user has remapped the key binding.
+        # We should cancel if the user presses, for example, f<Backspace>.
+        elif self.expecting_user_input and name == 'vi_h':
+            self.cancel_action = True
             return
 
         # Check for digraphs like gg in dgg.
@@ -735,16 +739,19 @@ class VintageState(object):
     def eval_cancel_action(self):
         """Cancels the whole run of the command.
         """
-        # TODO: add a .parse() method that includes boths steps?
-        vi_cmd_data = self.parse_motion()
-        vi_cmd_data = self.parse_action(vi_cmd_data)
-        if vi_cmd_data['must_blink_on_error']:
-            utils.blink()
-        # Modify the data that determines the mode we'll end up in when the command finishes.
-        self.next_mode = vi_cmd_data['_exit_mode']
-        # Since we are exiting early, ensure we leave the selections as the commands wants them.
-        if vi_cmd_data['_exit_mode_command']:
-            self.view.run_command(vi_cmd_data['_exit_mode_command'])
+
+        try:
+            # TODO: add a .parse() method that includes boths steps?
+            vi_cmd_data = self.parse_motion()
+            vi_cmd_data = self.parse_action(vi_cmd_data)
+            # Modify the data that determines the mode we'll end up in when the command finishes.
+            self.next_mode = vi_cmd_data['_exit_mode']
+            # Since we are exiting early, ensure we leave the selections as the commands wants them.
+            if vi_cmd_data['_exit_mode_command']:
+                self.view.run_command(vi_cmd_data['_exit_mode_command'])
+        except Exception:
+            # XXX: If the above fails, we still have to cancel.
+            print("Vintageous: Exception caught in 'eval_cancel_action.")
 
     def eval_full_command(self):
         """Evaluates a command like 3dj, where there is an action as well as a motion.
