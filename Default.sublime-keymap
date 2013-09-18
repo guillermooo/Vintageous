@@ -261,6 +261,12 @@
 	{ "keys": ["Z", "Z"], "command": "ex_exit", "context": [{"key": "vi_mode_normal"}] },
 	{ "keys": ["Z", "Q"], "command": "ex_cquit", "context":[{"key": "vi_mode_normal"}] },
 
+	// Insert mode commands.==================================================
+	// FIXME: All this should probably go through Vintageous internal processing too.
+	{ "keys": ["ctrl+u"], "command": "_ivi_ctrl_u", "context": [{"key": "setting.command_mode", "operand": false}] },
+	{ "keys": ["ctrl+w"], "command": "delete_word", "args": { "forward": false }, "context": [{"key": "setting.command_mode", "operand": false}] },
+	//========================================================================
+
 	// Cmdline mode commands ======================================================================================================
 	{ "keys": [":"], "command": "vi_colon_input",                                     "context": [{"key": "setting.command_mode"}, {"key": "vi_enable_cmdline_mode"}] },
  	{ "keys": [":"], "command": "vi_colon_input", "args": {"initial_text": ":'<,'>"}, "context": [{"key": "setting.command_mode"}, {"key": "selection_empty", "operator": "equal", "operand": false }, {"key": "vi_enable_cmdline_mode"}] },

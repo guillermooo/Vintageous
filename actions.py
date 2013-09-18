@@ -1028,3 +1028,14 @@ class _vi_ctrl_y(sublime_plugin.TextCommand):
             return
         extend = True if mode == MODE_VISUAL else False
         self.view.run_command('scroll_lines', {'amount': 1, 'extend': extend})
+
+
+#  _ivi_... for 'insert vi...'
+class _ivi_ctrl_u(sublime_plugin.TextCommand):
+    def run(self, edit):
+        def f(view, s):
+            return sublime.Region(s.b, view.line(s.b).a)
+
+        regions_transformer(self.view, f)
+
+        self.view.run_command('left_delete')
