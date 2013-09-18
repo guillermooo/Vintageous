@@ -1,3 +1,9 @@
+2.3.2 - 18/09/2013
+
+	- Implement Ctrl-u, Ctrl-w in insert mode.
+	- Add <, > as text object delimiters.
+	- Improve handling of illegal input sequences.
+
 2.3.1 - 12/09/2013
 
 	- Improve :unvsplit.
