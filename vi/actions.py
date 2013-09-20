@@ -770,6 +770,7 @@ def vi_ctrl_x(vi_cmd_data):
 
 def vi_esc(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
+    vi_cmd_data['keep_selection_as_is'] = True
     if vi_cmd_data['mode'] == MODE_NORMAL_INSERT:
         vi_cmd_data['action']['command'] = 'vi_run_normal_insert_mode_actions'
         vi_cmd_data['action']['args'] = {}
