@@ -2,6 +2,8 @@ import sublime
 import sublime_plugin
 
 import threading
+import os
+import stat
 
 from Vintageous.vi import actions
 from Vintageous.vi import constants
@@ -830,6 +832,17 @@ class VintageState(object):
 
         # Action + motion, like in '3dj'.
         elif self.action and self.motion:
+            # TODO: abstract this away into a function.
+            read_only = False
+            if self.view.file_name():
+                mode = os.stat(self.view.file_name())
+                read_only = (stat.S_IMODE(mode.st_mode) & stat.S_IWUSR !=
+                                                                    stat.S_IWUSR)
+            if read_only or self.view.is_read_only():
+                self.reset()
+                utils.blink()
+                sublime.status_message("Vintageous: Readonly file.")
+                return
             self.eval_full_command()
 
         # Motion only, like in '3j'.
@@ -840,6 +853,17 @@ class VintageState(object):
 
         # Action only, like in 'd' or 'esc'. Some actions can be executed without a motion.
         elif self.action:
+            # TODO: abstract this away into a function.
+            read_only = False
+            if self.view.file_name():
+                mode = os.stat(self.view.file_name())
+                read_only = (stat.S_IMODE(mode.st_mode) & stat.S_IWUSR !=
+                                                                    stat.S_IWUSR)
+            if read_only or self.view.is_read_only():
+                self.reset()
+                utils.blink()
+                sublime.status_message("Vintageous: Readonly file.")
+                return
             self.eval_lone_action()
 
     def reset(self):
