@@ -118,8 +118,9 @@ def vi_d(vi_cmd_data):
 def vi_visual_o(vi_cmd_data):
     vi_cmd_data['motion_required'] = True
     vi_cmd_data['keep_selection_as_is'] = True
-    vi_cmd_data['action']['command'] = 'vi_reverse_caret'
-    vi_cmd_data['action']['args'] = {}
+    vi_cmd_data['action']['command'] = '_vi_visual_o'
+    vi_cmd_data['count'] = 1
+    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
 
     return vi_cmd_data
 

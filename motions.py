@@ -1463,3 +1463,16 @@ class _vi_e(sublime_plugin.TextCommand):
             return s
 
         regions_transformer(self.view, f)
+
+
+class _vi_visual_o(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, count=1):
+        def f(view, s):
+            # FIXME: In Vim, o doesn't work in MODE_VISUAL_LINE, but ST can't move the caret while
+            # in MODE_VISUAL_LINE, so we enable this for convenience. Change when/if ST can move
+            # the caret while in MODE_VISUAL_LINE.
+            if mode in (MODE_VISUAL, MODE_VISUAL_LINE):
+                return sublime.Region(s.b, s.a)
+            return s
+
+        regions_transformer(self.view, f)

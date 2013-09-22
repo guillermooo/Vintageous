@@ -359,6 +359,7 @@ class ViPushDigit(sublime_plugin.TextCommand):
             state.push_action_digit(digit)
 
 
+# TODO: Remove this.
 class ViReverseCaret(sublime_plugin.TextCommand):
     def run(self, edit):
         sels = list(self.view.sel())
