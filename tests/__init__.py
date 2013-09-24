@@ -44,3 +44,7 @@ def get_sel(view, num):
 
 def first_sel(view):
     return get_sel(view, 0)
+
+
+def second_sel(view):
+    return get_sel(view, 1)

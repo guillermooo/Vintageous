@@ -153,6 +153,7 @@ def vi_big_a(vi_cmd_data):
 
 
 def vi_big_i(vi_cmd_data):
+    # TOOD: Add next mode here instead of in the command implementation?
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = '_vi_big_i'
     vi_cmd_data['action']['args'] = {}

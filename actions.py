@@ -77,6 +77,7 @@ class _vi_big_i(sublime_plugin.TextCommand):
             return sublime.Region(pt, pt)
 
         state = VintageState(self.view)
+        # TODO: Use next_mode in the command parser instead?
         state.enter_insert_mode()
 
         regions_transformer(self.view, f)
