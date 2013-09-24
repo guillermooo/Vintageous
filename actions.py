@@ -26,23 +26,16 @@ from Vintageous.vi.sublime import restoring_sels
 import re
 
 
-class ViEditAtEol(sublime_plugin.TextCommand):
+class _vi_big_a(sublime_plugin.TextCommand):
     def run(self, edit, extend=False):
+        def f(view, s):
+            hard_eol = self.view.line(s.b).end()
+            return sublime.Region(hard_eol, hard_eol)
+
+        regions_transformer(self.view, f)
+
         state = VintageState(self.view)
         state.enter_insert_mode()
-
-        self.view.run_command('collapse_to_direction')
-
-        sels = list(self.view.sel())
-        self.view.sel().clear()
-
-        new_sels = []
-        for s in sels:
-            hard_eol = self.view.line(s.b).end()
-            new_sels.append(sublime.Region(hard_eol, hard_eol))
-
-        for s in new_sels:
-            self.view.sel().add(s)
 
 
 class ViEditAfterCaret(sublime_plugin.TextCommand):
