@@ -297,7 +297,7 @@ def find_next_lone_bracket(view, start, items, unbalanced=0):
     new_start = start
     for i in range(unbalanced or 1):
         next_closing_bracket = find_in_range(view, items[1],
-                                                  start=start,
+                                                  start=new_start,
                                                   end=view.size(),
                                                   flags=sublime.IGNORECASE)
         if next_closing_bracket is None:

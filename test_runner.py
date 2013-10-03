@@ -46,6 +46,8 @@ TESTS_KEYMAP = 'Vintageous.tests.test_keymap'
 TESTS_RUN = 'Vintageous.tests.test_run'
 TESTS_SEL = 'Vintageous.tests.sel.test_sel_orientation'
 
+TESTS_TEXT_OBJECTS = 'Vintageous.tests.vi.test_text_objects'
+
 TESTS_CMDS_SET_ACTION = 'Vintageous.tests.commands.test_set_action'
 TESTS_CMDS_SET_MOTION = 'Vintageous.tests.commands.test_set_motion'
 TESTS_CMDS_MOTION_VI_L = 'Vintageous.tests.commands.test__vi_l'
@@ -93,6 +95,10 @@ TESTS_CMDS_ALL_MOTIONS = [TESTS_CMDS_MOTION_VI_L,
                           TESTS_CMDS_MOTION_VI_VISUAL_O,
                           ]
 
+TESTS_ALL_TEXT_OBJECTS = [
+    TESTS_TEXT_OBJECTS,
+]
+
 TESTS_EX_CMDS = [
     TESTS_EX_CMDS_COPY,
     TESTS_EX_CMDS_MOVE,
@@ -135,6 +141,8 @@ test_suites = {
         'ex_cmds': ['_pt_run_tests', TESTS_EX_CMDS],
 
         '_sel_': ['_pt_run_tests', TESTS_SEL_RELATED],
+
+        'objects': ['_pt_run_tests', TESTS_ALL_TEXT_OBJECTS],
 }
 
 
