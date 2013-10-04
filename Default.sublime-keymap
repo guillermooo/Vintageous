@@ -209,13 +209,13 @@
 	// Text objects like di".
 	// TODO: This naming is utterly confusing: There's a vi_i function and a ViI command. Change this.
 	{ "keys": ["i"], "command": "vi_i", "args": {"inclusive": false}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_action"}] },
-	{ "keys": ["i"], "command": "vi_i", "args": {"inclusive": false}, "context": [{"key": "vi_mode_visual"},] },
+	{ "keys": ["i"], "command": "vi_i", "args": {"inclusive": false}, "context": [{"key": "vi_mode_visual"}] },
 
 	// Twofold process: First set the motion, then collect user input and run global state.
 	// Text objects like da".
 	// TODO: This naming is utterly confusing: There's a vi_a function and a ViA command. Change this.
 	{ "keys": ["a"], "command": "vi_i", "args": {"inclusive": true}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_action"}] },
-	{ "keys": ["a"], "command": "vi_i", "args": {"inclusive": true}, "context": [{"key": "vi_mode_visual"},] },
+	{ "keys": ["a"], "command": "vi_i", "args": {"inclusive": true}, "context": [{"key": "vi_mode_visual"}] },
 
 	{ "keys": ["r"], "command": "set_action", "args": {"action": "vi_r"},     "context": [{"key": "vi_mode_normal_or_any_visual"}] },
 
@@ -277,11 +277,11 @@
 	{ "keys": ["tab"],   "command": "fs_completion", "context": [{"key": "vi_is_cmdline"}, {"key": "vi_cmdline_at_fs_completion"}] },
 	{ "keys": ["tab"],   "command": "vi_setting_completion", "context": [{"key": "vi_is_cmdline"}, {"key": "vi_cmdline_at_setting_completion"}] },
 
-	{ "keys": ["ctrl+f"], "command": "move",    		"args": {"by": "characters", "forward": true},  "context": [{"key": "vi_is_cmdline"},] },
-	{ "keys": ["ctrl+b"], "command": "move",    		"args": {"by": "characters", "forward": false}, "context": [{"key": "vi_is_cmdline"},] },
-	{ "keys": ["ctrl+e"], "command": "move_to", 		"args": {"to": "eol"},							"context": [{"key": "vi_is_cmdline"},] },
-	{ "keys": ["ctrl+a"], "command": "_vi_cmd_line_a",													"context": [{"key": "vi_is_cmdline"},] },
-	{ "keys": ["ctrl+k"], "command": "_vi_cmd_line_k",													"context": [{"key": "vi_is_cmdline"},] },
+	{ "keys": ["ctrl+f"], "command": "move",    		"args": {"by": "characters", "forward": true},  "context": [{"key": "vi_is_cmdline"}] },
+	{ "keys": ["ctrl+b"], "command": "move",    		"args": {"by": "characters", "forward": false}, "context": [{"key": "vi_is_cmdline"}] },
+	{ "keys": ["ctrl+e"], "command": "move_to", 		"args": {"to": "eol"},							"context": [{"key": "vi_is_cmdline"}] },
+	{ "keys": ["ctrl+a"], "command": "_vi_cmd_line_a",													"context": [{"key": "vi_is_cmdline"}] },
+	{ "keys": ["ctrl+k"], "command": "_vi_cmd_line_k",													"context": [{"key": "vi_is_cmdline"}] },
 	// =============================================================================================================================
 
 	{ "keys": ["<character>"], "command": "set_register", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_register"}] },
