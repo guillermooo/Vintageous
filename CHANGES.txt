@@ -1,3 +1,7 @@
+2.3.5 - 05/10/2013
+
+	- Improve Ctrl-a.
+
 2.3.4 - 02/10/2013
 
 	- Fix detection of deeply nested text objects like '{'.
