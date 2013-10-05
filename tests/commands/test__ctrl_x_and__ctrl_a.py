@@ -103,7 +103,7 @@ class Test_vi_ctrl_a_InNormalMode(BufferTest):
         add_sel(self.view, self.R((2, 4), (2, 4)))
 
         self.view.run_command('_vi_ctrl_a', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1})
-        self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo 101\nfoo 101\nfoo 301\n')
+        self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo 101\nfoo 201\nfoo 301\n')
 
     def testDecreasePrefixedDigitsUnderSelection(self):
         set_text(self.view, ''.join(('foo -10\nfoo -10\nfoo -10\n',)))
