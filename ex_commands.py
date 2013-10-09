@@ -2,6 +2,7 @@ import sublime
 import sublime_plugin
 
 import os
+import stat
 import re
 import subprocess
 import sys
@@ -18,9 +19,10 @@ from Vintageous.state import VintageState
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
-from Vintageous.vi.sublime import has_dirty_buffers
-from Vintageous.vi.settings import set_local
 from Vintageous.vi.settings import set_global
+from Vintageous.vi.settings import set_local
+from Vintageous.vi.sublime import has_dirty_buffers
+from Vintageous.vi import utils
 
 
 GLOBAL_RANGES = []
@@ -373,6 +375,12 @@ class ExWriteFile(sublime_plugin.WindowCommand):
         content = get_region_by_range(self.view, line_range=line_range) if a_range else \
                         [sublime.Region(0, self.view.size())]
 
+        read_only = False
+        if self.view.file_name():
+            mode = os.stat(self.view.file_name())
+            read_only = (stat.S_IMODE(mode.st_mode) & stat.S_IWUSR !=
+                                                                stat.S_IWUSR)
+
         if target_redirect:
             target = self.window.new_file()
             target.set_name(target_redirect)
@@ -419,6 +427,11 @@ class ExWriteFile(sublime_plugin.WindowCommand):
             return
         else:
             target = self.view
+
+            if (read_only or self.view.is_read_only()) and not forced:
+                utils.blink()
+                sublime.status_message("Vintageous: Can't write read-only file.")
+                return
 
         start = 0 if not appending else target.size()
         prefix = '\n' if appending and target.size() > 0 else ''

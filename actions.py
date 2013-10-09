@@ -24,6 +24,8 @@ from Vintageous.vi.registers import REG_EXPRESSION
 from Vintageous.vi.sublime import restoring_sels
 
 import re
+import os
+import stat
 
 
 class NumberModifier(sublime_plugin.TextCommand):
@@ -323,6 +325,16 @@ class ViEnterInsertMode(sublime_plugin.TextCommand):
         state = VintageState(self.view)
         state.enter_insert_mode()
         self.view.run_command('collapse_to_direction')
+
+        # TODO: abstract this away into a function.
+        read_only = False
+        if self.view.file_name():
+            mode = os.stat(self.view.file_name())
+            read_only = (stat.S_IMODE(mode.st_mode) & stat.S_IWUSR !=
+                                                                stat.S_IWUSR)
+            if read_only or self.view.is_read_only():
+                # FIXME: Won't be displayed.
+                sublime.status_message("Vintageous: Warning: Attempting to change read-only file.")
 
 
 class ViEnterVisualMode(sublime_plugin.TextCommand):
