@@ -144,6 +144,8 @@
 
 	// gg can either be an action or a motion. It's an action when there is no actual action.
 	{ "keys": ["g"], "command": "set_action", "args": {"action": "vi_gg"},          "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
+	{ "keys": ["j"], "command": "set_action", "args": {"action": "vi_j"},           "context": [{"key": "vi_mode_normal_or_visual"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
+	{ "keys": ["k"], "command": "set_action", "args": {"action": "vi_k"},           "context": [{"key": "vi_mode_normal_or_visual"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
 	{ "keys": ["d"], "command": "set_action", "args": {"action": "vi_g_d"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
 	{ "keys": ["D"], "command": "set_action", "args": {"action": "vi_g_big_d"},     "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
 	{ "keys": ["U"], "command": "set_action", "args": {"action": "vi_g_big_u"},     "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },

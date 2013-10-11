@@ -1465,6 +1465,32 @@ class _vi_e(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
+class _vi_g_j(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, count=1):
+        if mode == MODE_NORMAL:
+            for i in range(count):
+                self.view.run_command('move', {'by': 'lines', 'forward': True, 'extend': False})
+        elif mode == MODE_VISUAL:
+            for i in range(count):
+                self.view.run_command('move', {'by': 'lines', 'forward': True, 'extend': True})
+        elif mode == _MODE_INTERNAL_NORMAL:
+            for i in range(count):
+                self.view.run_command('move', {'by': 'lines', 'forward': True, 'extend': False})
+
+
+class _vi_g_k(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, count=1):
+        if mode == MODE_NORMAL:
+            for i in range(count):
+                self.view.run_command('move', {'by': 'lines', 'forward': False, 'extend': False})
+        elif mode == MODE_VISUAL:
+            for i in range(count):
+                self.view.run_command('move', {'by': 'lines', 'forward': False, 'extend': True})
+        elif mode == _MODE_INTERNAL_NORMAL:
+            for i in range(count):
+                self.view.run_command('move', {'by': 'lines', 'forward': False, 'extend': False})
+
+
 class _vi_visual_o(sublime_plugin.TextCommand):
     def run(self, edit, mode=None, count=1):
         def f(view, s):

@@ -70,6 +70,8 @@ digraphs = {
     ('vi_g_action', 'vi_g_big_d'): ('vi_g_big_d', DIGRAPH_MOTION),
     ('vi_g_action', 'vi_g_star'): ('vi_g_star', DIGRAPH_MOTION),
     ('vi_g_action', 'vi_g_octothorp'): ('vi_g_octothorp', DIGRAPH_MOTION),
+    ('vi_g_action', 'vi_j'): ('vi_g_j', DIGRAPH_MOTION),
+    ('vi_g_action', 'vi_k'): ('vi_g_k', DIGRAPH_MOTION),
 
     ('vi_z_action', 'vi_z_enter'): ('vi_z_enter', DIGRAPH_ACTION),
     ('vi_z_action', 'vi_z_t'): ('vi_z_t', DIGRAPH_ACTION),

@@ -629,6 +629,21 @@ def vi_ctrl_u(vi_cmd_data):
 
     return vi_cmd_data
 
+def vi_g_j(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = '_vi_g_j'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['count'] = 1
+
+    return vi_cmd_data
+
+
+def vi_g_k(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = '_vi_g_k'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['count'] = 1
+
+    return vi_cmd_data
+
 
 # We have this one duplicated in actions.py because vi_g_action (like in gg or gU) can sometimes
 # be an action, and other times a motion.
