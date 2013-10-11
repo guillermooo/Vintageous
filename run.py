@@ -69,6 +69,7 @@ class ViRunCommand(sublime_plugin.TextCommand):
 
             # XXX: Fix this. When should we run the motion exactly?
             if vi_cmd_data['action']:
+
                 # If no motion is present, we know we just have to run the action (like ctrl+w, v).
                 if ((vi_cmd_data['motion']) or
                     (vi_cmd_data['motion_required'] and
@@ -88,8 +89,18 @@ class ViRunCommand(sublime_plugin.TextCommand):
                                 state.cancel_macro = True
                                 return
 
+                was_visual_bottom_top = (state.mode in (MODE_VISUAL, MODE_VISUAL_LINE) and
+                                         self.view.sel()[0].b < self.view.sel()[0].a)
                 self.reorient_begin_to_end(vi_cmd_data)
                 self.do_action(vi_cmd_data)
+                if not state.settings.vi['_is_repeating']:
+                    # TODO: Document this better.
+                    # _bottom_top is set to True when the current selection before an action is inverted: .b < .a.
+                    # This is useful to know when repeating, so that upward motions like k will be translated to
+                    # their opposite and vice versa. Without this piece of information, forward-pointing selections
+                    # where .a < .b will *also* get reversed as just described, but they should not.
+                    # For example, vkkkU should, when repeated, equate to: vjjjU.
+                    state.settings.vi['_bottom_top'] = was_visual_bottom_top
             else:
                 self.do_whole_motion(vi_cmd_data)
                 if (vi_cmd_data['mode'] == MODE_NORMAL and

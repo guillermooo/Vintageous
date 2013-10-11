@@ -809,12 +809,13 @@ class _vi_j(sublime_plugin.TextCommand, AntonymAwarenessMixin):
             return s
 
         # 'no_translation' avoids an inifinite loop.
-        if self.must_run_antonym(mode=mode) and not no_translation:
-            self.view.run_command('_vi_k', {'count': count,
-                                            'mode': mode,
-                                            'xpos': xpos,
-                                            'no_translation': True})
-            return
+        if (self.must_run_antonym(mode=mode) and not no_translation and
+            VintageState(self.view).settings.vi['_bottom_top']):
+                self.view.run_command('_vi_k', {'count': count,
+                                                'mode': mode,
+                                                'xpos': xpos,
+                                                'no_translation': True})
+                return
 
         if mode == MODE_VISUAL_BLOCK:
             # Don't do anything if we have reversed selections.
@@ -946,12 +947,13 @@ class _vi_k(sublime_plugin.TextCommand, AntonymAwarenessMixin):
                     return sublime.Region(s.a, view.full_line(target_pt).a)
 
         # 'no_translation' avoids an inifinite loop.
-        if self.must_run_antonym(mode=mode) and not no_translation:
-            self.view.run_command('_vi_j', {'count': count,
-                                            'mode': mode,
-                                            'xpos': xpos,
-                                            'no_translation': True})
-            return
+        if (self.must_run_antonym(mode=mode) and not no_translation and
+            VintageState(self.view).settings.vi['_bottom_top']):
+                self.view.run_command('_vi_j', {'count': count,
+                                                'mode': mode,
+                                                'xpos': xpos,
+                                                'no_translation': True})
+                return
 
         if mode == MODE_VISUAL_BLOCK:
             # Don't do anything if we have reversed selections.
