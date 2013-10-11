@@ -130,6 +130,7 @@ class ViRunCommand(sublime_plugin.TextCommand):
     def reorient_begin_to_end(self, vi_cmd_data):
         if vi_cmd_data['keep_selection_as_is']:
             return
+
         new_sel = []
         for s in self.view.sel():
             new_sel.append(sublime.Region(s.begin(), s.end()))
