@@ -1,3 +1,8 @@
+2.3.6 - 11/10/2013
+
+	- Improve mirroring of upward motions when repeating.
+	- Improve handling of read-only files.
+
 2.3.5 - 05/10/2013
 
 	- Improve Ctrl-a.
