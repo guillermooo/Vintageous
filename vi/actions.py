@@ -254,8 +254,8 @@ def vi_big_d(vi_cmd_data):
     # TODO: Use separate if branches for each mode.
 
     if vi_cmd_data['count'] == 1:
-        vi_cmd_data['motion']['command'] = 'move_to'
-        vi_cmd_data['motion']['args'] = {'to': 'eol', 'extend': True}
+        vi_cmd_data['motion']['command'] = '_vi_big_d_motion'
+        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
 
         vi_cmd_data['motion_required'] = False
         vi_cmd_data['action']['command'] = 'right_delete'
@@ -377,15 +377,17 @@ def vi_big_p(vi_cmd_data):
 def vi_dd(vi_cmd_data):
     # Assume _MODE_INTERNAL_NORMAL. Can't be issued in any other mode.
     vi_cmd_data['can_yank'] = True
-    vi_cmd_data['motion']['command'] = 'move'
-    vi_cmd_data['motion']['args'] = {'by': 'lines', 'extend': True, 'forward': True}
+    vi_cmd_data['yanks_linewise'] = True
     vi_cmd_data['motion_required'] = False
-    vi_cmd_data['pre_motion'] = ['_vi_dd_pre_motion', {'mode': vi_cmd_data['mode']}]
-    vi_cmd_data['post_motion'] = [['_vi_dd_post_motion', {'mode': vi_cmd_data['mode']}],]
-    vi_cmd_data['action']['command'] = 'left_delete'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['_vi_move_caret_to_first_non_white_space_character', {'mode': vi_cmd_data['mode']}]
+
+    vi_cmd_data['motion']['command'] = '_vi_dd_motion'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['count'] = 1
+
+    vi_cmd_data['action']['command'] = '_vi_dd_action'
+    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+    vi_cmd_data['next_mode'] = MODE_NORMAL
 
     return vi_cmd_data
 
