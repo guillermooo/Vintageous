@@ -250,6 +250,7 @@ def vi_big_c(vi_cmd_data):
 def vi_big_d(vi_cmd_data):
     vi_cmd_data['can_yank'] = True
     vi_cmd_data['populates_small_delete_register'] = True
+    vi_cmd_data['cancel_action_if_motion_fails'] = True
 
     # TODO: Use separate if branches for each mode.
 

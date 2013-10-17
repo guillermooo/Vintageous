@@ -1373,8 +1373,11 @@ class _vi_big_d_motion(sublime_plugin.TextCommand):
     def run(self, edit, mode=None, count=1):
         def f(view, s):
             if mode == _MODE_INTERNAL_NORMAL:
-                eol = view.line(s.b).b
-                return sublime.Region(s.b, eol)
+                if count == 1:
+                    if view.line(s.b).size() > 0:
+                        eol = view.line(s.b).b
+                        return sublime.Region(s.b, eol)
+                    return s
             return s
 
         regions_transformer(self.view, f)
