@@ -127,13 +127,14 @@ class _vi_p(sublime_plugin.TextCommand):
             print("Vintageous: Nothing in register \".")
             return
 
-        # force register population. We have to do it here
-        vi_cmd_data = {
-            "synthetize_new_line_at_eof": True,
-            "yanks_linewise": False,
-        }
-        prev_text = state.registers.get_selected_text(vi_cmd_data)
-        state.registers['"'] = prev_text
+        if state.mode == MODE_VISUAL:
+            # force register population. We have to do it here
+            vi_cmd_data = {
+                "synthetize_new_line_at_eof": True,
+                "yanks_linewise": False,
+            }
+            prev_text = state.registers.get_selected_text(vi_cmd_data)
+            state.registers['"'] = prev_text
 
         sels = list(self.view.sel())
         # If we have the same number of pastes and selections, map 1:1. Otherwise paste paste[0]
@@ -250,12 +251,13 @@ class _vi_big_p(sublime_plugin.TextCommand):
         old_rows = []
         state = VintageState(self.view)
 
-        # force register population. We have to do it here
-        vi_cmd_data = {
-            "synthetize_new_line_at_eof": True,
-            "yanks_linewise": False,
-        }
-        prev_text = state.registers.get_selected_text(vi_cmd_data)
+        if state.mode == MODE_VISUAL:
+            # force register population. We have to do it here
+            vi_cmd_data = {
+                "synthetize_new_line_at_eof": True,
+                "yanks_linewise": False,
+            }
+            prev_text = state.registers.get_selected_text(vi_cmd_data)
 
         if register:
             fragments = state.registers[register]
@@ -263,8 +265,9 @@ class _vi_big_p(sublime_plugin.TextCommand):
             # TODO: There should be a simpler way of getting the unnamed register's content.
             fragments = state.registers['"']
 
-        # Populate registers with the text we're about to paste.
-        state.registers['"'] = prev_text
+        if state.mode == MODE_VISUAL:
+            # Populate registers with the text we're about to paste.
+            state.registers['"'] = prev_text
 
         sels = list(self.view.sel())
         if len(sels) == len(fragments):
