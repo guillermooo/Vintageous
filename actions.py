@@ -1067,19 +1067,13 @@ class _vi_cc_action(sublime_plugin.TextCommand):
 
 # internal command
 class _vi_int_reindent(sublime_plugin.TextCommand):
-    def has_leading_white_space(self, row):
-        pt = self.view.text_point(row, 0)
-        # HACK: We should infer more reliably that the current context requires indenting.
-        return self.view.substr(pt) in (' ', '\t', '{')
-
     def run(self, edit, mode=None):
         def f(view, s):
             # We've made a selection with _vi_cc_motion just before this.
             if mode == _MODE_INTERNAL_NORMAL:
-                if self.has_leading_white_space(self.view.rowcol(s.b)[0] - 1):
-                    self.view.run_command('reindent')
-                    pt = utils.next_non_white_space_char(view, s.a, white_space=' \t')
-                    return sublime.Region(pt, pt)
+                self.view.run_command('reindent', {'force': False})
+                pt = utils.next_non_white_space_char(view, s.a, white_space=' \t')
+                return sublime.Region(pt, pt)
             return s
 
         regions_transformer(self.view, f)
