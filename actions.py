@@ -1071,7 +1071,7 @@ class _vi_int_reindent(sublime_plugin.TextCommand):
         def f(view, s):
             # We've made a selection with _vi_cc_motion just before this.
             if mode == _MODE_INTERNAL_NORMAL:
-                self.view.run_command('reindent', {'force': False})
+                self.view.run_command('reindent', {'force_indent': False})
                 pt = utils.next_non_white_space_char(view, s.a, white_space=' \t')
                 return sublime.Region(pt, pt)
             return s
