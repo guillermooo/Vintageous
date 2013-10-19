@@ -348,8 +348,10 @@ def vi_big_x(vi_cmd_data):
 
 
 def vi_p(vi_cmd_data):
+    # This command must yank, but we have to deal with it in the command itself, as setting the
+    # registers via 'can_yank' would overwrite the content we're about to paste.
     vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = 'vi_paste'
+    vi_cmd_data['action']['command'] = '_vi_p'
     vi_cmd_data['action']['args'] = {'count': vi_cmd_data['count'], 'register': vi_cmd_data['register']}
     # XXX: Since actions perform the actual edits to the buffer, they too should be in charge of
     # readjusting the selections? I think that would be better than the current approach.
@@ -364,6 +366,8 @@ def vi_p(vi_cmd_data):
 
 
 def vi_big_p(vi_cmd_data):
+    # This command must yank, but we have to deal with it in the command itself, as setting the
+    # registers via 'can_yank' would overwrite the content we're about to paste.
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = '_vi_big_p'
     vi_cmd_data['action']['args'] = {'count': vi_cmd_data['count'], 'register': vi_cmd_data['register']}
