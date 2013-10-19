@@ -53,6 +53,9 @@
 	{ "keys": ["E"], "command": "set_motion", "args": {"motion": "vi_big_e"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["B"], "command": "set_motion", "args": {"motion": "vi_big_b"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 
+	{ "keys": ["home"], "command": "set_motion", "args": {"motion": "vi_zero"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+	{ "keys": ["end"], "command": "set_motion", "args": {"motion": "vi_dollar"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
+
 	{ "keys": ["|"], "command": "set_motion", "args": {"motion": "vi_pipe"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 
 	{ "keys": ["$"], "command": "set_motion", "args": {"motion": "vi_dollar"},     "context": [{"key": "vi_mode_normal_or_visual"}] },

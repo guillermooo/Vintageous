@@ -777,6 +777,9 @@ class _vi_big_j(sublime_plugin.TextCommand):
     def run(self, edit, mode=None):
         def f(view, s):
             if mode == _MODE_INTERNAL_NORMAL:
+                # Don't join anything if there's only one line in the buffer.
+                if self.view.rowcol(self.view.size())[0] == 0:
+                    return s
                 full_current_line = view.full_line(s.b)
                 target = full_current_line.b - 1
                 full_next_line = view.full_line(full_current_line.b)
