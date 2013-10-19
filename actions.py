@@ -237,8 +237,9 @@ class ViPaste(sublime_plugin.TextCommand):
             return sel.a
 
 
-class ViPasteBefore(sublime_plugin.TextCommand):
+class _vi_big_p(sublime_plugin.TextCommand):
     def run(self, edit, register=None, count=1):
+        old_rows = []
         state = VintageState(self.view)
 
         if register:
@@ -248,7 +249,6 @@ class ViPasteBefore(sublime_plugin.TextCommand):
             fragments = state.registers['"']
 
         sels = list(self.view.sel())
-
         if len(sels) == len(fragments):
             sel_frag = zip(sels, fragments)
         else:
@@ -256,6 +256,9 @@ class ViPasteBefore(sublime_plugin.TextCommand):
 
         offset = 0
         for s, text in sel_frag:
+            row = self.view.rowcol(s.begin())[0]
+            row = max(0, row - 1)
+            old_rows.append(row)
             if text.endswith('\n'):
                 if utils.is_at_eol(self.view, s) or utils.is_at_bol(self.view, s):
                     self.paste_all(edit, s, self.view.line(s.b).a, text, count)
@@ -264,6 +267,16 @@ class ViPasteBefore(sublime_plugin.TextCommand):
             else:
                 self.paste_all(edit, s, s.b + offset, text, count)
                 offset += len(text) * count
+
+        self.place_sel(old_rows)
+
+    def place_sel(self, old_rows):
+        new_sel = []
+        for row in old_rows:
+            pt = self.view.text_point(row + 1, 0)
+            new_sel.append(sublime.Region(pt, pt))
+        self.view.sel().clear()
+        self.view.sel().add_all(new_sel)
 
     def paste_all(self, edit, sel, at, text, count):
         # for x in range(count):
