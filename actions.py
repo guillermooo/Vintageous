@@ -1069,7 +1069,8 @@ class _vi_cc_action(sublime_plugin.TextCommand):
 class _vi_int_reindent(sublime_plugin.TextCommand):
     def has_leading_white_space(self, row):
         pt = self.view.text_point(row, 0)
-        return self.view.substr(pt) in (' ', '\t')
+        # HACK: We should infer more reliably that the current context requires indenting.
+        return self.view.substr(pt) in (' ', '\t', '{')
 
     def run(self, edit, mode=None):
         def f(view, s):
