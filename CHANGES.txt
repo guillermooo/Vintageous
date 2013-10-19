@@ -1,3 +1,12 @@
+2.4.0 - 19/10/2013
+
+	- Implement gj, gk.
+	- Improve D and dd actions.
+	- Better indentation after cc.
+	- Improve caret placement after P.
+	- Implement Home and End in visual and normal mode.
+	- P and p populate the default register.
+
 2.3.6 - 11/10/2013
 
 	- Improve mirroring of upward motions when repeating.
