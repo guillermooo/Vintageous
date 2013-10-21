@@ -105,28 +105,12 @@ def vi_underscore(vi_cmd_data):
         vi_cmd_data['is_jump'] = True
 
     if vi_cmd_data['count'] == 1:
-        if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-            # TODO: This is sloppy. Make 'motion' a real motion and do away with 'pre_motion'. The
-            # problem is that VintageState or VintageRun automatically add 'extend': True
-            # to motions, so we cannot simply say 'move_to' 'hardbol' in the motion.
-            # Perhaps 'extend' should always be added manually or left unmodified if the current
-            # mode was _MODE_INTERNAL_NORMAL. Being explicit with 'extend' looks like the better idea.
+        vi_cmd_data['motion']['command'] = '_vi_underscore'
+        # FIXME: We don't need to pass count to this motion (?).
+        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+        if vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
             vi_cmd_data['motion']['command'] = 'vi_no_op'
             vi_cmd_data['motion']['args'] = {}
-            vi_cmd_data['pre_motion'] = ['move_to', {'to': 'hardbol', 'extend': True}]
-            vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion',],]
-        elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
-            vi_cmd_data['motion']['command'] = 'vi_no_op'
-            vi_cmd_data['motion']['args'] = {}
-        else:
-            vi_cmd_data['motion']['command'] = 'move_to'
-            vi_cmd_data['pre_motion'] = ['_vi_underscore_pre_motion', {'mode': vi_cmd_data['mode']}]
-            vi_cmd_data['motion']['args'] = {'to': 'bol'}
-            vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion', {'mode': vi_cmd_data['mode']}],]
-
-        if vi_cmd_data['mode'] == MODE_VISUAL:
-            vi_cmd_data['motion']['args']['extend'] = True
-
     else:
         vi_cmd_data['motion']['command'] = 'move'
         vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': True}
