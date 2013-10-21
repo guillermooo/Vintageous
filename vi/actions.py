@@ -952,6 +952,8 @@ def vi_g_tilde(vi_cmd_data):
     vi_cmd_data['action']['args'] = {}
     vi_cmd_data['post_action'] = ['collapse_to_a',]
 
+    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+
     return vi_cmd_data
 
 def vi_g_k(vi_cmd_data):
@@ -983,6 +985,8 @@ def vi_g_tilde_g_tilde(vi_cmd_data):
     vi_cmd_data['action']['command'] = '_vi_g_tilde_g_tilde'
     vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
     vi_cmd_data['post_action'] = ['collapse_to_a',]
+
+    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
 
