@@ -795,7 +795,7 @@ class Sequence(sublime_plugin.TextCommand):
 
 
 class _vi_big_j(sublime_plugin.TextCommand):
-    def run(self, edit, mode=None):
+    def run(self, edit, mode=None, separator=' '):
         def f(view, s):
             if mode == _MODE_INTERNAL_NORMAL:
                 # Don't join anything if there's only one line in the buffer.
@@ -814,7 +814,7 @@ class _vi_big_j(sublime_plugin.TextCommand):
                     next_line_text = next_line_text.lstrip()
 
                 sep = ''
-                if first_line_text and not first_line_text.endswith(' '):
+                if separator and first_line_text and not first_line_text.endswith(' '):
                     sep = ' '
 
                 view.replace(edit, two_lines, first_line_text + sep + next_line_text)

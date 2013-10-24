@@ -63,6 +63,7 @@ digraphs = {
     # prefixed with 'g'.
     ('vi_g_action', 'vi_t'): ('vi_g_t', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_big_t'): ('vi_g_big_t', DIGRAPH_ACTION),
+    ('vi_g_action', 'vi_big_j'): ('vi_g_big_j', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_e'): ('vi_g_e', DIGRAPH_MOTION),
     ('vi_g_action', 'vi_gg'): ('vi_gg', DIGRAPH_MOTION),
     ('vi_g_action', 'vi_g_d'): ('vi_g_d', DIGRAPH_MOTION),
