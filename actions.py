@@ -1055,11 +1055,11 @@ class _vi_cc_action(sublime_plugin.TextCommand):
         def f(view, s):
             # We've made a selection with _vi_cc_motion just before this.
             if mode == _MODE_INTERNAL_NORMAL:
-                pt = utils.next_non_white_space_char(view, s.a, white_space=' \t')
-                view.erase(edit, sublime.Region(pt, view.line(s.b).b))
+                begin = self.view.text_point(self.view.rowcol(s.b)[0], 0)
+                view.erase(edit, sublime.Region(s.a, s.b))
                 self.view.run_command('_vi_int_reindent', {'mode': mode})
-                pt = utils.next_non_white_space_char(view, pt, white_space=' \t')
-                return sublime.Region(pt, pt)
+                pt = utils.next_non_white_space_char(view, begin, white_space=' \t')
+                return sublime.Region(pt)
             return s
 
         regions_transformer(self.view, f)
@@ -1071,9 +1071,9 @@ class _vi_int_reindent(sublime_plugin.TextCommand):
         def f(view, s):
             # We've made a selection with _vi_cc_motion just before this.
             if mode == _MODE_INTERNAL_NORMAL:
+                begin = self.view.text_point(self.view.rowcol(s.b)[0], 0)
                 self.view.run_command('reindent', {'force_indent': False})
-                pt = utils.next_non_white_space_char(view, s.a, white_space=' \t')
-                return sublime.Region(pt, pt)
+                return sublime.Region(begin)
             return s
 
         regions_transformer(self.view, f)
