@@ -52,6 +52,7 @@ digraphs = {
     ('vi_g_tilde', 'vi_g_tilde'): ('vi_g_tilde_g_tilde', DIGRAPH_ACTION),
     # Ex: g~~ (complete)
     ('vi_g_tilde', 'vi_tilde'): ('vi_g_tilde_g_tilde', DIGRAPH_ACTION),
+
     ('vi_g_action', 'vi_g_big_u'): ('vi_g_big_u', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_u'): ('vi_g_u', DIGRAPH_ACTION),
     ('vi_g_action', 'vi_g_q'): ('vi_g_q', DIGRAPH_ACTION),
