@@ -172,17 +172,21 @@ class VintageState(object):
                 self.view.run_command('glue_marked_undo_groups')
 
         self.mode = MODE_NORMAL
+        self.display_partial_command()
 
     def enter_visual_line_mode(self):
         self.mode = MODE_VISUAL_LINE
+        self.display_partial_command()
 
     def enter_select_mode(self):
         self.mode = MODE_SELECT
+        self.display_partial_command()
 
     def enter_insert_mode(self):
         self.settings.view['command_mode'] = False
         self.settings.view['inverse_caret_state'] = False
         self.mode = MODE_INSERT
+        self.display_partial_command()
 
     def enter_visual_mode(self):
         self.mode = MODE_VISUAL
@@ -195,12 +199,14 @@ class VintageState(object):
         self.mode = MODE_NORMAL_INSERT
         self.settings.view['command_mode'] = False
         self.settings.view['inverse_caret_state'] = False
+        self.display_partial_command()
 
     def enter_replace_mode(self):
         self.mode = MODE_REPLACE
         self.settings.view['command_mode'] = False
         self.settings.view['inverse_caret_state'] = False
         self.view.set_overwrite_status(True)
+        self.display_partial_command()
 
     def store_visual_selections(self):
         self.view.add_regions('vi_visual_selections', list(self.view.sel()))
