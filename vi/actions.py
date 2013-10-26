@@ -877,7 +877,7 @@ def vi_equals_equals(vi_cmd_data):
 
     # The yanked text will be put in the clipboard if needed. This command shouldn't do any action.
     vi_cmd_data['action']['command'] = 'reindent'
-    vi_cmd_data['action']['args'] = {}
+    vi_cmd_data['action']['args'] = {'force_indent': False}
 
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
