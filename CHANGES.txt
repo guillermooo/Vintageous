@@ -1,3 +1,12 @@
+2.5.0 - 10/27/13
+
+	- Improve g~~ action.
+	- Improve _ motion.
+	- Implement gJ.
+	- Improve == action.
+	- Improve feedback when switching modes via some actions.
+	- Improve feedback when saving via :w in some cases.
+
 2.4.0 - 19/10/2013
 
 	- Implement gj, gk.
