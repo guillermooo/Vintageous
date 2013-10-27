@@ -1536,15 +1536,48 @@ class _vi_underscore(sublime_plugin.TextCommand):
     def run(self, edit, count=None, mode=None):
         def f(view, s):
             if mode == MODE_NORMAL:
-                bol = self.view.line(s.b).a
+                current_row, _ = self.view.rowcol(s.b)
+                bol = self.view.text_point(current_row + (count - 1), 0)
+                bol = utils.next_non_white_space_char(self.view, bol, white_space='\t ')
                 return sublime.Region(bol)
             elif mode == _MODE_INTERNAL_NORMAL:
-                bol = self.view.line(s.b).a
-                return sublime.Region(bol, s.b + 1)
+                current_row, _ = self.view.rowcol(s.b)
+                begin = self.view.text_point(current_row, 0)
+                end = self.view.text_point(current_row + (count - 1), 0)
+                end = self.view.full_line(end).b
+                return sublime.Region(begin, end)
             elif mode == MODE_VISUAL:
                 if self.view.rowcol(s.b)[1] == 0:
                     return s
                 bol = self.view.line(s.b - 1).a
+                bol = utils.next_non_white_space_char(self.view, bol, white_space='\t ')
+                if (s.a < s.b) and (bol < s.a):
+                    return sublime.Region(s.a + 1, bol)
+                elif (s.a < s.b):
+                    return sublime.Region(s.a, bol + 1)
+                return sublime.Region(s.a, bol)
+            else:
+                return s
+
+        regions_transformer(self.view, f)
+
+
+class _vi_hat(sublime_plugin.TextCommand):
+    def run(self, edit, count=None, mode=None):
+        def f(view, s):
+            if mode == MODE_NORMAL:
+                bol = self.view.line(s.b).a
+                bol = utils.next_non_white_space_char(self.view, bol, white_space='\t ')
+                return sublime.Region(bol)
+            elif mode == _MODE_INTERNAL_NORMAL:
+                begin = self.view.line(s.b).a
+                begin = utils.next_non_white_space_char(self.view, begin, white_space='\t ')
+                return sublime.Region(begin, s.b)
+            elif mode == MODE_VISUAL:
+                if self.view.rowcol(s.b)[1] == 0:
+                    return s
+                bol = self.view.line(s.b - 1).a
+                bol = utils.next_non_white_space_char(self.view, bol, white_space='\t ')
                 if (s.a < s.b) and (bol < s.a):
                     return sublime.Region(s.a + 1, bol)
                 elif (s.a < s.b):

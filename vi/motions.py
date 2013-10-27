@@ -104,32 +104,17 @@ def vi_underscore(vi_cmd_data):
     if vi_cmd_data['count'] > 5:
         vi_cmd_data['is_jump'] = True
 
-    if vi_cmd_data['count'] == 1:
-        vi_cmd_data['motion']['command'] = '_vi_underscore'
-        # FIXME: We don't need to pass count to this motion (?).
-        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-        if vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
-            vi_cmd_data['motion']['command'] = 'vi_no_op'
-            vi_cmd_data['motion']['args'] = {}
-    else:
-        vi_cmd_data['motion']['command'] = 'move'
-        vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': True}
-        vi_cmd_data['count'] = vi_cmd_data['count'] - 1
+    vi_cmd_data['motion']['command'] = '_vi_underscore'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
+    vi_cmd_data['count'] = 1
 
-        if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-            vi_cmd_data['motion']['command'] = 'move'
-            vi_cmd_data['motion']['args'] = {'by': 'lines', 'extend': True, 'forward': True}
-            vi_cmd_data['pre_motion'] = ['_vi_underscore_pre_motion', {'mode': vi_cmd_data['mode']}]
-            vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion', {'mode': vi_cmd_data['mode']}],]
-        elif vi_cmd_data['mode'] == MODE_NORMAL:
-            vi_cmd_data['pre_motion'] = ['_vi_underscore_pre_motion', {'mode': vi_cmd_data['mode']}]
-            vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion', {'mode': vi_cmd_data['mode']}],]
-        elif vi_cmd_data['mode'] == MODE_VISUAL:
-            vi_cmd_data['motion']['args']['extend'] = True
-            vi_cmd_data['post_motion'] = [['_vi_underscore_post_motion', {'mode': vi_cmd_data['mode'], 'extend': True}],]
-        elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
-            vi_cmd_data['motion']['command'] = 'vi_no_op'
-            vi_cmd_data['motion']['args'] = {}
+    return vi_cmd_data
+
+
+def vi_hat(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = '_vi_hat'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
+    vi_cmd_data['count'] = 1
 
     return vi_cmd_data
 
