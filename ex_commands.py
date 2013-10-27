@@ -452,9 +452,12 @@ class ExWriteFile(sublime_plugin.WindowCommand):
                 os.makedirs(dirname)
             self.window.run_command('save')
 
+        # This may unluckily prevent the user from seeing ST's feedback about saving the current
+        # file.
         state = VintageState(self.window.active_view())
-        state.enter_normal_mode()
-        self.window.run_command('vi_enter_normal_mode')
+        if state.mode != MODE_NORMAL:
+            state.enter_normal_mode()
+            self.window.run_command('vi_enter_normal_mode')
 
 
 class ExReplaceFile(sublime_plugin.TextCommand):
