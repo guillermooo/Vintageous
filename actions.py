@@ -16,6 +16,7 @@ from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
 from Vintageous.vi.constants import MODE_SELECT
+from Vintageous.vi.constants import MODE_VISUAL_BLOCK
 from Vintageous.vi.constants import regions_transformer
 from Vintageous.vi.constants import regions_transformer_reversed
 from Vintageous.vi.registers import REG_EXPRESSION
@@ -66,8 +67,12 @@ class NumberModifier(sublime_plugin.TextCommand):
 
 
 class _vi_big_a(sublime_plugin.TextCommand):
-    def run(self, edit, extend=False):
+    def run(self, edit, extend=False, mode=None):
         def f(view, s):
+            if mode == MODE_VISUAL_BLOCK:
+                return sublime.Region(s.end())
+            elif mode != _MODE_INTERNAL_NORMAL:
+                return s
             hard_eol = self.view.line(s.b).end()
             return sublime.Region(hard_eol, hard_eol)
 
@@ -102,8 +107,12 @@ class ViEditAfterCaret(sublime_plugin.TextCommand):
 
 
 class _vi_big_i(sublime_plugin.TextCommand):
-    def run(self, edit, extend=False):
+    def run(self, edit, extend=False, mode=None):
         def f(view, s):
+            if mode == MODE_VISUAL_BLOCK:
+                return sublime.Region(s.begin())
+            elif mode != _MODE_INTERNAL_NORMAL:
+                return s
             line = view.line(s.b)
             pt = utils.next_non_white_space_char(view, line.a)
             return sublime.Region(pt, pt)
