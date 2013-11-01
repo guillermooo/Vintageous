@@ -552,7 +552,6 @@ class _vi_yy_post_motion(sublime_plugin.TextCommand):
 
         regions_transformer(self.view, f)
 
-
 class _vi_move_caret_to_first_non_white_space_character(sublime_plugin.TextCommand):
     def run(self, edit, mode=None):
         def f(view, s):

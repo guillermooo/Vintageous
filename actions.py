@@ -794,6 +794,7 @@ class Sequence(sublime_plugin.TextCommand):
 
 
 class _vi_big_j(sublime_plugin.TextCommand):
+    WHITE_SPACE = ' \t'
     def run(self, edit, mode=None, separator=' '):
         def f(view, s):
             if mode == _MODE_INTERNAL_NORMAL:
@@ -803,7 +804,7 @@ class _vi_big_j(sublime_plugin.TextCommand):
                 full_current_line = view.full_line(s.b)
                 target = full_current_line.b - 1
                 full_next_line = view.full_line(full_current_line.b)
-                two_lines = sublime.Region(full_current_line.a, full_next_line.b)
+                contiguous_lines = sublime.Region(full_current_line.a, full_next_line.b)
 
                 # Text without \n.
                 first_line_text = view.substr(view.line(full_current_line.a))
@@ -813,10 +814,10 @@ class _vi_big_j(sublime_plugin.TextCommand):
                     next_line_text = next_line_text.lstrip()
 
                 sep = ''
-                if separator and first_line_text and not first_line_text.endswith(' '):
+                if (separator and first_line_text and not first_line_text.endswith(tuple(_vi_big_j.WHITE_SPACE))):
                     sep = ' '
 
-                view.replace(edit, two_lines, first_line_text + sep + next_line_text)
+                view.replace(edit, contiguous_lines, first_line_text + sep + next_line_text)
 
                 if first_line_text:
                     return sublime.Region(target, target)
