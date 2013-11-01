@@ -642,7 +642,9 @@ class _vi_r(sublime_plugin.TextCommand):
             # no ending \n
             if view.substr(s.end() - 1) == '\n':
                 s = sublime.Region(s.begin(), s.end() - 1)
-            view.replace(edit, s, character * s.size())
+            lines = view.split_by_newlines(s)
+            for line in lines:
+                view.replace(edit, line, character * line.size())
             return sublime.Region(s.begin(), s.begin())
 
         if mode == _MODE_INTERNAL_NORMAL:
