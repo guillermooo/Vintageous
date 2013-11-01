@@ -92,7 +92,7 @@ class ViEditAfterCaret(sublime_plugin.TextCommand):
             if visual:
                 new_sels.append(sublime.Region(s.end(), s.end()))
             else:
-                if not Utils.is_at_eol(self.view, s):
+                if not utils.is_at_eol(self.view, s):
                     new_sels.append(sublime.Region(s.end() + 1, s.end() + 1))
                 else:
                     new_sels.append(sublime.Region(s.end(), s.end()))
