@@ -389,6 +389,13 @@ class ViPercent(sublime_plugin.TextCommand):
                             a += 1
                         return sublime.Region(s.a, a)
 
+                if mode == MODE_VISUAL_LINE:
+                    # TODO: Improve handling of s.a < s.b and s.a > s.b cases.
+                    a = find_bracket_location(s.begin())
+                    if a is not None:
+                        a = self.view.full_line(a).b
+                        return sublime.Region(s.begin(), a)
+
                 elif mode == MODE_NORMAL:
                     a = find_bracket_location(s.b)
                     if a is not None:
