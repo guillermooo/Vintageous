@@ -10,3 +10,5 @@ dist/
 *.sublime-workspace
 
 *.swp
+*.swo
+

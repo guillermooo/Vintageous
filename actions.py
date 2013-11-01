@@ -11,9 +11,7 @@ import sublime_plugin
 from Vintageous.state import IrreversibleTextCommand
 from Vintageous.state import VintageState
 from Vintageous.vi import utils
-from Vintageous.vi import inputs
 from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
-from Vintageous.vi.constants import MODE_INSERT
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
@@ -21,7 +19,6 @@ from Vintageous.vi.constants import MODE_SELECT
 from Vintageous.vi.constants import regions_transformer
 from Vintageous.vi.constants import regions_transformer_reversed
 from Vintageous.vi.registers import REG_EXPRESSION
-from Vintageous.vi.sublime import restoring_sels
 
 import re
 import os
@@ -95,7 +92,7 @@ class ViEditAfterCaret(sublime_plugin.TextCommand):
             if visual:
                 new_sels.append(sublime.Region(s.end(), s.end()))
             else:
-                if not utils.is_at_eol(self.view, s):
+                if not Utils.is_at_eol(self.view, s):
                     new_sels.append(sublime.Region(s.end() + 1, s.end() + 1))
                 else:
                     new_sels.append(sublime.Region(s.end(), s.end()))

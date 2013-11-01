@@ -627,6 +627,7 @@ def vi_r(vi_cmd_data):
         vi_cmd_data['motion']['args'] = {'by': 'characters', 'extend': True, 'forward': True}
     vi_cmd_data['action']['command'] = '_vi_r'
     vi_cmd_data['action']['args'] = {'character': vi_cmd_data['user_action_input'], 'mode': vi_cmd_data['mode']}
+
     vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
     return vi_cmd_data
