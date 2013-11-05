@@ -65,6 +65,7 @@ TESTS_CMDS_ACTION_VI_BIG_A = 'Vintageous.tests.commands.test__vi_big_a'
 TESTS_CMDS_ACTION_VI_CC = 'Vintageous.tests.commands.test__vi_cc'
 TESTS_CMDS_ACTION_VI_BIG_S = 'Vintageous.tests.commands.test__vi_big_s'
 TESTS_CMDS_MOTION_VI_VISUAL_O = 'Vintageous.tests.commands.test__vi_visual_o'
+TESTS_CMDS_ACTION_VI_DD = 'Vintageous.tests.commands.test__vi_dd'
 
 TESTS_EX_CMDS_COPY = 'Vintageous.tests.ex.test_copy'
 TESTS_EX_CMDS_MOVE = 'Vintageous.tests.ex.test_move'
@@ -81,6 +82,7 @@ TESTS_CMDS_ALL_ACTIONS = [TESTS_CMDS_ACTION_CTRL_X,
                           TESTS_CMDS_ACTION_VI_S,
                           TESTS_CMDS_ACTION_VI_BIG_I,
                           TESTS_CMDS_ACTION_VI_BIG_A,
+                          TESTS_CMDS_ACTION_VI_DD,
                           ]
 
 TESTS_CMDS_ALL_MOTIONS = [TESTS_CMDS_MOTION_VI_L,

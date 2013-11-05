@@ -1363,18 +1363,23 @@ class _vi_cc_motion(sublime_plugin.TextCommand):
 
 
 class _vi_dd_motion(sublime_plugin.TextCommand):
+    def row_at(self, pt):
+        return self.view.rowcol(pt)[0]
+
     def run(self, edit, mode=None, count=1):
         def f(view, s):
             if mode == _MODE_INTERNAL_NORMAL:
-                if count == 1:
-                    return view.full_line(s.b)
-                row, _ = view.rowcol(s.b)
-                target_line = view.text_point(row + count - 1, 0)
-                return sublime.Region(view.line(s.b).a, view.line(target_line).b)
+                end = view.text_point(self.row_at(s.b) + (count - 1), 0)
+                begin = view.line(s.b).a
+                if ((self.row_at(end) == self.row_at(view.size())) and
+                    (view.substr(begin - 1) == '\n')):
+                        begin -= 1
+
+                return sublime.Region(begin, view.full_line(end).b)
+
             return s
 
         regions_transformer(self.view, f)
-
 
 class _vi_big_d_motion(sublime_plugin.TextCommand):
     def run(self, edit, mode=None, count=1):
