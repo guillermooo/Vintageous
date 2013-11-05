@@ -86,3 +86,7 @@ def blink(times=4, delay=55):
             sublime.set_timeout(do_blink, delay)
 
     do_blink()
+
+
+def has_empty_selection(view):
+    return any(s.empty() for s in view.sel())

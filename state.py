@@ -695,10 +695,15 @@ class VintageState(object):
             self.xpos = xpos
             vi_cmd_data['xpos'] = xpos
 
+        # Fake visual mode. The user has selected text outside of Vintageous' own means.
+        # XXX: I'm not sure this will always be correct wrt newlines. We should maybe ensure we
+        # are within the requirements for visual mode.
+        if self.action and (self.mode == MODE_NORMAL) and not utils.has_empty_selection(self.view):
+            vi_cmd_data['mode'] = MODE_VISUAL
         # Actions originating in normal mode are run in a pseudomode that helps to distiguish
         # between visual mode and this case (both use selections, either implicitly or
         # explicitly).
-        if self.action and (self.mode == MODE_NORMAL):
+        elif self.action and (self.mode == MODE_NORMAL):
             vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
 
         motion = self.motion
