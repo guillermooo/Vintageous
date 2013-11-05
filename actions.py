@@ -1065,13 +1065,24 @@ class _vi_cc_action(sublime_plugin.TextCommand):
             # We've made a selection with _vi_cc_motion just before this.
             if mode == _MODE_INTERNAL_NORMAL:
                 begin = self.view.text_point(self.view.rowcol(s.b)[0], 0)
-                view.erase(edit, sublime.Region(s.a, s.b))
-                self.view.run_command('_vi_int_reindent', {'mode': mode})
-                pt = utils.next_non_white_space_char(view, begin, white_space=' \t')
+                view.erase(edit, s)
+                return sublime.Region(begin)
+            return s
+
+        def ff(view, s):
+            # We've made a selection with _vi_cc_motion just before this.
+            if mode == _MODE_INTERNAL_NORMAL:
+                pt = utils.next_non_white_space_char(view, s.b, white_space=' \t')
                 return sublime.Region(pt)
             return s
 
-        regions_transformer(self.view, f)
+        prev_rows = [self.view.rowcol(s.a)[0] for s in list(self.view.sel())]
+        regions_transformer_reversed(self.view, f)
+        if mode == _MODE_INTERNAL_NORMAL:
+            self.view.sel().clear()
+            self.view.sel().add_all(list(sublime.Region(self.view.text_point(row, 0)) for row in prev_rows))
+            self.view.run_command('reindent', {'force_indent': False})
+        regions_transformer_reversed(self.view, ff)
 
 
 # internal command
@@ -1085,7 +1096,7 @@ class _vi_int_reindent(sublime_plugin.TextCommand):
                 return sublime.Region(begin)
             return s
 
-        regions_transformer(self.view, f)
+        regions_transformer_reversed(self.view, f)
 
 
 class _vi_dd_action(sublime_plugin.TextCommand):
