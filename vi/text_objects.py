@@ -7,6 +7,8 @@ from sublime import CLASS_PUNCTUATION_END
 from sublime import CLASS_LINE_END
 from sublime import CLASS_LINE_START
 
+import re
+
 from Vintageous.vi.search import reverse_search_by_pt
 from Vintageous.vi.search import find_in_range
 from Vintageous.vi import units
@@ -277,6 +279,11 @@ def get_text_object_region(view, s, text_object, inclusive=False, count=1):
     return s
 
 
+def get_tag_name(tag):
+    pattern = "<([0-9A-Za-z]+)(.*)>"
+    return re.match(pattern, tag).groups()[0]
+
+
 def find_tag_text_object(view, s, inclusive=False):
 
     if (view.score_selector(s.b, 'text.html') == 0 and
@@ -284,24 +291,59 @@ def find_tag_text_object(view, s, inclusive=False):
             # TODO: What happens with other xml formats?
             return s
 
-    end_tag_patt = "</(.+?)>"
-    begin_tag_patt = "<{0}(\s+.*?)?>"
+    # According to the HTML 5 editor's draft, only 0-9A-Za-z characters can be used in tag names.
+    # TODO: This won't be enough in Dart Polymer projects, for example.
+    start_tag_pattern = "<([0-9A-Za-z]+)(.*?)>"
+    end_tag_as_pattern = "</{0}>"
 
-    closing_tag = view.find(end_tag_patt, s.b, sublime.IGNORECASE)
-
-    if not closing_tag:
+    start_pt = utils.previous_white_space_char(view, s.b) + 1
+    start_tag = view.find(start_tag_pattern, start_pt, sublime.IGNORECASE)
+    if not start_tag:
         return s
 
-    begin_tag_patt = begin_tag_patt.format(view.substr(closing_tag)[2:-1])
+    tag_name = get_tag_name(view.substr(start_tag))
 
-    begin_tag = find_prev_lone_bracket(view, closing_tag.a, (begin_tag_patt, view.substr(closing_tag)))
+    end_tag_as_pattern = end_tag_as_pattern.format(tag_name)
+    end_tag = None
+    current_pt = start_tag.b
+    while True:
+        temp_end_tag = view.find(end_tag_as_pattern, current_pt, sublime.IGNORECASE)
+        if not end_tag and not temp_end_tag:
+            return s
+        elif not temp_end_tag:
+            break
 
-    if not begin_tag:
+        end_tag = temp_end_tag
+        current_pt = end_tag.b
+
+        where = view.substr(sublime.Region(start_pt, end_tag.end()))
+        opening_tags = re.findall("<{0}.*?>".format(tag_name), where, re.IGNORECASE)
+        closing_tags = re.findall(end_tag_as_pattern, where, sublime.IGNORECASE)
+
+        if len(opening_tags) == len(closing_tags):
+            break
+
+    if not end_tag:
         return s
 
+    # Perhaps this should be handled further up by the command itself?
+    was_visual = view.has_non_empty_selection_region()
     if not inclusive:
-        return sublime.Region(begin_tag.b, closing_tag.a)
-    return sublime.Region(begin_tag.a, closing_tag.b)
+        if not was_visual:
+            return sublime.Region(start_tag.b, end_tag.a)
+        else:
+            if start_tag.b == end_tag.a:
+                return sublime.Region(start_tag.b, start_tag.b + 1)
+            else:
+                return sublime.Region(start_tag.b, end_tag.a)
+
+    if not was_visual:
+        return sublime.Region(start_tag.a, end_tag.b)
+    else:
+        if start_tag.a == end_tag.b:
+            return sublime.Region(start_tag.a, start_tag.a + 1)
+        else:
+            return sublime.Region(start_tag.a, end_tag.b)
 
 
 def find_next_lone_bracket(view, start, items, unbalanced=0):
