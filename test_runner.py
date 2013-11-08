@@ -47,6 +47,7 @@ TESTS_RUN = 'Vintageous.tests.test_run'
 TESTS_SEL = 'Vintageous.tests.sel.test_sel_orientation'
 
 TESTS_TEXT_OBJECTS = 'Vintageous.tests.vi.test_text_objects'
+TESTS_TEXT_OBJECTS_A_WORD = 'Vintageous.tests.vi.test_a_word'
 
 TESTS_CMDS_SET_ACTION = 'Vintageous.tests.commands.test_set_action'
 TESTS_CMDS_SET_MOTION = 'Vintageous.tests.commands.test_set_motion'
@@ -99,6 +100,7 @@ TESTS_CMDS_ALL_MOTIONS = [TESTS_CMDS_MOTION_VI_L,
 
 TESTS_ALL_TEXT_OBJECTS = [
     TESTS_TEXT_OBJECTS,
+    TESTS_TEXT_OBJECTS_A_WORD,
 ]
 
 TESTS_EX_CMDS = [

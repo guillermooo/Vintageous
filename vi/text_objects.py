@@ -10,6 +10,7 @@ from sublime import CLASS_LINE_START
 from Vintageous.vi.search import reverse_search_by_pt
 from Vintageous.vi.search import find_in_range
 from Vintageous.vi import units
+from Vintageous.vi import utils
 
 
 ANCHOR_NEXT_WORD_BOUNDARY = CLASS_WORD_START | CLASS_PUNCTUATION_START | CLASS_LINE_END
@@ -49,7 +50,8 @@ PAIRS = {
 
 def is_at_punctuation(view, pt):
     next_char = view.substr(pt)
-    return (not (next_char.isalnum() or
+    # FIXME: Wrong if pt is at '\t'.
+    return (not (is_at_word(view, pt) or
                  next_char.isspace() or
                  next_char == '\n')
             and next_char.isprintable())
@@ -57,7 +59,7 @@ def is_at_punctuation(view, pt):
 
 def is_at_word(view, pt):
     next_char = view.substr(pt)
-    return next_char.isalnum()
+    return (next_char.isalnum() or next_char == '_')
 
 
 def is_at_space(view, pt):
@@ -115,12 +117,22 @@ def current_word_end(view, pt):
     return view.word(pt).b
 
 
+# See vim :help word for a definition of word.
 def a_word(view, pt, inclusive=True, count=1):
     assert count > 0
     start = current_word_start(view, pt)
     end = pt
     if inclusive:
         end = units.word_starts(view, start, count=count, internal=True)
+
+        # If there is no space at the end of our word text object, include any
+        # preceding spaces. (Follows Vim behavior.)
+        if (not view.substr(end - 1).isspace() and
+            view.substr(start - 1).isspace()):
+                start = utils.previous_non_white_space_char(
+                                                    view, start - 1,
+                                                    white_space=' \t') + 1
+
         # Vim does some inconsistent stuff here...
         if count > 1 and view.substr(end) == '\n':
             end += 1
