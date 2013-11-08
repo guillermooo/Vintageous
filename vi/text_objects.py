@@ -13,6 +13,7 @@ from Vintageous.vi.search import reverse_search_by_pt
 from Vintageous.vi.search import find_in_range
 from Vintageous.vi import units
 from Vintageous.vi import utils
+from Vintageous.vi import search
 
 
 ANCHOR_NEXT_WORD_BOUNDARY = CLASS_WORD_START | CLASS_PUNCTUATION_START | CLASS_LINE_END
@@ -280,7 +281,7 @@ def get_text_object_region(view, s, text_object, inclusive=False, count=1):
 
 
 def get_tag_name(tag):
-    pattern = "<([0-9A-Za-z]+)(.*)>"
+    pattern = "</?([0-9A-Za-z]+).*?>"
     return re.match(pattern, tag).groups()[0]
 
 
@@ -297,7 +298,16 @@ def find_tag_text_object(view, s, inclusive=False):
     end_tag_as_pattern = "</{0}>"
 
     start_pt = utils.previous_white_space_char(view, s.b) + 1
-    start_tag = view.find(start_tag_pattern, start_pt, sublime.IGNORECASE)
+    if view.substr(sublime.Region(start_pt, start_pt + 2)) == '</':
+        closing_tag = view.find('</.*?>', start_pt, sublime.IGNORECASE)
+        name = get_tag_name(view.substr(closing_tag))
+        start_tag_name = '<({0}).*?>'.format(name)
+        start_tag = search.reverse_search_by_pt(view, start_tag_name, 0, start_pt)
+    elif view.substr(sublime.Region(start_pt, start_pt + 1)) == '<':
+        start_tag = view.find(start_tag_pattern, start_pt, sublime.IGNORECASE)
+    else:
+        start_tag = search.reverse_search_by_pt(view, start_tag_pattern, 0, start_pt)
+
     if not start_tag:
         return s
 
