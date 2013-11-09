@@ -301,7 +301,10 @@ def find_tag_text_object(view, s, inclusive=False):
     start_tag_pattern = "<([0-9A-Za-z]+)(.*?)>"
     end_tag_as_pattern = "</{0}>"
 
-    start_pt = utils.previous_white_space_char(view, s.b) + 1
+    # TODO: Receive the actual mode in the parameter list?
+    current_pt = s.b - 1 if view.has_non_empty_selection_region() else s.b
+
+    start_pt = utils.previous_white_space_char(view, current_pt, white_space=' \t\n') + 1
     if view.substr(sublime.Region(start_pt, start_pt + 2)) == '</':
         closing_tag = view.find('</.*?>', start_pt, sublime.IGNORECASE)
         name = get_tag_name(view.substr(closing_tag))
@@ -309,6 +312,8 @@ def find_tag_text_object(view, s, inclusive=False):
         start_tag = search.reverse_search_by_pt(view, start_tag_name, 0, start_pt)
     elif view.substr(sublime.Region(start_pt, start_pt + 1)) == '<':
         start_tag = view.find(start_tag_pattern, start_pt, sublime.IGNORECASE)
+        if start_tag.a != start_pt:
+            return s
     else:
         start_tag = search.reverse_search_by_pt(view, start_tag_pattern, 0, start_pt)
 

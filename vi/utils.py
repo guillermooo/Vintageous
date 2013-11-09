@@ -60,8 +60,8 @@ def previous_non_white_space_char(view, pt, white_space='\t \n'):
 
 
 # deprecated
-def previous_white_space_char(view, pt):
-    while view.substr(pt) not in '\t ':
+def previous_white_space_char(view, pt, white_space='\t '):
+    while pt >= 0 and view.substr(pt) not in white_space:
         pt -= 1
     return pt
 
