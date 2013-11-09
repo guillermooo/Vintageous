@@ -6,6 +6,7 @@ from sublime import CLASS_PUNCTUATION_START
 from sublime import CLASS_PUNCTUATION_END
 from sublime import CLASS_LINE_END
 from sublime import CLASS_LINE_START
+from sublime import CLASS_EMPTY_LINE
 
 import re
 
@@ -26,6 +27,7 @@ SENTENCE = 3
 TAG = 4
 WORD = 5
 BIG_WORD = 6
+PARAGRAPH = 7
 
 
 PAIRS = {
@@ -46,8 +48,7 @@ PAIRS = {
     'w': (None, WORD),
     'W': (None, BIG_WORD),
     's': (None, SENTENCE),
-    # TODO: Implement this.
-    # 'p': (None, PARAGRAPH),
+    'p': (None, PARAGRAPH),
 }
 
 
@@ -205,6 +206,9 @@ def get_text_object_region(view, s, text_object, inclusive=False, count=1):
 
     if type_ == TAG:
         return find_tag_text_object(view, s, inclusive)
+
+    if type_ == PARAGRAPH:
+        return find_paragraph_text_object(view, s, inclusive)
 
     if type_ == BRACKET:
         opening = find_prev_lone_bracket(view, s.b, delims)
@@ -418,3 +422,13 @@ def find_prev_lone_bracket(view, start, tags, unbalanced=0):
                                                   nested)
     else:
         return prev_opening_bracket
+
+
+def find_paragraph_text_object(view, s, inclusive=True):
+    # TODO: Implement counts.
+    begin = view.find_by_class(s.a, forward=False, classes=CLASS_EMPTY_LINE)
+    end = view.find_by_class(s.b, forward=True, classes=CLASS_EMPTY_LINE)
+    if not inclusive:
+        if begin > 0:
+            begin += 1
+    return sublime.Region(begin, end)
