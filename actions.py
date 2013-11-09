@@ -1118,7 +1118,10 @@ class _vi_dd_action(sublime_plugin.TextCommand):
                 return sublime.Region(pt, pt)
             return s
 
-        regions_transformer(self.view, f)
+        row = [self.view.rowcol(s.begin())[0] for s in self.view.sel()][0]
+        regions_transformer_reversed(self.view, f)
+        self.view.sel().clear()
+        self.view.sel().add(sublime.Region(self.view.text_point(row, 0)))
 
 
 class _vi_big_s_action(sublime_plugin.TextCommand):
