@@ -44,7 +44,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
     # Indicates whether the user issued the call.
     interactive_call = True
     def is_enabled(self):
-        return len(self.window.views()) > 0
+        return bool(self.window.active_view())
 
     def __init__(self, window):
         sublime_plugin.WindowCommand.__init__(self, window)
