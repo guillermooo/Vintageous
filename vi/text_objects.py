@@ -8,17 +8,28 @@ from sublime import CLASS_LINE_END
 from sublime import CLASS_LINE_START
 from sublime import CLASS_EMPTY_LINE
 
-import re
-
 from Vintageous.vi.search import reverse_search_by_pt
 from Vintageous.vi.search import find_in_range
 from Vintageous.vi import units
 from Vintageous.vi import utils
 from Vintageous.vi import search
 
+import re
 
-ANCHOR_NEXT_WORD_BOUNDARY = CLASS_WORD_START | CLASS_PUNCTUATION_START | CLASS_LINE_END
-ANCHOR_PREVIOUS_WORD_BOUNDARY = CLASS_WORD_END | CLASS_PUNCTUATION_END | CLASS_LINE_START
+
+RX_ANY_TAG = r'</?([0-9A-Za-z]+).*?>'
+RXC_ANY_TAG = re.compile(r'</?([0-9A-Za-z]+).*?>')
+# According to the HTML 5 editor's draft, only 0-9A-Za-z characters can be
+# used in tag names. TODO: This won't be enough in Dart Polymer projects,
+# for example.
+RX_ANY_START_TAG = r'<([0-9A-Za-z]+)(.*?)>'
+RX_ANY_END_TAG = r'</.*?>'
+
+
+ANCHOR_NEXT_WORD_BOUNDARY = CLASS_WORD_START | CLASS_PUNCTUATION_START |
+                            CLASS_LINE_END
+ANCHOR_PREVIOUS_WORD_BOUNDARY = CLASS_WORD_END | CLASS_PUNCTUATION_END |
+                                CLASS_LINE_START
 
 
 BRACKET = 1
@@ -31,8 +42,6 @@ PARAGRAPH = 7
 
 
 PAIRS = {
-    # FIXME: Treat quotation marks differently. We cannot distinguish between opening and closing
-    # in this case.
     '"': (('"', '"'), QUOTE),
     "'": (("'", "'"), QUOTE),
     '`': (('`', '`'), QUOTE),
@@ -71,18 +80,22 @@ def is_at_space(view, pt):
 
 
 def get_punctuation_region(view, pt):
-   start = view.find_by_class(pt + 1, forward=False, classes=CLASS_PUNCTUATION_START)
-   end = view.find_by_class(pt, forward=True, classes=CLASS_PUNCTUATION_END)
+   start = view.find_by_class(pt + 1, forward=False,
+                              classes=CLASS_PUNCTUATION_START)
+   end = view.find_by_class(pt, forward=True,
+                            classes=CLASS_PUNCTUATION_END)
    return sublime.Region(start, end)
 
 
 def get_space_region(view, pt):
-    end = view.find_by_class(pt, forward=True, classes=ANCHOR_NEXT_WORD_BOUNDARY)
+    end = view.find_by_class(pt, forward=True,
+                             classes=ANCHOR_NEXT_WORD_BOUNDARY)
     return sublime.Region(previous_word_end(view, pt + 1), end)
 
 
 def previous_word_end(view, pt):
-    return view.find_by_class(pt, forward=False, classes=ANCHOR_PREVIOUS_WORD_BOUNDARY)
+    return view.find_by_class(pt, forward=False,
+                              classes=ANCHOR_PREVIOUS_WORD_BOUNDARY)
 
 
 def next_word_start(view, pt):
@@ -98,11 +111,14 @@ def next_word_start(view, pt):
         end = get_space_region(view, pt).b
         if is_at_word(view, end) or is_at_punctuation(view, end):
             end = view.find_by_class(end, forward=True,
-                                     classes=CLASS_WORD_END | CLASS_PUNCTUATION_END | CLASS_LINE_END)
+                                     classes=CLASS_WORD_END |
+                                             CLASS_PUNCTUATION_END |
+                                             CLASS_LINE_END)
             return end
 
     # Skip the word under the caret and any trailing spaces.
-    return view.find_by_class(pt, forward=True, classes=ANCHOR_NEXT_WORD_BOUNDARY)
+    return view.find_by_class(pt, forward=True,
+                              classes=ANCHOR_NEXT_WORD_BOUNDARY)
 
 
 def current_word_start(view, pt):
@@ -225,15 +241,15 @@ def get_text_object_region(view, s, text_object, inclusive=False, count=1):
         # Vim only operates on the current line.
         line = view.line(s)
         # FIXME: Escape sequences like \" are probably syntax-dependant.
-        prev_quote = reverse_search_by_pt(view, '(?<!\\\\)' + delims[0],
+        prev_quote = reverse_search_by_pt(view, r'(?<!\\\\)' + delims[0],
                                           start=line.a, end=s.b)
 
-        next_quote = find_in_range(view, '(?<!\\\\)' + delims[0],
+        next_quote = find_in_range(view, r'(?<!\\\\)' + delims[0],
                                    start=s.b, end=line.b)
 
         if next_quote and not prev_quote:
             prev_quote = next_quote
-            next_quote = find_in_range(view, '(?<!\\\\)' + delims[0],
+            next_quote = find_in_range(view, r'(?<!\\\\)' + delims[0],
                                        start=prev_quote.b, end=line.b)
 
         if not (prev_quote and next_quote):
@@ -261,14 +277,16 @@ def get_text_object_region(view, s, text_object, inclusive=False, count=1):
         sentence_start = view.find_by_class(s.b,
                                             forward=False,
                                             classes=sublime.CLASS_EMPTY_LINE)
-        sentence_start_2 = reverse_search_by_pt(view, "[.?!:]\s+|[.?!:]$",
-                                              start=0,
-                                              end=s.b)
+        sentence_start_2 = reverse_search_by_pt(view, r'[.?!:]\s+|[.?!:]$',
+                                                start=0,
+                                                end=s.b)
         if sentence_start_2:
-            sentence_start = sentence_start + 1 if sentence_start > sentence_start_2.b else sentence_start_2.b
+            sentence_start = (sentence_start + 1 if (sentence_start >
+                                                     sentence_start_2.b)
+                                                 else sentence_start_2.b)
         else:
             sentence_start = sentence_start + 1
-        sentence_end = find_in_range(view, "[.?!:)](?=\s)|[.?!:)]$",
+        sentence_end = find_in_range(view, r'[.?!:)](?=\s)|[.?!:)]$',
                                      start=s.b,
                                      end=view.size())
 
@@ -285,8 +303,7 @@ def get_text_object_region(view, s, text_object, inclusive=False, count=1):
 
 
 def get_tag_name(tag):
-    pattern = "</?([0-9A-Za-z]+).*?>"
-    return re.match(pattern, tag).groups()[0]
+    return re.match(RXC_ANY_TAG, tag).groups()[0]
 
 
 def find_tag_text_object(view, s, inclusive=False):
@@ -296,37 +313,36 @@ def find_tag_text_object(view, s, inclusive=False):
             # TODO: What happens with other xml formats?
             return s
 
-    # According to the HTML 5 editor's draft, only 0-9A-Za-z characters can be used in tag names.
-    # TODO: This won't be enough in Dart Polymer projects, for example.
-    start_tag_pattern = "<([0-9A-Za-z]+)(.*?)>"
-    end_tag_as_pattern = "</{0}>"
-
     # TODO: Receive the actual mode in the parameter list?
-    current_pt = s.b - 1 if view.has_non_empty_selection_region() else s.b
+    current_pt = (s.b - 1) if view.has_non_empty_selection_region() else s.b
+    start_pt = utils.previous_white_space_char(view, current_pt,
+                                               white_space=' \t\n') + 1
 
-    start_pt = utils.previous_white_space_char(view, current_pt, white_space=' \t\n') + 1
     if view.substr(sublime.Region(start_pt, start_pt + 2)) == '</':
-        closing_tag = view.find('</.*?>', start_pt, sublime.IGNORECASE)
+        closing_tag = view.find(RX_ANY_END_TAG, start_pt, sublime.IGNORECASE)
         name = get_tag_name(view.substr(closing_tag))
-        start_tag_name = '<({0}).*?>'.format(name)
-        start_tag = search.reverse_search_by_pt(view, start_tag_name, 0, start_pt)
-    elif view.substr(sublime.Region(start_pt, start_pt + 1)) == '<':
-        start_tag = view.find(start_tag_pattern, start_pt, sublime.IGNORECASE)
+        start_tag_pattern = r'<({0}).*?>'.format(name)
+        start_tag = search.reverse_search_by_pt(view, start_tag_pattern, 0,
+                                                start_pt)
+    elif view.substr(start_pt) == '<':
+        start_tag = view.find(RX_ANY_START_TAG, start_pt, sublime.IGNORECASE)
         if start_tag.a != start_pt:
             return s
     else:
-        start_tag = search.reverse_search_by_pt(view, start_tag_pattern, 0, start_pt)
+        start_tag = search.reverse_search_by_pt(view, RX_ANY_START_TAG, 0,
+                                                start_pt)
 
     if not start_tag:
         return s
 
     tag_name = get_tag_name(view.substr(start_tag))
 
-    end_tag_as_pattern = end_tag_as_pattern.format(tag_name)
+    literal_end_tag = r'</{0}>'.format(tag_name)
     end_tag = None
     current_pt = start_tag.b
     while True:
-        temp_end_tag = view.find(end_tag_as_pattern, current_pt, sublime.IGNORECASE)
+        temp_end_tag = view.find(literal_end_tag, current_pt,
+                                 sublime.IGNORECASE)
         if not end_tag and not temp_end_tag:
             return s
         elif not temp_end_tag:
@@ -336,8 +352,9 @@ def find_tag_text_object(view, s, inclusive=False):
         current_pt = end_tag.b
 
         where = view.substr(sublime.Region(start_pt, end_tag.end()))
-        opening_tags = re.findall("<{0}.*?>".format(tag_name), where, re.IGNORECASE)
-        closing_tags = re.findall(end_tag_as_pattern, where, sublime.IGNORECASE)
+        opening_tags = re.findall(r'<{0}.*?>'.format(tag_name), where,
+                                  re.IGNORECASE)
+        closing_tags = re.findall(literal_end_tag, where, sublime.IGNORECASE)
 
         if len(opening_tags) == len(closing_tags):
             break
@@ -366,7 +383,8 @@ def find_tag_text_object(view, s, inclusive=False):
 
 
 def find_next_lone_bracket(view, start, items, unbalanced=0):
-    # TODO: Extract common functionality from here and the % motion instead of duplicating code.
+    # TODO: Extract common functionality from here and the % motion instead of
+    # duplicating code.
     new_start = start
     for i in range(unbalanced or 1):
         next_closing_bracket = find_in_range(view, items[1],
@@ -398,7 +416,8 @@ def find_next_lone_bracket(view, start, items, unbalanced=0):
 
 
 def find_prev_lone_bracket(view, start, tags, unbalanced=0):
-    # TODO: Extract common functionality from here and the % motion instead of duplicating code.
+    # TODO: Extract common functionality from here and the % motion instead of
+    # duplicating code.
     new_start = start
     for i in range(unbalanced or 1):
         prev_opening_bracket = reverse_search_by_pt(view, tags[0],
