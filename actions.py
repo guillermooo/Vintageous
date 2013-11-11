@@ -785,7 +785,7 @@ class _vi_redo(IrreversibleTextCommand):
 
 class _vi_ctrl_w_v_action(sublime_plugin.TextCommand):
     def run(self, edit):
-        self.view.window().run_command('new_pane', {})
+        self.view.window().run_command('ex_vsplit')
 
 
 class Sequence(sublime_plugin.TextCommand):
