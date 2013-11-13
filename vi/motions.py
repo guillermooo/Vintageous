@@ -12,9 +12,6 @@ from Vintageous.vi.constants import MODE_VISUAL_BLOCK
 
 # $
 def vi_dollar(vi_cmd_data):
-    if vi_cmd_data['count'] > 5:
-        vi_cmd_data['is_jump'] = True
-
     vi_cmd_data['motion']['command'] = '_vi_dollar'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
     vi_cmd_data['count'] = 1
@@ -23,8 +20,7 @@ def vi_dollar(vi_cmd_data):
 
 
 def vi_big_g(vi_cmd_data):
-    if (vi_cmd_data['count'] > 5) or vi_cmd_data['count'] == 1:
-        vi_cmd_data['is_jump'] = True
+    vi_cmd_data['is_jump'] = True
 
     if vi_cmd_data['_user_provided_count']:
         target = vi_cmd_data['count']
@@ -39,8 +35,7 @@ def vi_big_g(vi_cmd_data):
 
 
 def vi_gg(vi_cmd_data):
-    if (vi_cmd_data['count'] > 5) or vi_cmd_data['count'] == 1:
-        vi_cmd_data['is_jump'] = True
+    vi_cmd_data['is_jump'] = True
 
     # FIXME: Cannot go to line 1. We need to signal when the count is user-provided and when it's
     # a default value.
@@ -101,9 +96,6 @@ def vi_zero(vi_cmd_data):
 
 
 def vi_underscore(vi_cmd_data):
-    if vi_cmd_data['count'] > 5:
-        vi_cmd_data['is_jump'] = True
-
     vi_cmd_data['motion']['command'] = '_vi_underscore'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
     vi_cmd_data['count'] = 1
@@ -136,6 +128,7 @@ def vi_h(vi_cmd_data):
 
 
 def vi_big_h(vi_cmd_data):
+    vi_cmd_data['is_jump'] = True
     vi_cmd_data['motion']['command'] = '_vi_big_h'
     # XXX: We subtract one, but vi_cmd_data should know when it's been set to a default value
     # or to an user-supplied one.
@@ -145,6 +138,7 @@ def vi_big_h(vi_cmd_data):
 
 
 def vi_big_l(vi_cmd_data):
+    vi_cmd_data['is_jump'] = True
     vi_cmd_data['motion']['command'] = 'vi_big_l'
     # XXX: We subtract one, but vi_cmd_data should know when it's been set to a default value
     # or to an user-supplied one.
@@ -154,6 +148,7 @@ def vi_big_l(vi_cmd_data):
 
 
 def vi_big_m(vi_cmd_data):
+    vi_cmd_data['is_jump'] = True
     vi_cmd_data['motion']['command'] = 'vi_big_m'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
 
@@ -168,9 +163,6 @@ def vi_g__(vi_cmd_data):
 
 
 def vi_j(vi_cmd_data):
-    if vi_cmd_data['count'] > 5:
-        vi_cmd_data['is_jump'] = True
-
     vi_cmd_data['must_update_xpos'] = False
 
     vi_cmd_data['motion']['command'] = '_vi_j'
@@ -184,9 +176,6 @@ def vi_j(vi_cmd_data):
 
 
 def vi_k(vi_cmd_data):
-    if vi_cmd_data['count'] > 5:
-        vi_cmd_data['is_jump'] = True
-
     vi_cmd_data['must_update_xpos'] = False
 
     vi_cmd_data['motion']['command'] = '_vi_k'
@@ -347,6 +336,7 @@ def vi_double_single_quote(vi_cmd_data):
 
 
 def vi_forward_slash(vi_cmd_data):
+    # TODO: This is a jump.
     vi_cmd_data['motion']['command'] = '_vi_forward_slash'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'search_string': vi_cmd_data['user_motion_input']}
     vi_cmd_data['count'] = 1
@@ -355,6 +345,7 @@ def vi_forward_slash(vi_cmd_data):
 
 
 def vi_question_mark(vi_cmd_data):
+    # TODO: This is a jump.
     vi_cmd_data['motion']['command'] = '_vi_question_mark'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'search_string': vi_cmd_data['user_motion_input']}
     vi_cmd_data['count'] = 1
@@ -363,6 +354,7 @@ def vi_question_mark(vi_cmd_data):
 
 
 def vi_n(vi_cmd_data):
+    # TODO: This is a jump.
     vi_cmd_data['motion']['command'] = '_vi_forward_slash'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'search_string': vi_cmd_data['last_buffer_search']}
     vi_cmd_data['count'] = 1
@@ -370,6 +362,7 @@ def vi_n(vi_cmd_data):
     return vi_cmd_data
 
 def vi_big_n(vi_cmd_data):
+    # TODO: This is a jump.
     vi_cmd_data['motion']['command'] = '_vi_question_mark'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'search_string': vi_cmd_data['last_buffer_search']}
     vi_cmd_data['count'] = 1
@@ -454,6 +447,7 @@ def vi_big_b(vi_cmd_data):
 
 
 def vi_right_brace(vi_cmd_data):
+    # TODO: This is a jump.
     vi_cmd_data['motion']['command'] = '_vi_right_brace'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
 
@@ -461,6 +455,7 @@ def vi_right_brace(vi_cmd_data):
 
 
 def vi_left_brace(vi_cmd_data):
+    # TODO: This is a jump.
     vi_cmd_data['motion']['command'] = '_vi_left_brace'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
 
@@ -468,6 +463,7 @@ def vi_left_brace(vi_cmd_data):
 
 
 def vi_right_parenthesis(vi_cmd_data):
+    # TODO: This is a jump.
     vi_cmd_data['motion']['command'] = '_vi_right_parenthesis'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
 
@@ -475,6 +471,7 @@ def vi_right_parenthesis(vi_cmd_data):
 
 
 def vi_left_parenthesis(vi_cmd_data):
+    # TODO: This is a jump.
     vi_cmd_data['motion']['command'] = '_vi_left_parenthesis'
     vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
 
@@ -498,6 +495,7 @@ def vi_g_big_d(vi_cmd_data):
 
 
 def vi_quote(vi_cmd_data):
+    # TODO: This is a jump.
     vi_cmd_data['motion']['command'] = '_vi_quote'
     vi_cmd_data['motion']['args'] = {'character': vi_cmd_data['user_motion_input'], 'mode': vi_cmd_data['mode']}
     vi_cmd_data['count'] = 1
