@@ -888,7 +888,14 @@ class ExEdit(IrreversibleTextCommand):
             if os.path.isdir(file_name):
                 sublime.status_message('Vintageous: "{0}" is a directory'.format(file_name))
                 return
+
             message = ''
+
+            if not os.path.isabs(file_name):
+                file_name = os.path.join(
+                                VintageState(self.view).settings.vi['_cmdline_cd'],
+                                file_name)
+
             if not os.path.exists(file_name):
                 message = '[New File]'
                 path = os.path.dirname(file_name)
