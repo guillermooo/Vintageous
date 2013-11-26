@@ -28,6 +28,8 @@
 		"release": [
 			["*.*", ["*builder.py",
 					 "*toplist.py",
+					 "._swp",
+					 "._swo",
 					 "*build.sh",
 					 "*.sublime-workspace",
 					 "*.sublime-project",
