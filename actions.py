@@ -111,6 +111,14 @@ class _vi_big_i(sublime_plugin.TextCommand):
         def f(view, s):
             if mode == MODE_VISUAL_BLOCK:
                 return sublime.Region(s.begin())
+            elif mode == MODE_VISUAL:
+                line = view.line(s.b - 1)
+                pt = utils.next_non_white_space_char(view, line.a)
+                return sublime.Region(pt)
+            elif mode == MODE_VISUAL_LINE:
+                line = view.line(s.a)
+                pt = utils.next_non_white_space_char(view, line.a)
+                return sublime.Region(pt)
             elif mode != _MODE_INTERNAL_NORMAL:
                 return s
             line = view.line(s.b)

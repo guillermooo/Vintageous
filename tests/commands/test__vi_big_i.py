@@ -1,10 +1,7 @@
-"""
-Tests for o motion (visual kind).
-"""
-
 import sublime
 
 import unittest
+from collections import namedtuple
 
 from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
 from Vintageous.vi.constants import MODE_NORMAL
@@ -20,97 +17,34 @@ from Vintageous.tests import second_sel
 from Vintageous.tests import BufferTest
 
 
-class Test_vi_big_i_InNormalMode_SingleSel(BufferTest):
-    def testMovesCaretToBol(self):
-        set_text(self.view, 'abc')
-        add_sel(self.view, self.R(0, 2))
+test_data = namedtuple('test_data', 'initial_text regions cmd_params expected actual_func msg')
 
-        self.view.settings().get('vintage')['mode'] = MODE_VISUAL
-        self.view.run_command('_vi_big_i')
-        self.assertEqual(self.R(0, 0), first_sel(self.view))
-
-
-class Test_vi_big_i_InNormalMode_MultipleSel(BufferTest):
-    def testMovesCaretToBol(self):
-        set_text(self.view, 'abc\nabc')
-        self.view.sel().add(self.R((0, 1), (0, 1)))
-        self.view.sel().add(self.R((1, 1), (1, 1)))
-
-        self.view.settings().get('vintage')['mode'] = MODE_VISUAL
-        self.view.run_command('_vi_big_i')
-
-        self.assertEqual(self.R(0, 0), first_sel(self.view))
-        self.assertEqual(self.R((1, 0), (1, 0)), second_sel(self.view))
+TESTS = (
+    test_data('abc',           [[(0, 0), (0, 2)]],                   {'mode': _MODE_INTERNAL_NORMAL}, [(0, 0), (0, 0)], first_sel, ''),
+    test_data('abc\nabc',      [[(0, 1), (0, 1)], [(1, 1), (1, 1)]], {'mode': _MODE_INTERNAL_NORMAL}, [(0, 0), (0, 0)], first_sel, ''),
+    test_data('abc\nabc',      [[(0, 1), (0, 1)], [(1, 1), (1, 1)]], {'mode': _MODE_INTERNAL_NORMAL}, [(1, 0), (1, 0)], second_sel, ''),
+    test_data('abc',           [[(0, 0), (0, 2)]],                   {'mode': MODE_VISUAL},           [(0, 0), (0, 0)], first_sel, ''),
+    test_data('abc\nabc',      [[(0, 1), (0, 2)], [(1, 1), (1, 2)]], {'mode': MODE_VISUAL},           [(0, 0), (0, 0)], first_sel, ''),
+    test_data('abc\nabc',      [[(0, 1), (0, 2)], [(1, 1), (1, 2)]], {'mode': MODE_VISUAL},           [(1, 0), (1, 0)], second_sel, ''),
+    test_data('abc\nabc\nabc', [[(0, 0), (1, 4)]],                   {'mode': MODE_VISUAL_LINE},      [(0, 0), (0, 0)], first_sel, ''),
+    test_data('abc\nabc\nabc', [[(1, 0), (2, 4)]],                   {'mode': MODE_VISUAL_LINE},      [(1, 0), (1, 0)], first_sel, ''),
+    test_data('abc\nabc',      [[(0, 2), (0, 3)], [(1, 2), (1, 3)]], {'mode': MODE_VISUAL_BLOCK},     [(0, 2), (0, 2)], first_sel, ''),
+    test_data('abc\nabc',      [[(0, 2), (0, 3)], [(1, 2), (1, 3)]], {'mode': MODE_VISUAL_BLOCK},     [(1, 2), (1, 2)], second_sel, ''),
+)
 
 
-class Test_vi_big_i_InVisualMode_SingleSel(BufferTest):
-    def testMovesCaretToBol(self):
-        set_text(self.view, 'abc')
-        add_sel(self.view, self.R((0, 0), (0, 2)))
+class Test_vi_big_i(BufferTest):
+    def testAll(self):
+        for (i, data) in enumerate(TESTS):
+            # TODO: Perhaps we should ensure that other state is reset too?
+            self.view.sel().clear()
 
-        self.view.settings().get('vintage')['mode'] = MODE_VISUAL
-        self.view.run_command('_vi_big_i')
+            set_text(self.view, data.initial_text)
+            for region in data.regions:
+                add_sel(self.view, self.R(*region))
 
-        self.assertEqual(self.R(0, 0), first_sel(self.view))
+            self.view.run_command('_vi_big_i', data.cmd_params)
 
-
-class Test_vi_big_i_InVisualMode_MultipleSel(BufferTest):
-    def testMovesCaretToBol(self):
-        set_text(self.view, 'abc\nabc')
-        add_sel(self.view, self.R((0, 0), (0, 2)))
-        self.view.sel().add(self.R((1, 1), (1, 1)))
-
-        self.view.settings().get('vintage')['mode'] = MODE_VISUAL
-        self.view.run_command('_vi_big_i')
-
-        self.assertEqual(self.R(0, 0), first_sel(self.view))
-        self.assertEqual(self.R((1, 0), (1, 0)), second_sel(self.view))
-
-
-class Test_vi_big_i_InVisualLineMode_SingleSel(BufferTest):
-    def testMovesCaretToBol(self):
-        set_text(self.view, 'abc')
-        add_sel(self.view, self.R((0, 0), (0, 2)))
-
-        self.view.settings().get('vintage')['mode'] = MODE_VISUAL_LINE
-        self.view.run_command('_vi_big_i')
-
-        self.assertEqual(self.R(0, 0), first_sel(self.view))
-
-
-class Test_vi_big_i_InVisualLineMode_MultipleSel(BufferTest):
-    def testMovesCaretToBol(self):
-        set_text(self.view, 'abc\nabc')
-        add_sel(self.view, self.R((0, 0), (0, 2)))
-        self.view.sel().add(self.R((1, 1), (1, 1)))
-
-        self.view.settings().get('vintage')['mode'] = MODE_VISUAL
-        self.view.run_command('_vi_big_i')
-
-        self.assertEqual(self.R(0, 0), first_sel(self.view))
-        self.assertEqual(self.R((1, 0), (1, 0)), second_sel(self.view))
-
-
-
-class Test_vi_big_i_InVisualBlockMode_SingleSel(BufferTest):
-    def testMovesCaretToBol(self):
-        set_text(self.view, 'abc')
-        add_sel(self.view, self.R((0, 0), (0, 2)))
-
-        self.view.settings().get('vintage')['mode'] = MODE_VISUAL_BLOCK
-        self.view.run_command('_vi_big_i')
-
-        self.assertEqual(self.R(0, 0), first_sel(self.view))
-
-
-class Test_vi_big_i_InVisualBlockMode_MultipleSel(BufferTest):
-    def testMovesCaretToBol(self):
-        set_text(self.view, 'abc\nabc')
-        add_sel(self.view, self.R((0, 0), (0, 2)))
-        self.view.sel().add(self.R((1, 0), (1, 2)))
-
-        self.view.settings().get('vintage')['mode'] = MODE_VISUAL_BLOCK
-        self.view.run_command('_vi_big_i')
-
-        self.assertEqual(self.R(0, 0), first_sel(self.view))
-        self.assertEqual(self.R((1, 0), (1, 0)), second_sel(self.view))
+            msg = "[{0}] {1}".format(i, data.msg)
+            actual = data.actual_func(self.view)
+            self.assertEqual(self.R(*data.expected), actual, msg)
