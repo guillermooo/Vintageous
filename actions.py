@@ -804,35 +804,67 @@ class Sequence(sublime_plugin.TextCommand):
 
 class _vi_big_j(sublime_plugin.TextCommand):
     WHITE_SPACE = ' \t'
-    def run(self, edit, mode=None, separator=' '):
+
+    def row_at(self, pt):
+        return self.view.rowcol(pt)[0]
+
+    def get_separator(self, pt):
+        # Get the line's last character.
+        pt = self.view.line(pt).b - 1
+        c = self.view.substr(pt)
+        sep = c if c in _vi_big_j.WHITE_SPACE else ''
+        return sep
+
+    def run(self, edit, mode=None, separator=' ', count=1):
         def f(view, s):
             if mode == _MODE_INTERNAL_NORMAL:
-                # Don't join anything if there's only one line in the buffer.
-                if self.view.rowcol(self.view.size())[0] == 0:
-                    return s
-                full_current_line = view.full_line(s.b)
-                target = full_current_line.b - 1
-                full_next_line = view.full_line(full_current_line.b)
-                contiguous_lines = sublime.Region(full_current_line.a, full_next_line.b)
-
-                # Text without \n.
-                first_line_text = view.substr(view.line(full_current_line.a))
-                next_line_text = view.substr(full_next_line)
-
-                if len(next_line_text) > 1:
-                    next_line_text = next_line_text.lstrip()
-
-                sep = ''
-                if (separator and first_line_text and not first_line_text.endswith(tuple(_vi_big_j.WHITE_SPACE))):
-                    sep = ' '
-
-                view.replace(edit, contiguous_lines, first_line_text + sep + next_line_text)
-
-                if first_line_text:
-                    return sublime.Region(target, target)
-                return s
+                end_pos = self.view.line(s.b).b
+                sep = self.get_separator(s.a)
+                start = end = s.b
+                if count > 2:
+                    end = self.view.text_point(self.row_at(s.b) + (count - 1), 0)
+                    end = self.view.line(end).b
+                else:
+                    # Join current line and the next.
+                    end = self.view.text_point(self.row_at(s.b) + 1, 0)
+                    end = self.view.line(end).b
+            elif mode == MODE_VISUAL:
+                if s.a < s.b:
+                    sep = self.get_separator(s.a)
+                    end_pos = self.view.line(s.a).b
+                    start = s.a
+                    if self.row_at(s.b - 1) == self.row_at(s.a):
+                        end = self.view.text_point(self.row_at(s.a) + 1, 0)
+                    else:
+                        end = self.view.text_point(self.row_at(s.b - 1), 0)
+                    end = self.view.line(end).b
+                else:
+                    sep = self.get_separator(s.b)
+                    end_pos = self.view.line(s.b).b
+                    start = s.b
+                    if self.row_at(s.b) == self.row_at(s.a - 1):
+                        end = self.view.text_point(self.row_at(s.a - 1) + 1, 0)
+                    else:
+                        end = self.view.text_point(self.row_at(s.a - 1), 0)
+                    end = self.view.line(end).b
             else:
                 return s
+
+            text_to_join = self.view.substr(sublime.Region(start, end))
+            text_to_join = re.sub(r'\n+', r'\n', text_to_join)
+            lines = text_to_join.split('\n')
+            lines = [l.lstrip().rstrip() for l in lines]
+            text_to_join = '\n'.join(lines)
+
+            if separator:
+                # J
+                joined_text = text_to_join.replace('\n', sep or separator)
+            else:
+                # gJ
+                joined_text = text_to_join.replace('\n', '')
+
+            self.view.replace(edit, sublime.Region(start, end), joined_text)
+            return sublime.Region(end_pos)
 
         regions_transformer(self.view, f)
 

@@ -138,7 +138,7 @@
 	{ "keys": ["o"], "command": "set_action", "args": {"action": "vi_o"},     "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["O"], "command": "set_action", "args": {"action": "vi_big_o"}, "context": [{"key": "setting.command_mode"}] },
 
-	{ "keys": ["J"], "command": "set_action", "args": {"action": "vi_big_j"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["J"], "command": "set_action", "args": {"action": "vi_big_j"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 
 	{ "keys": ["D"], "command": "set_action", "args": {"action": "vi_big_d"}, "context": [{"key": "setting.command_mode"}] },
 
