@@ -359,7 +359,7 @@ class ViGoToLine(sublime_plugin.TextCommand):
         self.view.show(self.view.sel()[0])
 
 
-class ViPercent(sublime_plugin.TextCommand):
+class _vi_percent(sublime_plugin.TextCommand):
     # TODO: Perhaps truly support multiple regions here?
     pairs = (
             ('(', ')'),
@@ -381,13 +381,13 @@ class ViPercent(sublime_plugin.TextCommand):
                         return self.find_balanced_opening_bracket(bracket_pt, brackets)
 
                 if mode == MODE_VISUAL:
-                    # TODO: Improve handling of s.a < s.b and s.a > s.b cases.
-                    a = find_bracket_location(s.b - 1)
-                    if a is not None:
-                        a = a + 1 if a > s.b else a
-                        if a == s.a:
-                            a += 1
-                        return sublime.Region(s.a, a)
+                    b = (s.b - 1) if (s.a < s.b) else s.b
+                    found = find_bracket_location(b)
+                    if found:
+                        end = (found + 1) if (found > s.b) else found
+                        end = (end + 1) if end == s.a else end
+                        begin = (s.a + 1) if (s.a < s.b) else s.a
+                        return sublime.Region(begin, end)
 
                 if mode == MODE_VISUAL_LINE:
                     # TODO: Improve handling of s.a < s.b and s.a > s.b cases.
@@ -403,9 +403,12 @@ class ViPercent(sublime_plugin.TextCommand):
 
                 # TODO: According to Vim we must swallow brackets in this case.
                 elif mode == _MODE_INTERNAL_NORMAL:
-                    a = find_bracket_location(s.b)
-                    if a is not None:
-                        return sublime.Region(s.a, a)
+                    found = find_bracket_location(s.b)
+                    if found:
+                        if found < s.a:
+                            return sublime.Region(s.a + 1, found)
+                        else:
+                            return sublime.Region(s.a, found + 1)
 
                 return s
 
