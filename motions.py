@@ -1602,3 +1602,30 @@ class _vi_hat(sublime_plugin.TextCommand):
                 return s
 
         regions_transformer(self.view, f)
+
+
+class _vi_double_antilambda_motion(sublime_plugin.TextCommand):
+    def run(self, edit, count=None, mode=None):
+        def f(view, s):
+            if mode == _MODE_INTERNAL_NORMAL:
+                if count > 1:
+                    begin = view.line(s.begin()).a
+                    pt = view.text_point(view.rowcol(begin)[0] + (count - 1), 0)
+                    end = view.line(pt).b
+                    return sublime.Region(begin, end)
+            return s
+
+        regions_transformer(self.view, f)
+
+
+class _vi_double_antilambda(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, count=None):
+        def f(view, s):
+            bol = view.line(s.begin()).a
+            pt = utils.next_non_white_space_char(view, bol, white_space='\t ')
+            return sublime.Region(pt)
+
+        self.view.run_command('_vi_double_antilambda_motion', {'mode': mode, 'count': count})
+        self.view.run_command('unindent')
+        regions_transformer(self.view, f)
+
