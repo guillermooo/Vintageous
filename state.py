@@ -752,19 +752,23 @@ class VintageState(object):
     def eval_cancel_action(self):
         """Cancels the whole run of the command.
         """
-
         try:
-            # TODO: add a .parse() method that includes boths steps?
             vi_cmd_data = self.parse_motion()
             vi_cmd_data = self.parse_action(vi_cmd_data)
-            # Modify the data that determines the mode we'll end up in when the command finishes.
+            # XXX: Perhaps the command data wants a specific exit mode.
             self.next_mode = vi_cmd_data['_exit_mode']
-            # Since we are exiting early, ensure we leave the selections as the commands wants them.
+            # Ensure we clean up selections as the command wants.
             if vi_cmd_data['_exit_mode_command']:
                 self.view.run_command(vi_cmd_data['_exit_mode_command'])
-        except Exception:
-            # XXX: If the above fails, we still have to cancel.
-            print("Vintageous: Exception caught in 'eval_cancel_action.")
+        except TypeError as te:
+            # Occurs when an action is missing from VintageState. It's normal
+            # if we are cancelling an incomplete command.
+            # XXX: Maybe it should be a ValueError instead?
+            pass
+        except Exception as e:
+            # Swallow all exceptions because we have to abort the command anyway.
+            print("Vintageous: Unexpected exception caught in 'eval_cancel_action:")
+            print(e)
 
     def eval_full_command(self):
         """Evaluates a command like 3dj, where there is an action as well as a motion.
