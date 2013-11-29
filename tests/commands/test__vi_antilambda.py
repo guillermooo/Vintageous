@@ -20,10 +20,11 @@ from Vintageous.tests import BufferTest
 test_data = namedtuple('test_data', 'initial_text regions cmd_params expected msg')
 
 TESTS = (
-    test_data('    abc',                   [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 1}, 'abc',           ''),
-    test_data('        abc',               [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 1}, '    abc',       ''),
-    test_data('    abc\n    abc',          [[(0, 0), (0, 0)], [(1, 0), (1, 0)]], {'mode': _MODE_INTERNAL_NORMAL, 'count': 2}, 'abc\nabc',      ''),
-    test_data('    abc\n    abc\n    abc', [[(0, 0), (0, 0)], [(1, 0), (1, 0)]], {'mode': _MODE_INTERNAL_NORMAL, 'count': 2}, 'abc\nabc\nabc', ''),
+    test_data('    abc',                   [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 1}, 'abc',               ''),
+    test_data('        abc',               [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 1}, '    abc',           ''),
+    test_data('    abc\n    abc',          [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 2}, 'abc\nabc',          ''),
+    test_data('    abc\n    abc\n    abc', [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 3}, 'abc\nabc\nabc',     ''),
+    test_data('    abc\n    abc\n    abc', [[(0, 0), (0, 0)], [(1, 0), (1, 0)]], {'mode': _MODE_INTERNAL_NORMAL, 'count': 1}, 'abc\nabc\n    abc', ''),
 )
 
 
