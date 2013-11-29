@@ -926,9 +926,10 @@ class _vi_right_parenthesis(sublime_plugin.TextCommand):
             sen = self.view.expand_by_class(sen, sublime.CLASS_PUNCTUATION_START |
                                                  sublime.CLASS_LINE_END)
             if (sen.b == self.view.size() or
-                self.view.substr(sublime.Region(sen.b, sen.b + 2)).endswith(('. ', '.\t')) or
-                self.view.substr(self.view.line(sen.b)).strip() == ''):
-                    if self.view.substr(sen.b) == '.':
+                (self.view.substr(sublime.Region(sen.b, sen.b + 2)).endswith(('. ', '.\t'))) or
+                (self.view.substr(sublime.Region(sen.b, sen.b + 1)).endswith(('?', '!'))) or
+                (self.view.substr(self.view.line(sen.b)).strip() == '')):
+                    if self.view.substr(sen.b) in '.?!':
                         return sublime.Region(sen.a, sen.b + 1)
                     else:
                         if self.view.line(sen.b).empty():
@@ -964,7 +965,7 @@ class _vi_left_parenthesis(sublime_plugin.TextCommand):
         sen = sublime.Region(pt, pt)
         while True:
             sen = self.view.expand_by_class(sen, sublime.CLASS_LINE_END | sublime.CLASS_PUNCTUATION_END)
-            if sen.a <= 0 or self.view.substr(sen.begin() - 1) in ('.', '\n'):
+            if sen.a <= 0 or self.view.substr(sen.begin() - 1) in ('.', '\n', '?', '!'):
                 if self.view.substr(sen.begin() - 1) == '.' and not self.view.substr(sen.begin()) == ' ':
                     continue
                 return sen

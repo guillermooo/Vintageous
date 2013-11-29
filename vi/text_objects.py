@@ -286,7 +286,7 @@ def get_text_object_region(view, s, text_object, inclusive=False, count=1):
                                                  else sentence_start_2.b)
         else:
             sentence_start = sentence_start + 1
-        sentence_end = find_in_range(view, r'[.?!:)](?=\s)|[.?!:)]$',
+        sentence_end = find_in_range(view, r'([.?!:)](?=\s))|([.?!:)]$)',
                                      start=s.b,
                                      end=view.size())
 
