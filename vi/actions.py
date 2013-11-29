@@ -24,7 +24,7 @@ def vi_enter_visual_mode(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['keep_selection_as_is'] = True
     vi_cmd_data['action']['command'] = 'vi_enter_visual_mode'
-    vi_cmd_data['action']['args'] = {}
+    vi_cmd_data['action']['args'] = {'count': vi_cmd_data['count']}
     return vi_cmd_data
 
 

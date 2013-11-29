@@ -386,10 +386,16 @@ class ViEnterInsertMode(sublime_plugin.TextCommand):
 
 
 class ViEnterVisualMode(sublime_plugin.TextCommand):
-    def run(self, edit):
+    def run(self, edit, count=None):
+        def f(view, s):
+            return sublime.Region(s.a, s.b + (count - 1))
+
         state = VintageState(self.view)
         state.enter_visual_mode()
         self.view.run_command('extend_to_minimal_width')
+
+        if count > 1:
+            regions_transformer(self.view, f)
 
 
 class ViEnterVisualBlockMode(sublime_plugin.TextCommand):
