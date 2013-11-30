@@ -262,7 +262,6 @@ class _vi_p(sublime_plugin.TextCommand):
 
 class _vi_big_p(sublime_plugin.TextCommand):
     def run(self, edit, register=None, count=1):
-        old_rows = []
         state = VintageState(self.view)
 
         if state.mode == MODE_VISUAL:
@@ -289,29 +288,29 @@ class _vi_big_p(sublime_plugin.TextCommand):
         else:
             sel_frag = zip(sels, [fragments[0],] * len(sels))
 
+        pasting_linewise = True
         offset = 0
+        paste_locations = []
         for s, text in sel_frag:
             row = self.view.rowcol(s.begin())[0]
             row = max(0, row - 1)
-            old_rows.append(row)
             if text.endswith('\n'):
                 if utils.is_at_eol(self.view, s) or utils.is_at_bol(self.view, s):
-                    self.paste_all(edit, s, self.view.line(s.b).a, text, count)
+                    l = self.paste_all(edit, s, self.view.line(s.b).a, text, count)
+                    paste_locations.append(l)
                 else:
-                    self.paste_all(edit, s, self.view.line(s.b - 1).a, text, count)
+                    l = self.paste_all(edit, s, self.view.line(s.b - 1).a, text, count)
+                    paste_locations.append(l)
             else:
-                self.paste_all(edit, s, s.b + offset, text, count)
+                pasting_linewise = False
+                l = self.paste_all(edit, s, s.b + offset, text, count)
+                paste_locations.append(l)
                 offset += len(text) * count
 
-        self.place_sel(old_rows)
-
-    def place_sel(self, old_rows):
-        new_sel = []
-        for row in old_rows:
-            pt = self.view.text_point(row + 1, 0)
-            new_sel.append(sublime.Region(pt, pt))
-        self.view.sel().clear()
-        self.view.sel().add_all(new_sel)
+        if pasting_linewise:
+            self.reset_carets_linewise()
+        else:
+            self.reset_carets_charwise(paste_locations, len(text))
 
     def paste_all(self, edit, sel, at, text, count):
         # for x in range(count):
@@ -320,6 +319,8 @@ class _vi_big_p(sublime_plugin.TextCommand):
         if state.mode not in (MODE_VISUAL, MODE_VISUAL_LINE):
             for x in range(count):
                 self.view.insert(edit, at, text)
+            return at + (len(text) * (count - 1))
+
         else:
             if text.endswith('\n'):
                 text = text * count
@@ -328,6 +329,35 @@ class _vi_big_p(sublime_plugin.TextCommand):
             else:
                 text = text * count
             self.view.replace(edit, sel, text)
+            return sel.begin()
+
+    def reset_carets_charwise(self, paste_locations, paste_len):
+        # FIXME: Won't work for multiple jagged pastes...
+        b_pts = [s.b for s in list(self.view.sel())]
+        if len(b_pts) > 1:
+            self.view.sel().clear()
+            self.view.sel().add_all([sublime.Region(ploc + paste_len - 1,
+                                                    ploc + paste_len - 1)
+                                            for ploc in paste_locations])
+        else:
+            self.view.sel().clear()
+            self.view.sel().add(sublime.Region(paste_locations[0] + paste_len - 1,
+                                               paste_locations[0] + paste_len - 1))
+
+    def reset_carets_linewise(self):
+        # FIXME: Won't work well for visual selections...
+        # FIXME: This might not work for cmdline paste command (the target row isn't necessarily
+        #        the next one.
+        state = VintageState(self.view)
+        if state.mode == MODE_VISUAL_LINE:
+            self.view.run_command('collapse_to_a')
+        else:
+            # After pasting linewise, we should move the caret one line down.
+            b_pts = [s.b for s in list(self.view.sel())]
+            new_rows = [self.view.rowcol(b)[0] + 1 for b in b_pts]
+            row_starts = [self.view.text_point(r, 0) for r in new_rows]
+            self.view.sel().clear()
+            self.view.sel().add_all([sublime.Region(pt, pt) for pt in row_starts])
 
 
 class ViEnterNormalMode(sublime_plugin.TextCommand):

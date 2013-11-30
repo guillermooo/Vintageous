@@ -263,13 +263,17 @@ def get_text_object_region(view, s, text_object, inclusive=False, count=1):
         w = a_word(view, s.b, inclusive=inclusive, count=count)
         if not w:
             return s
-        return w
+        if s.size() <= 1:
+            return w
+        return sublime.Region(s.a, w.b)
 
     if type_ == BIG_WORD:
         w = a_big_word(view, s.b, inclusive=inclusive, count=count)
         if not w:
             return s
-        return w
+        if s.size() <= 1:
+            return w
+        return sublime.Region(s.a, w.b)
 
     if type_ == SENTENCE:
         # FIXME: This doesn't work well.
