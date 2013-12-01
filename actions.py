@@ -26,44 +26,71 @@ import os
 import stat
 
 
-class NumberModifier(sublime_plugin.TextCommand):
+class _vi_modify_numbers(sublime_plugin.TextCommand):
     """
     Base class for Ctrl-x and Ctrl-a.
     """
-    DIGIT_PAT = re.compile('(-)?(\d+)(\D+)?')
+    DIGIT_PAT = re.compile('(\D+?)?(-)?(\d+)(\D+)?')
     NUM_PAT = re.compile('\d')
 
-    def get_word(self, s):
-        word = self.view.word(s.b)
-        if word.a > 0:
-            if self.view.substr(word.a - 1) == '-':
-               return sublime.Region(word.a - 1, word.b)
-        return word
+    def get_editable_data(self, pt):
+        sign = -1 if (self.view.substr(pt - 1) == '-') else 1
+        end = pt
+        while self.view.substr(end).isdigit():
+            end += 1
+        return (sign, int(self.view.substr(sublime.Region(pt, end))),
+                sublime.Region(end, self.view.line(pt).b))
 
-    def check_words(self, regions):
-        nums = [self.view.substr(s.b).isdigit() for s in regions]
-        if not all(nums):
-            return []
-
-        words = [self.get_word(s) for s in regions]
-        matches = [_vi_ctrl_x.DIGIT_PAT.match(self.view.substr(w)) for w in words]
-
-        if all(matches):
-            return zip(words, matches)
-        return []
 
     def find_next_num(self, regions):
+        # Modify selections that are inside a number already.
+        for i, r in enumerate(regions):
+            a = r.b
+            if self.view.substr(r.b).isdigit():
+                while self.view.substr(a).isdigit():
+                    a -=1
+                regions[i] = sublime.Region(a)
+
         lines = [self.view.substr(sublime.Region(r.b, self.view.line(r.b).b)) for r in regions]
-        positions = [_vi_ctrl_x.NUM_PAT.search(text) for text in lines]
-        if all(positions):
-            pairs = zip(regions, positions)
-            rv = [sublime.Region(r.b + p.start()) for (r, p) in pairs]
-            return rv
+        matches = [_vi_modify_numbers.NUM_PAT.search(text) for text in lines]
+        if all(matches):
+            return [(reg.b + ma.start()) for (reg, ma) in zip(regions, matches)]
         return []
 
-    def run(self, edit, count=1, mode=None):
-        # FIXME: Must abstract out this method to.
-        pass
+    def run(self, edit, count=1, mode=None, subtract=False):
+        if mode != _MODE_INTERNAL_NORMAL:
+            return
+
+        # TODO: Deal with octal, hex notations.
+        # TODO: Improve detection of numbers.
+        regs = list(self.view.sel())
+
+        pts = self.find_next_num(regs)
+        if not pts:
+            utils.blink()
+            return
+
+        count = count if not subtract else -count
+        end_sels = []
+        for pt in reversed(pts):
+            sign, num, tail = self.get_editable_data(pt)
+
+            num_as_text = str((sign * num) + count)
+            new_text = num_as_text + self.view.substr(tail)
+
+            offset = 0
+            if sign == -1:
+                offset = -1
+                self.view.replace(edit, sublime.Region(pt - 1, tail.b), new_text)
+            else:
+                self.view.replace(edit, sublime.Region(pt, tail.b), new_text)
+
+            rowcol = self.view.rowcol(pt + len(num_as_text) - 1 + offset)
+            end_sels.append(rowcol)
+
+        self.view.sel().clear()
+        for (row, col) in end_sels:
+            self.view.sel().add(sublime.Region(self.view.text_point(row, col)))
 
 
 class _vi_big_a(sublime_plugin.TextCommand):
@@ -911,111 +938,6 @@ class _vi_big_j(sublime_plugin.TextCommand):
             return sublime.Region(end_pos)
 
         regions_transformer(self.view, f)
-
-
-class _vi_ctrl_a(NumberModifier):
-    # FIXME: Must abstract out this method.
-    def run(self, edit, count=1, mode=None):
-        def f(view, s):
-            if mode == _MODE_INTERNAL_NORMAL:
-
-                word, match = next(pairs)
-                sign, amount, suffix = match.groups()
-                sign = -1 if sign else 1
-                suffix = suffix or ''
-
-                new_digit = (sign * int(amount)) + count
-                view.replace(edit, word, str(new_digit) + suffix)
-
-                offset = len(str(new_digit))
-                # FIXME: Deal with multiple sels as we should.
-                if len(view.sel()) == 1:
-                    return sublime.Region(word.a + offset - 1)
-                # return sublime.Region(word.b - len(suffix) - 1)
-
-            return s
-
-        if mode != _MODE_INTERNAL_NORMAL:
-            return
-
-        # TODO: Deal with octal, hex notations.
-        # TODO: Improve detection of numbers.
-        pairs = list(self.check_words(list(self.view.sel())))
-        if not pairs:
-            next_nums = self.find_next_num(list(self.view.sel()))
-            if not next_nums:
-                utils.blink()
-                return
-            pairs = iter(reversed(list(self.check_words(next_nums))))
-        else:
-            pairs = iter(reversed(list(self.check_words(self.view.sel()))))
-
-        try:
-            xpos = []
-            if len(self.view.sel()) > 1:
-                rowcols = [self.view.rowcol(s.b - 1) for s in self.view.sel()]
-            regions_transformer_reversed(self.view, f)
-            if len(self.view.sel()) > 1:
-                regs = [sublime.Region(self.view.text_point(*rc)) for rc in rowcols]
-                next_nums = self.find_next_num(regs)
-                if next_nums:
-                    self.view.sel().clear()
-                    self.view.sel().add_all(next_nums)
-        except StopIteration:
-            utils.blink()
-            return
-
-
-class _vi_ctrl_x(NumberModifier):
-    def run(self, edit, count=1, mode=None):
-        def f(view, s):
-            if mode == _MODE_INTERNAL_NORMAL:
-
-                word, match = next(pairs)
-                sign, amount, suffix = match.groups()
-                sign = -1 if sign else 1
-                suffix = suffix or ''
-
-                new_digit = (sign * int(amount)) - count
-                view.replace(edit, word, str(new_digit) + suffix)
-
-                offset = len(str(new_digit))
-                # FIXME: Deal with multiple sels as we should.
-                if len(view.sel()) == 1:
-                    return sublime.Region(word.a + offset - 1)
-                # return sublime.Region(word.b - len(suffix) - 1)
-
-            return s
-
-        if mode != _MODE_INTERNAL_NORMAL:
-            return
-
-        # TODO: Deal with octal, hex notations.
-        # TODO: Improve detection of numbers.
-        pairs = list(self.check_words(list(self.view.sel())))
-        if not pairs:
-            next_nums = self.find_next_num(list(self.view.sel()))
-            if not next_nums:
-                utils.blink()
-                return
-            pairs = iter(reversed(list(self.check_words(next_nums))))
-        else:
-            pairs = iter(reversed(list(self.check_words(self.view.sel()))))
-
-        try:
-            xpos = []
-            if len(self.view.sel()) > 1:
-                rowcols = [self.view.rowcol(s.b - 1) for s in self.view.sel()]
-            regions_transformer_reversed(self.view, f)
-            if len(self.view.sel()) > 1:
-                regs = [sublime.Region(self.view.text_point(*rc)) for rc in rowcols]
-                next_nums = self.find_next_num(regs)
-                if next_nums:
-                    self.view.sel().clear()
-                    self.view.sel().add_all(next_nums)
-        except StopIteration:
-            utils.blink()
-            return
 
 
 class _vi_g_v(IrreversibleTextCommand):

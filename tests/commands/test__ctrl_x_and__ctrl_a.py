@@ -1,4 +1,5 @@
 import unittest
+from collections import namedtuple
 
 from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
 from Vintageous.vi.constants import MODE_NORMAL
@@ -12,149 +13,51 @@ from Vintageous.tests import first_sel
 from Vintageous.tests import BufferTest
 
 
-class Test_vi_ctrl_x_InNormalMode(BufferTest):
-    def testAbortsIfNoDigitsInAnyLine(self):
-        set_text(self.view, ''.join(('foo bar\nfoo bar\nfoo bar\n',)))
-        add_sel(self.view, self.R((0, 0), (0, 0)))
-        add_sel(self.view, self.R((1, 0), (1, 0)))
-        add_sel(self.view, self.R((2, 0), (2, 0)))
+test_data = namedtuple('test_data', 'initial_text regions cmd_params expected msg')
 
-        self.view.run_command('_vi_ctrl_x', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1})
-        self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo bar\nfoo bar\nfoo bar\n')
+TESTS = (
+    test_data('abc aaa100bbb abc', [[(0, 0), (0, 0)]], {'mode':_MODE_INTERNAL_NORMAL, 'count': 10}, 'abc aaa110bbb abc', ''),
+    test_data('abc aaa-100bbb abc', [[(0, 0), (0, 0)]], {'mode':_MODE_INTERNAL_NORMAL, 'count': 10}, 'abc aaa-90bbb abc', ''),
 
-    def testDecreaseDigitsUnderSelection(self):
-        set_text(self.view, ''.join(('foo 100\nfoo 200\nfoo 300\n',)))
-        add_sel(self.view, self.R((0, 4), (0, 4)))
-        add_sel(self.view, self.R((1, 4), (1, 4)))
-        add_sel(self.view, self.R((2, 4), (2, 4)))
+    test_data('abc aaa100bbb abc', [[(0, 8), (0, 8)]], {'mode':_MODE_INTERNAL_NORMAL, 'count': 10}, 'abc aaa110bbb abc', ''),
+    test_data('abc aaa-100bbb abc', [[(0, 8), (0, 8)]], {'mode':_MODE_INTERNAL_NORMAL, 'count': 10}, 'abc aaa-90bbb abc', ''),
 
-        self.view.run_command('_vi_ctrl_x', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1})
-        self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo 99\nfoo 199\nfoo 299\n')
+    test_data('abc aaa100bbb abc\nabc aaa100bbb abc', [[(0, 0), (0, 0)], [(1, 0), (1, 0)]], {'mode':_MODE_INTERNAL_NORMAL, 'count': 10}, 'abc aaa110bbb abc\nabc aaa110bbb abc', ''),
+    test_data('abc aaa-100bbb abc\nabc aaa-100bbb abc', [[(0, 0), (0, 0)], [(1, 0), (1, 0)]], {'mode':_MODE_INTERNAL_NORMAL, 'count': 10}, 'abc aaa-90bbb abc\nabc aaa-90bbb abc', ''),
 
-    def testDecreasePrefixedDigitsUnderSelection(self):
-        set_text(self.view, ''.join(('foo 10\nfoo 10\nfoo 10\n',)))
-        add_sel(self.view, self.R((0, 4), (0, 4)))
-        add_sel(self.view, self.R((1, 4), (1, 4)))
-        add_sel(self.view, self.R((2, 4), (2, 4)))
+    test_data('abc aaa100bbb abc\nabc aaa100bbb abc', [[(0, 8), (0, 8)], [(1, 8), (1, 8)]], {'mode':_MODE_INTERNAL_NORMAL, 'count': 10}, 'abc aaa110bbb abc\nabc aaa110bbb abc', ''),
+    test_data('abc aaa-100bbb abc\nabc aaa-100bbb abc', [[(0, 0), (0, 0)], [(1, 8), (1, 8)]], {'mode':_MODE_INTERNAL_NORMAL, 'count': 10}, 'abc aaa-90bbb abc\nabc aaa-90bbb abc', ''),
 
-        self.view.run_command('_vi_ctrl_x', {'mode': _MODE_INTERNAL_NORMAL, 'count': 11})
-        self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo -1\nfoo -1\nfoo -1\n')
+    test_data('abc aaa100bbb abc', [[(0, 0), (0, 0)]], {'mode':_MODE_INTERNAL_NORMAL, 'count': 10, 'subtract': True}, 'abc aaa90bbb abc', ''),
+    test_data('abc aaa-100bbb abc', [[(0, 0), (0, 0)]], {'mode':_MODE_INTERNAL_NORMAL, 'count': 10, 'subtract': True}, 'abc aaa-110bbb abc', ''),
 
-    def testDecreaseSuffixeddDigitsUnderSelection(self):
-        set_text(self.view, ''.join(('foo 10px\nfoo 10px\nfoo 10px\n',)))
-        add_sel(self.view, self.R((0, 4), (0, 4)))
-        add_sel(self.view, self.R((1, 4), (1, 4)))
-        add_sel(self.view, self.R((2, 4), (2, 4)))
+    test_data('abc aaa100bbb abc', [[(0, 8), (0, 8)]], {'mode':_MODE_INTERNAL_NORMAL, 'count': 10, 'subtract': True}, 'abc aaa90bbb abc', ''),
+    test_data('abc aaa-100bbb abc', [[(0, 8), (0, 8)]], {'mode':_MODE_INTERNAL_NORMAL, 'count': 10, 'subtract': True}, 'abc aaa-110bbb abc', ''),
 
-        self.view.run_command('_vi_ctrl_x', {'mode': _MODE_INTERNAL_NORMAL, 'count': 11})
-        self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo -1px\nfoo -1px\nfoo -1px\n')
+    test_data('abc aaa100bbb abc\nabc aaa100bbb abc', [[(0, 0), (0, 0)], [(1, 0), (1, 0)]], {'mode':_MODE_INTERNAL_NORMAL, 'count': 10, 'subtract': True}, 'abc aaa90bbb abc\nabc aaa90bbb abc', ''),
+    test_data('abc aaa-100bbb abc\nabc aaa-100bbb abc', [[(0, 0), (0, 0)], [(1, 0), (1, 0)]], {'mode':_MODE_INTERNAL_NORMAL, 'count': 10, 'subtract': True}, 'abc aaa-110bbb abc\nabc aaa-110bbb abc', ''),
 
-    def testDecreaseDigitsAfterSelection(self):
-        set_text(self.view, ''.join(('foo 100\nfoo 200\nfoo 300\n',)))
-        add_sel(self.view, self.R((0, 0), (0, 0)))
-        add_sel(self.view, self.R((1, 0), (1, 0)))
-        add_sel(self.view, self.R((2, 0), (2, 0)))
+    test_data('abc aaa100bbb abc\nabc aaa100bbb abc', [[(0, 8), (0, 8)], [(1, 8), (1, 8)]], {'mode':_MODE_INTERNAL_NORMAL, 'count': 10, 'subtract': True}, 'abc aaa90bbb abc\nabc aaa90bbb abc', ''),
+    test_data('abc aaa-100bbb abc\nabc aaa-100bbb abc', [[(0, 0), (0, 0)], [(1, 8), (1, 8)]], {'mode':_MODE_INTERNAL_NORMAL, 'count': 10, 'subtract': True}, 'abc aaa-110bbb abc\nabc aaa-110bbb abc', ''),
 
-        self.view.run_command('_vi_ctrl_x', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1})
-        self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo 99\nfoo 199\nfoo 299\n')
-
-    def testDecreaseDigitsAfterSelectionByCount(self):
-        set_text(self.view, ''.join(('foo 100\nfoo 200\nfoo 300\n',)))
-        add_sel(self.view, self.R((0, 4), (0, 4)))
-        add_sel(self.view, self.R((1, 4), (1, 4)))
-        add_sel(self.view, self.R((2, 4), (2, 4)))
-
-        self.view.run_command('_vi_ctrl_x', {'mode': _MODE_INTERNAL_NORMAL, 'count': 10})
-        self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo 90\nfoo 190\nfoo 290\n')
-
-    def testAbortIfOnlySomeSelectionsHaveDigits(self):
-        set_text(self.view, ''.join(('foo 100\nfoo bar\nfoo 300\n',)))
-        add_sel(self.view, self.R((0, 4), (0, 4)))
-        add_sel(self.view, self.R((1, 4), (1, 4)))
-        add_sel(self.view, self.R((2, 4), (2, 4)))
-
-        self.view.run_command('_vi_ctrl_x', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1})
-        self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo 100\nfoo bar\nfoo 300\n')
-
-    def testAbortIfOnlySomeSelectionsHaveDigitsAfterThem(self):
-        set_text(self.view, ''.join(('foo 100\nfoo bar\nfoo 300\n',)))
-        add_sel(self.view, self.R((0, 0), (0, 0)))
-        add_sel(self.view, self.R((1, 0), (1, 0)))
-        add_sel(self.view, self.R((2, 0), (2, 0)))
-
-        self.view.run_command('_vi_ctrl_x', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1})
-        self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo 100\nfoo bar\nfoo 300\n')
+    # TODO: Test with sels on same line.
+    # TODO: Test with standalone number.
+    # TODO: Test with number followed by suffix.
+)
 
 
-class Test_vi_ctrl_a_InNormalMode(BufferTest):
-    def testAbortsIfNoDigitsInAnyLine(self):
-        set_text(self.view, ''.join(('foo bar\nfoo bar\nfoo bar\n',)))
-        add_sel(self.view, self.R((0, 0), (0, 0)))
-        add_sel(self.view, self.R((1, 0), (1, 0)))
-        add_sel(self.view, self.R((2, 0), (2, 0)))
+class Test__vi_ctrl_x(BufferTest):
+    def testAll(self):
+        for (i, data) in enumerate(TESTS):
+            # TODO: Perhaps we should ensure that other state is reset too?
+            self.view.sel().clear()
 
-        self.view.run_command('_vi_ctrl_a', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1})
-        self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo bar\nfoo bar\nfoo bar\n')
+            set_text(self.view, data.initial_text)
+            for region in data.regions:
+                add_sel(self.view, self.R(*region))
 
-    def testDecreaseDigitsUnderSelection(self):
-        set_text(self.view, ''.join(('foo 100\nfoo 200\nfoo 300\n',)))
-        add_sel(self.view, self.R((0, 4), (0, 4)))
-        add_sel(self.view, self.R((1, 4), (1, 4)))
-        add_sel(self.view, self.R((2, 4), (2, 4)))
+            self.view.run_command('_vi_modify_numbers', data.cmd_params)
 
-        self.view.run_command('_vi_ctrl_a', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1})
-        self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo 101\nfoo 201\nfoo 301\n')
-
-    def testDecreasePrefixedDigitsUnderSelection(self):
-        set_text(self.view, ''.join(('foo -10\nfoo -10\nfoo -10\n',)))
-        add_sel(self.view, self.R((0, 4), (0, 4)))
-        add_sel(self.view, self.R((1, 4), (1, 4)))
-        add_sel(self.view, self.R((2, 4), (2, 4)))
-
-        self.view.run_command('_vi_ctrl_a', {'mode': _MODE_INTERNAL_NORMAL, 'count': 11})
-        self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo 1\nfoo 1\nfoo 1\n')
-
-    def testDecreaseSuffixeddDigitsUnderSelection(self):
-        set_text(self.view, ''.join(('foo -10px\nfoo -10px\nfoo -10px\n',)))
-        add_sel(self.view, self.R((0, 4), (0, 4)))
-        add_sel(self.view, self.R((1, 4), (1, 4)))
-        add_sel(self.view, self.R((2, 4), (2, 4)))
-
-        self.view.run_command('_vi_ctrl_a', {'mode': _MODE_INTERNAL_NORMAL, 'count': 11})
-        self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo 1px\nfoo 1px\nfoo 1px\n')
-
-    def testDecreaseDigitsAfterSelection(self):
-        set_text(self.view, ''.join(('foo 100\nfoo 200\nfoo 300\n',)))
-        add_sel(self.view, self.R((0, 0), (0, 0)))
-        add_sel(self.view, self.R((1, 0), (1, 0)))
-        add_sel(self.view, self.R((2, 0), (2, 0)))
-
-        self.view.run_command('_vi_ctrl_a', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1})
-        self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo 101\nfoo 201\nfoo 301\n')
-
-    def testDecreaseDigitsAfterSelectionByCount(self):
-        set_text(self.view, ''.join(('foo 100\nfoo 200\nfoo 300\n',)))
-        add_sel(self.view, self.R((0, 4), (0, 4)))
-        add_sel(self.view, self.R((1, 4), (1, 4)))
-        add_sel(self.view, self.R((2, 4), (2, 4)))
-
-        self.view.run_command('_vi_ctrl_a', {'mode': _MODE_INTERNAL_NORMAL, 'count': 10})
-        self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo 110\nfoo 210\nfoo 310\n')
-
-    def testAbortIfOnlySomeSelectionsHaveDigits(self):
-        set_text(self.view, ''.join(('foo 100\nfoo bar\nfoo 300\n',)))
-        add_sel(self.view, self.R((0, 4), (0, 4)))
-        add_sel(self.view, self.R((1, 4), (1, 4)))
-        add_sel(self.view, self.R((2, 4), (2, 4)))
-
-        self.view.run_command('_vi_ctrl_a', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1})
-        self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo 100\nfoo bar\nfoo 300\n')
-
-    def testAbortIfOnlySomeSelectionsHaveDigitsAfterThem(self):
-        set_text(self.view, ''.join(('foo 100\nfoo bar\nfoo 300\n',)))
-        add_sel(self.view, self.R((0, 0), (0, 0)))
-        add_sel(self.view, self.R((1, 0), (1, 0)))
-        add_sel(self.view, self.R((2, 0), (2, 0)))
-
-        self.view.run_command('_vi_ctrl_a', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1})
-        self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo 100\nfoo bar\nfoo 300\n')
+            msg = "[{0}] {1}".format(i, data.msg)
+            actual = self.view.substr(self.R(0, self.view.size()))
+            self.assertEqual(data.expected, actual, msg)
