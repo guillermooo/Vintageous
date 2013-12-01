@@ -495,6 +495,8 @@ def vi_g_big_d(vi_cmd_data):
 
 
 def vi_quote(vi_cmd_data):
+    if vi_cmd_data['user_motion_input'] != "'":
+        vi_cmd_data['is_jump'] = True
     # TODO: This is a jump.
     vi_cmd_data['motion']['command'] = '_vi_quote'
     vi_cmd_data['motion']['args'] = {'character': vi_cmd_data['user_motion_input'], 'mode': vi_cmd_data['mode']}
