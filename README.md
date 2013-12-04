@@ -33,10 +33,9 @@ Development Version
 
 To use this development version, you should:
 
-1. ensure the built-in Vintage package is in the ``ignored_packages`` list, as it is by default
-2. zip the content of this repository and add the extension *.sublime-package* to the archive
-3. copy the *.sublime-package* file to the *Installed Packages* folder, located under Sublime Text's data directory
-
+1. Ensure the built-in Vintage package is in the ``ignored_packages`` list, as it is by default
+2. Clone the repository into a location of your choosing.
+3. Run `build.sh`
 
 Documentation
 -------------
