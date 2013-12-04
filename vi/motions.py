@@ -64,33 +64,8 @@ def vi_gg(vi_cmd_data):
 
 
 def vi_zero(vi_cmd_data):
-    if vi_cmd_data['count'] == 1:
-        vi_cmd_data['motion']['command'] = 'vi_move_to_hard_bol'
-        vi_cmd_data['motion']['args'] = {}
-
-        if vi_cmd_data['mode'] == MODE_VISUAL:
-            vi_cmd_data['pre_motion'] = ['_vi_orient_selections_toward_begin',]
-            vi_cmd_data['motion']['args']['extend'] = True
-        elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-            vi_cmd_data['motion']['args']['extend'] = True
-
-    else:
-        vi_cmd_data['motion']['command'] = 'move'
-        vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': True}
-        vi_cmd_data['count'] = vi_cmd_data['count'] - 1
-
-        if vi_cmd_data['mode'] == MODE_VISUAL:
-            vi_cmd_data['pre_motion'] = ['_vi_orient_selections_toward_begin',]
-            vi_cmd_data['motion']['args']['extend'] = True
-        elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-            vi_cmd_data['motion']['args']['extend'] = True
-        elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
-            vi_cmd_data['motion']['command'] = 'no_op'
-            vi_cmd_data['motion']['args'] = {}
-
-        # TODO: Unify handling of the 'extend' argument. All VISUAL modes need it, so either include
-        # it by default at some point, or let each command decide, as we do here.
-        vi_cmd_data['post_motion'] = [['move_to_first_non_white_space_char', {'extend': True}],]
+    vi_cmd_data['motion']['command'] = '_vi_zero'
+    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
 
     return vi_cmd_data
 

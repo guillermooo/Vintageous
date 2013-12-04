@@ -62,6 +62,7 @@ TESTS_CMDS_MOTION_VI_E = 'Vintageous.tests.commands.test__vi_e'
 TESTS_CMDS_MOTION_VI_BIG_F = 'Vintageous.tests.commands.test__vi_big_f'
 TESTS_CMDS_MOTION_VI_PERCENT = 'Vintageous.tests.commands.test__vi_percent'
 TESTS_CMDS_MOTION_VI_ANTILAMBDA = 'Vintageous.tests.commands.test__vi_antilambda'
+TESTS_CMDS_MOTION_VI_ZERO = 'Vintageous.tests.commands.test__vi_zero'
 TESTS_CMDS_ACTION_CTRL_X = 'Vintageous.tests.commands.test__ctrl_x_and__ctrl_a'
 TESTS_CMDS_ACTION_VI_S = 'Vintageous.tests.commands.test__vi_s'
 TESTS_CMDS_ACTION_VI_BIG_I = 'Vintageous.tests.commands.test__vi_big_i'
@@ -103,6 +104,7 @@ TESTS_CMDS_ALL_MOTIONS = [TESTS_CMDS_MOTION_VI_L,
                           TESTS_CMDS_MOTION_VI_VISUAL_O,
                           TESTS_CMDS_MOTION_VI_PERCENT,
                           TESTS_CMDS_MOTION_VI_ANTILAMBDA,
+                          TESTS_CMDS_MOTION_VI_ZERO,
                           ]
 
 TESTS_ALL_TEXT_OBJECTS = [

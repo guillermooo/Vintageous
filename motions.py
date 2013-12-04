@@ -1630,3 +1630,20 @@ class _vi_double_antilambda(sublime_plugin.TextCommand):
         self.view.run_command('unindent')
         regions_transformer(self.view, f)
 
+
+class _vi_zero(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None):
+        def f(view, s):
+            if mode == MODE_NORMAL:
+                return sublime.Region(view.line(s.b).a)
+            elif mode == _MODE_INTERNAL_NORMAL:
+                return sublime.Region(s.a, view.line(s.b).a)
+            elif mode == MODE_VISUAL:
+                if s.a < s.b:
+                    return sublime.Region(s.a, view.line(s.b - 1).a + 1)
+                else:
+                    return sublime.Region(s.a, view.line(s.b).a)
+            return s
+
+        regions_transformer(self.view, f)
+
