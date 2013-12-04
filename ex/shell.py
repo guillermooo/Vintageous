@@ -1,3 +1,5 @@
+import sublime
+
 import Vintageous.ex.plat as plat
 import Vintageous.ex.plat.linux
 import Vintageous.ex.plat.osx
@@ -37,6 +39,18 @@ def filter_thru_shell(view, edit, regions, cmd):
     else:
         raise NotImplementedError
 
-    for r in reversed(regions):
-        rv = filter_func(view, view.substr(r), cmd)
-        view.replace(edit, r, rv)
+    # Maintain text size delta as we replace each selection going forward.
+    # We can't simply go in reverse because cursor positions will be incorrect.
+    accumulated_delta = 0
+    new_points = []
+    for r in regions:
+        r_shifted = sublime.Region(r.begin() + accumulated_delta, r.end() + accumulated_delta)
+        rv = filter_func(view, view.substr(r_shifted), cmd)
+        view.replace(edit, r_shifted, rv)
+        new_points.append(r_shifted.a)
+        accumulated_delta += len(rv) - r_shifted.size()
+
+    # Switch to normal mode and move cursor(s) to beginning of replacement(s)
+    view.run_command('vi_enter_normal_mode')
+    view.sel().clear()
+    view.sel().add_all(new_points)

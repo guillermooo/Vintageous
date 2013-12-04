@@ -76,6 +76,7 @@ TESTS_CMDS_ACTION_VI_BIG_J = 'Vintageous.tests.commands.test__vi_big_j'
 TESTS_EX_CMDS_COPY = 'Vintageous.tests.ex.test_copy'
 TESTS_EX_CMDS_MOVE = 'Vintageous.tests.ex.test_move'
 TESTS_EX_CMDS_DELETE = 'Vintageous.tests.ex.test_delete'
+TESTS_EX_CMDS_SHELL_OUT = 'Vintageous.tests.ex.test_shell_out'
 
 TESTS_UNITS_WORD = 'Vintageous.tests.vi.test_word'
 TESTS_UNITS_BIG_WORD = 'Vintageous.tests.vi.test_big_word'
@@ -117,6 +118,7 @@ TESTS_EX_CMDS = [
     TESTS_EX_CMDS_COPY,
     TESTS_EX_CMDS_MOVE,
     TESTS_EX_CMDS_DELETE,
+    TESTS_EX_CMDS_SHELL_OUT,
 ]
 
 TESTS_UNITS_ALL = [TESTS_UNITS_WORD,
