@@ -4,7 +4,6 @@ import Vintageous.ex.plat as plat
 import Vintageous.ex.plat.linux
 import Vintageous.ex.plat.osx
 import Vintageous.ex.plat.windows
-from Vintageous.vi.constants import MODE_NORMAL
 
 
 def run_and_wait(view, cmd):
@@ -47,10 +46,9 @@ def filter_thru_shell(view, edit, regions, cmd):
     for r in regions:
         r_shifted = sublime.Region(r.begin() + accumulated_delta, r.end() + accumulated_delta)
         rv = filter_func(view, view.substr(r_shifted), cmd)
-        rv_string = rv.decode("utf8")
-        view.replace(edit, r_shifted, rv_string)
+        view.replace(edit, r_shifted, rv)
         new_points.append(r_shifted.a)
-        accumulated_delta += len(rv_string) - r_shifted.size()
+        accumulated_delta += len(rv) - r_shifted.size()
 
     # Switch to normal mode and move cursor(s) to beginning of replacement(s)
     view.run_command('vi_enter_normal_mode')

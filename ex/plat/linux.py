@@ -24,4 +24,4 @@ def filter_region(view, text, command):
     shell = shell or os.path.expandvars("$SHELL")
     p = subprocess.Popen([shell, '-c', 'echo "%s" | %s' % (text, command)],
                          stdout=subprocess.PIPE)
-    return p.communicate()[0][:-1]
+    return p.communicate()[0][:-1].decode('utf-8')
