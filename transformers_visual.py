@@ -837,8 +837,10 @@ class _vi_j(sublime_plugin.TextCommand, AntonymAwarenessMixin):
             max_size = max(r.size() for r in self.view.sel())
             row, col = self.view.rowcol(self.view.sel()[-1].a)
             start = self.view.text_point(row + 1, col)
-            self.view.sel().add(sublime.Region(start, start + max_size))
-            return
+            new_region = sublime.Region(start, start + max_size)
+            self.view.sel().add(new_region)
+            # FIXME: Perhaps we should scroll into view in a more general way...
+            self.view.show(new_region, False)
 
         regions_transformer(self.view, f)
 
@@ -970,7 +972,11 @@ class _vi_k(sublime_plugin.TextCommand, AntonymAwarenessMixin):
                     return
             rect_size = max(r.size() for r in self.view.sel())
             rect_a_pt = self.view.text_point(row - 1, rect_a)
-            self.view.sel().add(sublime.Region(rect_a_pt, rect_a_pt + rect_size))
+            new_region = sublime.Region(rect_a_pt, rect_a_pt + rect_size)
+            self.view.sel().add(new_region)
+            # FIXME: We should probably scroll into view in a more general way.
+            #        Or maybe every motion should handle this on their own.
+            self.view.show(new_region, False)
             return
 
         regions_transformer(self.view, f)
