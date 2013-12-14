@@ -1,3 +1,19 @@
+2.8.0 - 12/14/13
+
+	- Improve I action.
+	- Improve % motion.
+	- Improve << action.
+	- Improve vi_enter_visual_mode.
+	- Improve jumps.
+	- Improve ( and ) motions.
+	- Improve P.
+	- Improve word text objects.
+	- Improve ctrl-x and ctrl-a.
+	- Improve 0 motion.
+	- Improve '<','>'! command.
+	- Improve motions in visual block mode.
+	- Implement :abbreviate and :unabbreviate.
+
 2.7.1 - 11/26/13
 
 	- Improve J action.
