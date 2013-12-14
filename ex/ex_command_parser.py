@@ -110,7 +110,17 @@ EX_COMMANDS = {
                                 ),
     ('abbreviate', 'ab'): ex_cmd_data(
                                 command='ex_abbreviate',
-                                invocations=(),
+                                invocations=(
+                                    re.compile(r'^$'),
+                                    re.compile(r'^(?P<short>.+?) (?P<full>.+)$'),
+                                    ),
+                                error_on=(ex_error.ERR_NO_RANGE_ALLOWED,)
+                                ),
+    ('unabbreviate', 'una'): ex_cmd_data(
+                                command='ex_unabbreviate',
+                                invocations=(
+                                    re.compile(r'^(?P<short>.+)$'),
+                                    ),
                                 error_on=(ex_error.ERR_NO_RANGE_ALLOWED,)
                                 ),
     ('quit', 'q'): ex_cmd_data(

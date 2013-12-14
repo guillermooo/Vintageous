@@ -23,6 +23,7 @@ from Vintageous.vi.settings import set_global
 from Vintageous.vi.settings import set_local
 from Vintageous.vi.sublime import has_dirty_buffers
 from Vintageous.vi import utils
+from Vintageous.vi import abbrev
 
 
 GLOBAL_RANGES = []
@@ -335,16 +336,27 @@ class ExMap(sublime_plugin.TextCommand):
 
 class ExAbbreviate(sublime_plugin.TextCommand):
     # for them moment, just open a completions file.
-    def run(self, edit):
-        abbs_file_name = 'Vintageous Abbreviations.sublime-completions'
-        abbreviations = os.path.join(sublime.packages_path(),
-                                     'User/' + abbs_file_name)
-        if not os.path.exists(abbreviations):
-            with open(abbreviations, 'w') as f:
-                f.write('{\n\t"scope": "",\n\t"completions": [\n\t\n\t]\n}\n')
+    def run(self, edit, short=None, full=None):
+        if not (short and full):
+            self.show_all()
+            return
+        abbrevs = abbrev.Store()
+        abbrevs.set(short, full)
 
-        self.view.window().run_command('open_file',
-                                    {'file': "${packages}/User/%s" % abbs_file_name})
+    def show_all(self):
+        abbrevs = abbrev.Store()
+        data = list(abbrevs.get_all())
+        self.view.window().show_quick_panel(data, None,
+                                            flags=sublime.MONOSPACE_FONT)
+
+
+class ExUnabbreviate(sublime_plugin.TextCommand):
+    # for them moment, just open a completions file.
+    def run(self, edit, short):
+        if not short and full:
+            return
+        abbrevs = abbrev.Store()
+        abbrevs.erase(short)
 
 
 class ExPrintWorkingDir(IrreversibleTextCommand):
