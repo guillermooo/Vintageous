@@ -335,7 +335,6 @@ class ExMap(sublime_plugin.TextCommand):
 
 
 class ExAbbreviate(sublime_plugin.TextCommand):
-    # for them moment, just open a completions file.
     def run(self, edit, short=None, full=None):
         if not (short and full):
             self.show_all()
@@ -351,7 +350,6 @@ class ExAbbreviate(sublime_plugin.TextCommand):
 
 
 class ExUnabbreviate(sublime_plugin.TextCommand):
-    # for them moment, just open a completions file.
     def run(self, edit, short):
         if not short and full:
             return
