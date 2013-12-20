@@ -145,6 +145,7 @@ def vi_big_o(vi_cmd_data):
 
 
 def vi_big_a(vi_cmd_data):
+    vi_cmd_data['keep_selection_as_is'] = True
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = '_vi_big_a'
     vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
@@ -154,6 +155,7 @@ def vi_big_a(vi_cmd_data):
 
 def vi_big_i(vi_cmd_data):
     # TOOD: Add next mode here instead of in the command implementation?
+    vi_cmd_data['keep_selection_as_is'] = True
     vi_cmd_data['motion_required'] = False
     vi_cmd_data['action']['command'] = '_vi_big_i'
     vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}

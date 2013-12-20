@@ -97,7 +97,16 @@ class _vi_big_a(sublime_plugin.TextCommand):
     def run(self, edit, extend=False, mode=None):
         def f(view, s):
             if mode == MODE_VISUAL_BLOCK:
+                if self.view.substr(s.b - 1) == '\n':
+                    return sublime.Region(s.end() - 1)
                 return sublime.Region(s.end())
+            elif mode == MODE_VISUAL:
+                pt = s.b
+                if self.view.substr(s.b - 1) == '\n':
+                    pt -= 1
+                if s.a > s.b:
+                    pt = view.line(s.a).a
+                return sublime.Region(pt)
             elif mode != _MODE_INTERNAL_NORMAL:
                 return s
             hard_eol = self.view.line(s.b).end()
@@ -139,8 +148,9 @@ class _vi_big_i(sublime_plugin.TextCommand):
             if mode == MODE_VISUAL_BLOCK:
                 return sublime.Region(s.begin())
             elif mode == MODE_VISUAL:
-                line = view.line(s.b - 1)
-                pt = utils.next_non_white_space_char(view, line.a)
+                pt = view.line(s.a).a
+                if s.a > s.b:
+                    pt = s.b
                 return sublime.Region(pt)
             elif mode == MODE_VISUAL_LINE:
                 line = view.line(s.a)
