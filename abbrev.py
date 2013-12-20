@@ -10,8 +10,9 @@ import json
 
 
 def abbrevs_path():
-    return os.path.join(sublime.packages_path(),
-                        'User\\_vintageous_abbrev.sublime-completions')
+    path = os.path.join(sublime.packages_path(),
+                        'User/_vintageous_abbrev.sublime-completions')
+    return os.path.normpath(path)
 
 
 def get_json(path):
