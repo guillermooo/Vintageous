@@ -45,20 +45,8 @@ def vi_gg(vi_cmd_data):
         vi_cmd_data['motion']['command'] = 'vi_go_to_line'
         vi_cmd_data['motion']['args'] = {'line': target, 'mode': vi_cmd_data['mode']}
     else:
-        if vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
-            vi_cmd_data['motion']['command'] = 'no_op'
-            vi_cmd_data['motion']['args'] = {}
-        else:
-            vi_cmd_data['motion']['command'] = 'move_to'
-            vi_cmd_data['motion']['args'] = {'to': 'bof'}
-            vi_cmd_data['post_motion'] = [['clip_end_to_line',],]
-
-    if vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-    elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-    elif vi_cmd_data['mode'] == MODE_VISUAL_LINE:
-        vi_cmd_data['motion']['args']['extend'] = True
+        vi_cmd_data['motion']['command'] = '_vi_g_g'
+        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
 
     return vi_cmd_data
 
