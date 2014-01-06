@@ -15,7 +15,8 @@ def abbrevs_path():
     return os.path.normpath(path)
 
 
-def get_json(path):
+def load_abbrevs():
+    path = abbrevs_path()
     decoded_json = None
     if os.path.exists(path):
         with open(path, 'r') as f:
@@ -23,40 +24,44 @@ def get_json(path):
     return decoded_json or {'completions': []}
 
 
-def set_json(path, data):
+def save_abbrevs(data):
     # TODO: Make entries temporary unless !mksession is used or something like that.
     # TODO: Enable contexts for abbrevs?
     with open(path, 'w') as f:
-        decoded = json.dump(data, f)
+        json.dump(data, f)
 
 
 class Store(object):
+    """
+    Manages storage for abbreviations.
+    """
     def set(self, short, full):
-        data = get_json(abbrevs_path())
-        idx = self.contains(data, short)
+        abbrevs = load_abbrevs()
+        idx = self.contains(abbrevs, short)
         if idx is not None:
-            data['completions'][idx] = dict(trigger=short, contents=full)
+            abbrevs['completions'][idx] = dict(trigger=short, contents=full)
         else:
-            data['completions'].append(dict(trigger=short, contents=full))
-        set_json(abbrevs_path(), data)
+            abbrevs['completions'].append(dict(trigger=short, contents=full))
+        save_abbrevs(abbrevs)
 
     def get(self, short):
         raise NotImplementedError()
 
     def get_all(self):
-        data = get_json(abbrevs_path())
-        for item in data['completions']:
-            yield item['trigger'] + ' --> ' + item['contents']
+        abbrevs = load_abbrevs()
+        for item in abbrevs['completions']:
+            yield item
 
     def contains(self, data, short):
+        # TODO: Inefficient.
         for (i, completion) in enumerate(data['completions']):
             if completion['trigger'] == short:
                 return i
         return None
 
     def erase(self, short):
-        data = get_json(abbrevs_path())
+        data = load_abbrevs()
         idx = self.contains(data, short)
         if idx is not None:
             del data['completions'][idx]
-            set_json(abbrevs_path(), data)
+            save_abbrevs(data)

@@ -337,24 +337,27 @@ class ExMap(sublime_plugin.TextCommand):
 class ExAbbreviate(sublime_plugin.TextCommand):
     def run(self, edit, short=None, full=None):
         if not (short and full):
-            self.show_all()
+            self.show_abbreviations()
             return
-        abbrevs = abbrev.Store()
-        abbrevs.set(short, full)
 
-    def show_all(self):
-        abbrevs = abbrev.Store()
-        data = list(abbrevs.get_all())
-        self.view.window().show_quick_panel(data, None,
+        abbrev.Store().set(short, full)
+
+    def show_abbreviations(self):
+        abbrevs = ['{0} --> {1}'.format(item['trigger'], item['contents'])
+                                                    for item in
+                                                    abbrev.Store().get_all()]
+
+        self.view.window().show_quick_panel(abbrevs,
+                                            None, # Simply show the list.
                                             flags=sublime.MONOSPACE_FONT)
 
 
 class ExUnabbreviate(sublime_plugin.TextCommand):
     def run(self, edit, short):
-        if not short and full:
+        if not short:
             return
-        abbrevs = abbrev.Store()
-        abbrevs.erase(short)
+
+        abbrev.Store().erase(short)
 
 
 class ExPrintWorkingDir(IrreversibleTextCommand):
