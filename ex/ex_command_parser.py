@@ -219,7 +219,7 @@ EX_COMMANDS = {
                                           ex_error.ERR_NO_BANG_ALLOWED,
                                           ex_error.ERR_TRAILING_CHARS),
                                 ),
-    ('vsplit', 'vsplit'): ex_cmd_data(
+    ('vsplit', 'vs'): ex_cmd_data(
                                 command='ex_vsplit',
                                 invocations=(
                                     re.compile(r'^$'),
