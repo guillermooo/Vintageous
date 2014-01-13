@@ -659,7 +659,7 @@ def vi_antilambda(vi_cmd_data):
 def vi_big_j(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
 
-    if vi_cmd_data['mode'] in (_MODE_INTERNAL_NORMAL, MODE_VISUAL):
+    if vi_cmd_data['mode'] in (_MODE_INTERNAL_NORMAL, MODE_VISUAL, MODE_VISUAL_LINE, MODE_VISUAL_BLOCK):
         vi_cmd_data['count'] = (vi_cmd_data['count'] or 1)
         vi_cmd_data['action']['command'] = '_vi_big_j'
         vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
@@ -675,7 +675,7 @@ def vi_big_j(vi_cmd_data):
 def vi_g_big_j(vi_cmd_data):
     vi_cmd_data['motion_required'] = False
 
-    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
+    if vi_cmd_data['mode'] in [_MODE_INTERNAL_NORMAL, MODE_VISUAL, MODE_VISUAL_LINE, MODE_VISUAL_BLOCK]:
         vi_cmd_data['_repeat_action'] = True
         vi_cmd_data['count'] = (vi_cmd_data['count'] - 1 or 1)
         vi_cmd_data['action']['command'] = '_vi_big_j'
