@@ -132,6 +132,7 @@ INPUT_FOR_MOTIONS = {
     'vi_inclusive_text_object': (INPUT_IMMEDIATE, inputs.vi_inclusive_text_object),
     'vi_exclusive_text_object': (INPUT_IMMEDIATE, inputs.vi_exclusive_text_object),
     'vi_quote': (INPUT_IMMEDIATE, inputs.vi_quote),
+    'vi_backtick': (INPUT_IMMEDIATE, inputs.vi_backtick),
     'vi_forward_slash': (INPUT_IMMEDIATE, inputs.vi_forward_slash),
     'vi_question_mark': (INPUT_IMMEDIATE, inputs.vi_question_mark),
 }

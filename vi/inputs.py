@@ -47,6 +47,10 @@ def vi_quote(in_):
     return default(in_)
 
 
+def vi_backtick(in_):
+    return default(in_)
+
+
 def vi_forward_slash(in_):
     # Any input is valid.
     return True

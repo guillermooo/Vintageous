@@ -647,6 +647,39 @@ class _vi_quote(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
+class _vi_backtick(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, character=None, extend=False):
+        def f(view, s):
+            if mode == MODE_VISUAL:
+                if s.a <= s.b:
+                    if address.b < s.b:
+                        return sublime.Region(s.a + 1, address.b)
+                    else:
+                        return sublime.Region(s.a, address.b)
+                else:
+                    return sublime.Region(s.a + 1, address.b)
+            elif mode == MODE_NORMAL:
+                return address
+            elif mode == _MODE_INTERNAL_NORMAL:
+                return sublime.Region(s.a, address.b)
+
+            return s
+
+        state = VintageState(self.view)
+        address = state.marks.get_as_encoded_address(character, exact=True)
+
+        if address is None:
+            return
+
+        if isinstance(address, str):
+            if not address.startswith('<command'):
+                self.view.window().open_file(address, sublime.ENCODED_POSITION)
+            return
+
+        # This is a motion in a composite command.
+        regions_transformer(self.view, f)
+
+
 # TODO: Revise this text object... Can't we have a simpler approach without
 # this intermediary step?
 class ViI(IrreversibleTextCommand):

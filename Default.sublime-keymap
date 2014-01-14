@@ -191,6 +191,7 @@
 
 	{ "keys": ["m"], "command": "set_action", "args": {"action": "vi_m"}, "context": [{"key": "setting.command_mode"}] },
 	{ "keys": ["'"], "command": "set_motion", "args": {"motion": "vi_quote"}, "context": [{"key": "setting.command_mode"}] },
+	{ "keys": ["`"], "command": "set_motion", "args": {"motion": "vi_backtick"}, "context": [{"key": "setting.command_mode"}] },
 
 	{ "keys": ["f"], "command": "set_motion", "args":{"motion": "vi_f"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
 	{ "keys": ["t"], "command": "set_motion", "args":{"motion": "vi_t"}, "context": [{"key": "vi_mode_normal_or_visual"}] },

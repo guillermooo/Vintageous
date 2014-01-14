@@ -468,6 +468,14 @@ def vi_quote(vi_cmd_data):
     return vi_cmd_data
 
 
+def vi_backtick(vi_cmd_data):
+    vi_cmd_data['motion']['command'] = '_vi_backtick'
+    vi_cmd_data['motion']['args'] = {'character': vi_cmd_data['user_motion_input'], 'mode': vi_cmd_data['mode']}
+    vi_cmd_data['count'] = 1
+
+    return vi_cmd_data
+
+
 def vi_ctrl_f(vi_cmd_data):
     vi_cmd_data['motion']['command'] = 'move'
     vi_cmd_data['motion']['args'] = {'by': 'pages', 'forward': True}
