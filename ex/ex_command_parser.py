@@ -366,6 +366,17 @@ EX_COMMANDS = {
                         # FIXME: :!! is a different command to :!
                         error_on=(ex_error.ERR_NO_BANG_ALLOWED,),
                         ),
+
+    # Use buffer commands to switch tabs
+    ('bprevious', 'bp'): ex_cmd_data(command='ex_tab_prev',
+                                     invocations=(),
+                                     error_on=(ex_error.ERR_NO_RANGE_ALLOWED,)
+                                     ),
+    ('bnext', 'bn'): ex_cmd_data(command='ex_tab_next',
+                                     invocations=(),
+                                     error_on=(ex_error.ERR_NO_RANGE_ALLOWED,)
+                                     ),
+
     ('tabedit', 'tabe'): ex_cmd_data(
                                     command='ex_tab_open',
                                     invocations=(
