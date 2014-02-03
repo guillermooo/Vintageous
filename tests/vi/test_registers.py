@@ -195,6 +195,10 @@ class TestCaseRegisters(BufferTest):
         self.assertEqual(self.regs.get(registers.REG_SYS_CLIPBOARD_1), ['foo'])
         self.assertEqual(self.regs.get(registers.REG_SYS_CLIPBOARD_2), ['foo'])
 
+        self.regs.set(registers.REG_SYS_CLIPBOARD_2, ['bar'])
+        self.assertEqual(self.regs.get(registers.REG_SYS_CLIPBOARD_1), ['bar'])
+        self.assertEqual(self.regs.get(registers.REG_SYS_CLIPBOARD_2), ['bar'])
+
     def testGetSysClipboardAlwaysIfRequested(self):
         self.regs.settings.view['vintageous_use_sys_clipboard'] = True
         sublime.set_clipboard('foo')

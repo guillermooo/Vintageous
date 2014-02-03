@@ -22,6 +22,7 @@ REG_SPECIAL = (REG_UNNAMED, REG_SMALL_DELETE, REG_BLACK_HOLE,
 REG_ALL = REG_SPECIAL + REG_VALID_NUMBERS + REG_VALID_NAMES
 
 # todo(guillermo): There are more.
+# todo(guillermo): "* and "+ don't do what they should in linux
 
 
 # Registers must be available globally, so store here the data.
@@ -58,12 +59,6 @@ class Registers(object):
         vstate.registers['A'] # => "foobar" (synonyms)
     """
 
-
-    # def __init__(self, view=None, settings=None):
-    #     # TODO: Why do we have an __init__? We should be able to set up the class inside the
-    #     # __get__ method instead.
-    #     self.view = view
-    #     self.settings = settings
 
     def __get__(self, instance, owner):
         self.view = instance.view
@@ -114,7 +109,7 @@ class Registers(object):
         # Special registers and invalid registers won't be set.
         if (not (name.isalpha() or name.isdigit() or
                  name.isupper() or name == REG_UNNAMED or
-                 name == REG_SYS_CLIPBOARD_1 or
+                 name in REG_SYS_CLIPBOARD_ALL or
                  name == REG_EXPRESSION or
                  name == REG_SMALL_DELETE)):
                     # Vim fails silently.
