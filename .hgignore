@@ -1,14 +1,15 @@
 syntax: glob
-
+# foobar
 *.pyc
 
 *.tags
 *.tags_sorted_by_file
 
+*~
+*.TMP
+*.swp
+
 dist/
 
 *.sublime-workspace
-
-*.swp
-*.swo
 

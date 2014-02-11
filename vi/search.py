@@ -3,7 +3,7 @@ import sublime_plugin
 
 import re
 
-from Vintageous.state import VintageState
+# from Vintageous.state import VintageState
 
 
 def find_in_range(view, term, start, end, flags=0):
@@ -160,8 +160,9 @@ class BufferSearchBase(sublime_plugin.TextCommand):
             self.view.erase_regions('vi_search')
             return
 
-        if VintageState(self.view).settings.vi['hlsearch'] == False:
-            return
+        # TODO: Re-enable this.
+        # if VintageState(self.view).settings.vi['hlsearch'] == False:
+        #     return
 
         self.view.add_regions('vi_search', regs, 'comment', '',
                               sublime.DRAW_NO_FILL)

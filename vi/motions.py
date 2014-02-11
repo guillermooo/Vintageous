@@ -1,600 +1,457 @@
-"""Motion parsers.
-
-   Motion commands go in Vintageous/motions.py; not here.
-"""
-
-from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
-from Vintageous.vi.constants import MODE_NORMAL
-from Vintageous.vi.constants import MODE_VISUAL
-from Vintageous.vi.constants import MODE_VISUAL_LINE
-from Vintageous.vi.constants import MODE_VISUAL_BLOCK
+from Vintageous.vi import inputs
+from Vintageous.vi.keys import cmds
+from Vintageous.vi.keys import cmd_defs
 
 
-# $
-def vi_dollar(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_dollar'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
+def vi_j(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_j'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count, 'xpos': state.xpos}
+    return cmd
 
 
-def vi_big_g(vi_cmd_data):
-    vi_cmd_data['is_jump'] = True
+def vi_k(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_k'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count, 'xpos': state.xpos}
+    return cmd
 
-    if vi_cmd_data['_user_provided_count']:
-        target = vi_cmd_data['count']
-        vi_cmd_data['count'] = 1
-        vi_cmd_data['motion']['command'] = 'vi_go_to_line'
-        vi_cmd_data['motion']['args'] = {'line': target, 'mode': vi_cmd_data['mode']}
+
+def vi_h(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_h'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
+
+
+def vi_l(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_l'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
+
+
+def vi_t(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_find_in_line'
+    cmd['motion_args'] = {'char': state.user_input, 'mode': state.mode,
+                          'count': state.count, 'inclusive': False}
+    return cmd
+
+
+def vi_f(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_find_in_line'
+    cmd['motion_args'] = {'char': state.user_input, 'mode': state.mode,
+                          'count': state.count, 'inclusive': True}
+    return cmd
+
+
+def vi_quote(state, **kwargs):
+    if state.user_input == "'":
+        return vi_quote_quote(state, **kwargs)
+
+    cmd = {}
+    cmd['is_jump'] = True
+
+    cmd['motion'] = '_vi_quote'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count, 'character': state.user_input}
+    return cmd
+
+
+def vi_quote_quote(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_quote_quote'
+    cmd['motion_args'] = {} # {'mode': state.mode, 'count': state.count}
+    return cmd
+
+
+def vi_backtick(state, **kwargs):
+    cmd = {}
+    cmd['is_jump'] = True
+    cmd['motion'] = '_vi_backtick'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count, 'character': state.user_input}
+    return cmd
+
+
+def vi_big_t(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_reverse_find_in_line'
+    cmd['motion_args'] = {'char': state.user_input, 'mode': state.mode,
+                          'count': state.count, 'inclusive': False}
+    return cmd
+
+
+def vi_big_f(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_reverse_find_in_line'
+    cmd['motion_args'] = {'char': state.user_input, 'mode': state.mode,
+                          'count': state.count, 'inclusive': True}
+    return cmd
+
+
+def vi_semicolon(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_find_in_line' if state.last_character_search_forward else '_vi_reverse_find_in_line'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count,
+                          'char': state.last_character_search,
+                          'change_direction': False}
+
+    return cmd
+
+
+def vi_comma(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_find_in_line' if not state.last_character_search_forward else '_vi_reverse_find_in_line'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count,
+                          'char': state.last_character_search,
+                          'change_direction': False}
+
+    return cmd
+
+
+def vi_dollar(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_dollar'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
+
+    return cmd
+
+
+def vi_w(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_w'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
+
+    return cmd
+
+
+def vi_W(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_big_w'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
+
+    return cmd
+
+
+def vi_e(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_e'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
+
+    return cmd
+
+
+def vi_0(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_zero'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
+
+    return cmd
+
+
+def vi_slash(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_slash'
+    cmd['motion_args'] = {}
+
+    return cmd
+
+
+def vi_slash_impl(state, **kwargs):
+    cmd = {}
+    cmd['is_jump'] = True
+    cmd['motion'] = '_vi_slash_impl'
+    cmd['motion_args'] = {'search_string': state.user_input,
+                          'mode': state.mode,
+                          'count': state.count}
+
+    return cmd
+
+
+def vi_question_mark(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_question_mark'
+    cmd['motion_args'] = {}
+    return cmd
+
+
+def vi_question_mark_impl(state, **kwargs):
+    cmd = {}
+    cmd['is_jump'] = True
+    cmd['motion'] = '_vi_question_mark_impl'
+    cmd['motion_args'] = {'search_string': state.user_input,
+                          'mode': state.mode,
+                          'count': state.count}
+    return cmd
+
+
+def vi_left_brace(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_left_brace'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
+
+
+def vi_right_brace(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_right_brace'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
+
+
+def vi_gg(state, **kwargs):
+    cmd = {}
+    cmd['is_jump'] = True
+
+    if state.action_count or state.motion_count:
+        cmd['motion'] = '_vi_go_to_line'
+        cmd['motion_args'] = {'line': state.count, 'mode': state.mode}
+        return cmd
+
+    cmd['motion'] = '_vi_gg'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
+
+
+def vi_big_g(state, **kwargs):
+    cmd = {}
+    cmd['is_jump'] = True
+
+    if state.action_count or state.motion_count:
+        cmd['motion'] = '_vi_go_to_line'
+        cmd['motion_args'] = {'line': state.count, 'mode': state.mode}
     else:
-        vi_cmd_data['motion']['command'] = '_vi_big_g'
-        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
+        cmd['motion'] = '_vi_big_g'
+        cmd['motion_args'] = {'mode': state.mode}
 
-    return vi_cmd_data
+    return cmd
 
 
-def vi_gg(vi_cmd_data):
-    vi_cmd_data['is_jump'] = True
+def vi_percent(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_percent'
 
-    # FIXME: Cannot go to line 1. We need to signal when the count is user-provided and when it's
-    # a default value.
-    if vi_cmd_data['count'] > 1:
-        target = vi_cmd_data['count']
-        vi_cmd_data['count'] = 1
-        vi_cmd_data['motion']['command'] = 'vi_go_to_line'
-        vi_cmd_data['motion']['args'] = {'line': target, 'mode': vi_cmd_data['mode']}
-    else:
-        vi_cmd_data['motion']['command'] = '_vi_g_g'
-        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
+    percent = None
+    if state.motion_count or state.action_count:
+        percent = state.count
 
-    return vi_cmd_data
+    cmd['motion_args'] = {'mode': state.mode, 'percent': percent}
 
+    return cmd
 
-def vi_zero(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_zero'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
 
-    return vi_cmd_data
+def vi_H(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_big_h'
+    cmd['motion_args'] = {'count': state.count, 'mode': state.mode}
 
+    return cmd
 
-def vi_underscore(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_underscore'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    vi_cmd_data['count'] = 1
 
-    return vi_cmd_data
+def vi_L(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_big_l'
+    cmd['motion_args'] = {'count': state.count, 'mode': state.mode}
 
+    return cmd
 
-def vi_hat(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_hat'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
-    vi_cmd_data['count'] = 1
 
-    return vi_cmd_data
+def vi_M(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_big_m'
+    cmd['motion_args'] = {'count': state.count, 'mode': state.mode}
 
+    return cmd
 
-def vi_l(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_l'
-    vi_cmd_data['motion']['args'] = {'count': vi_cmd_data['count'], 'mode': vi_cmd_data['mode']}
-    vi_cmd_data['count'] = 1
 
-    return vi_cmd_data
+def vi_star(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_star'
+    cmd['motion_args'] = {'count': state.count, 'mode': state.mode}
 
+    return cmd
 
-def vi_h(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_h'
-    vi_cmd_data['motion']['args'] = {'count': vi_cmd_data['count'], 'mode': vi_cmd_data['mode']}
-    vi_cmd_data['count'] = 1
 
-    return vi_cmd_data
+def vi_underscore(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_underscore'
+    cmd['motion_args'] = {'count': state.count, 'mode': state.mode}
 
+    return cmd
 
-def vi_big_h(vi_cmd_data):
-    vi_cmd_data['is_jump'] = True
-    vi_cmd_data['motion']['command'] = '_vi_big_h'
-    # XXX: We subtract one, but vi_cmd_data should know when it's been set to a default value
-    # or to an user-supplied one.
-    vi_cmd_data['motion']['args'] = {'count': vi_cmd_data['count'] - 1, 'mode': vi_cmd_data['mode']}
 
-    return vi_cmd_data
+def vi_hat(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_hat'
+    cmd['motion_args'] = {'count': state.count, 'mode': state.mode}
 
+    return cmd
 
-def vi_big_l(vi_cmd_data):
-    vi_cmd_data['is_jump'] = True
-    vi_cmd_data['motion']['command'] = 'vi_big_l'
-    # XXX: We subtract one, but vi_cmd_data should know when it's been set to a default value
-    # or to an user-supplied one.
-    vi_cmd_data['motion']['args'] = {'count': vi_cmd_data['count'] - 1, 'mode': vi_cmd_data['mode']}
 
-    return vi_cmd_data
+def vi_octothorp(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_octothorp'
+    cmd['motion_args'] = {'count': state.count, 'mode': state.mode}
 
+    return cmd
 
-def vi_big_m(vi_cmd_data):
-    vi_cmd_data['is_jump'] = True
-    vi_cmd_data['motion']['command'] = 'vi_big_m'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
 
-    return vi_cmd_data
+def vi_big_b(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_big_b'
+    cmd['motion_args'] = {'count': state.count, 'mode': state.mode}
 
+    return cmd
 
-def vi_g__(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_g__'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
 
-    return vi_cmd_data
+def vi_g_j(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_g_j'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
 
+    return cmd
 
-def vi_j(vi_cmd_data):
-    vi_cmd_data['must_update_xpos'] = False
 
-    vi_cmd_data['motion']['command'] = '_vi_j'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'xpos': vi_cmd_data['xpos']}
-    vi_cmd_data['count'] = 1
-    # We handle this on our own?
-    vi_cmd_data['scroll_into_view'] = True
-    vi_cmd_data['scroll_command'] = ['_vi_minimal_scroll',]
+def vi_g_k(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_g_k'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
 
-    return vi_cmd_data
+    return cmd
 
 
-def vi_k(vi_cmd_data):
-    vi_cmd_data['must_update_xpos'] = False
+def vi_g__(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_g__'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
 
-    vi_cmd_data['motion']['command'] = '_vi_k'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'xpos': vi_cmd_data['xpos']}
-    vi_cmd_data['count'] = 1
-    vi_cmd_data['scroll_into_view'] = True
-    # TODO: This could be further simplified; I don't think we need a hook here.
-    vi_cmd_data['scroll_command'] = ['_vi_minimal_scroll',]
+    return cmd
 
-    return vi_cmd_data
 
+def vi_ctrl_u(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_ctrl_u'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
 
-def vi_w(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_w'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    vi_cmd_data['count'] = 1
+    return cmd
 
-    return vi_cmd_data
 
+def vi_ctrl_d(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_ctrl_d'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
 
-def vi_b(vi_cmd_data):
-    # FIXME: b is a huge mess. Fix it.
-    vi_cmd_data['motion']['command'] = 'move'
-    vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_begin': True, 'punct_begin': True, 'empty_line': True, 'forward': False}
+    return cmd
 
-    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-    elif vi_cmd_data['mode'] == MODE_VISUAL:
-        # TODO: Rename to factor in *every*.
-        vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode'],}]
-        vi_cmd_data['post_every_motion'] = ['_vi_b_post_every_motion', {'mode': vi_cmd_data['mode']}]
-        vi_cmd_data['motion']['args']['extend'] = True
-    elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
-        vi_cmd_data['motion']['command'] = 'vi_no_op'
-        vi_cmd_data['motion']['args'] = {}
 
-    return vi_cmd_data
+def vi_pipe(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_pipe'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
 
+    return cmd
 
-def vi_e(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_e'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    vi_cmd_data['count'] = 1
 
-    return vi_cmd_data
+def vi_left_paren(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_left_paren'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
 
+    return cmd
 
-def vi_g_e(vi_cmd_data):
-    # TODO: Improve this by implementing the whole command in a TextCommand (don't use 'move').
-    vi_cmd_data['motion']['command'] = 'move'
-    vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_end': True, 'punct_end': True, 'empty_line': False, 'forward': False}
-    vi_cmd_data['__reorient_caret'] = True
 
-    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
-        vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
+def vi_right_paren(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_right_paren'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
 
-    elif vi_cmd_data['mode'] == MODE_NORMAL:
-        vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
-        vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
+    return cmd
 
-    elif vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['pre_motion'] = ['_vi_g_e_pre_motion', {'mode': vi_cmd_data['mode']}]
-        vi_cmd_data['post_motion'] = [['_vi_g_e_post_motion', {'mode': vi_cmd_data['mode']}]]
 
-    elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
-        vi_cmd_data['motion']['command'] = 'vi_no_op'
-        vi_cmd_data['motion']['args'] = {}
+def vi_b(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_b'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
 
-    return vi_cmd_data
+    return cmd
 
 
-def vi_octothorp(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = 'vi_octothorp'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
+def vi_ge(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_ge'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
 
-    return vi_cmd_data
+    return cmd
 
 
-def vi_star(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = 'vi_star'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'exact_word': True}
+def vi_n(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_n'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count, 'search_string': state.last_buffer_search}
 
-    return vi_cmd_data
+    return cmd
 
 
-def vi_f(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = 'vi_find_in_line_inclusive'
-    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_motion_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    vi_cmd_data['count'] = 1
+def vi_big_n(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_big_n'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count, 'search_string': state.last_buffer_search}
 
-    return vi_cmd_data
+    return cmd
 
 
-def vi_t(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = 'vi_find_in_line_exclusive'
-    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_motion_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    vi_cmd_data['count'] = 1
+def vi_big_e(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_big_e'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
 
-    return vi_cmd_data
+    return cmd
 
 
-def vi_big_t(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = 'vi_reverse_find_in_line_exclusive'
-    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_motion_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    vi_cmd_data['count'] = 1
+def vi_ctrl_f(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_ctrl_f'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
 
-    return vi_cmd_data
+    return cmd
 
 
-def vi_big_f(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = 'vi_reverse_find_in_line_inclusive'
-    vi_cmd_data['motion']['args'] = {'extend': False, 'character': vi_cmd_data['user_motion_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    vi_cmd_data['count'] = 1
+def vi_ctrl_b(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_ctrl_b'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
 
-    return vi_cmd_data
+    return cmd
 
 
-# TODO: Unify handling of text objects in one function. Perhaps add state.args to merge with vi_cmd_data['motion']['args']
-def vi_inclusive_text_object(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_select_text_object'
-    vi_cmd_data['motion']['args'] = {'text_object': vi_cmd_data['user_motion_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'inclusive': True}
-    vi_cmd_data['count'] = 1
+def vi_enter(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_enter'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
 
-    return vi_cmd_data
+    return cmd
 
 
-# TODO: Unify handling of text objects in one function. Perhaps add state.args to merge with vi_cmd_data['motion']['args']
-def vi_exclusive_text_object(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_select_text_object'
-    vi_cmd_data['motion']['args'] = {'text_object': vi_cmd_data['user_motion_input'], 'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'inclusive': False}
-    vi_cmd_data['count'] = 1
+def vi_shift_enter(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_shift_enter'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
 
-    return vi_cmd_data
+    return cmd
 
 
-def vi_percent(vi_cmd_data):
-    vi_cmd_data['is_jump'] = True
+def vi_a_text_object(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_select_text_object'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count, 'text_object': state.user_input, 'inclusive': True}
 
-    vi_cmd_data['motion']['command'] = '_vi_percent'
-    # Make sure we know exactly what the user entered (1% != %) so we can disambiguate in the
-    # command.
-    vi_cmd_data['motion']['args'] = {'percent': vi_cmd_data['_user_provided_count'], 'mode': vi_cmd_data['mode']}
-    vi_cmd_data['count'] = 1
+    return cmd
 
-    return vi_cmd_data
 
+def vi_i_text_object(state, **kwargs):
+    cmd = {}
+    cmd['motion'] = '_vi_select_text_object'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count, 'text_object': state.user_input, 'inclusive': False}
 
-def vi_double_single_quote(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_double_single_quote'
-    vi_cmd_data['motion']['args'] = {}
-    vi_cmd_data['count'] = 1
-    vi_cmd_data['creates_jump_at_current_position'] = True
-
-    return vi_cmd_data
-
-
-def vi_forward_slash(vi_cmd_data):
-    # TODO: This is a jump.
-    vi_cmd_data['motion']['command'] = '_vi_forward_slash'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'search_string': vi_cmd_data['user_motion_input']}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-def vi_question_mark(vi_cmd_data):
-    # TODO: This is a jump.
-    vi_cmd_data['motion']['command'] = '_vi_question_mark'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'search_string': vi_cmd_data['user_motion_input']}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-def vi_n(vi_cmd_data):
-    # TODO: This is a jump.
-    vi_cmd_data['motion']['command'] = '_vi_forward_slash'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'search_string': vi_cmd_data['last_buffer_search']}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-def vi_big_n(vi_cmd_data):
-    # TODO: This is a jump.
-    vi_cmd_data['motion']['command'] = '_vi_question_mark'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'search_string': vi_cmd_data['last_buffer_search']}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-def vi_semicolon(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = 'vi_find_in_line_inclusive' if vi_cmd_data['last_character_search_forward'] else 'vi_reverse_find_in_line_inclusive'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'character': vi_cmd_data['last_character_search'], 'change_direction': False}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-def vi_comma(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = 'vi_reverse_find_in_line_inclusive' if vi_cmd_data['last_character_search_forward'] else 'vi_find_in_line_inclusive'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'character': vi_cmd_data['last_character_search'], 'change_direction': False}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-def vi_big_w(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_big_w'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-def vi_big_e(vi_cmd_data):
-    # NORMAL mode movement:
-    #   ST does what Vim does (TODO: always?).
-    #
-    # _MODE_INTERNAL_NORMAL
-    #
-    vi_cmd_data['motion']['command'] = 'move'
-    vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_end': True, 'empty_line': True, 'separators': '', 'forward': True}
-    vi_cmd_data['__reorient_caret'] = True
-
-    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
-        vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
-
-    elif vi_cmd_data['mode'] == MODE_NORMAL:
-        vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
-        vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
-
-    elif vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['pre_motion'] = ['_vi_e_pre_motion', {'mode': vi_cmd_data['mode']}]
-        vi_cmd_data['post_every_motion'] = ['_vi_e_post_every_motion', {'mode': vi_cmd_data['mode']}]
-
-    elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
-        vi_cmd_data['motion']['command'] = 'vi_no_op'
-        vi_cmd_data['motion']['args'] = {}
-
-    return vi_cmd_data
-
-
-def vi_big_b(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = 'move'
-    vi_cmd_data['motion']['args'] = {'by': 'stops', 'word_begin': True, 'empty_line': True, 'separators': '', 'forward': False}
-
-    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode'],}]
-        vi_cmd_data['post_every_motion'] = ['dont_stay_on_eol_backward',]
-    elif vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['pre_motion'] = ['_vi_b_pre_motion',]
-        vi_cmd_data['pre_every_motion'] = ['_vi_b_pre_motion', {'mode': vi_cmd_data['mode']}]
-        vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['post_every_motion'] = ['_vi_b_post_every_motion', {'mode': vi_cmd_data['mode']}]
-
-    elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
-        vi_cmd_data['motion']['command'] = 'vi_no_op'
-        vi_cmd_data['motion']['args'] = {}
-
-    return vi_cmd_data
-
-
-def vi_right_brace(vi_cmd_data):
-    # TODO: This is a jump.
-    vi_cmd_data['motion']['command'] = '_vi_right_brace'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
-
-    return vi_cmd_data
-
-
-def vi_left_brace(vi_cmd_data):
-    # TODO: This is a jump.
-    vi_cmd_data['motion']['command'] = '_vi_left_brace'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
-
-    return vi_cmd_data
-
-
-def vi_right_parenthesis(vi_cmd_data):
-    # TODO: This is a jump.
-    vi_cmd_data['motion']['command'] = '_vi_right_parenthesis'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
-
-    return vi_cmd_data
-
-
-def vi_left_parenthesis(vi_cmd_data):
-    # TODO: This is a jump.
-    vi_cmd_data['motion']['command'] = '_vi_left_parenthesis'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
-
-    return vi_cmd_data
-
-
-def vi_g_d(vi_cmd_data):
-    vi_cmd_data['is_jump'] = True
-    vi_cmd_data['motion']['command'] = '_vi_go_to_symbol'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
-
-    return vi_cmd_data
-
-
-def vi_g_big_d(vi_cmd_data):
-    vi_cmd_data['is_jump'] = True
-    vi_cmd_data['motion']['command'] = '_vi_go_to_symbol'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'globally': True}
-
-    return vi_cmd_data
-
-
-def vi_quote(vi_cmd_data):
-    if vi_cmd_data['user_motion_input'] != "'":
-        vi_cmd_data['is_jump'] = True
-    # TODO: This is a jump.
-    vi_cmd_data['motion']['command'] = '_vi_quote'
-    vi_cmd_data['motion']['args'] = {'character': vi_cmd_data['user_motion_input'], 'mode': vi_cmd_data['mode']}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-def vi_backtick(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_backtick'
-    vi_cmd_data['motion']['args'] = {'character': vi_cmd_data['user_motion_input'], 'mode': vi_cmd_data['mode']}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-def vi_ctrl_f(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = 'move'
-    vi_cmd_data['motion']['args'] = {'by': 'pages', 'forward': True}
-
-    if vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['motion']['args']['extend'] = True
-    elif vi_cmd_data['mode'] == MODE_VISUAL_LINE:
-        vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['post_motion'] = [['visual_extend_to_full_line',]]
-    elif vi_cmd_data['mode'] != MODE_NORMAL:
-        # TODO: Sublime Text seems to ignore the 'extend' param to Ctrl+f, so disable it.
-        # vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['motion']['command'] = 'vi_no_op'
-        vi_cmd_data['motion']['args'] = {}
-    elif vi_cmd_data['mode'] == MODE_VISUAL_BLOCK:
-        vi_cmd_data['motion']['command'] = 'vi_no_op'
-        vi_cmd_data['motion']['args'] = {}
-
-    return vi_cmd_data
-
-def vi_ctrl_b(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = 'move'
-    vi_cmd_data['motion']['args'] = {'by': 'pages', 'forward': False}
-
-    if vi_cmd_data['mode'] != MODE_NORMAL:
-        # TODO: Sublime Text seems to ignore the 'extend' param to Ctrl+b, so disable it.
-        # vi_cmd_data['motion']['args']['extend'] = True
-        vi_cmd_data['motion']['command'] = 'vi_no_op'
-        vi_cmd_data['motion']['args'] = {}
-
-    return vi_cmd_data
-
-
-def vi_g_star(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = 'vi_star'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'exact_word': False}
-
-    return vi_cmd_data
-
-
-def vi_g_octothorp(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = 'vi_octothorp'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'exact_word': False}
-
-    return vi_cmd_data
-
-def vi_enter(vi_cmd_data):
-    # TODO: Improve post_motion: should leave caret at first non-white space char.
-    vi_cmd_data['motion']['command'] = '_vi_j'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': 1, 'xpos': 0}
-    vi_cmd_data['post_action'] = ['_vi_move_caret_to_first_non_white_space_character', {'mode': vi_cmd_data['mode']}]
-
-    if vi_cmd_data['mode'] == MODE_VISUAL_LINE:
-        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': 1, 'xpos': vi_cmd_data['xpos']}
-
-    return vi_cmd_data
-
-
-def vi_shift_enter(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_k'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': 1, 'xpos': 0}
-    vi_cmd_data['post_motion'] = [['_vi_shift_enter_post_motion', {'mode': vi_cmd_data['mode']}]]
-
-    if vi_cmd_data['mode'] == MODE_VISUAL_LINE:
-        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': 1, 'xpos': vi_cmd_data['xpos']}
-        vi_cmd_data['post_motion'] = None
-
-    return vi_cmd_data
-
-
-def vi_pipe(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_pipe'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-def vi_ctrl_d(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_ctrl_d'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-def vi_ctrl_u(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_ctrl_u'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-def vi_g_j(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_g_j'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-def vi_g_k(vi_cmd_data):
-    vi_cmd_data['motion']['command'] = '_vi_g_k'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-# We have this one duplicated in actions.py because vi_g_action (like in gg or gU) can sometimes
-# be an action, and other times a motion.
-def vi_g_action(vi_cmd_data):
-    """This doesn't do anything by itself, but tells global state to wait for a second action that
-       completes this one.
-    """
-    vi_cmd_data['motion_required'] = True
-    # Let global state know we still need a second action to complete this one.
-    vi_cmd_data['is_digraph_start'] = True
-    vi_cmd_data['action']['command'] = 'no_op'
-    vi_cmd_data['action']['args'] = {}
-
-    return vi_cmd_data
+    return cmd

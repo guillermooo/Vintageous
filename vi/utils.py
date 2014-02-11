@@ -1,75 +1,100 @@
 import sublime
+import sublime_plugin
 
-from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL, MODE_NORMAL, MODE_VISUAL
-
-
-# deprecated
-def is_at_eol(view, reg):
-    return view.line(reg.b).b == reg.b
+from contextlib import contextmanager
+import logging
+import re
 
 
-# deprecated
-def _is_on_eol(view, reg, mode):
-    if mode in (_MODE_INTERNAL_NORMAL, MODE_NORMAL):
-            return view.line(reg.b).b == reg.b
-    elif mode == MODE_VISUAL:
-        return view.full_line(reg.b - 1).b == reg.b
+logging.basicConfig(level=logging.INFO)
 
 
-# deprecated
-def is_at_bol(view, reg):
-    return view.line(reg.b).a == reg.b
+def get_logger():
+    v = sublime.active_window().active_view()
+    level = v.settings().get('vintageous_log_level', 'ERROR')
+    # logging.basicConfig(level=_str_to_log_level(level))
+    logging.basicConfig(level=0)
+    return logging
 
 
-# deprecated
-def back_one_char(reg):
-    return sublime.Region(reg.a - 1, reg.b - 1)
+def get_logging_level():
+    v = sublime.active_window().active_view()
+    level = v.settings().get('vintageous_log_level', 'ERROR')
+    return getattr(logging, level.upper(), logging.ERROR)
 
 
-# deprecated
-def is_line_empty(view, pt):
-    return view.line(pt).empty()
+def get_user_defined_log_level():
+    v = sublime.active_window().active_view()
+    level = v.settings().get('vintageous_log_level', 'ERROR')
+    return getattr(logging, level.upper(), logging.ERROR)
 
 
-# deprecated
-def is_on_empty_line(view, s):
-    if is_line_empty(view, s.a):
-        return True
+
+# Use strings because we need to pass modes as arguments in
+# Default.sublime-keymap and it's more readable.
+class modes:
+    """
+    Vim modes.
+    """
+    COMMAND_LINE = 'mode_command_line'
+    INSERT = 'mode_insert'
+    INTERNAL_NORMAL = 'mode_internal_normal'
+    NORMAL = 'mode_normal'
+    OPERATOR_PENDING = 'mode_operator_pending'
+    VISUAL = 'mode_visual'
+    VISUAL_BLOCK = 'mode_visual_block'
+    VISUAL_LINE = 'mode_visual_line'
+    UNKNOWN = 'mode_unknown'
+    REPLACE = 'mode_replace'
+    NORMAL_INSERT = 'mode_normal_insert'
+    SELECT ='mode_select'
 
 
-# deprecated
-def is_region_reversed(view, r):
-    return r.a > r.b
+class input_types:
+    """
+    Types of input parsers.
+    """
+    INMEDIATE = 1
+    VIA_PANEL = 2
+
+class jump_directions:
+    FORWARD = 1
+    BACK = 0
+
+def regions_transformer(view, f):
+    sels = list(view.sel())
+    new = []
+    for sel in sels:
+        region = f(view, sel)
+        if not isinstance(region, sublime.Region):
+            raise TypeError('sublime.Region required')
+        new.append(region)
+    view.sel().clear()
+    view.sel().add_all(new)
 
 
-# deprecated
-def reverse_region(r):
-    return sublime.Region(r.b, r.a)
+def row_at(view, pt):
+    return view.rowcol(pt)[0]
 
 
-def next_non_white_space_char(view, pt, white_space='\t '):
-    while (view.substr(pt) in white_space) and (pt <= view.size()):
-        pt += 1
-    return pt
+def col_at(view, pt):
+    return view.rowcol(pt)[1]
 
 
-def previous_non_white_space_char(view, pt, white_space='\t \n'):
-    while view.substr(pt) in white_space and pt > 0:
-        pt -= 1
-    return pt
+def strip_command_preamble(seq):
+    """
+    Strips register and count data.
+    """
+    return re.sub(r'^(?:".)?(?:[1-9]+)?', '', seq)
 
 
-# deprecated
-def previous_white_space_char(view, pt, white_space='\t '):
-    while pt >= 0 and view.substr(pt) not in white_space:
-        pt -= 1
-    return pt
-
-
-def is_same_line(view, pt1, pt2):
-    # XXX: Use built-in region comparison when's available.
-    line_a, line_b = view.line(pt1), view.line(pt2)
-    return (line_a.a == line_b.a) and (line_a.b == line_b.b)
+@contextmanager
+def gluing_undo_groups(view, state):
+    state.gluing_sequence = True
+    view.run_command('mark_undo_groups_for_gluing')
+    yield
+    view.run_command('glue_marked_undo_groups')
+    state.gluing_sequence = False
 
 
 def blink(times=4, delay=55):
@@ -88,5 +113,54 @@ def blink(times=4, delay=55):
     do_blink()
 
 
-def has_empty_selection(view):
-    return any(s.empty() for s in view.sel())
+class IrreversibleTextCommand(sublime_plugin.TextCommand):
+    """ Base class.
+
+        The undo stack will ignore commands derived from this class. This is
+        useful to prevent global state management commands from shadowing
+        commands performing edits to the buffer, which are the important ones
+        to keep in the undo history.
+    """
+    def __init__(self, view):
+        sublime_plugin.TextCommand.__init__(self, view)
+
+    def run_(self, edit_token, kwargs):
+        if kwargs and 'event' in kwargs:
+            del kwargs['event']
+
+        if kwargs:
+            self.run(**kwargs)
+        else:
+            self.run()
+
+    def run(self, **kwargs):
+        pass
+
+
+def next_non_white_space_char(view, pt, white_space='\t '):
+    while (view.substr(pt) in white_space) and (pt <= view.size()):
+        pt += 1
+    return pt
+
+
+def previous_non_white_space_char(view, pt, white_space='\t \n'):
+    while view.substr(pt) in white_space and pt > 0:
+        pt -= 1
+    return pt
+
+
+def is_at_eol(view, reg):
+    return view.line(reg.b).b == reg.b
+
+
+def is_at_bol(view, reg):
+    return view.line(reg.b).a == reg.b
+
+
+def translate_char(char):
+    if char.upper() == '<CR>':
+        return '\n'
+    elif char.upper() == '<SPACE>':
+        return ' '
+    else:
+        return char

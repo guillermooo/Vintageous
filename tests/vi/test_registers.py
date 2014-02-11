@@ -9,6 +9,7 @@ from Vintageous.vi import registers
 from Vintageous.vi.registers import Registers
 from Vintageous.vi.settings import SettingsManager
 from Vintageous.state import VintageState
+from Vintageous.tests import BufferTest
 
 
 class TestCaseRegistersConstants(unittest.TestCase):
@@ -70,8 +71,9 @@ class TestCaseRegistersConstants(unittest.TestCase):
                              registers.REG_VALID_NAMES))
 
 
-class TestCaseRegisters(unittest.TestCase):
+class TestCaseRegisters(BufferTest):
     def setUp(self):
+        super().setUp()
         sublime.set_clipboard('')
         registers._REGISTER_DATA = {}
         TestsState.view.settings().erase('vintage')
@@ -178,6 +180,7 @@ class TestCaseRegisters(unittest.TestCase):
 
     def testGetDefaultToUnnamedRegister(self):
         registers._REGISTER_DATA['"'] = ['foo']
+        self.view.settings().set('vintageous_use_sys_clipboard', False)
         self.assertEqual(self.regs.get(), ['foo'])
 
     def testGettingBlackHoleRegisterReturnsNone(self):
@@ -199,6 +202,7 @@ class TestCaseRegisters(unittest.TestCase):
 
     def testGettingExpressionRegisterClearsExpressionRegister(self):
         registers._REGISTER_DATA[registers.REG_EXPRESSION] = ['100']
+        self.view.settings().set('vintageous_use_sys_clipboard', False)
         self.assertEqual(self.regs.get(), ['100'])
         self.assertEqual(registers._REGISTER_DATA[registers.REG_EXPRESSION], '')
 

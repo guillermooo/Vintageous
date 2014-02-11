@@ -1,3 +1,9 @@
+2.9.0 - 12/02/13
+
+	- New core.
+	- New bugs.
+	- DD/MM/YY format in changelog.
+
 2.8.0 - 12/14/13
 
 	- Improve I action.

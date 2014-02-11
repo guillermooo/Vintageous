@@ -14,16 +14,21 @@ from Vintageous.ex import shell
 from Vintageous.ex.plat.windows import get_oem_cp
 from Vintageous.ex.plat.windows import get_startup_info
 from Vintageous.ex_main import FsCompletion
-from Vintageous.state import IrreversibleTextCommand
+from Vintageous.state import user_mappings
 from Vintageous.state import VintageState
+from Vintageous.vi import abbrev
+from Vintageous.vi import utils
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
+from Vintageous.vi.keys import cmd_types
 from Vintageous.vi.settings import set_global
 from Vintageous.vi.settings import set_local
 from Vintageous.vi.sublime import has_dirty_buffers
-from Vintageous.vi import utils
-from Vintageous.vi import abbrev
+from Vintageous.vi.utils import IrreversibleTextCommand
+from Vintageous.vi.utils import modes
+from Vintageous.vi.mappings import Mappings
+from Vintageous.state import State
 
 
 GLOBAL_RANGES = []
@@ -155,20 +160,18 @@ class ExGoto(sublime_plugin.TextCommand):
         # FIXME: In Visual mode, goto line does some weird stuff.
         if state.mode == MODE_NORMAL:
             # TODO: push all this code down to ViGoToLine?
-            self.view.window().run_command('vi_add_to_jump_list')
-            self.view.run_command('vi_go_to_line', {'line': b, 'mode': MODE_NORMAL})
-            self.view.window().run_command('vi_add_to_jump_list')
+            self.view.window().run_command('_vi_add_to_jump_list')
+            self.view.run_command('_vi_go_to_line', {'line': b, 'mode': state.mode})
+            self.view.window().run_command('_vi_add_to_jump_list')
             self.view.show(self.view.sel()[0])
         elif state.mode in (MODE_VISUAL, MODE_VISUAL_LINE) and line_range['right_offset']:
             # TODO: push all this code down to ViGoToLine?
-            self.view.run_command('vi_enter_normal_mode')
-            self.view.window().run_command('vi_add_to_jump_list')
+            self.view.window().run_command('_vi_add_to_jump_list')
             # FIXME: The parser fails with '<,'>100. 100 is not the right_offset, but an argument.
             b = self.view.rowcol(self.view.sel()[0].b - 1)[0] + line_range['right_offset'] + 1
-            self.view.run_command('vi_go_to_line', {'line': b, 'mode': MODE_NORMAL})
-            self.view.window().run_command('vi_add_to_jump_list')
+            self.view.run_command('_vi_go_to_line', {'line': b, 'mode': state.mode})
+            self.view.window().run_command('_vi_add_to_jump_list')
             self.view.show(self.view.sel()[0])
-            state.display_partial_command()
 
 
 class ExShellOut(sublime_plugin.TextCommand):
@@ -321,17 +324,23 @@ class ExPromptSelectOpenFile(sublime_plugin.TextCommand):
 
 
 class ExMap(sublime_plugin.TextCommand):
-    # do at least something moderately useful: open the user's .sublime-keymap
-    # file
-    def run(self, edit):
-        if sublime.platform() == 'windows':
-            platf = 'Windows'
-        elif sublime.platform() == 'linux':
-            platf = 'Linux'
-        else:
-            platf = 'OSX'
-        self.view.window().run_command('open_file', {'file':
-                                        '${packages}/User/Default (%s).sublime-keymap' % platf})
+    """
+    Remaps keys.
+    """
+    def run(self, edit, mode=None, count=None, cmd=''):
+        keys, command = cmd.lstrip().split(' ', 1)
+        # mappings = Mappings(State(self.view))
+        # mappings.add(modes.NORMAL, keys, command)
+        # mappings.add(modes.OPERATOR_PENDING, keys, command)
+
+
+class ExUnmap(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, count=None, cmd=''):
+        pass
+        # try:
+            # del user_mappings[cmd]
+        # except IndexError:
+            # sublime.status_message('[Vintageous] Nothing to unmmap.')
 
 
 class ExAbbreviate(sublime_plugin.TextCommand):
@@ -947,7 +956,7 @@ class ExExit(sublime_plugin.TextCommand):
 
     TODO: Support ranges, like :w.
     """
-    def run(self, edit, line_range=None):
+    def run(self, edit, line_range=None, mode=None, count=1):
         w = self.view.window()
 
         if w.active_view().is_dirty():
@@ -973,7 +982,7 @@ class ExListRegisters(sublime_plugin.TextCommand):
         state = VintageState(self.view)
         pairs = [(k, v) for (k, v) in state.registers.to_dict().items() if v]
         pairs = [(k, repr(v[0]), len(v)) for (k, v) in pairs]
-        pairs = ['"{0}\t{1}\t{2}'.format(k, v, show_lines(lines)) for (k, v, lines) in pairs]
+        pairs = ['"{0}  {1}  {2}'.format(k, v, show_lines(lines)) for (k, v, lines) in pairs]
 
         self.view.window().show_quick_panel(pairs, self.on_done, flags=sublime.MONOSPACE_FONT)
 

@@ -33,5 +33,10 @@
 	"vintageous_magic": true,
 
 	// If true, /, ?, * and # will always ignore case.
-	"vintageous_ignorecase": true
+	"vintageous_ignorecase": true,
+
+	// Logging level. Used for diagnostics and troubleshooting. Common valid
+	// values are 'debug', 'info', 'error', 'critical'. Most users should
+	// not need to modify the default value.
+	"vintageous_log_level": "error"
 }

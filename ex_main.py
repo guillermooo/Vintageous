@@ -13,6 +13,7 @@ from Vintageous.ex.completions import wants_fs_completions
 from Vintageous.ex.completions import wants_setting_completions
 from Vintageous.vi.settings import iter_settings
 from Vintageous.vi.sublime import show_ipanel
+from Vintageous.vi.utils import modes
 from Vintageous.state import VintageState
 
 
@@ -57,6 +58,9 @@ class ViColonInput(sublime_plugin.WindowCommand):
             return
 
         FsCompletion.invalidate()
+
+        if VintageState(self.window.active_view()).mode in (modes.VISUAL, modes.VISUAL_LINE):
+            initial_text = ":'<,'>" + initial_text[1:]
 
         v = show_ipanel(self.window, initial_text=initial_text,
                         on_done=self.on_done, on_change=self.on_change)

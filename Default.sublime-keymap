@@ -1,299 +1,409 @@
-//
-// Basic rule to add new key bindings:
-//
-//  * Given two key bindings for the same key, the one defined last in the file wins, even if its
-//    context is less restrictive.
-//
-
 [
-	{ "keys": ["escape"], "command": "set_action", "args": {"action": "vi_esc"}, "context": [{"key": "vi_must_change_mode"}, {"key": "vi_is_buffer"}] },
-	{ "keys": ["ctrl+["], "command": "set_action", "args": {"action": "vi_esc"}, "context": [{"key": "vi_must_change_mode"}, {"key": "vi_is_buffer"}, {"key": "vi_use_ctrl_keys"}] },
-	{ "keys": ["ctrl+c"], "command": "set_action", "args": {"action": "vi_esc"}, "context": [{"key": "vi_must_change_mode"}, {"key": "vi_is_buffer"}, {"key": "vi_use_ctrl_keys"}] },
+	{"keys": ["shift+escape"], "command": "toggle_mode" },
+
+	{"keys": ["escape"], "command": "press_key", "args": {"key": "<esc>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["enter"], "command": "press_key", "args": {"key": "<CR>"}, "context": [{"key": "setting.command_mode"}]},
+
+	{"keys": ["shift+enter"], "command": "press_key", "args": {"key": "<shift+cr>"}, "context": [{"key": "setting.command_mode"}]},
+
+	{"keys": ["escape"], "command": "_enter_normal_mode", "args": {"mode": "mode_insert"}, "context": [{"key": "setting.command_mode", "operand": false}]},
+	{"keys": ["ctrl+c"], "command": "_enter_normal_mode", "args": {"mode": "mode_insert"}, "context": [{"key": "setting.command_mode", "operand": false}]},
+	{"keys": ["ctrl+["], "command": "_enter_normal_mode", "args": {"mode": "mode_insert"}, "context": [{"key": "setting.command_mode", "operand": false}]},
+
+	// {"keys": ["ctrl+r"], "command": "press_key", "args": {"key": "<ctrl+r>", "force_mode": "mode_normal"}, "context": [{"key": "setting.command_mode", "operand": false}]},
+
+	{"keys": ["*"], "command": "press_key", "args": {"key": "*"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["@"], "command": "press_key", "args": {"key": "@"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["#"], "command": "press_key", "args": {"key": "#"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["+"], "command": "press_key", "args": {"key": "+"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": [","], "command": "press_key", "args": {"key": ","}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["-"], "command": "press_key", "args": {"key": "-"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["."], "command": "press_key", "args": {"key": "."}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": [":"], "command": "press_key", "args": {"key": ":"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": [";"], "command": "press_key", "args": {"key": ";"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["<"], "command": "press_key", "args": {"key": "<"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": [">"], "command": "press_key", "args": {"key": ">"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["^"], "command": "press_key", "args": {"key": "^"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["_"], "command": "press_key", "args": {"key": "_"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["|"], "command": "press_key", "args": {"key": "|"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["`"], "command": "press_key", "args": {"key": "`"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["\""], "command": "press_key", "args": {"key": "`"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["'"], "command": "press_key", "args": {"key": "'"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["¨"], "command": "press_key", "args": {"key": "¨"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["´"], "command": "press_key", "args": {"key": "´"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["~"], "command": "press_key", "args": {"key": "~"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["\\"], "command": "press_key", "args": {"key": "\\"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": [" "], "command": "press_key", "args": {"key": "<space>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["}"], "command": "press_key", "args": {"key": "}"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["{"], "command": "press_key", "args": {"key": "{"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["]"], "command": "press_key", "args": {"key": "]"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["["], "command": "press_key", "args": {"key": "["}, "context": [{"key": "setting.command_mode"}]},
+
+	{"keys": ["up"], 	"command": "press_key", "args": {"key": "<up>"},    "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["down"],  "command": "press_key", "args": {"key": "<down>"},  "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["left"],  "command": "press_key", "args": {"key": "<left>"},  "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["right"], "command": "press_key", "args": {"key": "<right>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["end"], "command": "press_key", "args": {"key": "<end>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["home"], "command": "press_key", "args": {"key": "<home>"}, "context": [{"key": "setting.command_mode"}]},
+
+	{"keys": ["a"], "command": "press_key", "args": {"key": "a"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["b"], "command": "press_key", "args": {"key": "b"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["c"], "command": "press_key", "args": {"key": "c"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["d"], "command": "press_key", "args": {"key": "d"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["e"], "command": "press_key", "args": {"key": "e"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["f"], "command": "press_key", "args": {"key": "f"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["g"], "command": "press_key", "args": {"key": "g"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["h"], "command": "press_key", "args": {"key": "h"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["i"], "command": "press_key", "args": {"key": "i"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["j"], "command": "press_key", "args": {"key": "j"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["k"], "command": "press_key", "args": {"key": "k"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["l"], "command": "press_key", "args": {"key": "l"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["m"], "command": "press_key", "args": {"key": "m"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["n"], "command": "press_key", "args": {"key": "n"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["o"], "command": "press_key", "args": {"key": "o"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["p"], "command": "press_key", "args": {"key": "p"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["q"], "command": "press_key", "args": {"key": "q"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["r"], "command": "press_key", "args": {"key": "r"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["s"], "command": "press_key", "args": {"key": "s"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["t"], "command": "press_key", "args": {"key": "t"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["u"], "command": "press_key", "args": {"key": "u"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["v"], "command": "press_key", "args": {"key": "v"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["w"], "command": "press_key", "args": {"key": "w"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["x"], "command": "press_key", "args": {"key": "x"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["y"], "command": "press_key", "args": {"key": "y"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["z"], "command": "press_key", "args": {"key": "z"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ç"], "command": "press_key", "args": {"key": "ç"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ñ"], "command": "press_key", "args": {"key": "ñ"}, "context": [{"key": "setting.command_mode"}]},
+
+	{"keys": ["A"], "command": "press_key", "args": {"key": "A"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["B"], "command": "press_key", "args": {"key": "B"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["C"], "command": "press_key", "args": {"key": "C"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["D"], "command": "press_key", "args": {"key": "D"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["E"], "command": "press_key", "args": {"key": "E"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["F"], "command": "press_key", "args": {"key": "F"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["G"], "command": "press_key", "args": {"key": "G"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["H"], "command": "press_key", "args": {"key": "H"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["I"], "command": "press_key", "args": {"key": "I"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["J"], "command": "press_key", "args": {"key": "J"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["K"], "command": "press_key", "args": {"key": "K"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["L"], "command": "press_key", "args": {"key": "L"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["M"], "command": "press_key", "args": {"key": "M"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["N"], "command": "press_key", "args": {"key": "N"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["O"], "command": "press_key", "args": {"key": "O"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["P"], "command": "press_key", "args": {"key": "P"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["Q"], "command": "press_key", "args": {"key": "Q"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["R"], "command": "press_key", "args": {"key": "R"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["S"], "command": "press_key", "args": {"key": "S"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["T"], "command": "press_key", "args": {"key": "T"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["U"], "command": "press_key", "args": {"key": "U"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["V"], "command": "press_key", "args": {"key": "V"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["W"], "command": "press_key", "args": {"key": "W"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["X"], "command": "press_key", "args": {"key": "X"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["Y"], "command": "press_key", "args": {"key": "Y"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["Z"], "command": "press_key", "args": {"key": "Z"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["Ç"], "command": "press_key", "args": {"key": "Ç"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["Ñ"], "command": "press_key", "args": {"key": "Ñ"}, "context": [{"key": "setting.command_mode"}]},
+
+	{"keys": ["ctrl+a"], "command": "press_key", "args": {"key": "<ctrl+a>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+b"], "command": "press_key", "args": {"key": "<ctrl+b>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+c"], "command": "press_key", "args": {"key": "<ctrl+c>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+d"], "command": "press_key", "args": {"key": "<ctrl+d>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+e"], "command": "press_key", "args": {"key": "<ctrl+e>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+f"], "command": "press_key", "args": {"key": "<ctrl+f>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+g"], "command": "press_key", "args": {"key": "<ctrl+g>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+h"], "command": "press_key", "args": {"key": "<ctrl+h>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+i"], "command": "press_key", "args": {"key": "<ctrl+i>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+j"], "command": "press_key", "args": {"key": "<ctrl+j>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+k"], "command": "press_key", "args": {"key": "<ctrl+k>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+l"], "command": "press_key", "args": {"key": "<ctrl+l>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+m"], "command": "press_key", "args": {"key": "<ctrl+m>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+n"], "command": "press_key", "args": {"key": "<ctrl+n>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+o"], "command": "press_key", "args": {"key": "<ctrl+o>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+p"], "command": "press_key", "args": {"key": "<ctrl+p>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+q"], "command": "press_key", "args": {"key": "<ctrl+q>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+r"], "command": "press_key", "args": {"key": "<ctrl+r>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+s"], "command": "press_key", "args": {"key": "<ctrl+s>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+t"], "command": "press_key", "args": {"key": "<ctrl+t>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+u"], "command": "press_key", "args": {"key": "<ctrl+u>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+v"], "command": "press_key", "args": {"key": "<ctrl+v>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+w"], "command": "press_key", "args": {"key": "<ctrl+w>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+x"], "command": "press_key", "args": {"key": "<ctrl+x>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+y"], "command": "press_key", "args": {"key": "<ctrl+y>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+z"], "command": "press_key", "args": {"key": "<ctrl+z>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+ç"], "command": "press_key", "args": {"key": "<ctrl+ç>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+ñ"], "command": "press_key", "args": {"key": "<ctrl+ñ>"}, "context": [{"key": "setting.command_mode"}]},
+
+	{"keys": ["alt+a"], "command": "press_key", "args": {"key": "alt+a"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+b"], "command": "press_key", "args": {"key": "alt+b"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+c"], "command": "press_key", "args": {"key": "alt+c"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+d"], "command": "press_key", "args": {"key": "alt+d"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+e"], "command": "press_key", "args": {"key": "alt+e"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+f"], "command": "press_key", "args": {"key": "alt+f"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+g"], "command": "press_key", "args": {"key": "alt+g"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+h"], "command": "press_key", "args": {"key": "alt+h"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+i"], "command": "press_key", "args": {"key": "alt+i"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+j"], "command": "press_key", "args": {"key": "alt+j"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+k"], "command": "press_key", "args": {"key": "alt+k"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+l"], "command": "press_key", "args": {"key": "alt+l"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+m"], "command": "press_key", "args": {"key": "alt+m"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+n"], "command": "press_key", "args": {"key": "alt+n"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+o"], "command": "press_key", "args": {"key": "alt+o"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+p"], "command": "press_key", "args": {"key": "alt+p"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+q"], "command": "press_key", "args": {"key": "alt+q"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+r"], "command": "press_key", "args": {"key": "alt+r"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+s"], "command": "press_key", "args": {"key": "alt+s"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+t"], "command": "press_key", "args": {"key": "alt+t"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+u"], "command": "press_key", "args": {"key": "alt+u"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+v"], "command": "press_key", "args": {"key": "alt+v"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+w"], "command": "press_key", "args": {"key": "alt+w"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+x"], "command": "press_key", "args": {"key": "alt+x"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+y"], "command": "press_key", "args": {"key": "alt+y"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+z"], "command": "press_key", "args": {"key": "alt+z"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+ç"], "command": "press_key", "args": {"key": "alt+ç"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["alt+ñ"], "command": "press_key", "args": {"key": "alt+ñ"}, "context": [{"key": "setting.command_mode"}]},
+
+	{"keys": ["super+a"], "command": "press_key", "args": {"key": "super+a"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+b"], "command": "press_key", "args": {"key": "super+b"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+c"], "command": "press_key", "args": {"key": "super+c"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+d"], "command": "press_key", "args": {"key": "super+d"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+e"], "command": "press_key", "args": {"key": "super+e"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+f"], "command": "press_key", "args": {"key": "super+f"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+g"], "command": "press_key", "args": {"key": "super+g"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+h"], "command": "press_key", "args": {"key": "super+h"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+i"], "command": "press_key", "args": {"key": "super+i"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+j"], "command": "press_key", "args": {"key": "super+j"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+k"], "command": "press_key", "args": {"key": "super+k"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+l"], "command": "press_key", "args": {"key": "super+l"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+m"], "command": "press_key", "args": {"key": "super+m"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+n"], "command": "press_key", "args": {"key": "super+n"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+o"], "command": "press_key", "args": {"key": "super+o"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+p"], "command": "press_key", "args": {"key": "super+p"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+q"], "command": "press_key", "args": {"key": "super+q"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+r"], "command": "press_key", "args": {"key": "super+r"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+s"], "command": "press_key", "args": {"key": "super+s"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+t"], "command": "press_key", "args": {"key": "super+t"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+u"], "command": "press_key", "args": {"key": "super+u"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+v"], "command": "press_key", "args": {"key": "super+v"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+w"], "command": "press_key", "args": {"key": "super+w"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+x"], "command": "press_key", "args": {"key": "super+x"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+y"], "command": "press_key", "args": {"key": "super+y"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+z"], "command": "press_key", "args": {"key": "super+z"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+ç"], "command": "press_key", "args": {"key": "super+ç"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["super+ñ"], "command": "press_key", "args": {"key": "super+ñ"}, "context": [{"key": "setting.command_mode"}]},
+
+	{"keys": ["altgr+a"], "command": "press_key", "args": {"key": "altgr+a"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+b"], "command": "press_key", "args": {"key": "altgr+b"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+c"], "command": "press_key", "args": {"key": "altgr+c"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+d"], "command": "press_key", "args": {"key": "altgr+d"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+e"], "command": "press_key", "args": {"key": "altgr+e"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+f"], "command": "press_key", "args": {"key": "altgr+f"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+g"], "command": "press_key", "args": {"key": "altgr+g"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+h"], "command": "press_key", "args": {"key": "altgr+h"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+i"], "command": "press_key", "args": {"key": "altgr+i"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+j"], "command": "press_key", "args": {"key": "altgr+j"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+k"], "command": "press_key", "args": {"key": "altgr+k"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+l"], "command": "press_key", "args": {"key": "altgr+l"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+m"], "command": "press_key", "args": {"key": "altgr+m"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+n"], "command": "press_key", "args": {"key": "altgr+n"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+o"], "command": "press_key", "args": {"key": "altgr+o"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+p"], "command": "press_key", "args": {"key": "altgr+p"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+q"], "command": "press_key", "args": {"key": "altgr+q"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+r"], "command": "press_key", "args": {"key": "altgr+r"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+s"], "command": "press_key", "args": {"key": "altgr+s"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+t"], "command": "press_key", "args": {"key": "altgr+t"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+u"], "command": "press_key", "args": {"key": "altgr+u"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+v"], "command": "press_key", "args": {"key": "altgr+v"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+w"], "command": "press_key", "args": {"key": "altgr+w"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+x"], "command": "press_key", "args": {"key": "altgr+x"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+y"], "command": "press_key", "args": {"key": "altgr+y"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+z"], "command": "press_key", "args": {"key": "altgr+z"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+ç"], "command": "press_key", "args": {"key": "altgr+ç"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["altgr+ñ"], "command": "press_key", "args": {"key": "altgr+ñ"}, "context": [{"key": "setting.command_mode"}]},
+
+	{"keys": ["shift+ctrl+a"], "command": "press_key", "args": {"key": "<ctrl+A>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+b"], "command": "press_key", "args": {"key": "<ctrl+B>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+c"], "command": "press_key", "args": {"key": "<ctrl+C>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+d"], "command": "press_key", "args": {"key": "<ctrl+D>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+e"], "command": "press_key", "args": {"key": "<ctrl+E>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+f"], "command": "press_key", "args": {"key": "<ctrl+F>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+g"], "command": "press_key", "args": {"key": "<ctrl+G>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+h"], "command": "press_key", "args": {"key": "<ctrl+H>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+i"], "command": "press_key", "args": {"key": "<ctrl+I>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+j"], "command": "press_key", "args": {"key": "<ctrl+J>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+k"], "command": "press_key", "args": {"key": "<ctrl+K>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+l"], "command": "press_key", "args": {"key": "<ctrl+L>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+m"], "command": "press_key", "args": {"key": "<ctrl+M>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+n"], "command": "press_key", "args": {"key": "<ctrl+N>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+o"], "command": "press_key", "args": {"key": "<ctrl+O>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+p"], "command": "press_key", "args": {"key": "<ctrl+P>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+q"], "command": "press_key", "args": {"key": "<ctrl+Q>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+r"], "command": "press_key", "args": {"key": "<ctrl+R>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+s"], "command": "press_key", "args": {"key": "<ctrl+S>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+t"], "command": "press_key", "args": {"key": "<ctrl+T>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+u"], "command": "press_key", "args": {"key": "<ctrl+U>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+v"], "command": "press_key", "args": {"key": "<ctrl+V>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+w"], "command": "press_key", "args": {"key": "<ctrl+W>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+x"], "command": "press_key", "args": {"key": "<ctrl+X>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+y"], "command": "press_key", "args": {"key": "<ctrl+Y>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+z"], "command": "press_key", "args": {"key": "<ctrl+Z>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+ç"], "command": "press_key", "args": {"key": "<ctrl+Ç>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+ñ"], "command": "press_key", "args": {"key": "<ctrl+Ñ>"}, "context": [{"key": "setting.command_mode"}]},
+
+	{"keys": ["shift+alt+a"], "command": "press_key", "args": {"key": "alt+A"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+b"], "command": "press_key", "args": {"key": "alt+B"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+c"], "command": "press_key", "args": {"key": "alt+C"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+d"], "command": "press_key", "args": {"key": "alt+D"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+e"], "command": "press_key", "args": {"key": "alt+E"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+f"], "command": "press_key", "args": {"key": "alt+F"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+g"], "command": "press_key", "args": {"key": "alt+G"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+h"], "command": "press_key", "args": {"key": "alt+H"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+i"], "command": "press_key", "args": {"key": "alt+I"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+j"], "command": "press_key", "args": {"key": "alt+J"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+k"], "command": "press_key", "args": {"key": "alt+K"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+l"], "command": "press_key", "args": {"key": "alt+L"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+m"], "command": "press_key", "args": {"key": "alt+M"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+n"], "command": "press_key", "args": {"key": "alt+N"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+o"], "command": "press_key", "args": {"key": "alt+O"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+p"], "command": "press_key", "args": {"key": "alt+P"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+q"], "command": "press_key", "args": {"key": "alt+Q"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+r"], "command": "press_key", "args": {"key": "alt+R"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+s"], "command": "press_key", "args": {"key": "alt+S"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+t"], "command": "press_key", "args": {"key": "alt+T"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+u"], "command": "press_key", "args": {"key": "alt+U"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+v"], "command": "press_key", "args": {"key": "alt+V"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+w"], "command": "press_key", "args": {"key": "alt+W"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+x"], "command": "press_key", "args": {"key": "alt+X"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+y"], "command": "press_key", "args": {"key": "alt+Y"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+z"], "command": "press_key", "args": {"key": "alt+Z"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+ç"], "command": "press_key", "args": {"key": "alt+Ç"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+alt+ñ"], "command": "press_key", "args": {"key": "alt+Ñ"}, "context": [{"key": "setting.command_mode"}]},
+
+	{"keys": ["ctrl+alt+a"], "command": "press_key", "args": {"key": "<ctrl+alt+a>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+b"], "command": "press_key", "args": {"key": "<ctrl+alt+b>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+c"], "command": "press_key", "args": {"key": "<ctrl+alt+c>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+d"], "command": "press_key", "args": {"key": "<ctrl+alt+d>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+e"], "command": "press_key", "args": {"key": "<ctrl+alt+e>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+f"], "command": "press_key", "args": {"key": "<ctrl+alt+f>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+g"], "command": "press_key", "args": {"key": "<ctrl+alt+g>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+h"], "command": "press_key", "args": {"key": "<ctrl+alt+h>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+i"], "command": "press_key", "args": {"key": "<ctrl+alt+i>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+j"], "command": "press_key", "args": {"key": "<ctrl+alt+j>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+k"], "command": "press_key", "args": {"key": "<ctrl+alt+k>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+l"], "command": "press_key", "args": {"key": "<ctrl+alt+l>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+m"], "command": "press_key", "args": {"key": "<ctrl+alt+m>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+n"], "command": "press_key", "args": {"key": "<ctrl+alt+n>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+o"], "command": "press_key", "args": {"key": "<ctrl+alt+o>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+p"], "command": "press_key", "args": {"key": "<ctrl+alt+p>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+q"], "command": "press_key", "args": {"key": "<ctrl+alt+q>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+r"], "command": "press_key", "args": {"key": "<ctrl+alt+r>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+s"], "command": "press_key", "args": {"key": "<ctrl+alt+s>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+t"], "command": "press_key", "args": {"key": "<ctrl+alt+t>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+u"], "command": "press_key", "args": {"key": "<ctrl+alt+u>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+v"], "command": "press_key", "args": {"key": "<ctrl+alt+v>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+w"], "command": "press_key", "args": {"key": "<ctrl+alt+w>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+x"], "command": "press_key", "args": {"key": "<ctrl+alt+x>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+y"], "command": "press_key", "args": {"key": "<ctrl+alt+y>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+z"], "command": "press_key", "args": {"key": "<ctrl+alt+z>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+ç"], "command": "press_key", "args": {"key": "<ctrl+alt+ç>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+alt+ñ"], "command": "press_key", "args": {"key": "<ctrl+alt+ñ>"}, "context": [{"key": "setting.command_mode"}]},
+
+	{"keys": ["shift+ctrl+alt+a"], "command": "press_key", "args": {"key": "<ctrl+alt+A>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+b"], "command": "press_key", "args": {"key": "<ctrl+alt+B>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+c"], "command": "press_key", "args": {"key": "<ctrl+alt+C>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+d"], "command": "press_key", "args": {"key": "<ctrl+alt+D>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+e"], "command": "press_key", "args": {"key": "<ctrl+alt+E>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+f"], "command": "press_key", "args": {"key": "<ctrl+alt+F>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+g"], "command": "press_key", "args": {"key": "<ctrl+alt+G>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+h"], "command": "press_key", "args": {"key": "<ctrl+alt+H>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+i"], "command": "press_key", "args": {"key": "<ctrl+alt+I>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+j"], "command": "press_key", "args": {"key": "<ctrl+alt+J>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+k"], "command": "press_key", "args": {"key": "<ctrl+alt+K>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+l"], "command": "press_key", "args": {"key": "<ctrl+alt+L>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+m"], "command": "press_key", "args": {"key": "<ctrl+alt+M>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+n"], "command": "press_key", "args": {"key": "<ctrl+alt+N>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+o"], "command": "press_key", "args": {"key": "<ctrl+alt+O>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+p"], "command": "press_key", "args": {"key": "<ctrl+alt+P>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+q"], "command": "press_key", "args": {"key": "<ctrl+alt+Q>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+r"], "command": "press_key", "args": {"key": "<ctrl+alt+R>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+s"], "command": "press_key", "args": {"key": "<ctrl+alt+S>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+t"], "command": "press_key", "args": {"key": "<ctrl+alt+T>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+u"], "command": "press_key", "args": {"key": "<ctrl+alt+U>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+v"], "command": "press_key", "args": {"key": "<ctrl+alt+V>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+w"], "command": "press_key", "args": {"key": "<ctrl+alt+W>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+x"], "command": "press_key", "args": {"key": "<ctrl+alt+X>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+y"], "command": "press_key", "args": {"key": "<ctrl+alt+Y>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+z"], "command": "press_key", "args": {"key": "<ctrl+alt+Z>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+ç"], "command": "press_key", "args": {"key": "<ctrl+alt+Ç>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["shift+ctrl+alt+ñ"], "command": "press_key", "args": {"key": "<ctrl+alt+Ñ>"}, "context": [{"key": "setting.command_mode"}]},
+
+	{"keys": ["1"], "command": "press_key", "args": {"key": "1"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["2"], "command": "press_key", "args": {"key": "2"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["3"], "command": "press_key", "args": {"key": "3"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["4"], "command": "press_key", "args": {"key": "4"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["5"], "command": "press_key", "args": {"key": "5"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["6"], "command": "press_key", "args": {"key": "6"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["7"], "command": "press_key", "args": {"key": "7"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["8"], "command": "press_key", "args": {"key": "8"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["9"], "command": "press_key", "args": {"key": "9"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["0"], "command": "press_key", "args": {"key": "0"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["º"], "command": "press_key", "args": {"key": "º"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ª"], "command": "press_key", "args": {"key": "ª"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["!"], "command": "press_key", "args": {"key": "!"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["\""], "command": "press_key", "args": {"key": "\""}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["·"], "command": "press_key", "args": {"key": "·"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["$"], "command": "press_key", "args": {"key": "$"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["%"], "command": "press_key", "args": {"key": "%"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["&"], "command": "press_key", "args": {"key": "&"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["/"], "command": "press_key", "args": {"key": "/"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["("], "command": "press_key", "args": {"key": "("}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": [")"], "command": "press_key", "args": {"key": ")"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["="], "command": "press_key", "args": {"key": "="}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["?"], "command": "press_key", "args": {"key": "?"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["¿"], "command": "press_key", "args": {"key": "¿"}, "context": [{"key": "setting.command_mode"}]},
+
+	{"keys": ["f1"], "command": "press_key", "args": {"key": "<f1>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["f2"], "command": "press_key", "args": {"key": "<f2>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["f3"], "command": "press_key", "args": {"key": "<f3>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["f4"], "command": "press_key", "args": {"key": "<f4>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["f5"], "command": "press_key", "args": {"key": "<f5>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["f6"], "command": "press_key", "args": {"key": "<f6>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["f7"], "command": "press_key", "args": {"key": "<f7>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["f8"], "command": "press_key", "args": {"key": "<f8>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["f9"], "command": "press_key", "args": {"key": "<f9>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["f10"], "command": "press_key", "args": {"key": "<f10>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["f11"], "command": "press_key", "args": {"key": "<f11>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["f12"], "command": "press_key", "args": {"key": "<f12>"}, "context": [{"key": "setting.command_mode"}]},
+
+	{"keys": ["ctrl+f1"], "command": "press_key", "args": {"key": "<ctrl+f1>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+f2"], "command": "press_key", "args": {"key": "<ctrl+f2>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+f3"], "command": "press_key", "args": {"key": "<ctrl+f3>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+f4"], "command": "press_key", "args": {"key": "<ctrl+f4>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+f5"], "command": "press_key", "args": {"key": "<ctrl+f5>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+f6"], "command": "press_key", "args": {"key": "<ctrl+f6>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+f7"], "command": "press_key", "args": {"key": "<ctrl+f7>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+f8"], "command": "press_key", "args": {"key": "<ctrl+f8>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+f9"], "command": "press_key", "args": {"key": "<ctrl+f9>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+f10"], "command": "press_key", "args": {"key": "<ctrl+f10>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+f11"], "command": "press_key", "args": {"key": "<ctrl+f11>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+f12"], "command": "press_key", "args": {"key": "<ctrl+f12>"}, "context": [{"key": "setting.command_mode"}]},
+
+	{"keys": ["ctrl+shift+f1"], "command": "press_key", "args": {"key": "<shift+ctrl+f1>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+shift+f2"], "command": "press_key", "args": {"key": "<shift+ctrl+f2>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+shift+f3"], "command": "press_key", "args": {"key": "<shift+ctrl+f3>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+shift+f4"], "command": "press_key", "args": {"key": "<shift+ctrl+f4>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+shift+f5"], "command": "press_key", "args": {"key": "<shift+ctrl+f5>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+shift+f6"], "command": "press_key", "args": {"key": "<shift+ctrl+f6>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+shift+f7"], "command": "press_key", "args": {"key": "<shift+ctrl+f7>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+shift+f8"], "command": "press_key", "args": {"key": "<shift+ctrl+f8>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+shift+f9"], "command": "press_key", "args": {"key": "<shift+ctrl+f9>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+shift+f10"], "command": "press_key", "args": {"key": "<shift+ctrl+f10>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+shift+f11"], "command": "press_key", "args": {"key": "<shift+ctrl+f11>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["ctrl+shift+f12"], "command": "press_key", "args": {"key": "<shift+ctrl+f12>"}, "context": [{"key": "setting.command_mode"}]},
 
-	{ "keys": ["R"], "command": "set_action", "args": {"action": "vi_enter_replace_mode"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_is_buffer"}] },
-
-	{ "keys": ["i"], "command": "set_action", "args": {"action": "vi_enter_insert_mode"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_mode_visual_any", "operand": false}] },
-
-	// This allows insertions such as 5ifoobar\n<esc>. Macros help with this, but we should
-	// prevent the user from requesting a macro recording until after <esc> is pressed.
-	// TODO: Maybe create a context like "vi_in_normal_insert_mode"?
-	{ "keys": ["i"], "command": "vi_enter_normal_insert_mode",            "context": [{"key": "setting.command_mode"}, {"key": "vi_has_motion_count"}] },
-	{ "keys": ["a"], "command": "set_action", "args": {"action": "vi_a"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_mode_visual_any", "operand": false}] },
-
-	{ "keys": ["h"], "command": "set_motion", "args": {"motion": "vi_h"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["j"], "command": "set_motion", "args": {"motion": "vi_j"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["k"], "command": "set_motion", "args": {"motion": "vi_k"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["l"], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-
-	// Non-standard Vim commands.
-	{ "keys": ["j"], "command": "find_under_expand",      "context": [{"key": "vi_mode_select"}] },
-	{ "keys": ["k"], "command": "vi_soft_undo",           "context": [{"key": "vi_mode_select"}] },
-	{ "keys": ["l"], "command": "find_under_expand_skip", "context": [{"key": "vi_mode_select"}] },
-	{ "keys": ["A"], "command": "find_all_under",         "context": [{"key": "vi_mode_select"}] },
-
-	{ "keys": ["down"], "command": "set_motion", "args": {"motion": "vi_j"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["up"],   "command": "set_motion", "args": {"motion": "vi_k"},   "context": [{"key": "setting.command_mode"}] },
-
-	{ "keys": ["left"],  "command": "set_motion", "args": {"motion": "vi_h"},  "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["right"], "command": "set_motion", "args": {"motion": "vi_l"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-
-	{ "keys": [" "],           "command": "set_motion", "args": {"motion": "vi_l"},           "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["enter"],       "command": "set_motion", "args": {"motion": "vi_enter"},       "context": [{"key": "vi_mode_normal_or_any_visual"}] },
-	{ "keys": ["shift+enter"], "command": "set_motion", "args": {"motion": "vi_shift_enter"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
-	{ "keys": ["ctrl+space"],  "command": "set_motion", "args": {"motion": "vi_w"},           "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["backspace"],   "command": "set_motion", "args": {"motion": "vi_h"},       	  "context": [{"key": "vi_mode_normal_or_any_visual"}] },
-
-	{ "keys": ["w"], "command": "set_motion", "args": {"motion": "vi_w"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["e"], "command": "set_motion", "args": {"motion": "vi_e"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["b"], "command": "set_motion", "args": {"motion": "vi_b"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-
-	{ "keys": ["e"], "command": "set_action", "args": {"action": "vi_g_e"}, "context": [{"key": "vi_mode_normal_or_visual"}, {"key": "vi_has_incomplete_action"}] },
-
-	{ "keys": ["W"], "command": "set_motion", "args": {"motion": "vi_big_w"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["E"], "command": "set_motion", "args": {"motion": "vi_big_e"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["B"], "command": "set_motion", "args": {"motion": "vi_big_b"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-
-	{ "keys": ["home"], "command": "set_motion", "args": {"motion": "vi_zero"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["end"], "command": "set_motion", "args": {"motion": "vi_dollar"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-
-	{ "keys": ["|"], "command": "set_motion", "args": {"motion": "vi_pipe"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-
-	{ "keys": ["$"], "command": "set_motion", "args": {"motion": "vi_dollar"},     "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["_"], "command": "set_motion", "args": {"motion": "vi_underscore"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["^"], "command": "set_motion", "args": {"motion": "vi_hat"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-
-	{ "keys": ["{"], "command": "set_motion", "args": {"motion": "vi_left_brace"},  "context": [{"key": "vi_mode_normal_or_any_visual"}] },
-	{ "keys": ["}"], "command": "set_motion", "args": {"motion": "vi_right_brace"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
-
-	{ "keys": ["("], "command": "set_motion", "args": {"motion": "vi_left_parenthesis"},  "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": [")"], "command": "set_motion", "args": {"motion": "vi_right_parenthesis"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-
-	{ "keys": ["I"], "command": "set_action", "args": {"action": "vi_big_i"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["A"], "command": "set_action", "args": {"action": "vi_big_a"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
-
-	{ "keys": ["G"], "command": "set_motion", "args": {"motion": "vi_big_g"},   "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["%"], "command": "set_motion", "args": {"motion": "vi_percent"}, "context": [{"key": "setting.command_mode"}] },
-
-	// TODO: They don't work in VISUALLINEMODE.
-	{ "keys": ["H"], "command": "set_motion", "args": {"motion": "vi_big_h"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["M"], "command": "set_motion", "args": {"motion": "vi_big_m"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["L"], "command": "set_motion", "args": {"motion": "vi_big_l"}, "context": [{"key": "setting.command_mode"}] },
-
-	{ "keys": ["*"], "command": "set_motion", "args": {"motion": "vi_star"},      "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["#"], "command": "set_motion", "args": {"motion": "vi_octothorp"}, "context": [{"key": "setting.command_mode"}] },
-
-	// TODO: Do the same as for ESC and fold all v commands into a single one.
-	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_enter_visual_mode"}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_can_enter_any_visual_mode"}] },
-	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_enter_normal_mode"}, "context": [{"key": "vi_mode_visual"}] },
-	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_enter_visual_mode"}, "context": [{"key": "vi_mode_visual_line"}] },
-
-	{ "keys": ["V"], "command": "set_action", "args": {"action": "vi_enter_visual_line_mode"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_can_enter_any_visual_mode"}] },
-	{ "keys": ["V"], "command": "set_action", "args": {"action": "vi_enter_normal_mode"},      "context": [{"key": "vi_mode_visual_line"}] },
-
-
-	{ "keys": ["1"], "command": "vi_push_digit", "args": {"digit": "1"}, "context": [{"key": "vi_mode_can_push_digit"}, {"key": "setting.command_mode"}] },
-	{ "keys": ["2"], "command": "vi_push_digit", "args": {"digit": "2"}, "context": [{"key": "vi_mode_can_push_digit"}, {"key": "setting.command_mode"}] },
-	{ "keys": ["3"], "command": "vi_push_digit", "args": {"digit": "3"}, "context": [{"key": "vi_mode_can_push_digit"}, {"key": "setting.command_mode"}] },
-	{ "keys": ["4"], "command": "vi_push_digit", "args": {"digit": "4"}, "context": [{"key": "vi_mode_can_push_digit"}, {"key": "setting.command_mode"}] },
-	{ "keys": ["5"], "command": "vi_push_digit", "args": {"digit": "5"}, "context": [{"key": "vi_mode_can_push_digit"}, {"key": "setting.command_mode"}] },
-	{ "keys": ["6"], "command": "vi_push_digit", "args": {"digit": "6"}, "context": [{"key": "vi_mode_can_push_digit"}, {"key": "setting.command_mode"}] },
-	{ "keys": ["7"], "command": "vi_push_digit", "args": {"digit": "7"}, "context": [{"key": "vi_mode_can_push_digit"}, {"key": "setting.command_mode"}] },
-	{ "keys": ["8"], "command": "vi_push_digit", "args": {"digit": "8"}, "context": [{"key": "vi_mode_can_push_digit"}, {"key": "setting.command_mode"}] },
-	{ "keys": ["9"], "command": "vi_push_digit", "args": {"digit": "9"}, "context": [{"key": "vi_mode_can_push_digit"}, {"key": "setting.command_mode"}] },
-	{ "keys": ["0"], "command": "vi_push_digit", "args": {"digit": "0"}, "context": [{"key": "vi_mode_can_push_digit"}, {"key": "setting.command_mode"}] },
-
-	{ "keys": ["0"], "command": "set_motion", "args": {"motion": "vi_zero"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_mode_cannot_push_zero"}] },
-
-	// ** Actions **
-
-	// This one is run directly so we don't overwrite the command we want repeated.
-	{ "keys": ["."], "command": "_vi_repeat", "context": [{"key": "setting.command_mode"}]},
-
-	// In Vim, u only works in NORMALMODE.
-	// TODO: Does it take counts?
-	{ "keys": ["u"], "command": "_vi_undo", "context": [{"key": "vi_mode_normal"}] },
-	// TODO: implement counts for redo and make it go through all the normal machinery.
-	{ "keys": ["ctrl+r"], "command": "_vi_redo", "context": [{"key": "vi_mode_normal"}, {"key": "vi_use_ctrl_keys"}] },
-
-	// TODO: Do we really want to use the built-in jump list? Do we have are own?
-	{ "keys": ["ctrl+o"], "command": "jump_back",    "context": [{"key": "vi_mode_normal"}, {"key": "vi_use_ctrl_keys"}] },
-	{ "keys": ["ctrl+i"], "command": "jump_forward", "context": [{"key": "vi_mode_normal"}, {"key": "vi_use_ctrl_keys"}] },
-
-
-	// Ctrl+f in Vim cannot be used as a motion for an action.
-	{ "keys": ["ctrl+f"], "command": "set_motion", "args": {"motion": "vi_ctrl_f"}, "context": [{"key": "vi_mode_normal_or_any_visual"}, {"key": "vi_use_ctrl_keys"}] },
-	{ "keys": ["ctrl+b"], "command": "set_motion", "args": {"motion": "vi_ctrl_b"}, "context": [{"key": "vi_mode_normal_or_any_visual"}, {"key": "vi_use_ctrl_keys"}] },
-	{ "keys": ["ctrl+d"], "command": "set_motion", "args": {"motion": "vi_ctrl_d"}, "context": [{"key": "vi_mode_normal_or_any_visual"}, {"key": "vi_use_ctrl_keys"}] },
-	{ "keys": ["ctrl+u"], "command": "set_motion", "args": {"motion": "vi_ctrl_u"}, "context": [{"key": "vi_mode_normal_or_any_visual"}, {"key": "vi_use_ctrl_keys"}] },
-
-	{ "keys": ["ctrl+e"], "command": "set_action", "args": {"action": "vi_ctrl_e"}, "context": [{"key": "vi_mode_normal_or_visual"}, {"key": "vi_use_ctrl_keys"}] },
-	{ "keys": ["ctrl+y"], "command": "set_action", "args": {"action": "vi_ctrl_y"}, "context": [{"key": "vi_mode_normal_or_visual"}, {"key": "vi_use_ctrl_keys"}] },
-
-	{ "keys": ["d"], "command": "set_action", "args": {"action": "vi_d"},     "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["s"], "command": "set_action", "args": {"action": "vi_s"},     "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["S"], "command": "set_action", "args": {"action": "vi_big_s"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["c"], "command": "set_action", "args": {"action": "vi_c"},     "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["C"], "command": "set_action", "args": {"action": "vi_big_c"}, "context": [{"key": "setting.command_mode"}] },
-
-	{ "keys": ["o"], "command": "set_action", "args": {"action": "vi_o"},     "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["O"], "command": "set_action", "args": {"action": "vi_big_o"}, "context": [{"key": "setting.command_mode"}] },
-
-	{ "keys": ["J"], "command": "set_action", "args": {"action": "vi_big_j"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
-
-	{ "keys": ["D"], "command": "set_action", "args": {"action": "vi_big_d"}, "context": [{"key": "setting.command_mode"}] },
-
-	// This is a fake action that 'opens' the 'g' key namespace within Vintageous.
-	{ "keys": ["g"], "command": "set_action", "args": {"action": "vi_g_action"}, "context": [{"key": "setting.command_mode"}] },
-
-	// gg can either be an action or a motion. It's an action when there is no actual action.
-	{ "keys": ["g"], "command": "set_action", "args": {"action": "vi_gg"},          "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
-	{ "keys": ["j"], "command": "set_action", "args": {"action": "vi_j"},           "context": [{"key": "vi_mode_normal_or_visual"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
-	{ "keys": ["J"], "command": "set_action", "args": {"action": "vi_big_j"},     "context": [{"key": "vi_mode_normal_or_any_visual"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
-	{ "keys": ["k"], "command": "set_action", "args": {"action": "vi_k"},           "context": [{"key": "vi_mode_normal_or_visual"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
-	{ "keys": ["d"], "command": "set_action", "args": {"action": "vi_g_d"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
-	{ "keys": ["D"], "command": "set_action", "args": {"action": "vi_g_big_d"},     "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
-	{ "keys": ["U"], "command": "set_action", "args": {"action": "vi_g_big_u"},     "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
-	{ "keys": ["u"], "command": "set_action", "args": {"action": "vi_g_u"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
-	{ "keys": ["q"], "command": "set_action", "args": {"action": "vi_g_q"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
-	{ "keys": ["_"], "command": "set_action", "args": {"action": "vi_g__"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
-	{ "keys": ["*"], "command": "set_action", "args": {"action": "vi_g_star"},      "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
-	{ "keys": ["#"], "command": "set_action", "args": {"action": "vi_g_octothorp"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
-	{ "keys": ["v"], "command": "set_action", "args": {"action": "vi_g_v"},         "context": [{"key": "vi_mode_normal"},       {"key": "vi_in_key_namespace", "operand": "g"}] },
-
-	// Enters select mode (multiple selection mode in Vintageous).
-	// Includes the following actions:
-	//	* j: Adds selection (find_under_expand)
-	//	* k: Remove selection (soft_undo)
-	//	* l: Skip selection over (find_under_expand_skip)
-	{ "keys": ["h"], "command": "set_action", "args": {"action": "vi_g_h"},         "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "g"}] },
-
-	{ "keys": ["U"], "command": "set_action", "args": {"action": "vi_big_u"}, "context": [{"key": "vi_mode_visual_any"}] },
-	{ "keys": ["u"], "command": "set_action", "args": {"action": "vi_u"},     "context": [{"key": "vi_mode_visual_any"}] },
-	{ "keys": ["~"], "command": "set_action", "args": {"action": "vi_tilde"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
-
-	{ "keys": ["="], "command": "set_action", "args": {"action": "vi_equals"}, "context": [{"key": "vi_mode_normal_or_any_visual"}] },
-
-	// These come after the ones above so we don't need extra context checks.
-	{ "keys": ["o"], "command": "set_action", "args": {"action": "vi_visual_o"}, "context": [{"key": "vi_mode_visual_any"}] },
-
-	{ "keys": ["y"], "command": "set_action", "args": {"action": "vi_y"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["x"], "command": "set_action", "args": {"action": "vi_x"}, "context": [{"key": "setting.command_mode"}] },
-	// FIXME: X behaves linewise in visual mode. The following command is wrong at the moment.
-	{ "keys": ["X"], "command": "set_action", "args": {"action": "vi_big_x"}, "context": [{"key": "setting.command_mode"}] },
-
-	{ "keys": ["Y"], "command": "set_action", "args": {"action": "vi_yy"}, "context": [{"key": "setting.command_mode"}] },
-
-	{ "keys": ["p"], "command": "set_action", "args": {"action": "vi_p"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["P"], "command": "set_action", "args": {"action": "vi_big_p"}, "context": [{"key": "setting.command_mode"}] },
-
-	// TODO: Restrict this to when there's no count, action or motion.
-	{ "keys": ["\""], "command": "set_register", "context": [{"key": "setting.command_mode"}] },
-
-	{ "keys": ["m"], "command": "set_action", "args": {"action": "vi_m"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["'"], "command": "set_motion", "args": {"motion": "vi_quote"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["`"], "command": "set_motion", "args": {"motion": "vi_backtick"}, "context": [{"key": "setting.command_mode"}] },
-
-	{ "keys": ["f"], "command": "set_motion", "args":{"motion": "vi_f"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["t"], "command": "set_motion", "args":{"motion": "vi_t"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["T"], "command": "set_motion", "args":{"motion": "vi_big_t"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-	{ "keys": ["F"], "command": "set_motion", "args":{"motion": "vi_big_f"}, "context": [{"key": "vi_mode_normal_or_visual"}] },
-
-	// Repeats f backward
-	{ "keys": [","], "command": "set_motion", "args":{"motion": "vi_comma"}, "context": [{"key": "vi_mode_normal"}] },
-	{ "keys": [","], "command": "set_motion", "args":{"motion": "vi_comma"}, "context": [{"key": "vi_mode_visual"}] },
-
-	// Repeats f
-	{ "keys": [";"], "command": "set_motion", "args":{"motion": "vi_semicolon"}, "context": [{"key": "vi_mode_normal"}] },
-	{ "keys": [";"], "command": "set_motion", "args":{"motion": "vi_semicolon"}, "context": [{"key": "vi_mode_visual"}] },
-
-	{ "keys": ["/"], "command": "vi_buffer_search", "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["?"], "command": "vi_buffer_reverse_search", "context": [{"key": "setting.command_mode"}] },
-
-	{ "keys": ["n"], "command": "set_motion", "args": {"motion": "vi_n"}, "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["N"], "command": "set_motion", "args": {"motion": "vi_big_n"}, "context": [{"key": "setting.command_mode"}] },
-
-	// Twofold process: First set the motion, then collect user input and run global state.
-	// Text objects like di".
-	// TODO: This naming is utterly confusing: There's a vi_i function and a ViI command. Change this.
-	{ "keys": ["i"], "command": "vi_i", "args": {"inclusive": false}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_action"}] },
-	{ "keys": ["i"], "command": "vi_i", "args": {"inclusive": false}, "context": [{"key": "vi_mode_visual"}] },
-
-	// Twofold process: First set the motion, then collect user input and run global state.
-	// Text objects like da".
-	// TODO: This naming is utterly confusing: There's a vi_a function and a ViA command. Change this.
-	{ "keys": ["a"], "command": "vi_i", "args": {"inclusive": true}, "context": [{"key": "vi_mode_normal"}, {"key": "vi_has_action"}] },
-	{ "keys": ["a"], "command": "vi_i", "args": {"inclusive": true}, "context": [{"key": "vi_mode_visual"}] },
-
-	{ "keys": ["r"], "command": "set_action", "args": {"action": "vi_r"},     "context": [{"key": "vi_mode_normal_or_any_visual"}] },
-
-	{ "keys": [">"], "command": "set_action", "args": {"action": "vi_lambda"},     "context": [{"key": "setting.command_mode"}] },
-	{ "keys": ["<"], "command": "set_action", "args": {"action": "vi_antilambda"}, "context": [{"key": "setting.command_mode"}] },
-
-	// This is a fake action that opens the 'z' key namespace within Vintageous.
-	{ "keys": ["z"],     "command": "set_action", "args": {"action": "vi_z_action"}, "context": [{"key": "setting.command_mode"}] },
-	// Order matters: To avoid conflicts with t and possibly other key bindings with less
-	// restrictive contexts, place these after them.
-	{ "keys": ["enter"], "command": "set_action", "args": {"action": "vi_z_enter"},  "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "z"}] },
-	{ "keys": ["-"],     "command": "set_action", "args": {"action": "vi_z_minus"},  "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "z"}] },
-	{ "keys": ["z"],     "command": "set_action", "args": {"action": "vi_zz"},       "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "z"}] },
-	{ "keys": ["b"],     "command": "set_action", "args": {"action": "vi_z_b"},      "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "z"}] },
-	{ "keys": ["t"],     "command": "set_action", "args": {"action": "vi_z_t"},      "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "z"}] },
-
-	// Ensure this key isn't captured when a key namespace is expecting further input.
-	{ "keys": ["q"], "command": "set_action", "args": {"action": "vi_q"},  "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action", "operand": false}] },
-	// TODO: Can we have this command go the same path as others?
-	{ "keys": ["q"], "command": "_vi_q", 								   "context": [{"key": "vi_is_recording_macro"}] },
-	{ "keys": ["@"], "command": "set_action", "args": {"action": "vi_at"}, "context": [{"key": "vi_mode_normal"}] },
-
-	// Put this before ctrlw+w namespace keys to avoid conflicts.
-	{ "keys": ["ctrl+v"], "command": "set_action", "args": {"action": "vi_enter_visual_block_mode"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "vi_mode_normal"}]},
-
-	// Pane management
-	{ "keys": ["ctrl+w"], "command": "set_action", "args": {"action": "vi_ctrl_w_action"}, "context": [{"key": "setting.command_mode"}]},
-	// TODO: The action name is misleading.
-	{ "keys": ["ctrl+q"], "command": "set_action", "args": {"action": "vi_g_q"},          "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "ctrl_w"}] },
-	{ "keys": ["ctrl+v"], "command": "set_action", "args": {"action": "vi_ctrl_w_v"},     "context": [{"key": "setting.command_mode"}, {"key": "vi_in_key_namespace", "operand": "ctrl_w"}] },
-	{ "keys": ["l"],      "command": "set_action", "args": {"action": "vi_ctrl_w_l"},     "context": [{"key": "vi_mode_normal"},       {"key": "vi_in_key_namespace", "operand": "ctrl_w"}] },
-	{ "keys": ["h"],      "command": "set_action", "args": {"action": "vi_ctrl_w_h"},     "context": [{"key": "vi_mode_normal"},       {"key": "vi_in_key_namespace", "operand": "ctrl_w"}] },
-	{ "keys": ["L"],      "command": "set_action", "args": {"action": "vi_ctrl_w_big_l"}, "context": [{"key": "vi_mode_normal"},       {"key": "vi_in_key_namespace", "operand": "ctrl_w"}] },
-	{ "keys": ["H"],      "command": "set_action", "args": {"action": "vi_ctrl_w_big_h"}, "context": [{"key": "vi_mode_normal"},       {"key": "vi_in_key_namespace", "operand": "ctrl_w"}] },
-
-	// TODO: Simplify the logic needed to make the expression register work in INSERTMODE.
-	{ "keys": ["ctrl+r"], "command": "set_action", "args": {"action": "vi_ctrl_r_action"}, "context": [{"key": "vi_use_ctrl_keys"},     {"key": "setting.command_mode", "operator": "equal", "operand": false}]},
-	{ "keys": ["="],      "command": "set_action", "args": {"action": "vi_ctrl_r_equals"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_has_incomplete_action"}]},
-
-	{ "keys": ["ctrl+a"], "command": "set_action", "args": {"action": "vi_ctrl_a"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "setting.command_mode"}]},
-	{ "keys": ["ctrl+x"], "command": "set_action", "args": {"action": "vi_ctrl_x"}, "context": [{"key": "vi_use_ctrl_keys"}, {"key": "setting.command_mode"}]},
-
-	{ "keys": ["Z", "Z"], "command": "ex_exit", "context": [{"key": "vi_mode_normal"}] },
-	{ "keys": ["Z", "Q"], "command": "ex_cquit", "context":[{"key": "vi_mode_normal"}] },
-
-	// Insert mode commands.==================================================
-	// FIXME: All this should probably go through Vintageous internal processing too.
-	{ "keys": ["ctrl+u"], "command": "_ivi_ctrl_u", "context": [{"key": "setting.command_mode", "operand": false}] },
-	{ "keys": ["ctrl+w"], "command": "delete_word", "args": { "forward": false }, "context": [{"key": "setting.command_mode", "operand": false}] },
-	//========================================================================
-
-	// Cmdline mode commands ======================================================================================================
-	{ "keys": [":"], "command": "vi_colon_input",                                     "context": [{"key": "setting.command_mode"}, {"key": "vi_enable_cmdline_mode"}] },
- 	{ "keys": [":"], "command": "vi_colon_input", "args": {"initial_text": ":'<,'>"}, "context": [{"key": "setting.command_mode"}, {"key": "selection_empty", "operator": "equal", "operand": false }, {"key": "vi_enable_cmdline_mode"}] },
 
 	{ "keys": ["up"],   "command": "cycle_cmdline_history", "args": {"backwards": true }, "context": [{"key": "vi_is_cmdline"}] },
  	{ "keys": ["down"], "command": "cycle_cmdline_history",								  "context": [{"key": "vi_is_cmdline"}] },
 
 	{ "keys": ["tab"],   "command": "fs_completion", "context": [{"key": "vi_is_cmdline"}, {"key": "vi_cmdline_at_fs_completion"}] },
-	{ "keys": ["tab"],   "command": "vi_setting_completion", "context": [{"key": "vi_is_cmdline"}, {"key": "vi_cmdline_at_setting_completion"}] },
-
-	{ "keys": ["ctrl+f"], "command": "move",    		"args": {"by": "characters", "forward": true},  "context": [{"key": "vi_is_cmdline"}] },
-	{ "keys": ["ctrl+b"], "command": "move",    		"args": {"by": "characters", "forward": false}, "context": [{"key": "vi_is_cmdline"}] },
-	{ "keys": ["ctrl+e"], "command": "move_to", 		"args": {"to": "eol"},							"context": [{"key": "vi_is_cmdline"}] },
-	{ "keys": ["ctrl+a"], "command": "_vi_cmd_line_a",													"context": [{"key": "vi_is_cmdline"}] },
-	{ "keys": ["ctrl+k"], "command": "_vi_cmd_line_k",													"context": [{"key": "vi_is_cmdline"}] },
-	// =============================================================================================================================
-
-	{ "keys": ["<character>"], "command": "set_register", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_register"}] },
-	// Collects user input for commands such as t, f, T, F.
-	// XXX: Seems to need to come after every other key binding so it will catch every character. Investigate this.
-	// FIXME: Won't capture '\n'... Perhaps it's a limitation of Sublime Text?
-	{ "keys": ["<character>"], "command": "collect_user_input", "context": [{"key": "setting.command_mode", "key": "vi_state_expecting_user_input"}] },
+	{ "keys": ["tab"],   "command": "vi_setting_completion", "context": [{"key": "vi_is_cmdline"}, {"key": "vi_cmdline_at_setting_completion"}] }
 ]

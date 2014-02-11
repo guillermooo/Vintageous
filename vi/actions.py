@@ -1,1025 +1,563 @@
-"""Action parsers.
-
-   Action commands go in Vintageous/actions.py; not here.
-"""
-
-# All data types stores in the ``vi_cmd_data`` dictionary must be valid for JSON.
-# The dictionary ends up being an argumento to an ST command.
+from Vintageous.vi.utils import modes
 
 
-from Vintageous.vi import motions
-from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
-from Vintageous.vi.constants import ACTIONS_EXITING_TO_INSERT_MODE
-from Vintageous.vi.constants import MODE_INSERT
-from Vintageous.vi.constants import MODE_NORMAL
-from Vintageous.vi.constants import MODE_NORMAL_INSERT
-from Vintageous.vi.constants import MODE_REPLACE
-from Vintageous.vi.constants import MODE_SELECT
-from Vintageous.vi.constants import MODE_VISUAL
-from Vintageous.vi.constants import MODE_VISUAL_LINE
-from Vintageous.vi.constants import MODE_VISUAL_BLOCK
+def vi_a(state):
+    cmd = {}
+    cmd['action'] = '_vi_a'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    state.glue_until_normal_mode = True
+    return cmd
 
 
-def vi_enter_visual_mode(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['keep_selection_as_is'] = True
-    vi_cmd_data['action']['command'] = 'vi_enter_visual_mode'
-    vi_cmd_data['action']['args'] = {'count': vi_cmd_data['count']}
-    return vi_cmd_data
+def vi_m(state):
+    cmd = {}
+    cmd['action'] = '_vi_m'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count, 'character': state.user_input}
+    return cmd
 
 
-def vi_enter_select_mode(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['keep_selection_as_is'] = True
-    vi_cmd_data['action']['command'] = 'vi_enter_select_mode'
-    vi_cmd_data['action']['args'] = {}
-    return vi_cmd_data
+def vi_gd(state):
+    cmd = {}
+    cmd['is_jump'] = True
+    cmd['action'] = '_vi_go_to_symbol'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count, 'globally': False}
+    return cmd
 
 
-def vi_enter_normal_mode(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['keep_selection_as_is'] = True
-    vi_cmd_data['action']['command'] = 'vi_enter_normal_mode'
-    vi_cmd_data['action']['args'] = {}
-    return vi_cmd_data
+def vi_big_v(state):
+    cmd = {}
+    cmd['action'] = '_enter_visual_line_mode'
+    cmd['action_args'] = {'mode': state.mode}
+    return cmd
+
+def vi_g_big_d(state):
+    cmd = {}
+    cmd['is_jump'] = True
+    cmd['action'] = '_vi_go_to_symbol'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count, 'globally': True}
+    return cmd
 
 
-def vi_enter_visual_line_mode(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    # TODO: This seems to be duplicated during this command's full run.
-    vi_cmd_data['keep_selection_as_is'] = True
-    vi_cmd_data['action']['command'] = 'vi_enter_visual_line_mode'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['visual_extend_to_full_line',]
-    return vi_cmd_data
+def vi_big_a(state):
+    cmd = {}
+    cmd['action'] = '_vi_big_a'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    state.glue_until_normal_mode = True
+    return cmd
 
 
-def vi_enter_visual_block_mode(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['keep_selection_as_is'] = True
-    vi_cmd_data['action']['command'] = 'vi_enter_visual_block_mode'
-    vi_cmd_data['action']['args'] = {}
-    return vi_cmd_data
+def vi_big_i(state):
+    cmd = {}
+    cmd['action'] = '_vi_big_i'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    state.glue_until_normal_mode = True
+    return cmd
 
 
-def vi_enter_insert_mode(vi_cmd_data):
-    # It's not too important to set this attribute, since vi_enter_normal_mode and co. will always
-    # update xpos on their own, but it's confusing to let vi_enter_insert_mode set xpos to 0.
-    vi_cmd_data['must_update_xpos'] = False
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = 'vi_enter_insert_mode'
-    vi_cmd_data['action']['args'] = {}
-    return vi_cmd_data
+def vi_ctrl_p(state):
+    cmd = {}
+    cmd['action'] = 'show_overlay'
+    cmd['action_args'] = {'overlay': 'goto', 'show_files': True}
+    return cmd
 
 
-def vi_enter_normal_insert_mode(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = 'vi_enter_normal_insert_mode'
-    vi_cmd_data['action']['args'] = {}
-    return vi_cmd_data
+def vi_f12(state):
+    cmd = {}
+    cmd['action'] = 'goto_definition'
+    cmd['action_args'] = {}
+    return cmd
+
+def vi_ctrl_f12(state):
+    cmd = {}
+    cmd['action'] = 'show_overlay'
+    cmd['action_args'] = {'overlay': 'goto', 'text': '@'}
+    return cmd
 
 
-def vi_enter_replace_mode(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = 'vi_enter_replace_mode'
-    vi_cmd_data['action']['args'] = {}
-    return vi_cmd_data
+def vi_shift_ctrl_f12(state):
+    cmd = {}
+    cmd['action'] = 'goto_symbol_in_project'
+    cmd['action_args'] = {}
+    return cmd
 
 
-def vi_d(vi_cmd_data):
-    vi_cmd_data['cancel_action_if_motion_fails'] = True
-    vi_cmd_data['can_yank'] = True
-    vi_cmd_data['populates_small_delete_register'] = True
-    vi_cmd_data['motion_required'] = True
-    forward = vi_cmd_data['motion'].get('args') and vi_cmd_data['motion']['args'].get('forward')
-    # FIXME: Should not delete new line characters.
-    vi_cmd_data['action']['command'] = 'right_delete' if forward else 'left_delete'
-    vi_cmd_data['action']['args'] = {}
-    # FIXME: dj must leave the caret at the first non-whitespace character. Either let commands
-    # specify multiple post_action hooks or implement a custom one for vi_d to factor this in.
-    vi_cmd_data['post_action'] = ['_vi_d_post_action',]
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
-
-    # If we're deleting by words, make sure we don't delete the entire line
-    # when deleting the last character from the last word on the line.
-    # Under these circumstances, visual mode will select the last character and
-    # the newline, so clip the newline from the resulting motion.
-    #
-    # TODO: Maybe there should be a 'post_motion_required_by_action' step in
-    # the action execution. That would help avoid conflicting requirements by
-    # motions/actions?
-    if vi_cmd_data['motion'].get('args') and \
-       vi_cmd_data['motion']['args'].get('by') == 'words':
-            vi_cmd_data['post_every_motion'] = ['_d_w_post_every_motion']
-
-    return vi_cmd_data
+def vi_ctrl_alt_p(state):
+    cmd = {}
+    cmd['action'] = 'prompt_select_workspace'
+    cmd['action_args'] = {}
+    return cmd
 
 
-def vi_visual_o(vi_cmd_data):
-    vi_cmd_data['motion_required'] = True
-    vi_cmd_data['keep_selection_as_is'] = True
-    vi_cmd_data['action']['command'] = '_vi_visual_o'
-    vi_cmd_data['count'] = 1
-    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
-
-    return vi_cmd_data
-
-def vi_o(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = 'run_macro_file'
-    vi_cmd_data['action']['args'] = {'file': 'res://Packages/Default/Add Line.sublime-macro'}
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
-    vi_cmd_data['next_mode'] = MODE_INSERT
-
-    return vi_cmd_data
+def vi_colon(state):
+    cmd = {}
+    cmd['action'] = 'vi_colon_input'
+    cmd['action_args'] = {}
+    return cmd
 
 
-def vi_big_o(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = 'run_macro_file'
-    vi_cmd_data['action']['args'] = {'file': 'res://Packages/Default/Add Line Before.sublime-macro'}
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
-    vi_cmd_data['next_mode'] = MODE_INSERT
-
-    return vi_cmd_data
+def vi_i(state):
+    cmd = {}
+    cmd['action'] = '_enter_insert_mode'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    state.glue_until_normal_mode = True
+    return cmd
 
 
-def vi_big_a(vi_cmd_data):
-    vi_cmd_data['keep_selection_as_is'] = True
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = '_vi_big_a'
-    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
-
-    return vi_cmd_data
-
-
-def vi_big_i(vi_cmd_data):
-    # TOOD: Add next mode here instead of in the command implementation?
-    vi_cmd_data['keep_selection_as_is'] = True
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = '_vi_big_i'
-    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
-
-    return vi_cmd_data
+def vi_big_r(state):
+    cmd = {}
+    cmd['action'] = '_enter_replace_mode'
+    cmd['action_args'] = {}
+    state.glue_until_normal_mode = True
+    return cmd
 
 
-def vi_a(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = 'vi_edit_after_caret'
-    vi_cmd_data['action']['args'] = {}
-
-    return vi_cmd_data
-
-
-def vi_s(vi_cmd_data):
-    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-        vi_cmd_data['motion']['command'] = 'move'
-        vi_cmd_data['motion']['args'] = {'by': 'characters', 'extend': True, 'forward': True}
-
-    vi_cmd_data['can_yank'] = True
-    vi_cmd_data['populates_small_delete_register'] = True
-
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = 'right_delete'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
-    vi_cmd_data['next_mode'] = MODE_INSERT
-
-    return vi_cmd_data
-
-def vi_c(vi_cmd_data):
-    vi_cmd_data['can_yank'] = True
-    vi_cmd_data['populates_small_delete_register'] = True
-    vi_cmd_data['cancel_action_if_motion_fails'] = True
-
-    vi_cmd_data['motion_required'] = True
-    vi_cmd_data['action']['command'] = 'left_delete'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
-    vi_cmd_data['next_mode'] = MODE_INSERT
-
-    # If we're deleting by words, make sure we don't delete the entire line
-    # when deleting the last character from the last word on the line.
-    # Under these circumstances, visual mode will select the last character and
-    # the newline, so clip the newline from the resulting motion.
-    #
-    # TODO: Maybe there should be a 'post_motion_required_by_action' step in
-    # the action execution. That would help avoid conflicting requirements by
-    # motions/actions?
-    if vi_cmd_data['motion'].get('args') and \
-       vi_cmd_data['motion']['args'].get('by') == 'words':
-            vi_cmd_data['post_every_motion'] = ['visual_dont_stay_on_eol_forward_maybe']
-
-    return vi_cmd_data
+def vi_dd(state):
+    cmd = {}
+    cmd['action'] = '_vi_dd_action'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
 
-def vi_big_c(vi_cmd_data):
-    # C
-    # Motion + Action
-    # No count: CHARACTERWISE + EXCLUSIVE
-    # Count: LINEWISE + EXCLUSIVE
+def vi_cc(state):
+    cmd = {}
+    cmd['action'] = '_vi_cc_action'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    state.glue_until_normal_mode = True
+    return cmd
 
-    vi_cmd_data['cancel_action_if_motion_fails'] = True
-    vi_cmd_data['can_yank'] = True
-    vi_cmd_data['populates_small_delete_register'] = True
 
-    if vi_cmd_data['count'] == 1:
-        vi_cmd_data['motion']['command'] = '_vi_big_c'
-        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
 
-        vi_cmd_data['motion_required'] = False
-        vi_cmd_data['action']['command'] = 'right_delete'
-        vi_cmd_data['action']['args'] = {}
-        vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
-        vi_cmd_data['next_mode'] = MODE_INSERT
+def vi_d(state):
+    cmd = {}
+    cmd['action'] = '_vi_d'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count, 'register': state.register}
+    return cmd
 
+
+def vi_big_d(state):
+    cmd = {}
+    cmd['action'] = '_vi_big_d'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
+
+
+def vi_big_c(state):
+    cmd = {}
+    cmd['action'] = '_vi_big_c'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
+
+
+def vi_esc(state):
+    cmd = {}
+    cmd['action'] = '_enter_normal_mode'
+    cmd['action_args'] = {'mode': state.mode}
+    return cmd
+
+
+def vi_v(state):
+    cmd = {}
+    cmd['action'] = '_enter_visual_mode'
+    cmd['action_args'] = {'mode': state.mode}
+    return cmd
+
+
+def vi_gU(state):
+    cmd = {}
+    cmd['action'] = '_vi_g_big_u'
+    cmd['action_args'] = {'mode': state.mode}
+    return cmd
+
+
+def vi_gu(state):
+    cmd = {}
+    cmd['action'] = '_vi_gu'
+    cmd['action_args'] = {'mode': state.mode}
+    return cmd
+
+
+def vi_u(state):
+    cmd = {}
+    cmd['action'] = '_vi_u'
+    cmd['action_args'] = {'count': state.count}
+    return cmd
+
+
+def vi_ctrl_r(state):
+    cmd = {}
+    cmd['action'] = '_vi_ctrl_r'
+    cmd['action_args'] = {'count': state.count}
+    return cmd
+
+
+def vi_c(state):
+    cmd = {}
+    cmd['action'] = '_vi_c'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    state.glue_until_normal_mode = True
+    return cmd
+
+
+def vi_dot(state):
+    cmd = {}
+    cmd['action'] = '_vi_dot'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count,
+                          'repeat_data': state.repeat_data}
+    return cmd
+
+
+def vi_o(state, **kwargs):
+    cmd = {}
+
+    if state.mode in (modes.VISUAL, modes.VISUAL_LINE):
+        cmd['action'] = '_vi_visual_o'
+        cmd['action_args'] = {'mode': state.mode, 'count': 1}
     else:
-        # Avoid C'ing one line too many.
-        vi_cmd_data['count'] = vi_cmd_data['count'] - 1
-        vi_cmd_data['motion']['command'] = 'move'
-        vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': True, 'extend': True}
-        vi_cmd_data['post_motion'] = [['extend_to_minimal_width',], ['visual_extend_to_line',]]
-
-        vi_cmd_data['motion_required'] = False
-        vi_cmd_data['action']['command'] = 'right_delete'
-        vi_cmd_data['action']['args'] = {}
-        vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
-        vi_cmd_data['next_mode'] = MODE_INSERT
+        cmd = {}
+        cmd['action'] = '_vi_o'
+        cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+        state.glue_until_normal_mode = True
 
-    return vi_cmd_data
+    return cmd
 
 
-def vi_big_d(vi_cmd_data):
-    vi_cmd_data['can_yank'] = True
-    vi_cmd_data['populates_small_delete_register'] = True
-    vi_cmd_data['cancel_action_if_motion_fails'] = True
+def vi_big_s(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_big_s_action'
+    cmd['action_args'] = {'mode': state.mode, 'count': 1, 'register': state.register}
+    state.glue_until_normal_mode = True
 
-    # TODO: Use separate if branches for each mode.
+    return cmd
 
-    if vi_cmd_data['count'] == 1:
-        vi_cmd_data['motion']['command'] = '_vi_big_d_motion'
-        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
 
-        vi_cmd_data['motion_required'] = False
-        vi_cmd_data['action']['command'] = 'right_delete'
-        vi_cmd_data['action']['args'] = {}
+def vi_s(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_s'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count, 'register': state.register}
+    state.glue_until_normal_mode = True
 
-    else:
-        # Avoid C'ing one line too many.
-        vi_cmd_data['count'] = vi_cmd_data['count'] - 1
-        vi_cmd_data['motion']['command'] = 'move'
-        vi_cmd_data['motion']['args'] = {'by': 'lines', 'forward': True, 'extend': True}
-        vi_cmd_data['post_motion'] = [['_vi_big_b_post_motion', {'mode': vi_cmd_data['mode']}],]
+    return cmd
 
-        vi_cmd_data['motion_required'] = False
-        vi_cmd_data['action']['command'] = 'right_delete'
-        vi_cmd_data['action']['args'] = {}
 
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
-    vi_cmd_data['next_mode'] = MODE_NORMAL
+def vi_x(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_x'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count, 'register': state.register}
+    state.glue_until_normal_mode = True
 
-    return vi_cmd_data
+    return cmd
 
 
-def vi_big_s(vi_cmd_data):
-    # S
-    # Motion + Action
-    # No count: CHARACTERWISE + EXCLUSIVE
-    # Count: LINEWISE + EXCLUSIVE
+def vi_r(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_r'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count, 'register': state.register, 'char': state.user_input}
 
-    vi_cmd_data['cancel_action_if_motion_fails'] = True
-    vi_cmd_data['can_yank'] = True
-    vi_cmd_data['yanks_linewise'] = True
+    return cmd
 
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['motion']['command'] = '_vi_big_s_motion'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    vi_cmd_data['action']['command'] = '_vi_big_s_action'
-    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
-    vi_cmd_data['count'] == 1
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
-    vi_cmd_data['next_mode'] = MODE_INSERT
 
-    return vi_cmd_data
+def vi_less_than_less_than(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_less_than_less_than'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
 
+    return cmd
 
-def vi_x(vi_cmd_data):
-    vi_cmd_data['can_yank'] = True
-    vi_cmd_data['populates_small_delete_register'] = True
-    vi_cmd_data['motion_required'] = False
 
-    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-        vi_cmd_data['cancel_action_if_motion_fails'] = True
-        vi_cmd_data['motion']['command'] = 'move'
-        vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': True, 'extend':True}
-        vi_cmd_data['post_every_motion'] = ['_vi_x_post_every_motion', {'mode': vi_cmd_data['mode']}]
+def vi_equal_equal(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_equal_equal'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
 
-    vi_cmd_data['action']['command'] = 'right_delete'
-    vi_cmd_data['action']['args'] = {}
+    return cmd
 
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
-    return vi_cmd_data
+def vi_greater_than_greater_than(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_greater_than_greater_than'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
 
+    return cmd
 
-def vi_big_x(vi_cmd_data):
-    # TODO: Commands that specify a motion as well as an action should have a way of inspecting
-    # the current operation mode. Perhaps a dummy_motion command could be introduced to enable
-    # this.
-    vi_cmd_data['can_yank'] = True
-    vi_cmd_data['motion_required'] = False
 
-    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-        vi_cmd_data['populates_small_delete_register'] = True
-        vi_cmd_data['cancel_action_if_motion_fails'] = True
-        vi_cmd_data['motion']['command'] = 'move'
-        vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': False, 'extend':True}
-        vi_cmd_data['post_every_motion'] = ['_vi_big_x_post_every_motion', {'mode': vi_cmd_data['mode']}]
+def vi_greater_than(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_greater_than'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
 
-    elif vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['motion']['command'] = '_vi_big_x_motion'
-        vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode']}
+    return cmd
 
-    # TODO: This is wrong for VISUALMODE. In VISUALMODE, X in Vim deletes linewise.
-    vi_cmd_data['action']['command'] = 'left_delete'
-    vi_cmd_data['action']['args'] = {}
+def vi_less_than(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_less_than'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
 
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+    return cmd
 
-    return vi_cmd_data
+def vi_equal(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_equal'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
 
+    return cmd
 
-def vi_p(vi_cmd_data):
-    # This command must yank, but we have to deal with it in the command itself, as setting the
-    # registers via 'can_yank' would overwrite the content we're about to paste.
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = '_vi_p'
-    vi_cmd_data['action']['args'] = {'count': vi_cmd_data['count'], 'register': vi_cmd_data['register']}
-    # XXX: Since actions perform the actual edits to the buffer, they too should be in charge of
-    # readjusting the selections? I think that would be better than the current approach.
-    vi_cmd_data['post_action'] = ['dont_stay_on_eol_backward',]
 
-    if vi_cmd_data['mode'] in (MODE_VISUAL, MODE_VISUAL_LINE):
-        vi_cmd_data['post_action'] = ['collapse_to_a',]
+def vi_yy(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_yy'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count, 'register': state.register}
+    return cmd
 
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
-    return vi_cmd_data
+def vi_y(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_y'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count, 'register': state.register}
+    return cmd
 
 
-def vi_big_p(vi_cmd_data):
-    # This command must yank, but we have to deal with it in the command itself, as setting the
-    # registers via 'can_yank' would overwrite the content we're about to paste.
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = '_vi_big_p'
-    vi_cmd_data['action']['args'] = {'count': vi_cmd_data['count'], 'register': vi_cmd_data['register']}
+def vi_f7(state, **kwargs):
+    cmd = {}
+    cmd['action'] = 'build'
+    cmd['action_args'] = {}
+    return cmd
 
-    if vi_cmd_data['mode'] == MODE_VISUAL:
-        # vi_cmd_data['post_action'] = ['collapse_to_a',]
-        vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
-    return vi_cmd_data
+def vi_big_o(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_big_o'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    state.glue_until_normal_mode = True
 
+    return cmd
 
-def vi_dd(vi_cmd_data):
-    # Assume _MODE_INTERNAL_NORMAL. Can't be issued in any other mode.
-    vi_cmd_data['can_yank'] = True
-    vi_cmd_data['yanks_linewise'] = True
-    vi_cmd_data['motion_required'] = False
 
-    vi_cmd_data['motion']['command'] = '_vi_dd_motion'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    vi_cmd_data['count'] = 1
+def vi_big_x(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_big_x'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count, 'register': state.register}
 
-    vi_cmd_data['action']['command'] = '_vi_dd_action'
-    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
-    vi_cmd_data['next_mode'] = MODE_NORMAL
+    return cmd
 
-    return vi_cmd_data
 
+def vi_big_p(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_big_p'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count, 'register': state.register}
 
-def vi_cc(vi_cmd_data):
-    vi_cmd_data['can_yank'] = True
-    vi_cmd_data['yanks_linewise'] = True
+    return cmd
 
-    # We need a separate motion step so that registers get populated.
-    vi_cmd_data['motion']['command'] = '_vi_cc_motion'
-    vi_cmd_data['motion']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    vi_cmd_data['count'] = 1
-    vi_cmd_data['motion_required'] = False
 
-    vi_cmd_data['action']['command'] = '_vi_cc_action'
-    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_insert_mode'
-    vi_cmd_data['next_mode'] = MODE_INSERT
+def vi_p(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_p'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count, 'register': state.register}
 
-    return vi_cmd_data
+    return cmd
 
 
-def vi_y(vi_cmd_data):
-    vi_cmd_data['motion_required'] = True
-    vi_cmd_data['has_training_wheels'] = True
-    vi_cmd_data['can_yank'] = True
-    vi_cmd_data['restore_original_carets'] = True
-    # The yanked text will be put in the clipboard if needed. This command shouldn't do any action.
-    vi_cmd_data['action']['command'] = 'no_op'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['selection_modifier'] = ['_vi_collapse_to_begin',]
-    # For example, 3yk operates linewise in _MODE_INTERNAL_NORMAL. This will cause the carets to
-    # end up at BOL, so selection_modifier isn't enough to place them at the desirable point.
-    # XXX: Maybe selection_modifier and align_with_xpos can be simplified somehow: linewise
-    # commands in _MODE_INTERNAL_NORMAL probably behave the same?
-    vi_cmd_data['align_with_xpos'] = True
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+def vi_gq(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_gq'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
 
-    return vi_cmd_data
+    return cmd
 
 
-def vi_yy(vi_cmd_data):
-    # Assume NORMALMODE.
-    # FIXME: Cannot copy (or maybe pasting is the problem) one empty line only.
-    vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
-    vi_cmd_data['has_training_wheels'] = True
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['restore_original_carets'] = True
+def vi_gt(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_gt'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
-    vi_cmd_data['synthetize_new_line_at_eof'] = True
 
-    vi_cmd_data['pre_motion'] = ['_vi_yy_pre_motion',]
-    vi_cmd_data['motion']['command'] = 'move'
-    vi_cmd_data['motion']['args'] = {'by': 'lines', 'extend': True, 'forward': True}
-    # TODO: yy should leave the caret where it found it. As a temporary solution, we'll leave it
-    # at BOL, which is the lesser evil between that and HEOL.
-    vi_cmd_data['post_motion'] = [['_vi_yy_post_motion',],]
+def vi_g_big_t(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_g_big_t'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
-    vi_cmd_data['count'] = vi_cmd_data['count'] - 1
-    vi_cmd_data['can_yank'] = True
 
-    # The yanked text will be put in the clipboard if needed. This command shouldn't do any action.
-    vi_cmd_data['action']['command'] = 'no_op'
-    vi_cmd_data['action']['args'] = {}
+def vi_ctrl_w_q(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_ctrl_w_q'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
-    vi_cmd_data['_mark_groups_for_gluing'] = False
 
-    return vi_cmd_data
+def vi_ctrl_w_v(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_ctrl_w_v'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
 
-def vi_g_action(vi_cmd_data):
-    """This doesn't do anything by itself, but tells global state to wait for a second action that
-       completes this one.
-    """
-    vi_cmd_data['motion_required'] = True
-    # Let global state know we still need a second action to complete this one.
-    vi_cmd_data['is_digraph_start'] = True
-    vi_cmd_data['action']['command'] = 'no_op'
-    vi_cmd_data['action']['args'] = {}
+def vi_ctrl_w_l(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_ctrl_w_l'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
-    return vi_cmd_data
+def vi_ctrl_w_h(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_ctrl_w_h'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
 
-def vi_g_big_u(vi_cmd_data):
-    vi_cmd_data['motion_required'] = True
-    vi_cmd_data['has_training_wheels'] = True
-    vi_cmd_data['action']['command'] = 'upper_case'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['collapse_to_a',]
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+def vi_ctrl_w_big_h(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_ctrl_w_big_h'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
-    return vi_cmd_data
 
+def vi_ctrl_w_big_l(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_ctrl_w_big_l'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
-def vi_g_u(vi_cmd_data):
-    vi_cmd_data['motion_required'] = True
-    vi_cmd_data['has_training_wheels'] = True
-    vi_cmd_data['action']['command'] = 'lower_case'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['collapse_to_a',]
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
-    return vi_cmd_data
+def vi_z_enter(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_z_enter'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
 
-def vi_g_q(vi_cmd_data):
-    vi_cmd_data['motion_required'] = True
-    vi_cmd_data['action']['command'] = 'wrap_lines'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['collapse_to_a',]
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+def vi_zz(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_zz'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
-    return vi_cmd_data
 
+def vi_z_minus(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_z_minus'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
-def vi_g_t(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['is_window_command'] = True
-    vi_cmd_data['_repeat_action'] = True
-    vi_cmd_data['action']['command'] = 'tab_control'
-    vi_cmd_data['action']['args'] = {'command': 'next'}
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
-    return vi_cmd_data
+def vi_z_b(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_z_minus'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
 
-def vi_g_big_t(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['is_window_command'] = True
-    vi_cmd_data['_repeat_action'] = True
-    vi_cmd_data['action']['command'] = 'tab_control'
-    vi_cmd_data['action']['args'] = {'command': 'prev'}
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+def vi_ctrl_x(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_modify_numbers'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count, 'subtract': True}
+    return cmd
 
-    return vi_cmd_data
 
+def vi_ctrl_a(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_modify_numbers'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
-def vi_z_action(vi_cmd_data):
-    """This doesn't do anything by itself, but tells global state to wait for a second action that
-       completes this one.
-    """
-    vi_cmd_data['motion_required'] = True
-    # Let global state know we still need a second action to complete this one.
-    vi_cmd_data['is_digraph_start'] = True
-    vi_cmd_data['action']['command'] = 'no_op'
-    vi_cmd_data['action']['args'] = {}
 
-    return vi_cmd_data
+def vi_big_j(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_big_j'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
 
-def vi_z_enter(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = '_vi_z_enter'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['_vi_move_caret_to_first_non_white_space_character', {'mode': vi_cmd_data['mode']}]
+def vi_g_big_j(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_big_j'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count, 'separator': None}
+    return cmd
 
-    return vi_cmd_data
 
+def vi_gv(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_gv'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
-def vi_z_t(vi_cmd_data):
-    # Identical to vi_z_enter except the caret should remain untouched.
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = '_vi_z_enter'
-    vi_cmd_data['action']['args'] = {}
 
-    return vi_cmd_data
+def vi_ctrl_e(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_ctrl_e'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
 
-def vi_zz(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = '_vi_zz'
-    vi_cmd_data['action']['args'] = {}
+def vi_ctrl_y(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_ctrl_y'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
-    return vi_cmd_data
+def vi_ctrl_big_p(state, **kwargs):
+    cmd = {}
+    cmd['action'] = 'show_overlay'
+    cmd['action_args'] = {'overlay': 'command_palette'}
+    return cmd
 
 
-def vi_z_minus(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = '_vi_z_minus'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['_vi_move_caret_to_first_non_white_space_character', {'mode': vi_cmd_data['mode']}]
+def vi_f11(state, **kwargs):
+    cmd = {}
+    cmd['action'] = 'toggle_full_screen'
+    cmd['action_args'] = {}
+    return cmd
 
-    return vi_cmd_data
 
-def vi_z_b(vi_cmd_data):
-    # Identical to vi_z_minus except the caret should remain untouched.
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = '_vi_z_minus'
-    vi_cmd_data['action']['args'] = {}
+def vi_big_y(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_big_y'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
-    return vi_cmd_data
 
+def vi_big_z_big_z(state, **kwargs):
+    cmd = {}
+    cmd['action'] = 'ex_exit'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
 
-def vi_double_lambda(vi_cmd_data):
-    # Assume _MODE_INTERNAL_NORMAL.
-    if vi_cmd_data['count'] > 1:
-        vi_cmd_data['count'] = vi_cmd_data['count'] - 1
-        vi_cmd_data['motion']['command'] = 'move'
-        vi_cmd_data['motion']['args'] = {'by': 'lines', 'extend': True, 'forward': True}
 
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = 'indent'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['collapse_to_a',]
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
+def vi_big_z_big_q(state, **kwargs):
+    cmd = {}
+    cmd['action'] = 'ex_quit'
+    cmd['action_args'] = {'forced': True, 'count': state.count}
+    return cmd
 
-    return vi_cmd_data
 
+def vi_gh(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_enter_select_mode'
+    cmd['action_args'] = {'mode': state.mode}
+    return cmd
 
-def vi_double_antilambda(vi_cmd_data):
-    # Assume _MODE_INTERNAL_NORMAL.
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = '_vi_double_antilambda'
-    vi_cmd_data['action']['args'] = {'mode': _MODE_INTERNAL_NORMAL, 'count': vi_cmd_data['count']}
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
-    return vi_cmd_data
+def vi_f4(state, **kwargs):
+    cmd = {}
+    cmd['action'] = 'next_result'
+    cmd['action_args'] = {}
+    return cmd
 
 
-def vi_r(vi_cmd_data):
-    # TODO: If count > len(line), r should abort. We'd need _p_post_every_motion hook and tell
-    # ViRun to cancel if selections didn't change.
-    vi_cmd_data['motion_required'] = False
-    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-        vi_cmd_data['motion']['command'] = 'move'
-        vi_cmd_data['motion']['args'] = {'by': 'characters', 'extend': True, 'forward': True}
-    vi_cmd_data['action']['command'] = '_vi_r'
-    vi_cmd_data['action']['args'] = {'character': vi_cmd_data['user_action_input'], 'mode': vi_cmd_data['mode']}
+def vi_ctrl_r_equal(state):
+    cmd = {}
+    cmd['action'] = '_vi_ctrl_r_equal'
+    cmd['action_args'] = {'insert': True}
 
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
 
-    return vi_cmd_data
+def vi_q(state):
+    cmd = {}
+    cmd['action'] = '_vi_q'
+    cmd['action_args'] = {'name': state.user_input}
+    return cmd
 
-
-def vi_lambda(vi_cmd_data):
-    vi_cmd_data['motion_required'] = True
-    vi_cmd_data['action']['command'] = 'indent'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['collapse_to_a',]
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
-
-    if vi_cmd_data['mode'] in (MODE_VISUAL, MODE_VISUAL_LINE):
-        vi_cmd_data['_repeat_action'] = True
-
-    return vi_cmd_data
-
-
-def vi_antilambda(vi_cmd_data):
-    vi_cmd_data['motion_required'] = True
-    vi_cmd_data['action']['command'] = 'unindent'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['collapse_to_a',]
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
-
-    if vi_cmd_data['mode'] in (MODE_VISUAL, MODE_VISUAL_LINE):
-        vi_cmd_data['_repeat_action'] = True
-
-    return vi_cmd_data
-
-
-def vi_big_j(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-
-    if vi_cmd_data['mode'] in (_MODE_INTERNAL_NORMAL, MODE_VISUAL, MODE_VISUAL_LINE, MODE_VISUAL_BLOCK):
-        vi_cmd_data['count'] = (vi_cmd_data['count'] or 1)
-        vi_cmd_data['action']['command'] = '_vi_big_j'
-        vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    else:
-        vi_cmd_data['action']['command'] = 'no_op'
-        vi_cmd_data['action']['args'] = {}
-
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
-
-    return vi_cmd_data
-
-
-def vi_g_big_j(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-
-    if vi_cmd_data['mode'] in [_MODE_INTERNAL_NORMAL, MODE_VISUAL, MODE_VISUAL_LINE, MODE_VISUAL_BLOCK]:
-        vi_cmd_data['_repeat_action'] = True
-        vi_cmd_data['count'] = (vi_cmd_data['count'] - 1 or 1)
-        vi_cmd_data['action']['command'] = '_vi_big_j'
-        vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode'], 'separator': None}
-    else:
-        vi_cmd_data['action']['command'] = 'no_op'
-        vi_cmd_data['action']['args'] = {}
-
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
-
-    return vi_cmd_data
-
-
-def vi_big_u(vi_cmd_data):
-    # XXX: Assume MODE_VISUAL or MODE_VISUAL_LINE
-    # TODO: Is this required for a visual operation?
-    vi_cmd_data['motion_required'] = False
-
-    vi_cmd_data['motion']['command'] = 'no_op'
-    vi_cmd_data['motion']['args'] = {}
-
-    vi_cmd_data['action']['command'] = 'upper_case'
-    vi_cmd_data['action']['args'] = {}
-
-    vi_cmd_data['post_action'] = ['collapse_to_a',]
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
-
-    return vi_cmd_data
-
-
-def vi_u(vi_cmd_data):
-    # XXX: Assume MODE_VISUAL or MODE_VISUAL_LINE
-    # TODO: Is this required for a visual operation?
-    vi_cmd_data['motion_required'] = False
-
-    vi_cmd_data['motion']['command'] = 'no_op'
-    vi_cmd_data['motion']['args'] = {}
-
-    vi_cmd_data['action']['command'] = 'lower_case'
-    vi_cmd_data['action']['args'] = {}
-
-    vi_cmd_data['post_action'] = ['collapse_to_a',]
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
-
-    return vi_cmd_data
-
-
-def vi_ctrl_w_action(vi_cmd_data):
-    """This doesn't do anything by itself, but tells global state to wait for a second action that
-       completes this one.
-    """
-    vi_cmd_data['motion_required'] = False
-    # Let global state know we still need a second action to complete this one.
-    vi_cmd_data['is_digraph_start'] = True
-    vi_cmd_data['action']['command'] = 'no_op'
-    vi_cmd_data['action']['args'] = {}
-
-    return vi_cmd_data
-
-
-def vi_ctrl_w_v(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-
-    vi_cmd_data['action']['command'] = '_vi_ctrl_w_v_action'
-    vi_cmd_data['action']['args'] = {}
-
-    return vi_cmd_data
-
-
-def vi_ctrl_r_action(vi_cmd_data):
-    """This doesn't do anything by itself, but tells global state to wait for a second action that
-       completes this one.
-    """
-    vi_cmd_data['_change_mode_to'] = MODE_NORMAL
-    vi_cmd_data['must_blink_on_error'] = True
-    vi_cmd_data['_exit_mode'] = MODE_INSERT
-    vi_cmd_data['_exit_mode_command'] = 'vi_enter_insert_mode'
-    vi_cmd_data['motion_required'] = False
-    # Let global state know we still need a second action to complete this one.
-    vi_cmd_data['is_digraph_start'] = True
-    vi_cmd_data['action']['command'] = 'vi_enter_normal_mode'
-    vi_cmd_data['action']['args'] = {}
-
-    return vi_cmd_data
-
-
-def vi_ctrl_r_equals(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-
-    vi_cmd_data['action']['command'] = 'vi_expression_register'
-    vi_cmd_data['action']['args'] = {'insert': True, 'next_mode': MODE_INSERT}
-
-    return vi_cmd_data
-
-
-def vi_ctrl_a(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-
-    vi_cmd_data['action']['command'] = '_vi_modify_numbers'
-    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count']}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-def vi_ctrl_x(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-
-    vi_cmd_data['action']['command'] = '_vi_modify_numbers'
-    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode'], 'count': vi_cmd_data['count'], 'subtract': True}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-def vi_esc(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['keep_selection_as_is'] = True
-    if vi_cmd_data['mode'] == MODE_NORMAL_INSERT:
-        vi_cmd_data['action']['command'] = 'vi_run_normal_insert_mode_actions'
-        vi_cmd_data['action']['args'] = {}
-        vi_cmd_data['motion']['command'] = 'no_op'
-        vi_cmd_data['motion']['args'] = {}
-    if vi_cmd_data['mode'] == MODE_SELECT:
-        vi_cmd_data['action']['command'] = 'vi_enter_normal_mode'
-        vi_cmd_data['action']['args'] = {}
-        vi_cmd_data['motion']['command'] = 'no_op'
-        vi_cmd_data['motion']['args'] = {}
-    if vi_cmd_data['mode'] in (MODE_INSERT, MODE_REPLACE,):
-        vi_cmd_data['action']['command'] = 'vi_enter_normal_mode_from_insert_mode'
-        vi_cmd_data['action']['args'] = {}
-        vi_cmd_data['motion']['command'] = 'no_op'
-        vi_cmd_data['motion']['args'] = {}
-    elif vi_cmd_data['mode'] in (MODE_VISUAL, MODE_VISUAL_LINE, MODE_VISUAL_BLOCK):
-        vi_cmd_data['action']['command'] = 'vi_enter_normal_mode'
-        vi_cmd_data['action']['args'] = {}
-        vi_cmd_data['motion']['command'] = 'no_op'
-        vi_cmd_data['motion']['args'] = {}
-    elif vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-        # We reach this branch, for instance, when we have 'vi_search' regions outlined from a
-        # previous search; we need to remove them.
-        vi_cmd_data['action']['command'] = 'vi_enter_normal_mode'
-        vi_cmd_data['action']['args'] = {}
-        vi_cmd_data['motion']['command'] = 'no_op'
-        vi_cmd_data['motion']['args'] = {}
-
-    return vi_cmd_data
-
-def vi_m(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = '_vi_m'
-    vi_cmd_data['action']['args'] = {'character': vi_cmd_data['user_action_input']}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-def vi_equals(vi_cmd_data):
-    vi_cmd_data['action']['command'] = 'reindent'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
-
-    return vi_cmd_data
-
-
-def vi_g_v(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = '_vi_g_v'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_visual_mode'
-
-    return vi_cmd_data
-
-
-def vi_equals_equals(vi_cmd_data):
-    # FIXME: Sloppy implementation. I don't even know what the 'reindent' built-in is supposed to
-    # do.
-
-    # Assume NORMALMODE.
-    vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['restore_original_carets'] = True
-
-    #////////////////////////////////////////////////////////////
-    # FIXME: This looks bad here, but it will probably work at a basic level.
-    # vi_cmd_data['pre_motion'] = ['_vi_yy_pre_motion',]
-    vi_cmd_data['motion']['command'] = 'move'
-    vi_cmd_data['motion']['args'] = {'by': 'lines', 'extend': True, 'forward': True}
-    # TODO: yy should leave the caret where it found it. As a temporary solution, we'll leave it
-    # at BOL, which is the lesser evil between that and HEOL.
-    # vi_cmd_data['post_motion'] = [['_vi_yy_post_motion',],]
-    #////////////////////////////////////////////////////////////
-
-    vi_cmd_data['count'] = vi_cmd_data['count'] - 1
-    vi_cmd_data['can_yank'] = True
-
-    # The yanked text will be put in the clipboard if needed. This command shouldn't do any action.
-    vi_cmd_data['action']['command'] = 'reindent'
-    vi_cmd_data['action']['args'] = {'force_indent': False}
-
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
-
-    return vi_cmd_data
-
-def vi_q(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = '_vi_q'
-    vi_cmd_data['action']['args'] = {'name': vi_cmd_data['user_action_input']}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-def vi_at(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = '_vi_run_macro'
-    vi_cmd_data['action']['args'] = {'name': vi_cmd_data['user_action_input']}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-def vi_ctrl_w_q(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = '_vi_ctrl_w_q'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-def vi_ctrl_w_l(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = '_vi_ctrl_w_l'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-def vi_ctrl_w_big_l(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = '_vi_ctrl_w_big_l'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-def vi_ctrl_w_h(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = '_vi_ctrl_w_h'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-
-def vi_ctrl_w_big_h(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = '_vi_ctrl_w_big_h'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['count'] = 1
-
-    return vi_cmd_data
-
-def vi_tilde(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['action']['command'] = 'swap_case'
-
-    vi_cmd_data['action']['args'] = {}
-
-    if vi_cmd_data['mode'] == _MODE_INTERNAL_NORMAL:
-        vi_cmd_data['cancel_action_if_motion_fails'] = True
-        vi_cmd_data['motion']['command'] = 'move'
-        vi_cmd_data['motion']['args'] = {'by': 'characters', 'forward': True, 'extend': True}
-        vi_cmd_data['post_action'] = ['move',{'by': 'characters', 'forward': True}]
-    elif vi_cmd_data['mode'] == MODE_VISUAL:
-        vi_cmd_data['post_action'] = ['collapse_to_a',]
-
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
-
-    return vi_cmd_data
-
-def vi_g_tilde(vi_cmd_data):
-
-    vi_cmd_data['motion_required'] = True
-    vi_cmd_data['action']['command'] = 'swap_case'
-    vi_cmd_data['action']['args'] = {}
-    vi_cmd_data['post_action'] = ['collapse_to_a',]
-
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
-
-    return vi_cmd_data
-
-def vi_g_k(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['cancel_action_if_motion_fails'] = True
-    vi_cmd_data['_repeat_action'] = True
-    vi_cmd_data['is_window_command'] = True
-    vi_cmd_data['action']['command'] = 'find_under_expand'
-    vi_cmd_data['action']['args'] = {}
-
-    return vi_cmd_data
-
-
-def vi_g_l(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['cancel_action_if_motion_fails'] = True
-    vi_cmd_data['_repeat_action'] = True
-    vi_cmd_data['is_window_command'] = True
-    vi_cmd_data['action']['command'] = 'find_under_expand_skip'
-    vi_cmd_data['action']['args'] = {}
-
-    return vi_cmd_data
-
-
-def vi_g_tilde_g_tilde(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['restore_original_carets'] = True
-    vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
-    vi_cmd_data['action']['command'] = '_vi_g_tilde_g_tilde'
-    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
-    vi_cmd_data['post_action'] = ['collapse_to_a',]
-
-    vi_cmd_data['follow_up_mode'] = 'vi_enter_normal_mode'
-
-    return vi_cmd_data
-
-# TODO: This is wrong. They must be motions.
-def vi_ctrl_e(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['_repeat_action'] = True
-    vi_cmd_data['action']['command'] = '_vi_ctrl_e'
-    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
-
-    return vi_cmd_data
-
-
-# TODO: This is wrong. They must be motions.
-def vi_ctrl_y(vi_cmd_data):
-    vi_cmd_data['motion_required'] = False
-    vi_cmd_data['_repeat_action'] = True
-    vi_cmd_data['action']['command'] = '_vi_ctrl_y'
-    vi_cmd_data['action']['args'] = {'mode': vi_cmd_data['mode']}
-
-    return vi_cmd_data
-
+def vi_at(state):
+    cmd = {}
+    cmd['action'] = '_vi_at'
+    cmd['action_args'] = {'name': state.user_input, 'count': state.count}
+    return cmd

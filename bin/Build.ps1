@@ -2,6 +2,13 @@ param([switch]$Release)
 
 $script:thisDir = split-path $MyInvocation.MyCommand.Path -parent
 
+. (join-path $script:thisDir "Config.ps1")
+
+if(!$?){
+	write-error "Could not read config."
+	exit 1
+}
+
 $publishRelease = join-path $script:thisDir "Publish.ps1"
 
 
@@ -15,4 +22,11 @@ if ($LASTEXITCODE -ne 0) {
 
 get-process "sublime_text" | stop-process
 start-sleep -milliseconds 250
-sss
+# sss
+$editor = (GetConfigValue 'global-win' 'editor')
+if(!$?){
+	write-error "Could not locate editor command."
+	exit 1
+}
+
+&$editor

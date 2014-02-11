@@ -49,11 +49,11 @@ class MarksTests(unittest.TestCase):
         self.assertEqual(self.marks.get_as_encoded_address('a'), sublime.Region(0, 0))
 
     def testCanRetrieveMarkInTheCurrentBufferAsTuple2(self):
-        set_text(TestsState.view, '\n'.join(('foo bar ' * 30,) * 50))
+        set_text(TestsState.view, ''.join(('foo bar\n') * 10))
         TestsState.view.sel().clear()
-        TestsState.view.sel().add(sublime.Region(25, 25))
+        TestsState.view.sel().add(sublime.Region(30, 30))
         self.marks.add('a', TestsState.view)
-        self.assertEqual(self.marks.get_as_encoded_address('a'), sublime.Region(25, 25))
+        self.assertEqual(self.marks.get_as_encoded_address('a'), sublime.Region(24, 24))
 
     def testCanRetrieveMarkInADifferentBufferAsEncodedMark(self):
         view = View(id_=TestsState.view.view_id + 1, fname=r'C:\foo.txt')

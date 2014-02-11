@@ -24,3 +24,13 @@ def show_ipanel(window, caption='', initial_text='', on_done=None,
     v = window.show_input_panel(caption, initial_text, on_done, on_change,
                                 on_cancel)
     return v
+
+
+def is_view(view):
+    """
+    Returns `True` if @view is a normal view.
+    """
+    if ((getattr(view, 'settings') is None) or
+         view.settings().get('is_widget')):
+            return False
+    return True

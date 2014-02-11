@@ -105,7 +105,12 @@ EX_COMMANDS = {
                                 ),
     ('map', 'map'): ex_cmd_data(
                                 command='ex_map',
-                                invocations=(),
+                                invocations=(re.compile(r"(?P<cmd>^.+$)"),),
+                                error_on=(ex_error.ERR_NO_RANGE_ALLOWED,)
+                                ),
+    ('unmap', 'unmap'): ex_cmd_data(
+                                command='ex_unmap',
+                                invocations=(re.compile(r"(?P<cmd>^.+$)"),),
                                 error_on=(ex_error.ERR_NO_RANGE_ALLOWED,)
                                 ),
     ('abbreviate', 'ab'): ex_cmd_data(

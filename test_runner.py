@@ -40,11 +40,8 @@ TESTS_SETTINGS = 'Vintageous.tests.vi.test_settings'
 TESTS_REGISTERS = 'Vintageous.tests.vi.test_registers'
 TESTS_MARKS = 'Vintageous.tests.vi.test_marks'
 TESTS_STATE = 'Vintageous.tests.test_state'
-TESTS_CONSTANTS = 'Vintageous.tests.vi.test_constants'
-TESTS_CMD_DATA = 'Vintageous.tests.vi.test_cmd_data'
-TESTS_KEYMAP = 'Vintageous.tests.test_keymap'
-TESTS_RUN = 'Vintageous.tests.test_run'
-TESTS_SEL = 'Vintageous.tests.sel.test_sel_orientation'
+TESTS_KEYS = 'Vintageous.tests.vi.test_keys'
+TESTS_MAPPINGS = 'Vintageous.tests.vi.test_mappings'
 
 TESTS_TEXT_OBJECTS = 'Vintageous.tests.vi.test_text_objects'
 TESTS_TEXT_OBJECTS_A_WORD = 'Vintageous.tests.vi.test_a_word'
@@ -85,30 +82,32 @@ TESTS_UNITS_WORD_END = 'Vintageous.tests.vi.test_word_end'
 
 TESTS_CMDS_ALL_SUPPORT = [TESTS_CMDS_SET_ACTION, TESTS_CMDS_SET_MOTION]
 
-TESTS_CMDS_ALL_ACTIONS = [TESTS_CMDS_ACTION_CTRL_X,
-                          TESTS_CMDS_ACTION_VI_CC,
-                          TESTS_CMDS_ACTION_VI_S,
-                          TESTS_CMDS_ACTION_VI_BIG_I,
-                          TESTS_CMDS_ACTION_VI_BIG_A,
-                          TESTS_CMDS_ACTION_VI_DD,
-                          TESTS_CMDS_ACTION_VI_BIG_J,
-                          ]
+TESTS_CMDS_ALL_ACTIONS = [
+    TESTS_CMDS_ACTION_CTRL_X,
+    TESTS_CMDS_ACTION_VI_CC,
+    TESTS_CMDS_ACTION_VI_S,
+    TESTS_CMDS_ACTION_VI_BIG_I,
+    TESTS_CMDS_ACTION_VI_BIG_A,
+    TESTS_CMDS_ACTION_VI_DD,
+    TESTS_CMDS_ACTION_VI_BIG_J,
+    ]
 
-TESTS_CMDS_ALL_MOTIONS = [TESTS_CMDS_MOTION_VI_L,
-                          TESTS_CMDS_MOTION_VI_H,
-                          TESTS_CMDS_MOTION_VI_BIG_G,
-                          TESTS_CMDS_MOTION_VI_G_G,
-                          TESTS_CMDS_MOTION_VI_DOLLAR,
-                          TESTS_CMDS_MOTION_VI_J,
-                          TESTS_CMDS_MOTION_VI_K,
-                          TESTS_CMDS_MOTION_VI_E,
-                          TESTS_CMDS_MOTION_VI_BIG_F,
-                          TESTS_CMDS_ACTION_VI_BIG_S,
-                          TESTS_CMDS_MOTION_VI_VISUAL_O,
-                          TESTS_CMDS_MOTION_VI_PERCENT,
-                          TESTS_CMDS_MOTION_VI_ANTILAMBDA,
-                          TESTS_CMDS_MOTION_VI_ZERO,
-                          ]
+TESTS_CMDS_ALL_MOTIONS = [
+    TESTS_CMDS_MOTION_VI_L,
+    TESTS_CMDS_MOTION_VI_H,
+    TESTS_CMDS_MOTION_VI_BIG_G,
+    TESTS_CMDS_MOTION_VI_G_G,
+    TESTS_CMDS_MOTION_VI_DOLLAR,
+    TESTS_CMDS_MOTION_VI_J,
+    TESTS_CMDS_MOTION_VI_K,
+    TESTS_CMDS_MOTION_VI_E,
+    TESTS_CMDS_MOTION_VI_BIG_F,
+    TESTS_CMDS_ACTION_VI_BIG_S,
+    TESTS_CMDS_MOTION_VI_VISUAL_O,
+    TESTS_CMDS_MOTION_VI_PERCENT,
+    TESTS_CMDS_MOTION_VI_ANTILAMBDA,
+    TESTS_CMDS_MOTION_VI_ZERO,
+  ]
 
 TESTS_ALL_TEXT_OBJECTS = [
     TESTS_TEXT_OBJECTS,
@@ -125,32 +124,23 @@ TESTS_EX_CMDS = [
 
 TESTS_UNITS_ALL = [TESTS_UNITS_WORD,
                    TESTS_UNITS_BIG_WORD,
-                   TESTS_UNITS_WORD_END,
-                  ]
+                   TESTS_UNITS_WORD_END,]
 
-
-TESTS_SEL_RELATED = [
-                    TESTS_SEL,
-]
 
 TESTS_CMDS_ALL = TESTS_CMDS_ALL_MOTIONS + TESTS_CMDS_ALL_ACTIONS + TESTS_CMDS_ALL_SUPPORT
 
 
 test_suites = {
-        '_storage_': ['_pt_run_tests', [TESTS_MARKS, TESTS_SETTINGS, TESTS_REGISTERS, TESTS_CONSTANTS]],
+        '_storage_': ['_pt_run_tests', [TESTS_MARKS,
+                                        TESTS_SETTINGS,
+                                        TESTS_REGISTERS]],
 
         'settings': ['_pt_run_tests', [TESTS_SETTINGS]],
         'registers': ['_pt_run_tests', [TESTS_REGISTERS]],
         'marks': ['_pt_run_tests', [TESTS_MARKS]],
 
         'state': ['_pt_run_tests', [TESTS_STATE]],
-        'run': ['_pt_run_tests', [TESTS_RUN]],
-
-        'constants': ['_pt_run_tests', [TESTS_CONSTANTS]],
-
-        'cmd_data': ['_pt_run_tests', [TESTS_CMD_DATA]],
-
-        'keymap': ['_pt_run_tests', [TESTS_KEYMAP]],
+        'keys': ['_pt_run_tests', [TESTS_KEYS, TESTS_MAPPINGS]],
 
         'commands': ['_pt_run_tests', TESTS_CMDS_ALL],
 
@@ -158,7 +148,7 @@ test_suites = {
 
         'ex_cmds': ['_pt_run_tests', TESTS_EX_CMDS],
 
-        '_sel_': ['_pt_run_tests', TESTS_SEL_RELATED],
+        # '_sel_': ['_pt_run_tests', TESTS_SEL_RELATED],
 
         'objects': ['_pt_run_tests', TESTS_ALL_TEXT_OBJECTS],
 }
@@ -186,11 +176,14 @@ class ShowVintageousTestSuites(sublime_plugin.WindowCommand):
         self.window.show_quick_panel(sorted(test_suites.keys()), self.run_suite)
 
     def run_suite(self, idx):
-        suite_name = sorted(test_suites.keys())[idx]
-        TestsState.suite = suite_name
-        command_to_run, _ = test_suites[suite_name]
+      if idx == -1:
+        return
 
-        self.window.run_command(command_to_run, dict(suite_name=suite_name))
+      suite_name = sorted(test_suites.keys())[idx]
+      TestsState.suite = suite_name
+      command_to_run, _ = test_suites[suite_name]
+
+      self.window.run_command(command_to_run, dict(suite_name=suite_name))
 
 
 class _ptRunTests(sublime_plugin.WindowCommand):

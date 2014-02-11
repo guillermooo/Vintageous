@@ -22,6 +22,7 @@ class Test_ex_shell_out_no_input(BufferTest):
         expected = test_string + '\n'
         self.assertEqual(expected, actual)
 
+
 class Test_ex_shell_out_filter_through_shell(BufferTest):
     @staticmethod
     def getWordCountCommand():

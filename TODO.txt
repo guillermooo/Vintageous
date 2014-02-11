@@ -1,0 +1,21 @@
+INBOX
+=====
+
+registers as keys ???
+parsers after motion
+
+
+add yank(reg) method to ViTextCommandBase
+new build sys: reload pacakge, don't restart sublime :: Vintageous dev-tools package?
+
+
+BUGS
+====
+
+fix <count>,;
+filenames with spaces in cmdline completion
+Entering normal mode when mode is None/Unknown clears selections
+
+
+DONE
+====

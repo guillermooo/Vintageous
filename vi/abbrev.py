@@ -27,9 +27,9 @@ def load_abbrevs():
 def save_abbrevs(data):
     # TODO: Make entries temporary unless !mksession is used or something like that.
     # TODO: Enable contexts for abbrevs?
+    path = abbrevs_path()
     with open(path, 'w') as f:
         json.dump(data, f)
-
 
 class Store(object):
     """

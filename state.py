@@ -1,1041 +1,803 @@
+import re
+import logging
+
 import sublime
 import sublime_plugin
 
-import threading
-import os
-import stat
-
 from Vintageous.vi import actions
-from Vintageous.vi import constants
-from Vintageous.vi import inputs
 from Vintageous.vi import motions
-from Vintageous.vi import registers
+from Vintageous.vi.keys import cmds
+from Vintageous.vi.keys import cmd_types
+from Vintageous.vi.keys import mappings
+from Vintageous.vi.keys import user_mappings
+from Vintageous.vi.keys import seq_to_command
+from Vintageous.vi.keys import parse_sequence
 from Vintageous.vi import utils
-from Vintageous.vi.cmd_data import CmdData
-from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
-from Vintageous.vi.constants import ACTION_OR_MOTION
-from Vintageous.vi.constants import ACTIONS_EXITING_TO_INSERT_MODE
-from Vintageous.vi.constants import DIGRAPH_MOTION
-from Vintageous.vi.constants import digraphs
-from Vintageous.vi.constants import INCOMPLETE_ACTIONS
-from Vintageous.vi.constants import INPUT_AFTER_MOTION
-from Vintageous.vi.constants import INPUT_FOR_ACTIONS
-from Vintageous.vi.constants import INPUT_FOR_MOTIONS
-from Vintageous.vi.constants import INPUT_IMMEDIATE
-from Vintageous.vi.constants import MODE_INSERT
-from Vintageous.vi.constants import MODE_NORMAL
-from Vintageous.vi.constants import MODE_NORMAL_INSERT
-from Vintageous.vi.constants import MODE_REPLACE
-from Vintageous.vi.constants import MODE_SELECT
-from Vintageous.vi.constants import mode_to_str
-from Vintageous.vi.constants import MODE_VISUAL
-from Vintageous.vi.constants import MODE_VISUAL_LINE
-from Vintageous.vi.constants import MODE_VISUAL_BLOCK
-from Vintageous.vi.constants import MOTION_TRANSLATION_TABLE
-from Vintageous.vi.constants import STASH
-from Vintageous.vi.contexts import KeyContext
-from Vintageous.vi.extend import PluginManager
-from Vintageous.vi.marks import Marks
-from Vintageous.vi.registers import Registers
+from Vintageous.vi.utils import modes
+from Vintageous.vi.utils import input_types
 from Vintageous.vi.settings import SettingsManager
-from Vintageous.vi.settings import SublimeSettings
-from Vintageous.vi.settings import VintageSettings
+from Vintageous.vi import inputs
+from Vintageous.vi.registers import Registers
+from Vintageous.vi.marks import Marks
+from Vintageous.vi.utils import jump_directions
+from Vintageous.vi.utils import get_logger
+from Vintageous.vi.sublime import is_view
+from Vintageous.vi.dot_file import DotFile
+from Vintageous import local_logger
+from Vintageous.vi.contexts import KeyContext
 
 
-# Some commands gather user input through input panels. An input panel is just a view, so when it
-# closes, the previous view gets activated and, consequently, Vintageous init code runs. However,
-# if we're exiting from an input panel, we most likely want the global state to remain unchanged.
-# This variable helps to signal this. For example, see the 'ViBufferSearch' command.
+# ============================================================================
+# examples that need to work
 #
-# XXX: Make this a class-level attribute of VintageState (had some trouble with it last time I tried).
-# XXX Is there anything weird with ST and using class-level attributes from different modules?
-_dont_reset_during_init = False
+#   ysta" => ys + t + [a as input for t] + [" as input for ys]
+#   d/foobar<cr>gUw
+#   ft:s/this/that/g<cr>gg
+# ============================================================================
 
 
-def _init_vintageous(view):
-    """Initialize global data. Runs at startup and every time a view gets activated.
+_logger = local_logger(__name__)
+
+
+def _init_vintageous(view, new_session=False):
     """
-    global _dont_reset_during_init
+    Initializes global data. Runs at startup and every time a view gets
+    activated, loaded, etc.
 
-    # Abort if we didn't get a real view.
-    if (not getattr(view, 'settings', None) or
-        view.settings().get('is_widget')):
-            return
+    @new_session
+      Whether we're starting up Sublime Text. If so, volatile data must be
+      wiped.
+    """
 
-    if _dont_reset_during_init:
-        # We are probably coming from an input panel, like when using '/'. We don't want to reset
-        # the global state, as it main contain data needed to complete the command that's being
-        # built.
-        _dont_reset_during_init = False
+    if not is_view(view):
+        # XXX: This seems to be necessary here.
+        # Abort if we got a widget, panel...
+        view.settings().set('command_mode', False)
+        view.settings().set('inverse_caret_state', False)
         return
 
-    state = VintageState(view)
+    state = State(view)
+
+    if not state.reset_during_init:
+        # Probably exiting from an input panel, like when using '/'. Don't
+        # reset the global state, as it may contain data needed to complete
+        # the command that's being built.
+        state.reset_during_init = True
+        return
 
     # Non-standard user setting.
     reset = state.settings.view['vintageous_reset_mode_when_switching_tabs']
-    # XXX: If the view was already in normal mode, we still need to run the init code. I believe
-    # this is due to Sublime Text (intentionally) not serializing the inverted caret state and
-    # the command_mode setting when first loading a file.
-    if not reset and state.mode and (state.mode != MODE_NORMAL):
+    # XXX: If the view was already in normal mode, we still need to run the
+    # init code. I believe this is due to Sublime Text (intentionally) not
+    # serializing the inverted caret state and the command_mode setting when
+    # first loading a file.
+    if not reset and (state.mode != modes.NORMAL):
         return
 
-    # TODO: make this a table in constants.py?
-    if state.mode in (MODE_VISUAL, MODE_VISUAL_LINE):
-        view.run_command('enter_normal_mode')
-    elif state.mode in (MODE_INSERT, MODE_REPLACE):
-        view.run_command('vi_enter_normal_mode_from_insert_mode')
-    elif state.mode == MODE_NORMAL_INSERT:
-        view.run_command('vi_run_normal_insert_mode_actions')
+    state.logger.info('[state.py] running init')
+    if state.mode in (modes.VISUAL, modes.VISUAL_LINE):
+        # TODO: Don't we need to pass a mode here?
+        view.window().run_command('_enter_normal_mode')
+
+    elif state.mode in (modes.INSERT, modes.REPLACE):
+        # TODO: Don't we need to pass a mode here?
+        view.window().run_command('_enter_normal_mode')
+
+    elif state.mode == modes.NORMAL_INSERT:
+        # TODO: Implement this.
+        # TODO: This isn't needed anymore?
+        view.window().run_command('vi_run_normal_insert_mode_actions')
+
     else:
         # This may be run when we're coming from cmdline mode.
+        pseudo_visual = view.has_non_empty_selection_region()
+        mode = modes.VISUAL if pseudo_visual else modes.INSERT
+        # TODO: Maybe the above should be handled by State?
         state.enter_normal_mode()
+        view.window().run_command('_enter_normal_mode', {'mode': mode})
 
-    state.reset()
+    state.reset_command_data()
+    if new_session:
+        state.reset_volatile_data()
+
+        # Load settings.
+        DotFile.from_user().run()
 
 
+# TODO: Implement this
 plugin_manager = None
+
 
 # TODO: Test me.
 def plugin_loaded():
-    global plugin_manager
-    plugin_manager = PluginManager()
     view = sublime.active_window().active_view()
-    _init_vintageous(view)
+    _init_vintageous(view, new_session=True)
 
 
-# TODO: Test me.
-def unload_handler():
-    for w in sublime.windows():
-        for v in w.views():
-            v.settings().set('command_mode', False)
-            v.settings().set('inverse_caret_state', False)
-            v.settings().set('vintage', {})
+class State(object):
+    """
+    Manages global state needed to build commands and control modes, etc.
 
-
-class VintageState(object):
-    """ Stores per-view state using View.Settings() for storage.
+    Usage:
+      Before using it, always instantiate with the view commands are going to
+      target. `State` uses view.settings() and window.settings() for data
+      storage.
     """
 
     registers = Registers()
-    context = KeyContext()
     marks = Marks()
-    macros = {}
-    # We maintain a stack of parsers for user input.
-    user_input_parsers = []
-
-    # Let's imitate Sublime Text's .command_history() 'null' value.
-    _latest_repeat_command = ('', None, 0)
-
-    # Stores the latest register name used for macro recording. It's a volatile value that never
-    # gets reset during command execution.
-    _latest_macro_name = None
-    _is_recording = False
-    _cancel_macro = False
+    context = KeyContext()
 
     def __init__(self, view):
         self.view = view
-        # We have two types of settings: vi-specific (settings.vi) and regular ST view settings
-        # (settings.view).
+        # We have multiple types of settings: vi-specific (settings.vi) and
+        # regular ST view settings (settings.view) and window settings
+        # (settings.window).
+        # TODO: Make this a descriptor. Why isn't it?
         self.settings = SettingsManager(self.view)
 
-    def enter_normal_mode(self):
-        self.settings.view['command_mode'] = True
-        self.settings.view['inverse_caret_state'] = True
-        # Xpos must be updated every time we return to normal mode, because it doesn't get
-        # updated while in insert mode.
-        self.xpos = None if not self.view.sel() else self.view.rowcol(self.view.sel()[0].b)[1]
-
-        if self.view.overwrite_status():
-            self.view.set_overwrite_status(False)
-
-        # Clear regions outlined by buffer search commands.
-        self.view.erase_regions('vi_search')
-
-        if not self.buffer_was_changed_in_visual_mode():
-            # We've been in some visual mode, but we haven't modified the buffer at all.
-            self.view.run_command('unmark_undo_groups_for_gluing')
-        else:
-            # Either we haven't been in any visual mode or we've modified the buffer while in
-            # any visual mode.
-            #
-            # However, there might be cases where we have a clean buffer. For example, we might
-            # have undone our changes, or saved via standard commands. Assume Sublime Text knows
-            # better than us.
-            #
-            # NOTE: There's an issue in S3 where 'glue_marked_undo_groups' will mark the buffer as
-            # dirty even if there are no intervening changes between the 'mark_groups_for_gluing'
-            # and 'glue_marked_undo_groups' calls. That's why we need to explicitly unmark groups
-            # here if the view reports back as clean.
-            if not self.view.is_dirty():
-                self.view.run_command('unmark_undo_groups_for_gluing')
-            else:
-                self.view.run_command('glue_marked_undo_groups')
-
-        self.mode = MODE_NORMAL
-        self.display_partial_command()
-
-    def enter_visual_line_mode(self):
-        self.mode = MODE_VISUAL_LINE
-        self.display_partial_command()
-
-    def enter_select_mode(self):
-        self.mode = MODE_SELECT
-        self.display_partial_command()
-
-    def enter_insert_mode(self):
-        self.settings.view['command_mode'] = False
-        self.settings.view['inverse_caret_state'] = False
-        self.mode = MODE_INSERT
-        self.display_partial_command()
-
-    def enter_visual_mode(self):
-        self.mode = MODE_VISUAL
-
-    def enter_visual_block_mode(self):
-        self.mode = MODE_VISUAL_BLOCK
-
-    def enter_normal_insert_mode(self):
-        # This is the mode we enter when we give i a count, as in 5ifoobar<CR><ESC>.
-        self.mode = MODE_NORMAL_INSERT
-        self.settings.view['command_mode'] = False
-        self.settings.view['inverse_caret_state'] = False
-        self.display_partial_command()
-
-    def enter_replace_mode(self):
-        self.mode = MODE_REPLACE
-        self.settings.view['command_mode'] = False
-        self.settings.view['inverse_caret_state'] = False
-        self.view.set_overwrite_status(True)
-        self.display_partial_command()
-
-    def store_visual_selections(self):
-        self.view.add_regions('vi_visual_selections', list(self.view.sel()))
-
-    def buffer_was_changed_in_visual_mode(self):
-        """Returns `True` if we've changed the buffer while in visual mode.
+    @property
+    def glue_until_normal_mode(self):
         """
-        # XXX: What if we used view.is_dirty() instead? That should be simpler?
-        # XXX: If we can be sure that every modifying command will leave the buffer in a dirty
-        # state, we could go for this solution.
+        Indicates that editing commands should be grouped together in a single
+        undo step once the user requests `_enter_normal_mode`.
 
-        # 'maybe_mark_undo_groups_for_gluing' and 'glue_marked_undo_groups' seem to add an entry
-        # to the undo stack regardless of whether intervening modifying-commands have been
-        # issued.
+        This property is *VOLATILE*; it shouldn't be persisted between
+        sessions.
+        """
+        # FIXME: What happens when we have an incomplete command and we switch
+        #        views? We should clean up.
+        # TODO: Make this a window setting.
+        return self.settings.vi['_vintageous_glue_until_normal_mode'] or False
+
+    @glue_until_normal_mode.setter
+    def glue_until_normal_mode(self, value):
+        self.settings.vi['_vintageous_glue_until_normal_mode'] = value
+
+    @property
+    def gluing_sequence(self):
+        """
+        Indicates whether `PressKeys` is running a command and is grouping all
+        of the edits in one single undo step.
+
+        This property is *VOLATILE*; it shouldn't be persisted between
+        sessions.
+        """
+        # TODO: Store this as a window setting.
+        return self.settings.vi['_vintageous_gluing_sequence'] or False
+
+    @gluing_sequence.setter
+    def gluing_sequence(self, value):
+        self.settings.vi['_vintageous_gluing_sequence'] = value
+
+    @property
+    def non_interactive(self):
+        # FIXME: This property seems to do the same as gluing_sequence.
+        """
+        Indicates whether `PressKeys` is running a command and no interactive
+        prompts should be used (for example, by the '/' motion.)
+
+        This property is *VOLATILE*; it shouldn't be persisted between
+        sessions.
+        """
+        # TODO: Store this as a window setting.
+        return self.settings.vi['_vintageous_non_interactive'] or False
+
+    @non_interactive.setter
+    def non_interactive(self, value):
+        if not isinstance(value, bool):
+            raise ValueError('expected bool')
+
+        self.settings.vi['_vintageous_non_interactive'] = value
+
+    @property
+    def input_parsers(self):
+        """
+        Contains parsers for user input, like '/' or 'f' need.
+        """
+        # TODO: Rename to 'validators'?
+        # TODO: Use window settings for storage?
+        # TODO: Enable setting lists directly.
+        return self.settings.vi['_vintageous_input_parsers'] or []
+
+    @input_parsers.setter
+    def input_parsers(self, value):
+        self.settings.vi['_vintageous_input_parsers'] = value
+
+    @property
+    def last_character_search(self):
+        """
+        Last character used as input for 'f' or 't'.
+        """
+        return self.settings.window['_vintageous_last_character_search'] or ''
+
+    @last_character_search.setter
+    def last_character_search(self, value):
+        self.settings.window['_vintageous_last_character_search'] = value
+
+    @property
+    def last_character_search_forward(self):
+        """
+        ',' and ';' change directions depending on whether 'f' or 't' was
+        issued previously.
+
+        Returns `True` if the previous character search command was 'f'.
+        """
+        return self.settings.window['_vintageous_last_character_search_forward'] or False
+
+    @last_character_search_forward.setter
+    def last_character_search_forward(self, value):
+        # FIXME: It isn't working.
+        self.settings.window['_vintageous_last_character_search_forward'] = value
+
+    @property
+    def capture_register(self):
+        """
+        Returns `True` if `State` is expecting a register name next.
+        """
+        return self.settings.vi['capture_register'] or False
+
+    @capture_register.setter
+    def capture_register(self, value):
+        self.settings.vi['capture_register'] = value
+
+    @property
+    def last_buffer_search(self):
+        """
+        Returns the last string used by buffer search commands such as '/' and
+        '?'.
+        """
+        return self.settings.window['_vintageous_last_buffer_search'] or ''
+
+    @last_buffer_search.setter
+    def last_buffer_search(self, value):
+        self.settings.window['_vintageous_last_buffer_search'] = value
+
+    @property
+    def reset_during_init(self):
+        # Some commands gather user input through input panels. An input panel
+        # is just a view, so when it's closed, the previous view gets
+        # activated and Vintageous init code runs. In this case, however, we
+        # most likely want the global state to remain unchanged. This variable
+        # helps to signal this.
         #
-        # Example:
-        #   1) We enter visual mode by pressing 'v'.
-        #   2) We exit visual mode by pressing 'v' again.
-        #
-        # Since before the first 'v' and after the second we've called the aforementioned commands,
-        # respectively, we'd now have a new (useless) entry in the undo stack, and the redo stack
-        # would be empty. This would be undesirable, so we need to find out whether marked groups
-        # in visual mode actually need to be glued or not and act based on that information.
-
-        # FIXME: Design issue. This method won't work always. We have actions like yy that
-        # will make this method return true, while it should return False (since yy isn't a
-        # modifying command). However, yy signals in its own way that it's a non-modifying command.
-        # I don't think this redundancy will cause any bug, but we need to unify nevetheless.
-
-        if self.mode == MODE_VISUAL:
-            visual_cmd = 'vi_enter_visual_mode'
-        elif self.mode == MODE_VISUAL_LINE:
-            visual_cmd = 'vi_enter_visual_line_mode'
-        else:
+        # For an example, see the '_vi_slash' command.
+        value = self.settings.window['_vintageous_reset_during_init']
+        if not isinstance(value, bool):
             return True
+        return value
 
-        cmds = []
-        # Set an upper limit to look-ups in the undo stack.
-        for i in range(0, -249, -1):
-            cmd_name, args, _ = self.view.command_history(i)
-            if (cmd_name == 'vi_run' and args['action'] and
-                args['action']['command'] == visual_cmd):
-                    break
+    @reset_during_init.setter
+    def reset_during_init(self, value):
+        if not isinstance(value, bool):
+            raise ValueError('expected a bool')
 
-            # Sublime Text returns ('', None, 0) when we hit the undo stack's bottom.
-            if not cmd_name:
-                break
+        self.settings.window['_vintageous_reset_during_init'] = value
 
-            cmds.append((cmd_name, args))
+    # This property isn't reset automatically. _enter_normal_mode mode must
+    # take care of that so it can repeat the commands issues while in
+    # insert mode.
+    @property
+    def normal_insert_count(self):
+        """
+        Count issued to 'i' or 'a', etc. These commands enter insert mode.
+        If passed a count, they must repeat the commands issued while in
+        insert mode.
+        """
+        return self.settings.vi['normal_insert_count'] or '1'
 
-        # If we have an action between v..v calls (or visual line), we have modified the buffer
-        # (most of the time, anyway, there are exceptions that we're not covering here).
-        # TODO: Cover exceptions too, like yy (non-modifying command, though has the shape of a
-        # modifying command).
-        was_modifed = [name for (name, data) in cmds
-                                        if data and data.get('action')]
+    @normal_insert_count.setter
+    def normal_insert_count(self, value):
+        self.settings.vi['normal_insert_count'] = value
 
-        return bool(was_modifed)
+    # TODO: Make these simple properties that access settings descriptors?
+    @property
+    def sequence(self):
+        """
+        Sequence of keys that build the command.
+        """
+        return self.settings.vi['sequence'] or ''
+
+    @sequence.setter
+    def sequence(self, value):
+        self.settings.vi['sequence'] = value
+
+    @property
+    def partial_sequence(self):
+        """
+        Sometimes we need to store a partial sequence to obtain the commands'
+        full name. Such is the case of `gD`, for example.
+        """
+        return self.settings.vi['partial_sequence'] or ''
+
+    @partial_sequence.setter
+    def partial_sequence(self, value):
+        self.settings.vi['partial_sequence'] = value
 
     @property
     def mode(self):
-        """The current mode.
         """
-        return self.settings.vi['mode']
+        Current mode. It isn't guaranteed that the underlying view's .sel()
+        will be in a consistent state (for example, that it will at least
+        have one non-empty region in visual mode.
+        """
+        return self.settings.vi['mode'] or modes.UNKNOWN
 
     @mode.setter
     def mode(self, value):
         self.settings.vi['mode'] = value
 
     @property
-    def cancel_macro(self):
-        """Signals whether a running macro should be cancel if, for instance, a motion failed.
-        """
-        return VintageState._cancel_macro
-
-    # Should only be called from _vi_run_macro.
-    @cancel_macro.setter
-    def cancel_macro(self, value):
-        VintageState._cancel_macro = value
-
-    @property
-    def cancel_action(self):
-        """Returns `True` if the current action must be cancelled.
-        """
-        # If we can't find a suitable action, we should cancel.
-        return self.settings.vi['cancel_action']
-
-    @cancel_action.setter
-    def cancel_action(self, value):
-        self.settings.vi['cancel_action'] = value
-
-    # TODO: Test me.
-    @property
-    def stashed_action(self):
-        return self.settings.vi['stashed_action']
-
-    # TODO: Test me.
-    @stashed_action.setter
-    def stashed_action(self, name):
-        self.settings.vi['stashed_action'] = name
-
-    @property
     def action(self):
-        """Command's action; must be the name of a function in the `actions` module.
-        """
-        return self.settings.vi['action']
+        return self.settings.vi['action'] or None
 
-    # TODO: Test me.
     @action.setter
-    def action(self, action):
-        stored_action = self.settings.vi['action']
-        target = 'action'
-
-        # Sometimes we'll receive an incomplete command that may be an action or a motion, like g
-        # or dg, both leading up to gg and dgg, respectively. When there's already a complete
-        # action, though, we already know it must be a motion (as in dg and dgg).
-        # Similarly, if there is an action and a motion, the motion must handle the new name just
-        # received. This would be the case when we have dg and we receive another 'g' (or
-        # anything else, for that matter).
-        if (self.action and INCOMPLETE_ACTIONS.get(action) == ACTION_OR_MOTION or
-            self.motion):
-            # The .motion should handle this.
-            self.motion = action
-            return
-
-        # Check for digraphs like cc, dd, yy.
-        final_action = action
-        if stored_action and action:
-            final_action, type_ = digraphs.get((stored_action, action), ('', None))
-            # We didn't find a built-in action; let's try with the plugins.
-            if final_action == '':
-                final_action, type_ = plugin_manager.composite_commands.get((stored_action, action), ('', None))
-
-            # Check for multigraphs like g~g~, g~~.
-            # This sequence would get us here:
-            #   * vi_g_action
-            #   * vi_tilde
-            #   * vi_g_action => vi_g_tilde, STASH
-            #   * vi_tilde => vi_g_tilde_vi_g_tilde, DIGRAPH_ACTION
-            if self.stashed_action:
-                final_action, type_ = digraphs.get((self.stashed_action, final_action),
-                                                 ('', None))
-
-            # Some motion digraphs are captured as actions, but need to be stored as motions
-            # instead so that the vi command is evaluated correctly.
-            # Ex: gg (vi_g_action, vi_gg)
-            if type_ == DIGRAPH_MOTION:
-                target = 'motion'
-
-                # TODO: Encapsulate this in a method.
-                input_type, input_parser = INPUT_FOR_MOTIONS.get(final_action, (None, None))
-                if input_parser:
-                    self.user_input_parsers.append(input_parser)
-                if input_type == INPUT_IMMEDIATE:
-                    self.expecting_user_input = True
-
-                self.settings.vi['action'] = None
-            # We are still in an intermediary step, so do some bookkeeping...
-            elif type_ == STASH:
-                # In this case we need to overwrite the current action differently.
-                self.stashed_action = final_action
-                self.settings.vi['action'] = action
-                self.display_partial_command()
-                return
-
-        # Avoid recursion. The .reset() method will try to set this property to None, not ''.
-        if final_action == '':
-            # The chord is invalid, so notify that we need to cancel the command in .eval().
-            self.cancel_action = True
-            return
-
-        if target == 'action':
-            input_type, input_parser = INPUT_FOR_ACTIONS.get(final_action, (None, None))
-            if input_parser:
-                self.user_input_parsers.append(input_parser)
-            if input_type == INPUT_IMMEDIATE:
-                self.expecting_user_input = True
-
-        self.settings.vi[target] = final_action
-        self.display_partial_command()
+    def action(self, value):
+        self.settings.vi['action'] = value
 
     @property
     def motion(self):
-        """Command's motion; must be the name of a function in the `motions` module.
-        """
-        return self.settings.vi['motion']
+        return self.settings.vi['motion'] or None
 
-    # TODO: Test me.
     @motion.setter
-    def motion(self, name):
-        if self.action in INCOMPLETE_ACTIONS:
-            # The .action should handle this.
-            self.action = name
-            return
-
-        # HACK: Translate vi_enter to \n if we're expecting user input.
-        # This enables r\n, for instance.
-        # XXX: I don't understand why the enter key is captured as a motion in this case, though;
-        # the catch-all key binding for user input should have intercepted it.
-        if self.expecting_user_input and name == 'vi_enter':
-            self.view.run_command('collect_user_input', {'character': '\n'})
-        # XXX: The user pressed backspace. This won't work if the user has remapped the key binding.
-        # We should cancel if the user presses, for example, f<Backspace>.
-        elif self.expecting_user_input and name == 'vi_h':
-            self.cancel_action = True
-            return
-
-        # Check for digraphs like gg in dgg.
-        stored_motion = self.motion
-        if stored_motion and name:
-            name, type_ = digraphs.get((stored_motion, name), (None, None))
-            if type_ != DIGRAPH_MOTION:
-                # We know there's an action because we only check for digraphs  when there is one.
-                self.cancel_action = True
-                return
-
-        motion_name = MOTION_TRANSLATION_TABLE.get((self.action, name), name)
-
-        input_type, input_parser = INPUT_FOR_MOTIONS.get(motion_name, (None, None))
-        if input_type == INPUT_IMMEDIATE:
-            self.expecting_user_input = True
-            self.user_input_parsers.append(input_parser)
-
-        if not input_type and self.user_input_parsers:
-            self.expecting_user_input = True
-
-        self.settings.vi['motion'] = motion_name
-        self.display_partial_command()
+    def motion(self, value):
+        self.settings.vi['motion'] = value
 
     @property
-    def motion_digits(self):
-        """Count for the motion, like in 3k.
-        """
-        return self.settings.vi['motion_digits'] or []
+    def motion_count(self):
+        return self.settings.vi['motion_count'] or ''
 
-    @motion_digits.setter
-    def motion_digits(self, value):
-        self.settings.vi['motion_digits'] = value
-        self.display_partial_command()
-
-    def push_motion_digit(self, value):
-        digits = self.settings.vi['motion_digits']
-        if not digits:
-            self.settings.vi['motion_digits'] = [value]
-            self.display_partial_command()
-            return
-        digits.append(value)
-        self.settings.vi['motion_digits'] = digits
-        self.display_partial_command()
+    @motion_count.setter
+    def motion_count(self, value):
+        self.settings.vi['motion_count'] = value
 
     @property
-    def action_digits(self):
-        """Count for the action, as in 3dd.
-        """
-        return self.settings.vi['action_digits'] or []
+    def action_count(self):
+        return self.settings.vi['action_count'] or ''
 
-    @action_digits.setter
-    def action_digits(self, value):
-        self.settings.vi['action_digits'] = value
-        self.display_partial_command()
-
-    def push_action_digit(self, value):
-        digits = self.settings.vi['action_digits']
-        if not digits:
-            self.settings.vi['action_digits'] = [value]
-            self.display_partial_command()
-            return
-        digits.append(value)
-        self.settings.vi['action_digits'] = digits
-        self.display_partial_command()
-
-    @property
-    def count(self):
-        """Computes and returns the final count, defaulting to 1 if the user
-           didn't provide one.
-        """
-        motion_count = self.motion_digits and int(''.join(self.motion_digits)) or 1
-        action_count = self.action_digits and int(''.join(self.action_digits)) or 1
-
-        return (motion_count * action_count)
-
-    @property
-    def user_provided_count(self):
-        """Returns the actual count provided by the user, which may be `None`.
-        """
-        if not (self.motion_digits or self.action_digits):
-            return None
-
-        return self.count
-
-    @property
-    def expecting_register(self):
-        """Signals that we need more input from the user before evaluating the global data.
-        """
-        return self.settings.vi['expecting_register']
-
-    @expecting_register.setter
-    def expecting_register(self, value):
-        self.settings.vi['expecting_register'] = value
-
-    @property
-    def register(self):
-        """Name of the register provided by the user, as in "ayy.
-        """
-        return self.settings.vi['register'] or None
-
-    @register.setter
-    def register(self, name):
-        # TODO: Check for valid register name.
-        self.settings.vi['register'] = name
-        self.expecting_register = False
-
-    @property
-    def expecting_user_input(self):
-        """Signals that we need more input from the user before evaluating the global data.
-        """
-        return self.settings.vi['expecting_user_input']
-
-    @expecting_user_input.setter
-    def expecting_user_input(self, value):
-        self.settings.vi['expecting_user_input'] = value
+    @action_count.setter
+    def action_count(self, value):
+        self.settings.vi['action_count'] = value
 
     @property
     def user_input(self):
-        """Additional data provided by the user, as 'a' in @a.
-        """
         return self.settings.vi['user_input'] or ''
 
     @user_input.setter
     def user_input(self, value):
         self.settings.vi['user_input'] = value
-        # FIXME: Sometimes we set the following property in other places too.
-        self.validate_user_input()
-        # self.expecting_user_input = False
-        self.display_partial_command()
-
-    def validate_user_input(self):
-        name = ''
-        if len(self.user_input_parsers) == 2:
-            # We have two parsers: one for the motion, one for the action.
-            # Evaluate first the motion's.
-            name = self.motion
-            validator = self.user_input_parsers[-1]
-        elif self.motion and INPUT_FOR_ACTIONS.get(self.action, (None, None))[0] == INPUT_AFTER_MOTION:
-            assert len(self.user_input_parsers) == 1
-            name = self.action
-            validator = self.user_input_parsers[-1]
-        elif self.motion and self.action:
-            name = self.motion
-            validator = self.user_input_parsers[-1]
-        elif self.action:
-            name = self.action
-            validator = self.user_input_parsers[-1]
-        elif self.motion:
-            name = self.motion
-            validator = self.user_input_parsers[-1]
-
-        assert validator, "Validator must exist if expecting user input."
-        if validator(self.user_input):
-            if name == self.motion:
-                self.settings.vi['user_motion_input'] = self.user_input
-                self.settings.vi['user_input'] = None
-            elif name == self.action:
-                self.settings.vi['user_action_input'] = self.user_input
-                self.settings.vi['user_input'] = None
-
-            self.user_input_parsers.pop()
-            if len(self.user_input_parsers) == 0:
-                self.expecting_user_input = False
-
-    def clear_user_input_buffers(self):
-        self.settings.vi['user_action_input'] = None
-        self.settings.vi['user_motion_input'] = None
-        self.settings.vi['user_input'] = None
 
     @property
-    def last_buffer_search(self):
-        """Returns the latest buffer search string or `None`. Used by the n and N commands.
+    def repeat_data(self):
         """
-        return self.settings.vi['last_buffer_search'] or None
+        Stores (type, cmd_name_or_key_seq, , mode) so '.' can use them.
 
-    @last_buffer_search.setter
-    def last_buffer_search(self, value):
-        self.settings.vi['last_buffer_search'] = value
+        `type` may be 'vi' or 'native'. `vi`-commands are executed VIA_PANEL
+        `PressKeys`, while `native`-commands are executed via .run_command().
+        """
+        return self.settings.vi['repeat_data'] or None
+
+    @repeat_data.setter
+    def repeat_data(self, value):
+        self.logger.info("setting repeat data {0}".format(value))
+        self.settings.vi['repeat_data'] = value
 
     @property
-    def last_character_search(self):
-        """Returns the latest character search or `None`. Used by the , and ; commands.
+    def last_macro(self):
         """
-        return self.settings.vi['last_character_search'] or None
+        Stores the last recorded macro.
+        """
+        return self.settings.window['_vintageous_last_macro'] or None
+
+    @last_macro.setter
+    def last_macro(self, value):
+        """
+        Stores the last recorded macro.
+        """
+        # FIXME: Check that we're storing a valid macro?
+        self.settings.window['_vintageous_last_macro'] = value
 
     @property
-    def last_character_search_forward(self):
-        """Returns True, False or `None`. Used by the , and ; commands.
+    def recording_macro(self):
+        return self.settings.window['_vintageous_recording_macro'] or False
+
+    @recording_macro.setter
+    def recording_macro(self, value):
+        # FIXME: Check that we're storing a bool?
+        self.settings.window['_vintageous_recording_macro'] = value
+
+    @property
+    def count(self):
         """
-        return self.settings.vi['last_character_search_forward'] or None
+        Calculates the actual count for the current command.
+        """
+        c = 1
+        if self.action_count and not self.action_count.isdigit():
+            raise ValueError('action count must be a digit')
 
-    @last_character_search_forward.setter
-    def last_character_search_forward(self, value):
-        # TODO: Should this piece of data be global instead of local to each buffer?
-        self.settings.vi['last_character_search_forward'] = value
+        if self.motion_count and not self.motion_count.isdigit():
+            raise ValueError('motion count must be a digit')
 
-    @last_character_search.setter
-    def last_character_search(self, value):
-        # TODO: Should this piece of data be global instead of local to each buffer?
-        self.settings.vi['last_character_search'] = value
+        if self.action_count:
+            c = int(self.action_count) or 1
+
+        if self.motion_count:
+            c *= (int(self.motion_count) or 1)
+
+        if c < 1:
+            raise ValueError('count must be greater than 0')
+
+        return c
 
     @property
     def xpos(self):
-        """Maintains the current column for the caret in normal and visual mode.
         """
-        xpos = self.settings.vi['xpos']
-        return xpos if isinstance(xpos, int) else None
+        Stores the current xpos for carets.
+        """
+        return self.settings.vi['xpos'] or 0
+
+    @property
+    def logger(self):
+        # FIXME: potentially very slow?
+        # return get_logger()
+        global _logger
+        return _logger()
 
     @xpos.setter
     def xpos(self, value):
+        if not isinstance(value, int):
+            raise ValueError('xpos must be an int')
+
         self.settings.vi['xpos'] = value
 
     @property
-    def next_mode(self):
-        """Mode to transition to after the command has been run. For example, ce needs to change
-           to insert mode after it's run.
+    def register(self):
         """
-        next_mode = self.settings.vi['next_mode'] or MODE_NORMAL
-        return next_mode
-
-    @next_mode.setter
-    def next_mode(self, value):
-        self.settings.vi['next_mode'] = value
-
-    @property
-    def next_mode_command(self):
-        """Command to make the transitioning to the next mode.
+        Stores the current open register, as requested by the user.
         """
-        next_mode_command = self.settings.vi['next_mode_command']
-        return next_mode_command
+        # TODO: Maybe unify with Registers?
+        # TODO: Validate register name?
+        return self.settings.vi['register'] or '"'
 
-    @next_mode_command.setter
-    def next_mode_command(self, value):
-        self.settings.vi['next_mode_command'] = value
+    @register.setter
+    def register(self, value):
+        if len(str(value)) > 1:
+            raise ValueError('register must be an character')
 
-    @property
-    def repeat_command(self):
-        """Latest modifying command performed. Accessed via '.'.
-        """
-        # This property is volatile. It won't be persisted between sessions.
-        return VintageState._latest_repeat_command
+        self.logger.info('opening register {0}'.format(value))
+        self.settings.vi['register'] = value
+        self.capture_register = False
 
-    @repeat_command.setter
-    def repeat_command(self, value):
-        VintageState._latest_repeat_command = value
+    def pop_parser(self):
+        parsers = self.input_parsers
+        current = parsers.pop()
+        self.input_parsers = parsers
+        return current
 
-    @property
-    def is_recording(self):
-        """Signals that we're recording a macro.
-        """
-        return VintageState._is_recording
+    def enter_normal_mode(self):
+        self.mode = modes.NORMAL
 
-    @is_recording.setter
-    def is_recording(self, value):
-        VintageState._is_recording = value
+    def enter_visual_mode(self):
+        self.mode = modes.VISUAL
 
-    @property
-    def latest_macro_name(self):
-        """Latest macro recorded. Accessed via @@.
-        """
-        return VintageState._latest_macro_name
+    def enter_visual_line_mode(self):
+        self.mode = modes.VISUAL_LINE
 
-    @latest_macro_name.setter
-    def latest_macro_name(self, value):
-        VintageState._latest_macro_name = value
+    def enter_insert_mode(self):
+        self.mode = modes.INSERT
 
+    def enter_replace_mode(self):
+        self.mode = modes.REPLACE
 
-    def parse_motion(self):
-        """Returns a CmdData instance with parsed motion data.
-        """
-        vi_cmd_data = CmdData(self)
+    def enter_select_mode(self):
+        self.mode = modes.SELECT
 
-        # This should happen only at initialization.
-        # XXX: This is effectively zeroing xpos. Shouldn't we move this into new_vi_cmd_data()?
-        # XXX: REFACTOR
-        if vi_cmd_data['xpos'] is None:
-            xpos = 0
-            if self.view.sel():
-                xpos = self.view.rowcol(self.view.sel()[0].b)
-            self.xpos = xpos
-            vi_cmd_data['xpos'] = xpos
+    def reset_sequence(self):
+        self.sequence = ''
 
-        # Fake visual mode. The user has selected text outside of Vintageous' own means.
-        # XXX: I'm not sure this will always be correct wrt newlines. We should maybe ensure we
-        # are within the requirements for visual mode.
-        if self.action and (self.mode == MODE_NORMAL) and not utils.has_empty_selection(self.view):
-            vi_cmd_data['mode'] = MODE_VISUAL
-        # Actions originating in normal mode are run in a pseudomode that helps to distiguish
-        # between visual mode and this case (both use selections, either implicitly or
-        # explicitly).
-        elif self.action and (self.mode == MODE_NORMAL):
-            vi_cmd_data['mode'] = _MODE_INTERNAL_NORMAL
+    def reset_partial_sequence(self):
+        self.partial_sequence = ''
 
-        motion = self.motion
-        motion_func = None
-        if motion:
-            try:
-                motion_func = getattr(motions, self.motion)
-            except AttributeError:
-                raise AttributeError("Vintageous: Unknown motion: '{0}'".format(self.motion))
+    def reset_user_input(self):
+        self.input_parsers = []
+        self.user_input = ''
 
-        if motion_func:
-            vi_cmd_data = motion_func(vi_cmd_data)
+    def reset_register_data(self):
+        self.register = '"'
+        self.capture_register = False
 
-        return vi_cmd_data
+    def must_scroll_into_view(self):
+        return (self.motion and self.motion.get('scroll_into_view'))
 
-    def parse_action(self, vi_cmd_data):
-        """Updates and returns the passed-in CmdData instance using parsed data about the action.
-        """
-        try:
-            action_func = getattr(actions, self.action)
-        except AttributeError:
-            try:
-                # We didn't find the built-in function; let's try our luck with plugins.
-                action_func = plugin_manager.actions[self.action]
-            except KeyError:
-                raise AttributeError("Vintageous: Unknown action: '{0}'".format(self.action))
-        except TypeError:
-            raise TypeError("Vintageous: parse_action requires an action be specified.")
+    def scroll_into_view(self):
+        v = sublime.active_window().active_view()
+        # Make sure we show the first caret on the screen, but don't show
+        # its surroundings.
+        v.show(v.sel()[0], False)
 
-        if action_func:
-            vi_cmd_data = action_func(vi_cmd_data)
+    def reset_command_data(self):
+        # Resets all temporary data needed to build a command or partial
+        # command to their default values.
+        self.update_xpos()
 
-        # Notify global state to go ahead with the command if there are selections and the action
-        # is ready to be run (which is almost always the case except for some digraphs).
-        # NOTE: By virtue of checking for non-empty selections instead of an explicit mode,
-        # the user can run actions on selections created outside of Vintageous.
-        # This seems to work well.
-        if (self.view.has_non_empty_selection_region() and
-            # XXX: This check is pretty useless, because we abort early in .run() anyway.
-            # Logically, it makes sense, however.
-            not vi_cmd_data['is_digraph_start']):
-                vi_cmd_data['motion_required'] = False
+        if self.must_scroll_into_view():
+            self.scroll_into_view()
+        if not self.recording_macro:
+            sublime.status_message('')
 
-        return vi_cmd_data
-
-    def eval_cancel_action(self):
-        """Cancels the whole run of the command.
-        """
-        try:
-            vi_cmd_data = self.parse_motion()
-            vi_cmd_data = self.parse_action(vi_cmd_data)
-            # XXX: Perhaps the command data wants a specific exit mode.
-            self.next_mode = vi_cmd_data['_exit_mode']
-            # Ensure we clean up selections as the command wants.
-            if vi_cmd_data['_exit_mode_command']:
-                self.view.run_command(vi_cmd_data['_exit_mode_command'])
-        except TypeError as te:
-            # Occurs when an action is missing from VintageState. It's normal
-            # if we are cancelling an incomplete command.
-            # XXX: Maybe it should be a ValueError instead?
-            pass
-        except Exception as e:
-            # Swallow all exceptions because we have to abort the command anyway.
-            print("Vintageous: Unexpected exception caught in 'eval_cancel_action:")
-            print(e)
-
-    def eval_full_command(self):
-        """Evaluates a command like 3dj, where there is an action as well as a motion.
-        """
-        vi_cmd_data = self.parse_motion()
-
-        # Sometimes we'll have an incomplete motion, like in dg leading up to dgg. In this case,
-        # we don't want the vi command evaluated just yet.
-        if vi_cmd_data['is_digraph_start']:
-            return
-
-        vi_cmd_data = self.parse_action(vi_cmd_data)
-
-        if not vi_cmd_data['is_digraph_start']:
-            # We are about to run an action, so let Sublime Text know we want all editing
-            # steps folded into a single sequence. "All editing steps" means slightly different
-            # things depending on the mode we are in.
-            if vi_cmd_data['_mark_groups_for_gluing']:
-                self.view.run_command('maybe_mark_undo_groups_for_gluing')
-            self.view.run_command('vi_run', vi_cmd_data)
-            self.reset()
-        else:
-            # If we have a digraph start, the global data is in an invalid state because we
-            # are still missing the complete digraph. Abort and clean up.
-            if vi_cmd_data['_exit_mode'] == MODE_INSERT:
-                # We've been requested to change to this mode. For example, we're looking at
-                # CTRL+r,j in INSERTMODE, which is an invalid sequence.
-                utils.blink()
-                self.reset()
-                self.enter_insert_mode()
-            # We have an invalid command which consists in an action and a motion, like gl. Abort.
-            elif (self.mode == MODE_NORMAL) and self.motion:
-                utils.blink()
-                self.reset()
-            elif self.mode != MODE_NORMAL:
-                # Normally we'd go back to normal mode.
-                self.enter_normal_mode()
-                self.reset()
-
-    def eval_lone_action(self):
-        """Evaluate lone action like in 'd' or 'esc'. Some actions can be run without a motion.
-        """
-        vi_cmd_data = self.parse_motion()
-        vi_cmd_data = self.parse_action(vi_cmd_data)
-
-        if vi_cmd_data['is_digraph_start']:
-            # XXX: When does this happen? Why are we only interested in MODE_NORMAL?
-            # XXX In response to the above, this must be due to Ctrl+r.
-            if vi_cmd_data['_change_mode_to'] == MODE_NORMAL:
-                self.enter_normal_mode()
-            # We know we are not ready.
-            return
-
-        if not vi_cmd_data['motion_required']:
-            # We are about to run an action, so let Sublime Text know we want all editing
-            # steps folded into a single sequence. "All editing steps" means slightly different
-            # things depending on the mode we are in.
-            if vi_cmd_data['_mark_groups_for_gluing']:
-                self.view.run_command('maybe_mark_undo_groups_for_gluing')
-            self.view.run_command('vi_run', vi_cmd_data)
-            self.reset()
-
-
-    # TODO: Test me.
-    def eval(self):
-        """Examines the current state and decides whether to actually run the action/motion.
-        """
-
-        if self.cancel_action:
-            self.eval_cancel_action()
-            self.reset()
-            utils.blink()
-
-        elif self.expecting_user_input:
-            return
-
-        # Action + motion, like in '3dj'.
-        elif self.action and self.motion:
-            self.eval_full_command()
-
-        # Motion only, like in '3j'.
-        elif self.motion:
-            vi_cmd_data = self.parse_motion()
-            self.view.run_command('vi_run', vi_cmd_data)
-            self.reset()
-
-        # Action only, like in 'd' or 'esc'. Some actions can be executed without a motion.
-        elif self.action:
-            self.eval_lone_action()
-
-    def reset(self):
-        """Reset global state.
-        """
-        had_action = self.action
-
-        self.motion = None
         self.action = None
-        self.stashed_action = None
+        self.motion = None
+        self.action_count = ''
+        self.motion_count = ''
 
-        self.register = None
-        self.clear_user_input_buffers()
-        self.user_input_parsers.clear()
-        self.expecting_register = False
-        self.expecting_user_input = False
-        self.cancel_action = False
-
-        sublime.set_timeout(lambda: self.view.erase_regions('vi_training_wheels'), 300)
-
-        # In MODE_NORMAL_INSERT, we temporarily exit NORMAL mode, but when we get back to
-        # it, we need to know the repeat digits, so keep them. An example command for this case
-        # would be 5ifoobar\n<esc> starting in NORMAL mode.
-        if self.mode == MODE_NORMAL_INSERT:
-            return
-
-        self.motion_digits = []
-        self.action_digits = []
-
-        if self.next_mode in (MODE_NORMAL, MODE_INSERT):
-            if self.next_mode_command:
-                self.view.run_command(self.next_mode_command)
-
-        # Sometimes we'll reach this point after performing motions. If we have a stored repeat
-        # command in view A, we switch to view B and do a motion, we don't want .update_repeat_command()
-        # to inspect view B's undo stack and grab its latest modifying command; we want to keep
-        # view A's instead, which is what's stored in _latest_repeat_command. We only want to
-        # update this when there is a new action.
-        # FIXME: Even that will fail when we perform an action that does not modify the buffer,
-        # like splitting the window. The current view's latest modifying command will overwrite
-        # the genuine _latest_repeat_command. The correct solution seems to be to tag every single
-        # modifying command with a 'must_update_repeat_command' attribute.
-        if had_action:
-            self.update_repeat_command()
-
-        self.next_mode = MODE_NORMAL
-        self.next_mode_command = None
-
-    def update_repeat_command(self):
-        """Vintageous manages the repeat command on its own. Vim stores away the latest modifying
-           command as the repeat command, and does not wipe it when undoing. On the contrary,
-           Sublime Text will update the repeat command as soon as you undo past the current one.
-           The then previous latest modifying command becomes the new repeat command, and so on.
-        """
-        cmd, args, times = self.view.command_history(0, True)
-
-        if not cmd:
-            return
-        elif cmd == 'vi_run' and args.get('action'):
-            self.repeat_command = cmd, args, times
-        elif cmd == 'sequence':
-            # XXX: We are assuming every 'sequence' command is a modifying command, which seems
-            # to be reasonable, but I dunno.
-            self.repeat_command = cmd, args, times
-        elif cmd != 'vi_run':
-            # XXX: We are assuming every 'native' command is a modifying commmand, but it doesn't
-            # feel right...
-            self.repeat_command = cmd, args, times
+        self.reset_sequence()
+        self.reset_partial_sequence()
+        self.reset_user_input()
+        self.reset_register_data()
 
     def update_xpos(self):
-        xpos = 0
+        if self.motion and self.motion.get('updates_xpos'):
+            try:
+                xpos = self.view.rowcol(self.view.sel()[0].b)[1]
+            except Exception as e:
+                print(e)
+                raise ValueError('could not set xpos')
 
-        try:
-            first_sel = self.view.sel()[0]
-        except IndexError:
-            # XXX: Perhaps it's better to leave the xpos untouched?
             self.xpos = xpos
+
+    def reset(self):
+        # TODO: Remove this when we've ported all commands. This is here for
+        # retrocompatibility.
+        self.reset_command_data()
+
+    def reset_volatile_data(self):
+        """
+        Resets window- or application-wide data to their default values when
+        starting a new Vintageous session.
+        """
+        self.glue_until_normal_mode = False
+        self.view.run_command('unmark_undo_groups_for_gluing')
+        self.gluing_sequence = False
+        self.non_interactive = False
+        self.reset_during_init = True
+
+    def _set_parsers(self, command):
+        """
+        Returns `True` if we've had to run an immediate parser via an input
+        panel.
+        """
+        if command.get('input'):
+
+            # XXX: Special case. We should probably find a better solution.
+            if self.recording_macro and (command['input'] == 'vi_q'):
+                # We discard the parser, as we want to be able to press
+                # 'q' to stop the macro recorder.
+                return
+
+            # Our command requests input from the user. Let's see how we
+            # should go about it.
+            parser_name = command['input']
+
+            parser_list = self.input_parsers
+            parser_list.append(parser_name)
+            self.input_parsers = parser_list
+
+            return self._run_parser_via_panel()
+
+    def _run_parser_via_panel(self):
+        """
+        Returns `True` if the current parser needs to be run via a panel.
+
+        If needed, it runs the input-panel-based parser.
+        """
+        if not self.input_parsers:
+            return False
+
+        parser_name = self.input_parsers[-1]
+        parser, type_, post_parser = inputs.get(self, parser_name)
+
+        if type_ == input_types.VIA_PANEL:
+            # Let the input-collection command collect input.
+            sublime.active_window().run_command(parser)
+            return True
+
+        return False
+
+    def set_command(self, command):
+        """
+        Sets the current command to @command.
+
+        @command
+          A command definition as found in `keys.py`.
+        """
+        if command['type'] == cmd_types.MOTION:
+            if self.runnable():
+                # We already have a motion, so this looks like an error.
+                raise ValueError('too many motions')
+
+            self.motion = command
+            if self.mode == modes.OPERATOR_PENDING:
+                self.mode = modes.NORMAL
+
+            if self._set_parsers(command):
+                return
+
+        elif command['type'] == cmd_types.ACTION:
+            if self.runnable():
+                # We already have an action, so this looks like an error.
+                raise ValueError('too many actions')
+
+            self.action = command
+
+            if (self.action['motion_required'] and
+                not self.in_any_visual_mode()):
+                    self.mode = modes.OPERATOR_PENDING
+
+            if self._set_parsers(command):
+                return
+
+        else:
+            self.logger.info("[State] command: {0}".format(command))
+            raise ValueError('unexpected command type')
+
+    def in_any_visual_mode(self):
+        return (self.mode in (modes.VISUAL,
+                              modes.VISUAL_LINE,
+                              modes.VISUAL_BLOCK))
+
+    def can_run_action(self):
+        if (self.action and
+            (not self.action['motion_required'] or
+             self.in_any_visual_mode())):
+                return True
+
+    def get_visual_repeat_data(self):
+        """
+        Returns the data needed to repeat a visual mode command in normal mode.
+        """
+        if self.mode != modes.VISUAL:
             return
 
-        if self.mode == MODE_VISUAL:
-            if first_sel.a < first_sel.b:
-                xpos = self.view.rowcol(first_sel.b - 1)[1]
-            elif first_sel.a > first_sel.b:
-                xpos = self.view.rowcol(first_sel.b)[1]
-
-        elif self.mode == MODE_NORMAL:
-            xpos = self.view.rowcol(first_sel.b)[1]
-
-        self.xpos = xpos
-
-    def display_partial_command(self):
-        mode_name = mode_to_str(self.mode) or ""
-        mode_name = "-- %s --" % mode_name if mode_name else ""
-        msg = "{0} {1} {2} {3} {4} {5}"
-        action_count = ''.join(self.action_digits) or ''
-        action = self.stashed_action or self.action or ''
-        motion_count = ''.join(self.motion_digits) or ''
-        motion = self.motion or ''
-        motion_input = self.settings.vi['user_motion_input'] or ''
-        action_input = self.user_input or ''
-        if (action and motion) or motion:
-            msg = msg.format(action_count, action, motion_count, motion, motion_input, action_input)
-        elif action:
-            msg = msg.format(motion_count, action, action_count, motion, motion_input, action_input)
+        s0 = self.view.sel()[0]
+        lines = self.view.rowcol(s0.end())[0] - self.view.rowcol(s0.begin())[0]
+        if lines > 0:
+            chars = self.view.rowcol(s0.end())[1]
         else:
-            msg = msg.format(action_count, action, motion_count, motion, motion_input, action_input)
-        sublime.status_message(mode_name + ' ' + msg)
+            chars = s0.size()
+
+        return (lines, chars)
+
+    def runnable(self):
+        """
+        Returns `True` if we can run the state data as it is.
+        """
+        if self.input_parsers:
+            return False
+
+        if self.action and self.motion:
+            if self.mode != modes.NORMAL:
+                raise ValueError('wrong mode')
+            return True
+
+        if self.can_run_action():
+            if self.mode == modes.OPERATOR_PENDING:
+                raise ValueError('wrong mode')
+            return True
+
+        if self.motion:
+            if self.mode == modes.OPERATOR_PENDING:
+                raise ValueError('wrong mode')
+            return True
+
+        return False
+
+    def eval(self):
+        """
+        Run data as a command if possible.
+        """
+        if self.runnable():
+            action_func = motion_func = None
+            action_cmd = motion_cmd = None
+
+            if self.action:
+                action_func = getattr(actions, self.action['name'], None)
+
+                if action_func is None:
+                    self.logger.info('[State] action not implemented: {0}'.format(self.action))
+                    self.reset_command_data()
+                    return
+
+                action_cmd = action_func(self)
+                self.logger.info('[State] action cmd data: {0}'.format(action_cmd))
+
+            if self.motion:
+                motion_func = getattr(motions, self.motion['name'], None)
+
+                if motion_func is None:
+                    self.logger.info('[State] motion not implemented: {0}'.format(self.motion))
+                    self.reset_command_data()
+                    return
+
+                motion_cmd = motion_func(self)
+                self.logger.info('[State] motion cmd data: {0}'.format(motion_cmd))
+
+            if action_func and motion_func:
+                self.logger.info('[State] full command, switching to internal normal mode')
+                self.mode = modes.INTERNAL_NORMAL
+
+                # TODO: Make a requirement that motions and actions take a
+                # 'mode' param.
+                if 'mode' in action_cmd['action_args']:
+                    action_cmd['action_args']['mode'] = modes.INTERNAL_NORMAL
+
+                if 'mode' in motion_cmd['motion_args']:
+                    motion_cmd['motion_args']['mode'] = modes.INTERNAL_NORMAL
+
+                args = action_cmd['action_args']
+                args['count'] = 1
+                # let the action run the motion within its edit object so that we don't need to
+                # worry about grouping edits to the buffer.
+                args['motion'] = motion_cmd
+                self.logger.info('[Stage] motion in motion+action: {0}'.format(motion_cmd))
+
+                if self.glue_until_normal_mode and not self.gluing_sequence:
+                    # We need to tell Sublime Text now that it should group
+                    # all the next edits until we enter normal mode again.
+                    sublime.active_window().run_command('mark_undo_groups_for_gluing')
+
+                sublime.active_window().run_command(action_cmd['action'], args)
+                if not self.non_interactive:
+                    if self.action['repeatable']:
+                        self.repeat_data = ('vi', str(self.sequence), self.mode, None)
+                self.reset_command_data()
+                return
+
+            if motion_func:
+                self.logger.info('[State] lone motion cmd: {0}'.format(motion_cmd))
+
+                sublime.active_window().run_command(
+                                                motion_cmd['motion'],
+                                                motion_cmd['motion_args'])
+
+            if action_func:
+                self.logger.info('[Stage] lone action cmd '.format(action_cmd))
+                if self.mode == modes.NORMAL:
+                    self.logger.info('[State] switching to internal normal mode')
+                    self.mode = modes.INTERNAL_NORMAL
+
+                    if 'mode' in action_cmd['action_args']:
+                        action_cmd['action_args']['mode'] = modes.INTERNAL_NORMAL
+                elif self.mode in (modes.VISUAL, modes.VISUAL_LINE):
+                    self.view.add_regions('visual_sel', list(self.view.sel()))
+
+                # Some commands, like 'i' or 'a', open a series of edits that
+                # need to be grouped together unless we are gluing a larger
+                # sequence through PressKeys. For example, aFOOBAR<Esc> should
+                # be grouped atomically, but not inside a sequence like
+                # iXXX<Esc>llaYYY<Esc>, where we want to group the whole
+                # sequence instead.
+                if self.glue_until_normal_mode and not self.gluing_sequence:
+                    sublime.active_window().run_command('mark_undo_groups_for_gluing')
+
+                seq = self.sequence
+                visual_repeat_data = self.get_visual_repeat_data()
+                action = self.action
+
+                sublime.active_window().run_command(action_cmd['action'],
+                                                action_cmd['action_args'])
+
+                if not (self.gluing_sequence and self.glue_until_normal_mode):
+                    if action['repeatable']:
+                        self.repeat_data = ('vi', seq, self.mode, visual_repeat_data)
 
 
-# TODO: Test me.
-class VintageStateTracker(sublime_plugin.EventListener):
-    def on_load(self, view):
-        _init_vintageous(view)
+            self.logger.info('running command: action: {0} motion: {1}'.format(self.action,
+                                                                          self.motion))
 
-    def on_post_save(self, view):
-        # Ensure the carets are within valid bounds. For instance, this is a concern when
-        # `trim_trailing_white_space_on_save` is set to true.
-        state = VintageState(view)
-        view.run_command('_vi_adjust_carets', {'mode': state.mode})
-
-    def on_query_context(self, view, key, operator, operand, match_all):
-        vintage_state = VintageState(view)
-        return vintage_state.context.check(key, operator, operand, match_all)
+            if self.mode == modes.INTERNAL_NORMAL:
+                self.enter_normal_mode()
+            self.reset_command_data()
 
 
-# TODO: Test me.
-class ViFocusRestorerEvent(sublime_plugin.EventListener):
-    def __init__(self):
-        self.timer = None
-
-    def action(self):
-        self.timer = None
-
-    def on_activated(self, view):
-        if self.timer:
-            self.timer.cancel()
-            # Switching to a different view; enter normal mode.
-            _init_vintageous(view)
-        else:
-            # Switching back from another application. Ignore.
-            pass
-
-    def on_new(self, view):
-        # Without this, on OS X Vintageous might not initialize correctly if the user leaves
-        # the application in a windowless state and then creates a new buffer.
-        if sublime.platform() == 'osx':
-            _init_vintageous(view)
-
-    def on_load(self, view):
-        # Without this, on OS X Vintageous might not initialize correctly if the user leaves
-        # the application in a windowless state and then creates a new buffer.
-        if sublime.platform() == 'osx':
-            _init_vintageous(view)
-
-    def on_deactivated(self, view):
-        self.timer = threading.Timer(0.25, self.action)
-        self.timer.start()
-
-
-# TODO: Test me.
-class IrreversibleTextCommand(sublime_plugin.TextCommand):
-    """ Base class.
-
-        The undo stack will ignore commands derived from this class. This is
-        useful to prevent global state management commands from shadowing
-        commands performing edits to the buffer, which are the important ones
-        to keep in the undo history.
-    """
-    def __init__(self, view):
-        sublime_plugin.TextCommand.__init__(self, view)
-
-    def run_(self, edit_token, kwargs):
-        if kwargs and 'event' in kwargs:
-            del kwargs['event']
-
-        if kwargs:
-            self.run(**kwargs)
-        else:
-            self.run()
-
-    def run(self, **kwargs):
-        pass
+# TODO: Remove this when we've ported all commands.
+VintageState = State

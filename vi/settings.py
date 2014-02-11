@@ -44,6 +44,11 @@ def set_minimap(view, name, value, opt, globally=False):
     view.window().run_command('toggle_minimap')
 
 
+def set_sidebar(view, name, value, opt, globally=False):
+    # TODO: Ensure the minimap gets hidden when so desired.
+    view.window().run_command('toggle_side_bar')
+
+
 def opt_bool_parser(value):
     if value.lower() in ('false', 'true', '0', '1', 'yes', 'no'):
         if value.lower() in ('true', '1', 'yes'):
@@ -65,14 +70,14 @@ def opt_rulers_parser(value):
 
 
 VI_OPTIONS = {
-    # TODO: BUG - unrelated to this code: D,p,u,redo doesn't do what we want.
-    'hlsearch': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
-    'magic': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
-    'ignorecase': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=False, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
-    'incsearch': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
-    'autoindent': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=None, action=set_generic_view_setting, noable=False),
-    'showminimap': vi_user_setting(scope=SCOPE_WINDOW, values=(True, False, '0', '1'), default=True, parser=None, action=set_minimap, noable=True),
-    'rulers': vi_user_setting(scope=SCOPE_VIEW, values=None, default=[], parser=opt_rulers_parser, action=set_generic_view_setting, noable=False),
+    'hlsearch':     vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
+    'magic':        vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
+    'ignorecase':   vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=False, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
+    'incsearch':    vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
+    'autoindent':   vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=None, action=set_generic_view_setting, noable=False),
+    'showminimap':  vi_user_setting(scope=SCOPE_WINDOW, values=(True, False, '0', '1'), default=True, parser=None, action=set_minimap, noable=True),
+    'showsidebar':  vi_user_setting(scope=SCOPE_WINDOW, values=(True, False, '0', '1'), default=True, parser=None, action=set_sidebar, noable=True),
+    'rulers':       vi_user_setting(scope=SCOPE_VIEW, values=None, default=[], parser=opt_rulers_parser, action=set_generic_view_setting, noable=False),
 }
 
 
@@ -198,10 +203,29 @@ class VintageSettings(object):
         target.settings().set('vintage', setts)
 
 
+class SublimeWindowSettings(object):
+    """ Helper class for accessing settings values from views """
+
+    def __init__(self, view=None):
+        self.view = view
+
+    def __get__(self, instance, owner):
+        if instance is not None:
+            return SublimeSettings(instance.v.window())
+        return SublimeSettings()
+
+    def __getitem__(self, key):
+        return self.view.window().settings().get(key)
+
+    def __setitem__(self, key, value):
+        self.view.window().settings().set(key, value)
+
+
 # TODO: Make this a descriptor; avoid instantiation.
 class SettingsManager(object):
     view = SublimeSettings()
     vi = VintageSettings()
+    window = SublimeWindowSettings()
 
     def __init__(self, view):
         self.v = view
