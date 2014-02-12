@@ -7,12 +7,8 @@ from Vintageous.vi import utils
 
 
 _mappings = {
-    modes.NORMAL: {
-        "G": {"name": "G_", "type": cmd_types.USER},
-    },
-    modes.VISUAL: {
-        "<": {"name": "<gv", "type": cmd_types.USER},
-    },
+    modes.NORMAL: {},
+    modes.VISUAL: {},
     modes.VISUAL_LINE: {},
     modes.OPERATOR_PENDING: {},
     modes.VISUAL_BLOCK: {},
