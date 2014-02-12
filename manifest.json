@@ -10,6 +10,7 @@
 					"*.JSON-tmLanguage",
 					"*.ps1",
 					"*.hg*",
+					"TODO.txt",
 					"*manifest.json"]
 			],
 
