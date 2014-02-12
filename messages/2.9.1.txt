@@ -1,0 +1,49 @@
+==============================================================================
+Vintageous 2.9.1
+==============================================================================
+
+(First time I use Package Control's notifications; fingers crossed!)
+
+Anyway, just a quick note to:
+
+1) Say sorry! If you were affected by the version 2.9 keyboard bug — sorry! I
+hope you'll be able to use non-Vim key bindings again with 2.9.1. If that
+isn't the case, please report your problem in the Github issue tracker.
+
+(By the way, if you used the workaround suggested in Github's issue tracker,
+make sure to remove the copied Default.sublime-keymap file from your
+Packages/User folder. If this is all Greek to you, you should be fine.)
+
+2) Update you on Vintageous' status: Version 2.9 introduced new internals that
+supersede version 2.8's core and should pave the way to major features in the
+future. 'There will be bugs', but the experience with 2.9.1 should be on par
+with 2.8, save for some features, most notably insert mode keys and visual
+block mode. These we'll be added back gradually.
+
+3) Ask you for feedback:
+
+    - Are you a Mac user? I can't test on Macs, so any issues you report are
+      especially useful.
+
+    - Do you use a non-Latin language with Vintageous? 2.9+ may then cause
+      problems to you in that case. Please report any issues in the Github
+      issue tracker.
+
+    Here's the project's home:
+
+    https://github.com/guillermooo/Vintageous
+
+
+DONATIONS
+---------
+
+Do you like Vintageous? If you use it often to get actual work done, please
+consider donating. Perhaps I'll be able to buy a Mac and stop breaking this
+plugin for you! :)
+
+	PayPal: http://www.pledgie.com/campaigns/19122
+	Gittip: https://www.gittip.com/guillermooo/
+
+Thanks for reading and for using Vintageous!
+
+Guillermo
