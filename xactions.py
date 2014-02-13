@@ -996,6 +996,10 @@ class _vi_big_a(ViTextCommandBase):
             hard_eol = self.view.line(s.b).end()
             return sublime.Region(hard_eol, hard_eol)
 
+        if mode == modes.SELECT:
+            self.view.window().run_command('find_all_under')
+            return
+
         regions_transformer(self.view, f)
 
         self.enter_insert_mode(mode)

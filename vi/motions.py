@@ -1,10 +1,17 @@
 from Vintageous.vi import inputs
 from Vintageous.vi.keys import cmds
 from Vintageous.vi.keys import cmd_defs
+from Vintageous.vi.utils import modes
 
 
 def vi_j(state, **kwargs):
     cmd = {}
+
+    if state.mode == modes.SELECT:
+        cmd['motion'] = 'find_under_expand'
+        cmd['motion_args'] = {}
+        return cmd
+
     cmd['motion'] = '_vi_j'
     cmd['motion_args'] = {'mode': state.mode, 'count': state.count, 'xpos': state.xpos}
     return cmd
@@ -26,6 +33,12 @@ def vi_h(state, **kwargs):
 
 def vi_l(state, **kwargs):
     cmd = {}
+
+    if state.mode == modes.SELECT:
+        cmd['motion'] = 'find_under_expand_skip'
+        cmd['motion_args'] = {}
+        return cmd
+
     cmd['motion'] = '_vi_l'
     cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
     return cmd
@@ -454,4 +467,16 @@ def vi_i_text_object(state, **kwargs):
     cmd['motion'] = '_vi_select_text_object'
     cmd['motion_args'] = {'mode': state.mode, 'count': state.count, 'text_object': state.user_input, 'inclusive': False}
 
+    return cmd
+
+
+def vi_k_select(state):
+    """
+    Non-standard.
+    """
+    if state.mode != modes.SELECT:
+        raise ValueError('bad mode, expected mode_select, got {0}'.format(state.mode))
+    cmd = {}
+    cmd['motion'] = 'soft_undo'
+    cmd['motion_args'] = {} # {'mode': state.mode, 'count': state.count}
     return cmd

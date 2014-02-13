@@ -5,7 +5,10 @@ def vi_a(state):
     cmd = {}
     cmd['action'] = '_vi_a'
     cmd['action_args'] = {'mode': state.mode, 'count': state.count}
-    state.glue_until_normal_mode = True
+
+    if state.mode != modes.SELECT:
+        state.glue_until_normal_mode = True
+
     return cmd
 
 

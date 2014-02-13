@@ -277,10 +277,6 @@ class _vi_l(ViTextCommandBase):
 
             return s
 
-        if mode == modes.SELECT:
-            self.view.window().run_command('find_under_expand_skip')
-            return
-
         regions_transformer(self.view, f)
         state = self.state
         state.xpos = self.view.rowcol(self.view.sel()[0].b)[1]
@@ -455,11 +451,6 @@ class _vi_j(ViTextCommandBase):
             # FIXME: Perhaps we should scroll into view in a more general way...
             self.view.show(new_region, False)
 
-        if mode == modes.SELECT:
-            for i in range(count):
-                self.view.window().run_command('find_under_expand')
-            return
-
         regions_transformer(self.view, f)
 
 
@@ -588,13 +579,19 @@ class _vi_k(ViTextCommandBase):
             self.view.show(new_region, False)
             return
 
-        if mode == modes.SELECT:
-            for i in range(count):
-                # FIXME: It isn't working.
-                self.view.run_command('soft_undo')
+        regions_transformer(self.view, f)
+
+
+class _vi_k_select(ViTextCommandBase):
+    def run(self, edit, count=1, mode=None):
+        # FIXME: It isn't working.
+        if mode != modes.SELECT:
+            utils.blink()
             return
 
-        regions_transformer(self.view, f)
+        for i in range(count):
+            self.view.window().run_command('soft_undo')
+            return
 
 
 class _vi_gg(ViTextCommandBase):

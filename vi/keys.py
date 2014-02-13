@@ -33,6 +33,7 @@ class cmds:
     AMPERSAND = 'vi_ampersand'
     B = 'vi_b'
     BACKTICK = 'vi_backtick'
+    K_SELECT = 'vi_k_select'
     BIG_A = 'vi_big_a'
     BIG_B = 'vi_big_b'
     BIG_C = 'vi_big_c'
@@ -583,10 +584,11 @@ cmd_defs[modes.OPERATOR_PENDING][cmds.A] =    dict(name=cmds.A_TEXT_OBJECT,     
 cmd_defs[modes.VISUAL_LINE] = cmd_defs[modes.NORMAL].copy()
 
 cmd_defs[modes.SELECT] = {}
-cmd_defs[modes.SELECT][cmds.I] = dict(name=cmds.I, input=None, type=cmd_types.ACTION, multi_step=False, motion_required=False, repeatable=False)
-cmd_defs[modes.SELECT][cmds.J] = dict(name=cmds.J, input=None, type=cmd_types.MOTION, multi_step=False)
-cmd_defs[modes.SELECT][cmds.L] = dict(name=cmds.L, input=None, type=cmd_types.MOTION, multi_step=False)
-cmd_defs[modes.SELECT][cmds.K] = dict(name=cmds.K, input=None, type=cmd_types.MOTION, multi_step=False)
+cmd_defs[modes.SELECT][cmds.I] =        dict(name=cmds.I,           input=None, type=cmd_types.ACTION, multi_step=False, motion_required=False, repeatable=False)
+cmd_defs[modes.SELECT][cmds.J] =        dict(name=cmds.J,           input=None, type=cmd_types.MOTION, multi_step=False)
+cmd_defs[modes.SELECT][cmds.L] =        dict(name=cmds.L,           input=None, type=cmd_types.MOTION, multi_step=False)
+cmd_defs[modes.SELECT][cmds.K] =        dict(name=cmds.K_SELECT,    input=None, type=cmd_types.MOTION, multi_step=False)
+cmd_defs[modes.SELECT][cmds.BIG_A] =    dict(name=cmds.BIG_A,       input=None, type=cmd_types.ACTION, multi_step=False, motion_required=False, repeatable=False)
 
 
 def seq_to_command(state, seq):
@@ -1186,6 +1188,7 @@ seqs.G_BIG_J: cmd_defs[modes.OPERATOR_PENDING][cmds.G_BIG_J],
         seqs.J: cmd_defs[modes.SELECT][cmds.J],
         seqs.L: cmd_defs[modes.SELECT][cmds.L],
         seqs.K: cmd_defs[modes.SELECT][cmds.K],
+        seqs.BIG_A: cmd_defs[modes.SELECT][cmds.BIG_A],
     },
     '_missing': cmd_defs[modes.NORMAL][cmds.MISSING],
 }
