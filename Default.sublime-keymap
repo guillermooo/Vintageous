@@ -10,7 +10,6 @@
 	{"keys": ["ctrl+c"], "command": "_enter_normal_mode", "args": {"mode": "mode_insert"}, "context": [{"key": "setting.command_mode", "operand": false}, {"key": "vi_use_ctrl_keys"}]},
 	{"keys": ["ctrl+["], "command": "_enter_normal_mode", "args": {"mode": "mode_insert"}, "context": [{"key": "setting.command_mode", "operand": false}, {"key": "vi_use_ctrl_keys"}]},
 
-	// {"keys": ["ctrl+r"], "command": "press_key", "args": {"key": "<ctrl+r>", "force_mode": "mode_normal"}, "context": [{"key": "setting.command_mode", "operand": false}]},
 
 	{"keys": ["*"], "command": "press_key", "args": {"key": "*"}, "context": [{"key": "setting.command_mode"}]},
 	{"keys": ["@"], "command": "press_key", "args": {"key": "@"}, "context": [{"key": "setting.command_mode"}]},
@@ -120,6 +119,7 @@
 	{"keys": ["ctrl+n"], "command": "press_key", "args": {"key": "<ctrl+n>"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_use_ctrl_keys"}]},
 	{"keys": ["ctrl+o"], "command": "press_key", "args": {"key": "<ctrl+o>"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_use_ctrl_keys"}]},
 	{"keys": ["ctrl+p"], "command": "press_key", "args": {"key": "<ctrl+p>"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_use_ctrl_keys"}]},
+	{"keys": ["ctrl+r"], "command": "press_key", "args": {"key": "<ctrl+r>"},  "context": [{"key": "setting.command_mode"}, {"key": "vi_use_ctrl_keys"}]},
 	{"keys": ["ctrl+q"], "command": "press_key", "args": {"key": "<ctrl+q>"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_use_ctrl_keys"}]},
 	{"keys": ["ctrl+r"], "command": "press_key", "args": {"key": "<ctrl+r>"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_use_ctrl_keys"}]},
 	{"keys": ["ctrl+s"], "command": "press_key", "args": {"key": "<ctrl+s>"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_use_ctrl_keys"}]},

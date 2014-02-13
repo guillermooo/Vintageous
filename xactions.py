@@ -135,7 +135,7 @@ class _vi_u(IrreversibleTextCommand):
 
 
 class _vi_ctrl_r(IrreversibleTextCommand):
-    def run(self, count=1):
+    def run(self, count=1, mode=None):
         for i in range(count):
             self.view.run_command('redo')
 

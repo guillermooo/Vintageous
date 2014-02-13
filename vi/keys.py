@@ -185,7 +185,6 @@ class cmds:
     CTRL_L = 'vi_ctrl_l'
     CTRL_P = 'vi_ctrl_p'
     CTRL_R = 'vi_ctrl_r'
-    CTRL_R= 'open_name_space'
     CTRL_R_EQUAL = 'vi_ctrl_r_equal'
     CTRL_U = 'vi_ctrl_u'
     CTRL_W = 'open_name_space'
@@ -317,7 +316,6 @@ class seqs:
     CTRL_B = '<ctrl+b>'
     CTRL_F = '<ctrl+f>'
     CTRL_P = '<ctrl+p>'
-    CTRL_R = '<ctrl+r>'
     CTRL_U = '<ctrl+u>'
     D = 'd'
     DD = 'dd'
@@ -678,7 +676,6 @@ mappings = {
         seqs.CTRL_K_CTRL_B: cmd_defs[modes.NORMAL][cmds.CTRL_K_CTRL_B],
         seqs.CTRL_P: cmd_defs[modes.NORMAL][cmds.CTRL_P],
         seqs.CTRL_R: cmd_defs[modes.NORMAL][cmds.CTRL_R],
-        seqs.CTRL_R: cmd_defs[modes.NORMAL][cmds.CTRL_R],
         seqs.CTRL_R_EQUAL: cmd_defs[modes.NORMAL][cmds.CTRL_R_EQUAL],
         seqs.CTRL_U: cmd_defs[modes.NORMAL][cmds.CTRL_U],
         seqs.CTRL_W: cmd_defs[modes.NORMAL][cmds.CTRL_W],
@@ -838,7 +835,6 @@ mappings = {
         seqs.CTRL_F: cmd_defs[modes.VISUAL][cmds.CTRL_F],
         seqs.CTRL_K_CTRL_B: cmd_defs[modes.NORMAL][cmds.CTRL_K_CTRL_B],
         seqs.CTRL_P: cmd_defs[modes.VISUAL][cmds.CTRL_P],
-        seqs.CTRL_R: cmd_defs[modes.VISUAL][cmds.CTRL_R],
         seqs.CTRL_R: cmd_defs[modes.VISUAL][cmds.CTRL_R],
         seqs.CTRL_R_EQUAL: cmd_defs[modes.VISUAL][cmds.CTRL_R_EQUAL],
         seqs.CTRL_U: cmd_defs[modes.VISUAL][cmds.CTRL_U],
@@ -1114,7 +1110,6 @@ mappings = {
         seqs.CTRL_F: cmd_defs[modes.VISUAL_LINE][cmds.CTRL_F],
         seqs.CTRL_K_CTRL_B: cmd_defs[modes.VISUAL_LINE][cmds.CTRL_K_CTRL_B],
         seqs.CTRL_P: cmd_defs[modes.VISUAL_LINE][cmds.CTRL_P],
-        seqs.CTRL_R: cmd_defs[modes.VISUAL_LINE][cmds.CTRL_R],
         seqs.CTRL_R: cmd_defs[modes.VISUAL_LINE][cmds.CTRL_R],
         seqs.CTRL_R_EQUAL: cmd_defs[modes.VISUAL_LINE][cmds.CTRL_R_EQUAL],
         seqs.CTRL_U: cmd_defs[modes.VISUAL_LINE][cmds.CTRL_U],

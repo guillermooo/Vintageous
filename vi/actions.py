@@ -189,7 +189,7 @@ def vi_u(state):
 def vi_ctrl_r(state):
     cmd = {}
     cmd['action'] = '_vi_ctrl_r'
-    cmd['action_args'] = {'count': state.count}
+    cmd['action_args'] = {'count': state.count, 'mode': state.mode}
     return cmd
 
 
