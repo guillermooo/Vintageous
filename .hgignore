@@ -1,9 +1,6 @@
 syntax: glob
-# foobar
-*.pyc
 
-*.tags
-*.tags_sorted_by_file
+*.pyc
 
 *~
 *.TMP
@@ -12,4 +9,4 @@ syntax: glob
 dist/
 
 *.sublime-workspace
-
+*.sublime-package
