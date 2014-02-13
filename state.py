@@ -74,19 +74,14 @@ def _init_vintageous(view, new_session=False):
     if not reset and (state.mode != modes.NORMAL):
         return
 
-    state.logger.info('[state.py] running init')
+    state.logger.info('[_init_vintageous] running init')
     if state.mode in (modes.VISUAL, modes.VISUAL_LINE):
         # TODO: Don't we need to pass a mode here?
-        view.window().run_command('_enter_normal_mode')
+        view.window().run_command('_enter_normal_mode', {'from_init': True})
 
     elif state.mode in (modes.INSERT, modes.REPLACE):
         # TODO: Don't we need to pass a mode here?
-        view.window().run_command('_enter_normal_mode')
-
-    elif state.mode == modes.NORMAL_INSERT:
-        # TODO: Implement this.
-        # TODO: This isn't needed anymore?
-        view.window().run_command('vi_run_normal_insert_mode_actions')
+        view.window().run_command('_enter_normal_mode', {'from_init': True})
 
     else:
         # This may be run when we're coming from cmdline mode.
@@ -94,7 +89,8 @@ def _init_vintageous(view, new_session=False):
         mode = modes.VISUAL if pseudo_visual else modes.INSERT
         # TODO: Maybe the above should be handled by State?
         state.enter_normal_mode()
-        view.window().run_command('_enter_normal_mode', {'mode': mode})
+        view.window().run_command('_enter_normal_mode', {'mode': mode,
+                                                         'from_init': True})
 
     state.reset_command_data()
     if new_session:

@@ -25,6 +25,7 @@ from Vintageous.vi.utils import jump_directions
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import regions_transformer
 from Vintageous.vi.mappings import Mappings
+from Vintageous.vi.sublime import is_view
 
 
 _logger = local_logger(__name__)
@@ -189,16 +190,35 @@ class _vi_c(sublime_plugin.TextCommand):
 
 # TODO: This probably needs to be a view command so that macros work fine.
 class _enter_normal_mode(ViTextCommandBase):
-    def run(self, edit, mode=None):
+    """
+    The equivalent of pressing the Esc key in Vim.
+
+    @mode
+      The mode we're coming from, which should still be the current mode.
+
+    @from_init
+      Whether _enter_normal_mode has been called from _init_vintageous. This
+      is important to know in order to not hide output panels when the user
+      is only navigating files or clicking around, not pressing Esc.
+    """
+    def run(self, edit, mode=None, from_init=False):
+        state = self.state
+
         self.view.window().run_command('hide_auto_complete')
-        self.view.window().run_command('hide_panel', {'cancel': True})
+        self.view.window().run_command('hide_overlay')
+
+        if (not from_init and (mode == modes.NORMAL)) or not is_view(self.view):
+            # When _enter_normal_mode is requested from _init_vintageous, we
+            # should not hide output panels; hide them only if the user
+            # pressed Esc or a panel has the focus.
+            self.view.window().run_command('hide_panel', {'cancel': True})
+
         self.view.settings().set('command_mode', True)
         self.view.settings().set('inverse_caret_state', True)
 
         # Exit replace mode.
         self.view.set_overwrite_status(False)
 
-        state = self.state
         state.enter_normal_mode()
         # XXX: st bug? if we don't do this, selections won't be redrawn
         self.view.run_command('_enter_normal_mode_impl', {'mode': mode})
@@ -217,7 +237,6 @@ class _enter_normal_mode(ViTextCommandBase):
             # TODO: Calculate size the view has grown by and place the caret
             # after the newly inserted text.
             sels = list(self.view.sel())
-            print("REPEAT DATA", state.repeat_data)
             times = int(state.normal_insert_count) - 1
             state.normal_insert_count = '1'
             self.view.window().run_command('_vi_dot', {
