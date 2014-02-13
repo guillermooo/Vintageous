@@ -1,3 +1,4 @@
 [
-    { "caption": "Vintageous: Reset", "command": "reset_vintageous" }
+    { "caption": "Vintageous: Reset", "command": "reset_vintageous" },
+    { "caption": "Vintageous: Toggle Vim Ctrl Keys", "command": "vintageous_toggle_ctrl_keys" }
 ]

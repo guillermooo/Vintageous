@@ -1,4 +1,3 @@
 [
     { "caption": "Vintageous: Run Tests...", "command": "show_vintageous_test_suites" },
-    { "caption": "Vintageous: Reset", "command": "reset_vintageous" }
 ]

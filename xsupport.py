@@ -116,10 +116,19 @@ class Sequence(sublime_plugin.TextCommand):
             self.view.run_command(cmd, args)
 
 
-class ResetVintageous(sublime_plugin.TextCommand):
-    def run(self, edit):
-        self.view.settings().erase('vintage')
-        _init_vintageous(self.view)
+class ResetVintageous(sublime_plugin.WindowCommand):
+    def run(self):
+        v = self.window.active_view()
+        v.settings().erase('vintage')
+        _init_vintageous(v)
+
+
+class VintageousToggleCtrlKeys(sublime_plugin.WindowCommand):
+    def run(self):
+        prefs = sublime.load_settings('Preferences.sublime-settings')
+        value = prefs.get('vintageous_use_ctrl_keys', True)
+        prefs.set('vintageous_use_ctrl_keys', (not value))
+        sublime.save_settings('Preferences.sublime-settings')
 
 
 class ReloadVintageousSettings(sublime_plugin.TextCommand):
