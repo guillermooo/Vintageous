@@ -561,3 +561,35 @@ def vi_at(state):
     cmd['action'] = '_vi_at'
     cmd['action_args'] = {'name': state.user_input, 'count': state.count}
     return cmd
+
+
+def vi_f3(state):
+    """
+    ST command. Make it an action because it doesn't behave as a motion inside
+    Vim.
+    """
+    cmd = {}
+    cmd['action'] = 'find_next'
+    cmd['action_args'] = {}
+    return cmd
+
+def vi_shift_f3(state):
+    """
+    ST command. Make it an action because it doesn't behave as a motion inside
+    Vim.
+    """
+    cmd = {}
+    cmd['action'] = 'find_prev'
+    cmd['action_args'] = {}
+    return cmd
+
+
+def vi_shift_f4(state):
+    """
+    ST command. Make it an action because it doesn't behave as a motion inside
+    Vim.
+    """
+    cmd = {}
+    cmd['action'] = 'prev_result'
+    cmd['action_args'] = {}
+    return cmd
