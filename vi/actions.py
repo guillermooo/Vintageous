@@ -505,6 +505,13 @@ def vi_ctrl_big_p(state, **kwargs):
     return cmd
 
 
+def vi_ctrl_big_f(state, **kwargs):
+    cmd = {}
+    cmd['action'] = 'show_panel'
+    cmd['action_args'] = {'panel': 'find_in_files'}
+    return cmd
+
+
 def vi_f11(state, **kwargs):
     cmd = {}
     cmd['action'] = 'toggle_full_screen'
