@@ -1,3 +1,23 @@
+2.9.2 - 13/02/13
+
+	- Prevent Esc key from hiding output panels in some cases.
+	- Implement staple ST3 function keys in normal mode.
+	- Improve select mode:
+	      gh - enter select mode from normal or visual mode
+	       j - add selection
+	       k - remove selection
+	       A - add all instances
+	       l - skip instance
+	       i - return to insert mode preserving selections
+
+	       To use select mode, add selections and the enter insert mode by
+	       pressing 'i'. Then you will be able to edit text in insert mode.
+
+	- Improve cursor placement when exiting from visual line.
+	- Re-enable Ctrl+R in normal mode (redo).
+	- Add convenience commands to Command Palette:
+	     * Toggle Vim Ctrl Keys: toggles usage of modified Vim keys.
+
 2.9.1 - 12/02/13
 
 	- Fix overridden 'super' key bindings.

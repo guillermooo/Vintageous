@@ -39,7 +39,6 @@ class _vi_question_mark_on_parser_done(sublime_plugin.WindowCommand):
 
 class _vi_r_on_parser_done(sublime_plugin.WindowCommand):
     def run(self, key=None):
-        print("HELLO WORLD!", key)
         state = State(self.window.active_view())
         if not state.user_input:
             state.user_input = utils.translate_char(key)
@@ -101,7 +100,7 @@ class _vi_adjust_carets(sublime_plugin.TextCommand):
             if mode in (modes.NORMAL, modes.INTERNAL_NORMAL):
                 if  ((view.substr(s.b) == '\n' or s.b == view.size())
                      and not view.line(s.b).empty()):
-                        print('adjusting carets')
+                        # print('adjusting carets')
                         return sublime.Region(s.b - 1)
             return s
 
