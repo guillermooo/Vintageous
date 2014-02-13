@@ -206,9 +206,25 @@ def vi_left_brace(state, **kwargs):
     return cmd
 
 
+def vi_left_square_bracket(state, **kwargs):
+    # TODO: Implement this.
+    cmd = {}
+    cmd['motion'] = '_vi_left_square_bracket'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
+
+
 def vi_right_brace(state, **kwargs):
     cmd = {}
     cmd['motion'] = '_vi_right_brace'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
+
+
+def vi_right_square_bracket(state, **kwargs):
+    # TODO: Implement this.
+    cmd = {}
+    cmd['motion'] = '_vi_right_square_bracket'
     cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
     return cmd
 

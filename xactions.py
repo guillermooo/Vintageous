@@ -501,14 +501,18 @@ class PressKeys(ViWindowCommandBase):
                     if (leading_motions + keys) not in ('.', 'u', '<ctrl+r>'):
                             state.repeat_data = ('vi', leading_motions + keys, initial_mode, None)
 
-        # we might reach this point if we have a command that requests
-        # input and its input parser isn't satistied. For example, /foo.
-        # Note that /foo<CR> would instead satisfy the parser.
-        # Assume a command _ + parser_name exists that accepts a 'default'
-        # parameter. This command should be the panel that would have run
-        # in interactive mode to collect data from the user.
-        # Assume the motion is the one receiving data:
-        print('faux end action + motion', state.action, state.motion)
+        # We'll reach this point if we have a command that requests input
+        # whose input parser isn't satistied. For example, `/foo`. Note that
+        # `/foo<CR>`, on the contrary, would have satisfied the parser.
+        #
+        # Assume that:
+        #   * a command `_ + parser_name` exists that accepts a 'default'
+        #     parameter. This command should be the panel that would have run
+        #     in interactive mode to collect data from the user.
+        #
+        #   * the motion is the one receiving data.
+        #
+        _logger().info('[PressKeys] unsatisfied parser:', state.action, state.motion)
         if state.action and state.motion:
             # we have a parser an a motion that can collect data. Collect data interactively.
             motion_func = getattr(motions, state.motion['name'], None)
@@ -523,7 +527,7 @@ class PressKeys(ViWindowCommandBase):
 
         try:
             parser_name = state.input_parsers[-1]
-            print('last resort', parser_name)
+            _logger().info('[PressKeys] last attemp to collect input:', parser_name)
             self.window.run_command('_' + parser_name, {'default': state.user_input})
         except IndexError:
             print('[Vintageous] parser unsatisfied command not found')
