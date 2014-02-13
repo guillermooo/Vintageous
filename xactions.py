@@ -283,6 +283,14 @@ class _enter_normal_mode_impl(sublime_plugin.TextCommand):
                 if self.view.has_non_empty_selection_region():
                     self.view.add_regions('visual_sel', list(self.view.sel()))
 
+                if s.a < s.b:
+                    pt = s.b - 1
+                    if (view.substr(pt) == '\n') and not view.line(pt).empty():
+                        pt -= 1
+                    return sublime.Region(pt)
+                else:
+                    return sublime.Region(s.b)
+
             if mode == modes.SELECT:
                 return sublime.Region(s.begin())
 
