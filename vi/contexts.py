@@ -60,6 +60,18 @@ class KeyContext(object):
     #     value = (is_normal_mode and is_exit_mode_insert)
     #     return self._check(value, operator, operand, match_all)
 
+    def vi_command_mode_aware(self, key, operator, operand, match_all):
+        in_command_mode = self.state.view.settings().get('command_mode')
+        is_view = self.vi_is_view(key, operator, operand, match_all)
+        value = in_command_mode and is_view
+        return self._check(value, operator, operand, match_all)
+
+    def vi_insert_mode_aware(self, key, operator, operand, match_all):
+        in_command_mode = self.state.view.settings().get('command_mode')
+        is_view = self.vi_is_view(key, operator, operand, match_all)
+        value = (not in_command_mode) and is_view
+        return self._check(value, operator, operand, match_all)
+
     def vi_use_ctrl_keys(self, key, operator, operand, match_all):
         value = self.state.settings.view['vintageous_use_ctrl_keys']
         return self._check(value, operator, operand, match_all)
