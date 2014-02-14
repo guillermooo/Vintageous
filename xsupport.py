@@ -120,15 +120,18 @@ class ResetVintageous(sublime_plugin.WindowCommand):
         v = self.window.active_view()
         v.settings().erase('vintage')
         _init_vintageous(v)
-
+        print("Package.Vintageous: State reset.")
+        sublime.status_message("Vintageous: State reset")
 
 class VintageousToggleCtrlKeys(sublime_plugin.WindowCommand):
     def run(self):
         prefs = sublime.load_settings('Preferences.sublime-settings')
-        value = prefs.get('vintageous_use_ctrl_keys', True)
+        value = prefs.get('vintageous_use_ctrl_keys', False)
         prefs.set('vintageous_use_ctrl_keys', (not value))
         sublime.save_settings('Preferences.sublime-settings')
-
+        status = 'enabled' if (not value) else 'disabled'
+        print("Package.Vintageous: Use of Ctrl- keys {0}.".format(status))
+        sublime.status_message("Vintageous: Use of Ctrl- keys {0}".format(status))
 
 class ReloadVintageousSettings(sublime_plugin.TextCommand):
     def run(self, edit):
