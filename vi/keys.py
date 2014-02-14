@@ -122,9 +122,9 @@ class cmds:
     Z = 'open_name_space'
     Z_ENTER = 'vi_z_enter'
     Z_MINUS = 'vi_z_minus'
-    ZB = 'vi_z_b'
+    ZB = 'vi_zb'
     ZERO = 'vi_0'
-    ZT = 'vi_z_t'
+    ZT = 'vi_zt'
     ZZ = 'vi_zz'
 
     # Upper case

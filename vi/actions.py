@@ -443,9 +443,16 @@ def vi_z_minus(state, **kwargs):
     return cmd
 
 
-def vi_z_b(state, **kwargs):
+def vi_zb(state, **kwargs):
     cmd = {}
     cmd['action'] = '_vi_z_minus'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
+
+
+def vi_zt(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_z_enter'
     cmd['action_args'] = {'mode': state.mode, 'count': state.count}
     return cmd
 
