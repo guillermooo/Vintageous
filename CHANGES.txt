@@ -1,3 +1,16 @@
+2.9.3 - 14/02/13
+
+    - Fix z actions.
+    - Print status info to status bar.
+    - Ensure consistent mode if there are multiple selections in the view.
+    - Improve commands when applied to multiple selections.
+    - Enable Vintageous only for views -- exclude panels and widgets.
+    - Fix bug where it would be impossible to exit from input panels by
+      pressing Esc.
+    - Implement sidebar toggle in normal mode.
+    - Fix return value in d command.
+    - Convenience commands now provide feedback to the user.
+
 2.9.2 - 13/02/13
 
 	- Prevent Esc key from hiding output panels in some cases.
