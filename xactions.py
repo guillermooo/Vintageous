@@ -1206,8 +1206,7 @@ class _vi_big_d(ViTextCommandBase):
             view.erase(edit, s)
             if s.begin() != view.line(s.begin()).a:
                 return sublime.Region(s.begin() - 1)
-            return s.begin()
-
+            return sublime.Region(s.begin())
         self.save_sel()
         regions_transformer(self.view, f)
 
