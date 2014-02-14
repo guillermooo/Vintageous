@@ -153,23 +153,21 @@ class _vi_a(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
         self.view.window().run_command('_enter_insert_mode')
 
-
 class _vi_c(sublime_plugin.TextCommand):
     def run(self, edit, count=1, mode=None, motion=None):
-        def f(view, s):
-            pt = s.begin()
-            if mode == modes.INTERNAL_NORMAL:
-                view.erase(edit, s)
-                return sublime.Region(pt)
-            if mode == modes.VISUAL:
-                view.erase(edit, s)
-                return sublime.Region(pt)
-            if mode == modes.VISUAL_LINE:
-                r = sublime.Region(s.a, s.b - 1)
-                view.erase(edit, r)
-                return sublime.Region(pt)
-            return s
-
+        # def f(view, s):
+        #     pt = s.begin()
+        #     if mode == modes.INTERNAL_NORMAL:
+        #         view.erase(edit, s)
+        #         return sublime.Region(pt)
+        #     if mode == modes.VISUAL:
+        #         view.erase(edit, s)
+        #         return sublime.Region(pt)
+        #     if mode == modes.VISUAL_LINE:
+        #         r = sublime.Region(s.a, s.b - 1)
+        #         view.erase(edit, r)
+        #         return sublime.Region(pt)
+        #     return s
         if mode is None:
             raise ValueError('mode required')
 
@@ -181,12 +179,9 @@ class _vi_c(sublime_plugin.TextCommand):
 
         if motion:
             self.view.run_command(motion['motion'], motion['motion_args'])
-
-        regions_transformer(self.view, f)
+        # regions_transformer(self.view, f)
+        self.view.run_command('right_delete')
         self.view.window().run_command('_enter_insert_mode')
-
-
-# TODO: This probably needs to be a view command so that macros work fine.
 class _enter_normal_mode(ViTextCommandBase):
     """
     The equivalent of pressing the Esc key in Vim.
@@ -296,8 +291,7 @@ class _enter_normal_mode_impl(sublime_plugin.TextCommand):
 
         if mode == modes.UNKNOWN:
             return
-
-        if len(self.view.sel()) > 1:
+        if len(self.view.sel()) > 1 and mode == modes.NORMAL:
             sel = self.view.sel()[0]
             self.view.sel().clear()
             self.view.sel().add(sel)
@@ -857,29 +851,24 @@ class _vi_cc_action(ViTextCommandBase):
     _synthetize_new_line_at_eof = True
     _yanks_linewise = False
     _populates_small_delete_register = False
-
     def run(self, edit, mode=None, count=1):
-        def f(view, s):
-            # We've made a selection with _vi_cc_motion just before this.
-            if mode == modes.INTERNAL_NORMAL:
-                view.erase(edit, s)
-                if utils.row_at(self.view, s.a) != utils.row_at(self.view, self.view.size()):
-                    pt = utils.next_non_white_space_char(view, s.a, white_space=' \t')
-                else:
-                    pt = utils.next_non_white_space_char(view,
-                                                         self.view.line(s.a).a,
-                                                         white_space=' \t')
-
-                return sublime.Region(pt)
-            return s
-
+        # def f(view, s):
+        #     # We've made a selection with _vi_cc_motion just before this.
+        #     if mode == modes.INTERNAL_NORMAL:
+        #         view.erase(edit, s)
+        #         if utils.row_at(self.view, s.a) != utils.row_at(self.view, self.view.size()):
+        #             pt = utils.next_non_white_space_char(view, s.a, white_space=' \t')
+        #         else:
+        #             pt = utils.next_non_white_space_char(view,
+        #                                                  self.view.line(s.a).a,
+        #                                                  white_space=' \t')
+        #         return sublime.Region(pt)
+        #     return s
         self.view.run_command('_vi_cc_motion', {'mode': mode, 'count': count})
-
         state = self.state
         state.registers.yank(self)
-
-        regions_transformer_reversed(self.view, f)
-
+        self.view.run_command('right_delete')
+        # regions_transformer_reversed(self.view, f)
         self.enter_insert_mode(mode)
         self.set_xpos(state)
 
@@ -962,11 +951,9 @@ class _vi_d(ViTextCommandBase):
     def run(self, edit, mode=None, count=1, motion=None, register=None):
         def reverse(view, s):
             return sublime.Region(s.end(), s.begin())
-
-        def f(view, s):
-            view.replace(edit, s, '')
-            return sublime.Region(s.b)
-
+        # def f(view, s):
+        #     view.replace(edit, s, '')
+        #     return sublime.Region(s.b)
         if mode not in (modes.INTERNAL_NORMAL, modes.VISUAL,
                         modes.VISUAL_LINE):
             raise ValueError('wrong mode')
@@ -979,11 +966,10 @@ class _vi_d(ViTextCommandBase):
 
         state = self.state
         state.registers.yank(self, register)
-
-        regions_transformer(self.view, reverse)
-        regions_transformer(self.view, f)
+        self.view.run_command('left_delete')
+        # regions_transformer(self.view, reverse)
+        # regions_transformer(self.view, f)
         self.view.run_command('_vi_adjust_carets')
-
         self.enter_normal_mode(mode)
 
 
@@ -1200,19 +1186,19 @@ class _vi_big_d(ViTextCommandBase):
                     return s
             return s
 
-        def delete(view, s):
-            view.erase(edit, s)
-            if s.begin() != view.line(s.begin()).a:
-                return sublime.Region(s.begin() - 1)
-            return sublime.Region(s.begin())
+        # def delete(view, s):
+        #     view.erase(edit, s)
+        #     if s.begin() != view.line(s.begin()).a:
+        #         return sublime.Region(s.begin() - 1)
+        #     return sublime.Region(s.begin())
+
         self.save_sel()
         regions_transformer(self.view, f)
 
         state = self.state
         state.registers.yank(self)
-
-        regions_transformer(self.view, delete)
-
+        self.view.run_command('left_delete')
+        # regions_transformer(self.view, delete)
         self.enter_normal_mode(mode)
 
 
@@ -1230,21 +1216,17 @@ class _vi_big_c(ViTextCommandBase):
                         return sublime.Region(s.b, eol)
                     return s
             return s
-
-        def delete(view, s):
-            view.erase(edit, s)
-            return sublime.Region(s.begin())
-
+        # def delete(view, s):
+        #     view.erase(edit, s)
+        #     return sublime.Region(s.begin())
         self.save_sel()
         regions_transformer(self.view, f)
 
         state = self.state
         state.registers.yank(self)
-
-        regions_transformer(self.view, delete)
-
+        self.view.run_command('right_delete')
+        # regions_transformer(self.view, delete)
         self.enter_insert_mode(mode)
-
 
 class _vi_big_s_motion(sublime_plugin.TextCommand):
     def run(self, edit, mode=None, count=1):
@@ -1292,19 +1274,16 @@ class _vi_s(ViTextCommandBase):
     # Yank config data.
     _can_yank = True
     _populates_small_delete_register = True
-
     def run(self, edit, mode=None, count=1, register=None):
-        def erase(view, s):
-            view.erase(edit, s)
-            return sublime.Region(s.begin())
-
+        # def erase(view, s):
+        #     view.erase(edit, s)
+        #     return sublime.Region(s.begin())
         self.view.run_command('_vi_l', {'mode': mode, 'count': count})
         state = self.state
         state.registers.yank(self, register)
-        regions_transformer_reversed(self.view, erase)
-
+        self.view.run_command('right_delete')
+        # regions_transformer_reversed(self.view, erase)
         self.enter_insert_mode(mode)
-
 
 class _vi_x(ViTextCommandBase):
     """
@@ -1313,19 +1292,16 @@ class _vi_x(ViTextCommandBase):
     # Yank config data.
     _can_yank = True
     _populates_small_delete_register = True
-
     def run(self, edit, mode=None, count=1, register=None):
-        def erase(view, s):
-            view.erase(edit, s)
-            return sublime.Region(s.begin())
-
+        # def erase(view, s):
+        #     view.erase(edit, s)
+        #     return sublime.Region(s.begin())
         state = self.state
         self.view.run_command('_vi_l', {'mode': mode, 'count': count})
         state.registers.yank(self, register)
-        regions_transformer_reversed(self.view, erase)
-
+        self.view.run_command('right_delete')
+        # regions_transformer_reversed(self.view, erase)
         self.enter_normal_mode(mode)
-
 
 class _vi_r(ViTextCommandBase):
 
@@ -1524,18 +1500,15 @@ class _vi_big_x(ViTextCommandBase):
             if mode == modes.INTERNAL_NORMAL:
                 return sublime.Region(s.b, s.b - count)
             return sublme.Region(s.begin(), s.end())
-
-        def delete(view, s):
-            view.erase(edit, s)
-            return s
-
+        # def delete(view, s):
+        #     view.erase(edit, s)
+        #     return s
         regions_transformer(self.view, select)
         state = self.state
         state.registers.yank(self, register)
-        regions_transformer_reversed(self.view, delete)
-
+        self.view.run_command('left_delete')
+        # regions_transformer_reversed(self.view, delete)
         self.enter_normal_mode(mode)
-
 
 class _vi_big_p(ViTextCommandBase):
 
