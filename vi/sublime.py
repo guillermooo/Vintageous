@@ -30,7 +30,19 @@ def is_view(view):
     """
     Returns `True` if @view is a normal view.
     """
-    if ((getattr(view, 'settings') is None) or
-         view.settings().get('is_widget')):
-            return False
-    return True
+    return not (is_widget(view) or is_console(view))
+
+
+def is_widget(view):
+    """
+    Returns `True` if @view is a widget.
+    """
+    return view.settings().get('is_widget')
+
+
+def is_console(view):
+    """
+    Returns `True` if @view seems to be ST3's console.
+    """
+    # XXX: Is this reliable?
+    return (getattr(view, 'settings') is None)

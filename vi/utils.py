@@ -1,5 +1,6 @@
 import sublime
 import sublime_plugin
+from Vintageous.vi.sublime import is_view as sublime_is_view
 
 from contextlib import contextmanager
 import logging
@@ -7,6 +8,38 @@ import re
 
 
 logging.basicConfig(level=logging.INFO)
+def mark_as_widget(view):
+    """
+    Marks @view as a widget so we can later inspect that attribute, for
+    example, when hiding panels in _vi_enter_normal_mode.
+
+    Used prominently by '/', '?' and ':'.
+    """
+    view.settings().set('is_vintageous_widget', True)
+    return view
+
+
+def is_view(view):
+    """
+    Returns `True` if @view is a normal view as Vintageous understands them.
+    """
+    return (not is_widget(view)) and (not is_console(view))
+
+
+def is_widget(view):
+    """
+    Returns `True` if the @view is any kind of widget.
+    """
+    setts = view.settings()
+    return (setts.get('is_widget') or setts.get('is_vintageous_widget'))
+
+
+def is_console(view):
+    """
+    Returns `True` if @view seems to be ST3's console.
+    """
+    # XXX: Is this reliable?
+    return (getattr(view, 'settings') is None)
 
 
 def get_logger():

@@ -15,8 +15,7 @@ from Vintageous.vi.settings import iter_settings
 from Vintageous.vi.sublime import show_ipanel
 from Vintageous.vi.utils import modes
 from Vintageous.state import VintageState
-
-
+from Vintageous.vi.utils import mark_as_widget
 def plugin_loaded():
     v = sublime.active_window().active_view()
     state = VintageState(v)
@@ -61,9 +60,10 @@ class ViColonInput(sublime_plugin.WindowCommand):
 
         if VintageState(self.window.active_view()).mode in (modes.VISUAL, modes.VISUAL_LINE):
             initial_text = ":'<,'>" + initial_text[1:]
-
-        v = show_ipanel(self.window, initial_text=initial_text,
-                        on_done=self.on_done, on_change=self.on_change)
+        v = mark_as_widget(show_ipanel(self.window,
+                                       initial_text=initial_text,
+                                       on_done=self.on_done,
+                                       on_change=self.on_change))
         v.set_syntax_file('Packages/Vintageous/VintageousEx Cmdline.tmLanguage')
         v.settings().set('gutter', False)
         v.settings().set('rulers', [])

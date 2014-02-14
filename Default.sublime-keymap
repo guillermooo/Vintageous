@@ -1,16 +1,19 @@
 [
 	{"keys": ["shift+escape"], "command": "toggle_mode" },
-
-	{"keys": ["escape"], "command": "press_key", "args": {"key": "<esc>"}, "context": [{"key": "setting.command_mode"}]},
+	{"keys": ["escape"], "command": "press_key", "args": {"key": "<esc>"}, "context": [{"key": "setting.command_mode"}, {"key": "vi_is_view"}]},
 	{"keys": ["enter"], "command": "press_key", "args": {"key": "<CR>"}, "context": [{"key": "setting.command_mode"}]},
-
 	{"keys": ["shift+enter"], "command": "press_key", "args": {"key": "<shift+cr>"}, "context": [{"key": "setting.command_mode"}]},
-
 	{"keys": ["escape"], "command": "_enter_normal_mode", "args": {"mode": "mode_insert"}, "context": [{"key": "setting.command_mode", "operand": false}]},
-	{"keys": ["ctrl+c"], "command": "_enter_normal_mode", "args": {"mode": "mode_insert"}, "context": [{"key": "setting.command_mode", "operand": false}, {"key": "vi_use_ctrl_keys"}]},
-	{"keys": ["ctrl+["], "command": "_enter_normal_mode", "args": {"mode": "mode_insert"}, "context": [{"key": "setting.command_mode", "operand": false}, {"key": "vi_use_ctrl_keys"}]},
-
-
+	{"keys": ["ctrl+c"], "command": "_enter_normal_mode", "args": {"mode": "mode_insert"}, "context": [
+																			{"key": "setting.command_mode", "operand": false},
+																			{"key": "vi_use_ctrl_keys"},
+																			{"key": "vi_is_view"}
+																		]},
+	{"keys": ["ctrl+["], "command": "_enter_normal_mode", "args": {"mode": "mode_insert"}, "context": [
+																			{"key": "setting.command_mode", "operand": false},
+																			{"key": "vi_use_ctrl_keys"},
+																			{"key": "vi_is_view"}
+																		]},
 	{"keys": ["*"], "command": "press_key", "args": {"key": "*"}, "context": [{"key": "setting.command_mode"}]},
 	{"keys": ["@"], "command": "press_key", "args": {"key": "@"}, "context": [{"key": "setting.command_mode"}]},
 	{"keys": ["#"], "command": "press_key", "args": {"key": "#"}, "context": [{"key": "setting.command_mode"}]},

@@ -25,9 +25,7 @@ from Vintageous.vi.utils import jump_directions
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import regions_transformer
 from Vintageous.vi.mappings import Mappings
-from Vintageous.vi.sublime import is_view
-
-
+from Vintageous.vi.utils import is_view
 _logger = local_logger(__name__)
 
 

@@ -4,10 +4,8 @@ import sublime
 # from Vintageous.vi.constants import MODE_VISUAL_BLOCK
 from Vintageous.vi.utils import modes
 # from Vintageous.vi import constants
-# from Vintageous.vi import utils
+from Vintageous.vi import utils
 # from Vintageous.vi.constants import action_to_namespace
-
-
 class KeyContext(object):
     def __get__(self, instance, owner):
         self.state = instance
@@ -52,15 +50,9 @@ class KeyContext(object):
     #     # cleanup tasks, so let the command run anyway.
     #     if self.state.view.get_regions('vi_search'):
     #         return True
-
-
-    def vi_is_buffer(self, key, operator, operand, match_all):
-        # !! The following check is based on an implementation detail of Sublime Text. !!
-        is_console = False if (getattr(self.state.view, 'settings') is not None) else True
-        is_widget = self.state.view.settings().get('is_widget')
-        value = (is_console or is_widget)
-        return self._check(value, operand, operand, match_all)
-
+    def vi_is_view(self, key, operator, operand, match_all):
+        value = utils.is_view(self.state.view)
+        return self._check(value, operator, operand, match_all)
     # def vi_must_exit_to_insert_mode(self, key, operator, operand, match_all):
     #     # XXX: This conext most likely not needed any more.
     #     is_normal_mode = self.state.settings.view['command_mode']
