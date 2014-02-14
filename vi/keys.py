@@ -181,6 +181,7 @@ class cmds:
     CTRL_F = 'vi_ctrl_f'
     CTRL_F11 = 'vi_ctrl_f11'
     CTRL_F12 = 'vi_ctrl_f12'
+    CTRL_K = 'vi_ctrl_k'
     CTRL_K_CTRL_B = 'vi_ctrl_k_ctrl_b'
     CTRL_L = 'vi_ctrl_l'
     CTRL_P = 'vi_ctrl_p'
@@ -261,7 +262,8 @@ class seqs:
     CTRL_W_V = '<ctrl+w>v'
     CTRL_W_L = '<ctrl+w>l'
     CTRL_W_BIG_L = '<ctrl+w>L'
-    CTRL_K_CTRL_B = '<ctrl+l><ctrl+b>'
+    CTRL_K = '<ctrl+k>'
+    CTRL_K_CTRL_B = '<ctrl+k><ctrl+b>'
     CTRL_BIG_F = '<ctrl+F>'
     CTRL_BIG_P = '<ctrl+P>'
     CTRL_W_H = '<ctrl+w>h'
@@ -586,9 +588,9 @@ cmd_defs = {
         cmds.SHIFT_F4:                  dict(name=cmds.SHIFT_F4,                    input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.F7:                        dict(name=cmds.F7,                          input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.SHIFT_CTRL_F12:            dict(name=cmds.SHIFT_CTRL_F12,              input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
-
         cmds.CTRL_W:                    dict(name=cmds.OPEN_NAME_SPACE,             input=None,                 type=cmd_types.OTHER, motion_required=False, multi_step=False, repeatable=False),
         cmds.BIG_Z:                     dict(name=cmds.OPEN_NAME_SPACE,             input=None,                 type=cmd_types.OTHER, motion_required=False, multi_step=False, repeatable=False),
+        cmds.CTRL_K:                     dict(name=cmds.OPEN_NAME_SPACE,             input=None,                 type=cmd_types.OTHER, motion_required=False, multi_step=False, repeatable=False),
         cmds.Z:                         dict(name=cmds.OPEN_NAME_SPACE,             input=None,                 type=cmd_types.OTHER, motion_required=False, multi_step=False, repeatable=False),
         cmds.G:                         dict(name=cmds.OPEN_NAME_SPACE,             input=None,                 type=cmd_types.OTHER, motion_required=False, multi_step=False, repeatable=False),
         cmds.DOUBLE_QUOTE:              dict(name=cmds.OPEN_REGISTERS,              input=None,                 type=cmd_types.OTHER, motion_required=False, multi_step=False, repeatable=False),
@@ -645,6 +647,7 @@ mappings = {
         seqs.BIG_H: cmd_defs[modes.NORMAL][cmds.BIG_H],
         seqs.BIG_I: cmd_defs[modes.NORMAL][cmds.BIG_I],
         seqs.BIG_J: cmd_defs[modes.NORMAL][cmds.BIG_J],
+        seqs.BIG_J: cmd_defs[modes.NORMAL][cmds.BIG_J],
         seqs.BIG_L: cmd_defs[modes.NORMAL][cmds.BIG_L],
         seqs.BIG_M: cmd_defs[modes.NORMAL][cmds.BIG_M],
         seqs.BIG_N: cmd_defs[modes.NORMAL][cmds.BIG_N],
@@ -673,6 +676,7 @@ mappings = {
         seqs.CTRL_E: cmd_defs[modes.NORMAL][cmds.CTRL_E],
         seqs.CTRL_F12: cmd_defs[modes.NORMAL][cmds.CTRL_F12],
         seqs.CTRL_F: cmd_defs[modes.NORMAL][cmds.CTRL_F],
+        seqs.CTRL_K: cmd_defs[modes.NORMAL][cmds.CTRL_K],
         seqs.CTRL_K_CTRL_B: cmd_defs[modes.NORMAL][cmds.CTRL_K_CTRL_B],
         seqs.CTRL_P: cmd_defs[modes.NORMAL][cmds.CTRL_P],
         seqs.CTRL_R: cmd_defs[modes.NORMAL][cmds.CTRL_R],

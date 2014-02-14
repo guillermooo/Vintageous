@@ -603,3 +603,10 @@ def vi_shift_f4(state):
     cmd['action'] = 'prev_result'
     cmd['action_args'] = {}
     return cmd
+
+
+def vi_ctrl_k_ctrl_b(state):
+    cmd = {}
+    cmd['action'] = 'toggle_side_bar'
+    cmd['action_args'] = {}
+    return cmd
