@@ -1,0 +1,67 @@
+==============================================================================
+Vintageous 2.9.3
+==============================================================================
+
+IMPORTANT:      Vintageous now uses unified contexts to detect when it should
+----------      be active. If you've remapped a sequence like 'jj' to 'Esc',
+                check the wiki for the latest instructions to make it work
+                again. Note that remapping keys for command modes is
+                generally unsupported at the moment, but this particular case
+                seems to work fine.
+
+
+CHANGES
+-------
+
+2.9.3
+
+    - Fix z actions.
+    - Print status info to status bar.
+    - Ensure consistent mode if there are multiple selections in the view.
+    - Improve commands when applied to multiple selections.
+    - Enable Vintageous only for views -- exclude panels and widgets.
+    - Fix bug where it would be impossible to exit from input panels by
+      pressing Esc.
+    - Implement sidebar toggle in normal mode.
+    - Fix return value in d command.
+    - Convenience commands now provide feedback to the user.
+
+2.9.2
+
+    - Prevent Esc key from hiding output panels in some cases.
+    - Implement staple ST3 function keys in normal mode.
+    - Improve select mode. Check wiki for details.
+    - Improve cursor placement when exiting from visual line.
+    - Re-enable Ctrl+R in normal mode (redo).
+    - Add convenience commands to Command Palette:
+
+         * Toggle Vim Ctrl Keys: toggles usage of modified Vim keys.
+
+
+FOUND BUGS?
+-----------
+
+Please report them here:
+
+    https://github.com/guillermooo/Vintageous/issues
+
+
+SUPPORT VINTAGEOUS
+------------------
+
+Is Vintageous worth your time? Developing Vintageous is hard work. If you use
+it often to get actual work done, please consider donating and make it worth
+my time too.
+
+    PayPal: http://www.pledgie.com/campaigns/19122
+    Gittip: https://www.gittip.com/guillermooo/
+
+I'm the creator and main author of Vintageous, but some generous people have
+contributed their time and effort as well. See the more active ones here; you
+may want to show them some gratitude too:
+
+https://github.com/guillermooo/Vintageous/graphs/contributors
+
+Thanks for reading and for using Vintageous!
+
+Guillermo

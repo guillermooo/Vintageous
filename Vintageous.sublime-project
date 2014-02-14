@@ -3,30 +3,37 @@
 	[
 		{
 			"name": "Vintageus: Debug",
-			"working_dir": "${project_path}",
 			"shell_cmd": "./build.sh",
-			"windows": { "shell_cmd": "powershell -noninteractive -file \"$project_path\\bin\\Build.ps1\"" }
+			"windows":
+			{
+				"shell_cmd": "powershell -noninteractive -file \"$project_path\\bin\\Build.ps1\""
+			},
+			"working_dir": "${project_path}"
 		},
-
 		{
 			"name": "Vintageous: Release",
-			"working_dir": "${project_path}",
 			"shell_cmd": "./build.sh --release release",
-			"windows": { "shell_cmd": "powershell -noninteractive -file \"$project_path\\bin\\Build.ps1\" -release -dontupload" }
+			"windows":
+			{
+				"shell_cmd": "powershell -noninteractive -file \"$project_path\\bin\\Build.ps1\" -release -dontupload"
+			},
+			"working_dir": "${project_path}"
 		}
 	],
-
-	"settings":
-	{
-		"ensure_new_line_at_eof_on_save": true,
-		"trim_trailing_white_space_on_save": true
-	},
-
 	"folders":
 	[
 		{
 			"follow_symlinks": true,
 			"path": "."
+		},
+		{
+			"follow_symlinks": true,
+			"path": ".hg\\patches"
 		}
-	]
+	],
+	"settings":
+	{
+		"ensure_new_line_at_eof_on_save": true,
+		"trim_trailing_white_space_on_save": true
+	}
 }
