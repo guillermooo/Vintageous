@@ -81,7 +81,34 @@ class modes:
     REPLACE = 'mode_replace'
     NORMAL_INSERT = 'mode_normal_insert'
     SELECT ='mode_select'
-
+    @staticmethod
+    def to_friendly_name(mode):
+        # if name == COMMAND_LINE:
+            # return 'INSERT'
+        if mode == modes.INSERT:
+            return 'INSERT'
+        if mode == modes.INTERNAL_NORMAL:
+            return ''
+        if mode == modes.NORMAL:
+            return ''
+        if mode == modes.OPERATOR_PENDING:
+            return ''
+        if mode == modes.VISUAL:
+            return 'VISUAL'
+        if mode == modes.VISUAL_BLOCK:
+            return 'VISUAL BLOCK'
+        if mode == modes.VISUAL_LINE:
+            return 'VISUAL LINE'
+        if mode == modes.UNKNOWN:
+            return 'UNKNOWN'
+        if mode == modes.REPLACE:
+            return 'REPLACE'
+        if mode == modes.NORMAL_INSERT:
+            return 'INSERT'
+        if mode == modes.SELECT:
+            return 'SELECT'
+        else:
+            return 'REALLY UNKNOWN'
 
 class input_types:
     """

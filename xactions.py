@@ -239,10 +239,8 @@ class _enter_normal_mode(ViTextCommandBase):
                                 })
             self.view.sel().clear()
             self.view.sel().add_all(sels)
-
         state.xpos = self.view.rowcol(self.view.sel()[0].b)[1]
-
-
+        sublime.status_message('')
 class _enter_normal_mode_impl(sublime_plugin.TextCommand):
     def run(self, edit, mode=None):
         def f(view, s):
@@ -305,8 +303,8 @@ class _enter_normal_mode_impl(sublime_plugin.TextCommand):
 class _enter_select_mode(ViWindowCommandBase):
     def run(self, mode=None, count=1):
         self.state.enter_select_mode()
-
-
+        state = State(self.window.active_view())
+        state.display_status()
 class _enter_insert_mode(ViWindowCommandBase):
     def run(self, mode=None, count=1):
         self.window.active_view().settings().set('inverse_caret_state', False)
@@ -314,8 +312,7 @@ class _enter_insert_mode(ViWindowCommandBase):
         state = self.state
         state.enter_insert_mode()
         state.normal_insert_count = str(count)
-
-
+        state.display_status()
 class _enter_visual_mode(ViTextCommandBase):
     def run(self, edit, mode=None):
 
@@ -323,11 +320,9 @@ class _enter_visual_mode(ViTextCommandBase):
         if state.mode == modes.VISUAL:
             self.view.run_command('_enter_normal_mode', {'mode': mode})
             return
-
         self.view.run_command('_enter_visual_mode_impl', {'mode': mode})
         state.enter_visual_mode()
-
-
+        state.display_status()
 class _enter_visual_mode_impl(sublime_plugin.TextCommand):
     """
     Transforms the view's selections. We don't do this inside the EnterVisualMode
@@ -350,11 +345,9 @@ class _enter_visual_line_mode(ViTextCommandBase):
         if state.mode == modes.VISUAL_LINE:
             self.view.run_command('_enter_normal_mode', {'mode': mode})
             return
-
         self.view.run_command('_enter_visual_line_mode_impl', {'mode': mode})
         state.enter_visual_line_mode()
-
-
+        state.display_status()
 class _enter_visual_line_mode_impl(sublime_plugin.TextCommand):
     """
     Transforms the view's selections.
@@ -391,9 +384,8 @@ class _enter_replace_mode(ViTextCommandBase):
         state.view.set_overwrite_status(True)
         state.enter_replace_mode()
         regions_transformer(self.view, f)
+        state.display_status()
         state.reset()
-
-
 # TODO: Remove this command once we don't need it any longer.
 class ToggleMode(ViWindowCommandBase):
     def run(self):
@@ -555,12 +547,11 @@ class PressKey(ViWindowCommandBase):
             return
 
         state.sequence += key
-
         if not state.recording_macro:
-            sublime.status_message(state.sequence)
+            state.display_status()
+            # sublime.status_message(state.sequence)
         else:
             sublime.status_message('[Vintageous] Recording')
-
         if state.capture_register:
             state.register = key
             state.partial_sequence = ''
@@ -2077,8 +2068,8 @@ class _vi_q(IrreversibleTextCommand):
                 cmds.append([c['command'], c['args']])
             state.last_macro = cmds
             state.recording_macro = False
+            sublime.status_message('')
             return
-
         self.view.run_command('toggle_record_macro')
         state.recording_macro = True
         sublime.status_message('[Vintageous] Recording macro...')

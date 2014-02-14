@@ -498,10 +498,14 @@ class State(object):
 
     def reset_sequence(self):
         self.sequence = ''
+    def display_status(self):
+        msg = "{0} {1}"
+        mode_name = modes.to_friendly_name(self.mode)
+        mode_name = '-- {0} --'.format(mode_name) if mode_name else ''
+        sublime.status_message(msg.format(mode_name, self.sequence))
 
     def reset_partial_sequence(self):
         self.partial_sequence = ''
-
     def reset_user_input(self):
         self.input_parsers = []
         self.user_input = ''
@@ -523,12 +527,8 @@ class State(object):
         # Resets all temporary data needed to build a command or partial
         # command to their default values.
         self.update_xpos()
-
         if self.must_scroll_into_view():
             self.scroll_into_view()
-        if not self.recording_macro:
-            sublime.status_message('')
-
         self.action = None
         self.motion = None
         self.action_count = ''
