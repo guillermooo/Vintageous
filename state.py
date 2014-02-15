@@ -75,6 +75,7 @@ def _init_vintageous(view, new_session=False):
         return
 
     state.logger.info('[_init_vintageous] running init')
+
     if state.mode in (modes.VISUAL, modes.VISUAL_LINE):
         # TODO: Don't we need to pass a mode here?
         view.window().run_command('_enter_normal_mode', {'from_init': True})
@@ -82,6 +83,7 @@ def _init_vintageous(view, new_session=False):
     elif state.mode in (modes.INSERT, modes.REPLACE):
         # TODO: Don't we need to pass a mode here?
         view.window().run_command('_enter_normal_mode', {'from_init': True})
+
     elif (view.has_non_empty_selection_region() and len(view.sel()) > 1 and
           state.mode != modes.VISUAL):
           # Runs, for example, when we've performed a search via ST3 search
