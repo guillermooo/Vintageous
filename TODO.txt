@@ -1,6 +1,9 @@
 INBOX
 =====
 
+push wiki
+push stuff
+
 registers as keys ???
 parsers after motion
 

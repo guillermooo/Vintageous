@@ -25,6 +25,7 @@ CHANGES
     - Implement sidebar toggle in normal mode.
     - Fix return value in d command.
     - Convenience commands now provide feedback to the user.
+    - Implement cursor keys in visual modes.
 
 2.9.2
 
