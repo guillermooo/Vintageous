@@ -16,6 +16,8 @@ from Vintageous.vi.sublime import show_ipanel
 from Vintageous.vi.utils import modes
 from Vintageous.state import VintageState
 from Vintageous.vi.utils import mark_as_widget
+
+
 def plugin_loaded():
     v = sublime.active_window().active_view()
     state = VintageState(v)

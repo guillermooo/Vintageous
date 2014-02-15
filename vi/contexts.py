@@ -6,6 +6,8 @@ from Vintageous.vi.utils import modes
 # from Vintageous.vi import constants
 from Vintageous.vi import utils
 # from Vintageous.vi.constants import action_to_namespace
+
+
 class KeyContext(object):
     def __get__(self, instance, owner):
         self.state = instance

@@ -8,6 +8,8 @@ import re
 
 
 logging.basicConfig(level=logging.INFO)
+
+
 def mark_as_widget(view):
     """
     Marks @view as a widget so we can later inspect that attribute, for
