@@ -304,8 +304,17 @@ class _enter_normal_mode_impl(sublime_plugin.TextCommand):
 class _enter_select_mode(ViWindowCommandBase):
     def run(self, mode=None, count=1):
         self.state.enter_select_mode()
-        state = State(self.window.active_view())
+
+        view = self.window.active_view()
+
+        # If there are no visual selections, do some work work for the user.
+        if not view.has_non_empty_selection_region():
+            self.window.run_command('find_under_expand')
+
+        state = State(view)
         state.display_status()
+
+
 class _enter_insert_mode(ViWindowCommandBase):
     def run(self, mode=None, count=1):
         self.window.active_view().settings().set('inverse_caret_state', False)
@@ -314,6 +323,8 @@ class _enter_insert_mode(ViWindowCommandBase):
         state.enter_insert_mode()
         state.normal_insert_count = str(count)
         state.display_status()
+
+
 class _enter_visual_mode(ViTextCommandBase):
     def run(self, edit, mode=None):
 
@@ -324,6 +335,8 @@ class _enter_visual_mode(ViTextCommandBase):
         self.view.run_command('_enter_visual_mode_impl', {'mode': mode})
         state.enter_visual_mode()
         state.display_status()
+
+
 class _enter_visual_mode_impl(sublime_plugin.TextCommand):
     """
     Transforms the view's selections. We don't do this inside the EnterVisualMode
@@ -2120,3 +2133,12 @@ class _enter_visual_block_mode(ViTextCommandBase):
 
         if not self.view.has_non_empty_selection_region():
             regions_transformer(self.view, f)
+
+
+class _vi_select_j(ViWindowCommandBase):
+    def run(self, count=1, mode=None):
+        if mode != modes.SELECT:
+            raise ValueError('wrong mode')
+
+        for i in range(count):
+            self.window.run_command('find_under_expand')

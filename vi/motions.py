@@ -8,8 +8,8 @@ def vi_j(state, **kwargs):
     cmd = {}
 
     if state.mode == modes.SELECT:
-        cmd['motion'] = 'find_under_expand'
-        cmd['motion_args'] = {}
+        cmd['motion'] = '_vi_select_j'
+        cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
     cmd['motion'] = '_vi_j'
@@ -486,12 +486,14 @@ def vi_i_text_object(state, **kwargs):
     return cmd
 
 
+# TODO: Make this an action, not a motion.
 def vi_k_select(state):
     """
     Non-standard.
     """
     if state.mode != modes.SELECT:
         raise ValueError('bad mode, expected mode_select, got {0}'.format(state.mode))
+
     cmd = {}
     cmd['motion'] = 'soft_undo'
     cmd['motion_args'] = {} # {'mode': state.mode, 'count': state.count}
