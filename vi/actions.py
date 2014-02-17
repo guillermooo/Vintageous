@@ -474,6 +474,12 @@ def vi_ctrl_a(state, **kwargs):
 
 def vi_big_j(state, **kwargs):
     cmd = {}
+
+    if state.mode == modes.SELECT:
+        cmd['action'] = '_vi_select_big_j'
+        cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+        return cmd
+
     cmd['action'] = '_vi_big_j'
     cmd['action_args'] = {'mode': state.mode, 'count': state.count}
     return cmd
@@ -618,6 +624,7 @@ def vi_ctrl_k_ctrl_b(state):
     cmd['action'] = 'toggle_side_bar'
     cmd['action_args'] = {}
     return cmd
+
 
 def vi_ctrl_v(state):
     cmd = {}

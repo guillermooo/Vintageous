@@ -619,6 +619,7 @@ cmd_defs[modes.SELECT][cmds.J] =        dict(name=cmds.J,           input=None, 
 cmd_defs[modes.SELECT][cmds.L] =        dict(name=cmds.L,           input=None, type=cmd_types.MOTION, multi_step=False)
 cmd_defs[modes.SELECT][cmds.K] =        dict(name=cmds.K_SELECT,    input=None, type=cmd_types.MOTION, multi_step=False)
 cmd_defs[modes.SELECT][cmds.BIG_A] =    dict(name=cmds.BIG_A,       input=None, type=cmd_types.ACTION, multi_step=False, motion_required=False, repeatable=False)
+cmd_defs[modes.SELECT][cmds.BIG_J] =    dict(name=cmds.BIG_J,       input=None, type=cmd_types.ACTION, multi_step=False, motion_required=False, repeatable=False)
 
 
 def seq_to_command(state, seq):
@@ -1372,6 +1373,7 @@ mappings = {
         seqs.BIG_A: cmd_defs[modes.SELECT][cmds.BIG_A],
         seqs.I: cmd_defs[modes.SELECT][cmds.I],
         seqs.J: cmd_defs[modes.SELECT][cmds.J],
+        seqs.BIG_J: cmd_defs[modes.SELECT][cmds.BIG_J],
         seqs.K: cmd_defs[modes.SELECT][cmds.K],
         seqs.L: cmd_defs[modes.SELECT][cmds.L],
     },

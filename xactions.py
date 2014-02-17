@@ -1923,6 +1923,18 @@ class _vi_modify_numbers(sublime_plugin.TextCommand):
             self.view.sel().add(sublime.Region(self.view.text_point(row, col)))
 
 
+class _vi_select_big_j(IrreversibleTextCommand):
+    """
+    Active in select mode. Clears multiple selections and returns to normal
+    mode. Should be more convenient than having to reach for Esc.
+    """
+    def run(self, mode=None, count=1):
+        s = self.view.sel()[0]
+        self.view.sel().clear()
+        self.view.sel().add(s)
+        self.view.run_command('_enter_normal_mode', {'mode': mode})
+
+
 class _vi_big_j(sublime_plugin.TextCommand):
     WHITE_SPACE = ' \t'
 
