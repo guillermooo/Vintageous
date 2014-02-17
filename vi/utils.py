@@ -24,8 +24,21 @@ def mark_as_widget(view):
 def is_view(view):
     """
     Returns `True` if @view is a normal view as Vintageous understands them.
+
+    It returns `False` for views that have a `__vi_external_disable`
+    setting set to `True`.
     """
-    return (not is_widget(view)) and (not is_console(view))
+    return not any((is_widget(view), is_console(view), is_ignored(view)))
+
+
+def is_ignored(view):
+    """
+    Returns `True` if the view wants to be ignored by Vintageous.
+
+    Useful for external plugins that don't want Vintageous to be active for
+    specific views.
+    """
+    return view.settings().get('__vi_external_disable', False)
 
 
 def is_widget(view):

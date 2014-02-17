@@ -51,10 +51,14 @@ def _init_vintageous(view, new_session=False):
     """
 
     if not is_view(view):
-        # XXX: This seems to be necessary here.
         # Abort if we got a widget, panel...
-        view.settings().set('command_mode', False)
-        view.settings().set('inverse_caret_state', False)
+        try:
+            # XXX: All this seems to be necessary here.
+            view.settings().set('command_mode', False)
+            view.settings().set('inverse_caret_state', False)
+            view.settings().erase('vintage')
+        except AttributeError:
+            pass
         return
 
     state = State(view)
