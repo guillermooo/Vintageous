@@ -24,6 +24,7 @@ from Vintageous.vi.utils import directions
 from Vintageous.vi.utils import get_logger
 from Vintageous.vi.utils import input_types
 from Vintageous.vi.utils import is_view
+from Vintageous.vi.utils import is_ignored
 from Vintageous.vi.utils import jump_directions
 from Vintageous.vi.utils import modes
 
@@ -58,6 +59,9 @@ def _init_vintageous(view, new_session=False):
             view.settings().set('command_mode', False)
             view.settings().set('inverse_caret_state', False)
             view.settings().erase('vintage')
+            if is_ignored(view):
+                # Someone has intentionally disabled Vintageous, so let the user know.
+                sublime.status_message('Vintageous: Vim emulation disabled for the current view')
         except AttributeError:
             _logger().info('[_init_vintageous] probably received the console view')
             pass
