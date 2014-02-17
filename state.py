@@ -52,12 +52,14 @@ def _init_vintageous(view, new_session=False):
 
     if not is_view(view):
         # Abort if we got a widget, panel...
+        _logger().info('[_init_vintageous] ignoring view: {0}'.format(view.name() or view.file_name() or '<???>'))
         try:
             # XXX: All this seems to be necessary here.
             view.settings().set('command_mode', False)
             view.settings().set('inverse_caret_state', False)
             view.settings().erase('vintage')
         except AttributeError:
+            _logger().info('[_init_vintageous] probably received the console view')
             pass
         return
 
