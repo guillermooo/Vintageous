@@ -27,8 +27,7 @@
 			"path": "."
 		},
 		{
-			"follow_symlinks": true,
-			"path": ".hg\\patches"
+			"follow_symlinks": true
 		}
 	],
 	"settings":

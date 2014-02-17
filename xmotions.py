@@ -453,27 +453,31 @@ class _vi_j(ViTextCommandBase):
             # Don't do anything if we have reversed selections.
             if any((r.b < r.a) for r in self.view.sel()):
                 return
-            # FIXME: When there are multiple rectangular selections, S3 considers sel 0 to be the
-            # active one in all cases, so we can't know the 'direction' of such a selection and,
-            # therefore, we can't shrink it when we press k or j. We can only easily expand it.
-            # We could, however, have some more global state to keep track of the direction of
-            # visual block selections.
-            row, rect_b = self.view.rowcol(self.view.sel()[-1].b - 1)
-            # Don't do anything if the next row is empty or too short. Vim does a crazy thing: it
-            # doesn't select it and it doesn't include it in actions, but you have to still navigate
-            # your way through them.
-            # TODO: Match Vim's behavior.
-            if state.visual_block_direction == directions.DOWN:
-                next_line = self.view.line(self.view.text_point(row + 1, 0))
-                if next_line.empty() or self.view.rowcol(next_line.b)[1] < rect_b:
-                    return
 
-                max_size = max(r.size() for r in self.view.sel())
-                row, col = self.view.rowcol(self.view.sel()[-1].a)
-                start = self.view.text_point(row + 1, col)
-                new_region = sublime.Region(start, start + max_size)
-                self.view.sel().add(new_region)
-                # FIXME: Perhaps we should scroll into view in a more general way...
+            if state.visual_block_direction == directions.DOWN:
+                for i in range(count):
+                    # FIXME: When there are multiple rectangular selections, S3 considers sel 0 to be the
+                    # active one in all cases, so we can't know the 'direction' of such a selection and,
+                    # therefore, we can't shrink it when we press k or j. We can only easily expand it.
+                    # We could, however, have some more global state to keep track of the direction of
+                    # visual block selections.
+                    row, rect_b = self.view.rowcol(self.view.sel()[-1].b - 1)
+
+                    # Don't do anything if the next row is empty or too short. Vim does a crazy thing: it
+                    # doesn't select it and it doesn't include it in actions, but you have to still navigate
+                    # your way through them.
+                    # TODO: Match Vim's behavior.
+                    next_line = self.view.line(self.view.text_point(row + 1, 0))
+                    if next_line.empty() or self.view.rowcol(next_line.b)[1] < rect_b:
+                        return
+
+                    max_size = max(r.size() for r in self.view.sel())
+                    row, col = self.view.rowcol(self.view.sel()[-1].a)
+                    start = self.view.text_point(row + 1, col)
+                    new_region = sublime.Region(start, start + max_size)
+                    self.view.sel().add(new_region)
+                    # FIXME: Perhaps we should scroll into view in a more general way...
+
                 self.view.show(new_region, False)
                 return
 
@@ -597,23 +601,25 @@ class _vi_k(ViTextCommandBase):
             if any((r.b < r.a) for r in self.view.sel()):
                 return
 
-            rect_b = max(self.view.rowcol(r.b - 1)[1] for r in self.view.sel())
-            row, rect_a = self.view.rowcol(self.view.sel()[0].a)
-
             if state.visual_block_direction == directions.UP:
-                previous_line = self.view.line(self.view.text_point(row - 1, 0))
-                # Don't do anything if previous row is empty. Vim does crazy stuff in that case.
-                # Don't do anything either if the previous line can't accomodate a rectangular selection
-                # of the required size.
-                if (previous_line.empty() or
-                    self.view.rowcol(previous_line.b)[1] < rect_b):
-                        return
-                rect_size = max(r.size() for r in self.view.sel())
-                rect_a_pt = self.view.text_point(row - 1, rect_a)
-                new_region = sublime.Region(rect_a_pt, rect_a_pt + rect_size)
-                self.view.sel().add(new_region)
-                # FIXME: We should probably scroll into view in a more general way.
-                #        Or maybe every motion should handle this on their own.
+
+                for i in range(count):
+                    rect_b = max(self.view.rowcol(r.b - 1)[1] for r in self.view.sel())
+                    row, rect_a = self.view.rowcol(self.view.sel()[0].a)
+                    previous_line = self.view.line(self.view.text_point(row - 1, 0))
+                    # Don't do anything if previous row is empty. Vim does crazy stuff in that case.
+                    # Don't do anything either if the previous line can't accomodate a rectangular selection
+                    # of the required size.
+                    if (previous_line.empty() or
+                        self.view.rowcol(previous_line.b)[1] < rect_b):
+                            return
+                    rect_size = max(r.size() for r in self.view.sel())
+                    rect_a_pt = self.view.text_point(row - 1, rect_a)
+                    new_region = sublime.Region(rect_a_pt, rect_a_pt + rect_size)
+                    self.view.sel().add(new_region)
+                    # FIXME: We should probably scroll into view in a more general way.
+                    #        Or maybe every motion should handle this on their own.
+
                 self.view.show(new_region, False)
                 return
 
