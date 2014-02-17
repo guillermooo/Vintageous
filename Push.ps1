@@ -1,3 +1,5 @@
+param([switch]$Force)
+
 # This script ensures that we abort pushing if we have unfinzalied Mercurial patches.
 #
 # hg-git has bug that will break the local repository if we do all the following things:
@@ -11,7 +13,8 @@
 # 	2. git must be defined under [paths] in .hg/hgrc
 # 	3. 'push' must be disabled under [alias] in .hg/hgrc
 
-if (& hg qseries) {
+
+if (!$Force -and (& hg qseries)) {
 	write-host "Cannot push: unfinalized patches" -foregroundcolor RED
 	exit
 }
