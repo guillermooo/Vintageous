@@ -1,12 +1,11 @@
 INBOX
 =====
 
-push wiki
-push stuff
-
-registers as keys ???
+change key names to C-a, etc.
+improve parser management
 parsers after motion
 
+registers as keys ???
 
 add yank(reg) method to ViTextCommandBase
 new build sys: reload pacakge, don't restart sublime :: Vintageous dev-tools package?
