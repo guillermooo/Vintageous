@@ -1,4 +1,4 @@
-2.9.4 - 17/02/13
+2.9.4 - 17/02/14
 
 	- Enable cursor keys in visual modes.
 	- Re-enable basic visual block mode.
@@ -18,7 +18,7 @@
 	- Add more feedback to users.
 	- Esc only hides output panels when it's the only job left to be done.
 
-2.9.3 - 14/02/13
+2.9.3 - 14/02/14
 
     - Fix z actions.
     - Print status info to status bar.
@@ -32,7 +32,7 @@
     - Convenience commands now provide feedback to the user.
     - Implement cursor keys in visual modes.
 
-2.9.2 - 13/02/13
+2.9.2 - 13/02/14
 
 	- Prevent Esc key from hiding output panels in some cases.
 	- Implement staple ST3 function keys in normal mode.
@@ -52,13 +52,13 @@
 	- Add convenience commands to Command Palette:
 	     * Toggle Vim Ctrl Keys: toggles usage of modified Vim keys.
 
-2.9.1 - 12/02/13
+2.9.1 - 12/02/14
 
 	- Fix overridden 'super' key bindings.
 	- Reinstate 'vi_use_ctrl_keys' context and 'vintageous_use_ctrl_keys'
 	  setting.
 
-2.9.0 - 12/02/13
+2.9.0 - 12/02/14
 
 	- New core.
 	- New bugs.
