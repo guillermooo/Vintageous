@@ -21,11 +21,13 @@ from Vintageous.vi.search import find_wrapping
 from Vintageous.vi.search import reverse_find_wrapping
 from Vintageous.vi.search import reverse_search
 from Vintageous.vi.search import reverse_search_by_pt
+from Vintageous.state import State
+from Vintageous.vi.text_objects import get_text_object_region
 from Vintageous.vi.utils import col_at
+from Vintageous.vi.utils import directions
 from Vintageous.vi.utils import IrreversibleTextCommand
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import regions_transformer
-from Vintageous.vi.text_objects import get_text_object_region
 
 
 class _vi_find_in_line(ViTextCommandBase):
@@ -421,6 +423,7 @@ class _vi_j(ViTextCommandBase):
                         end = end - 1 if not crosses_a else end
                         return sublime.Region(s.a, end)
 
+
             if mode == modes.VISUAL_LINE:
                 if s.a < s.b:
                     current_row = view.rowcol(s.b - 1)[0]
@@ -441,7 +444,12 @@ class _vi_j(ViTextCommandBase):
 
             return s
 
+        state = State(self.view)
+
         if mode == modes.VISUAL_BLOCK:
+            if len(self.view.sel()) == 1:
+                state.visual_block_direction = directions.DOWN
+
             # Don't do anything if we have reversed selections.
             if any((r.b < r.a) for r in self.view.sel()):
                 return
@@ -455,17 +463,24 @@ class _vi_j(ViTextCommandBase):
             # doesn't select it and it doesn't include it in actions, but you have to still navigate
             # your way through them.
             # TODO: Match Vim's behavior.
-            next_line = self.view.line(self.view.text_point(row + 1, 0))
-            if next_line.empty() or self.view.rowcol(next_line.b)[1] < rect_b:
+            if state.visual_block_direction == directions.DOWN:
+                next_line = self.view.line(self.view.text_point(row + 1, 0))
+                if next_line.empty() or self.view.rowcol(next_line.b)[1] < rect_b:
+                    return
+
+                max_size = max(r.size() for r in self.view.sel())
+                row, col = self.view.rowcol(self.view.sel()[-1].a)
+                start = self.view.text_point(row + 1, col)
+                new_region = sublime.Region(start, start + max_size)
+                self.view.sel().add(new_region)
+                # FIXME: Perhaps we should scroll into view in a more general way...
+                self.view.show(new_region, False)
                 return
 
-            max_size = max(r.size() for r in self.view.sel())
-            row, col = self.view.rowcol(self.view.sel()[-1].a)
-            start = self.view.text_point(row + 1, col)
-            new_region = sublime.Region(start, start + max_size)
-            self.view.sel().add(new_region)
-            # FIXME: Perhaps we should scroll into view in a more general way...
-            self.view.show(new_region, False)
+            else:
+                # Must delete last sel.
+                self.view.sel().subtract(self.view.sel()[0])
+                return
 
         regions_transformer(self.view, f)
 
@@ -572,28 +587,40 @@ class _vi_k(ViTextCommandBase):
 
                     return sublime.Region(s.a, view.full_line(target_pt).a)
 
+        state = State(self.view)
+
         if mode == modes.VISUAL_BLOCK:
+            if len(self.view.sel()) == 1:
+                state.visual_block_direction = directions.UP
+
             # Don't do anything if we have reversed selections.
             if any((r.b < r.a) for r in self.view.sel()):
                 return
 
             rect_b = max(self.view.rowcol(r.b - 1)[1] for r in self.view.sel())
             row, rect_a = self.view.rowcol(self.view.sel()[0].a)
-            previous_line = self.view.line(self.view.text_point(row - 1, 0))
-            # Don't do anything if previous row is empty. Vim does crazy stuff in that case.
-            # Don't do anything either if the previous line can't accomodate a rectangular selection
-            # of the required size.
-            if (previous_line.empty() or
-                self.view.rowcol(previous_line.b)[1] < rect_b):
-                    return
-            rect_size = max(r.size() for r in self.view.sel())
-            rect_a_pt = self.view.text_point(row - 1, rect_a)
-            new_region = sublime.Region(rect_a_pt, rect_a_pt + rect_size)
-            self.view.sel().add(new_region)
-            # FIXME: We should probably scroll into view in a more general way.
-            #        Or maybe every motion should handle this on their own.
-            self.view.show(new_region, False)
-            return
+
+            if state.visual_block_direction == directions.UP:
+                previous_line = self.view.line(self.view.text_point(row - 1, 0))
+                # Don't do anything if previous row is empty. Vim does crazy stuff in that case.
+                # Don't do anything either if the previous line can't accomodate a rectangular selection
+                # of the required size.
+                if (previous_line.empty() or
+                    self.view.rowcol(previous_line.b)[1] < rect_b):
+                        return
+                rect_size = max(r.size() for r in self.view.sel())
+                rect_a_pt = self.view.text_point(row - 1, rect_a)
+                new_region = sublime.Region(rect_a_pt, rect_a_pt + rect_size)
+                self.view.sel().add(new_region)
+                # FIXME: We should probably scroll into view in a more general way.
+                #        Or maybe every motion should handle this on their own.
+                self.view.show(new_region, False)
+                return
+
+            else:
+                # Must remove last selection.
+                self.view.sel().subtract(self.view.sel()[-1])
+                return
 
         regions_transformer(self.view, f)
 

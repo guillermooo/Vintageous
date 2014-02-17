@@ -226,3 +226,11 @@ def translate_char(char):
         return ' '
     else:
         return char
+
+
+class directions:
+    NONE = 0
+    UP = 1
+    DOWN = 2
+    LEFT = 3
+    RIGHT = 4

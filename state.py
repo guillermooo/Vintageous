@@ -4,27 +4,28 @@ import logging
 import sublime
 import sublime_plugin
 
-from Vintageous.vi import actions
-from Vintageous.vi import motions
-from Vintageous.vi.keys import cmds
-from Vintageous.vi.keys import cmd_types
-from Vintageous.vi.keys import mappings
-from Vintageous.vi.keys import user_mappings
-from Vintageous.vi.keys import seq_to_command
-from Vintageous.vi.keys import parse_sequence
-from Vintageous.vi import utils
-from Vintageous.vi.utils import modes
-from Vintageous.vi.utils import input_types
-from Vintageous.vi.settings import SettingsManager
-from Vintageous.vi import inputs
-from Vintageous.vi.registers import Registers
-from Vintageous.vi.marks import Marks
-from Vintageous.vi.utils import jump_directions
-from Vintageous.vi.utils import get_logger
-from Vintageous.vi.sublime import is_view
-from Vintageous.vi.dot_file import DotFile
 from Vintageous import local_logger
+from Vintageous.vi import actions
+from Vintageous.vi import inputs
+from Vintageous.vi import motions
+from Vintageous.vi import utils
+from Vintageous.vi.keys import cmd_types
+from Vintageous.vi.keys import cmds
 from Vintageous.vi.contexts import KeyContext
+from Vintageous.vi.dot_file import DotFile
+from Vintageous.vi.keys import mappings
+from Vintageous.vi.keys import parse_sequence
+from Vintageous.vi.keys import seq_to_command
+from Vintageous.vi.keys import user_mappings
+from Vintageous.vi.marks import Marks
+from Vintageous.vi.registers import Registers
+from Vintageous.vi.settings import SettingsManager
+from Vintageous.vi.utils import directions
+from Vintageous.vi.utils import get_logger
+from Vintageous.vi.utils import input_types
+from Vintageous.vi.utils import is_view
+from Vintageous.vi.utils import jump_directions
+from Vintageous.vi.utils import modes
 
 
 # ============================================================================
@@ -442,19 +443,33 @@ class State(object):
         """
         return self.settings.vi['xpos'] or 0
 
-    @property
-    def logger(self):
-        # FIXME: potentially very slow?
-        # return get_logger()
-        global _logger
-        return _logger()
-
     @xpos.setter
     def xpos(self, value):
         if not isinstance(value, int):
             raise ValueError('xpos must be an int')
 
         self.settings.vi['xpos'] = value
+
+    @property
+    def visual_block_direction(self):
+        """
+        Stores the current visual block direction for the current selection.
+        """
+        return self.settings.vi['visual_block_direction'] or directions.DOWN
+
+    @visual_block_direction.setter
+    def visual_block_direction(self, value):
+        if not isinstance(value, int):
+            raise ValueError('visual_block_direction must be an int')
+
+        self.settings.vi['visual_block_direction'] = value
+
+    @property
+    def logger(self):
+        # FIXME: potentially very slow?
+        # return get_logger()
+        global _logger
+        return _logger()
 
     @property
     def register(self):

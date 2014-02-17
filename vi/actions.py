@@ -215,6 +215,7 @@ def vi_o(state, **kwargs):
     if state.mode in (modes.VISUAL, modes.VISUAL_LINE):
         cmd['action'] = '_vi_visual_o'
         cmd['action_args'] = {'mode': state.mode, 'count': 1}
+
     else:
         cmd = {}
         cmd['action'] = '_vi_o'
