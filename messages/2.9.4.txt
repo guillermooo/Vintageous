@@ -1,0 +1,53 @@
+==============================================================================
+Vintageous 2.9.4
+==============================================================================
+
+CHANGES
+-------
+
+    - Enable cursor keys in visual modes.
+    - Re-enable basic visual block mode.
+    - Track movement direction while in visual block mode.
+    - Implement counts for j and k in visual block mode.
+    - Improve build scripts.
+    - Implement __vi_external_disable setting so plugins can disable
+      Vintageous for specific views (experimental).
+    - New convenience command (Command Palette):
+
+        * Exit from command mode - Focibly enters insert mode.
+
+    - Improve select mode: J returns to normal mode.
+    - Improve select mode: j supports counts and gh selects the first instance.
+    - C command glues subsequent editing operations until next normal mode.
+    - Add more logging.
+    - Add more feedback to users.
+    - Esc only hides output panels when it's the only job left to be done.
+
+
+FOUND BUGS?
+-----------
+
+Please report them here:
+
+    https://github.com/guillermooo/Vintageous/issues
+
+
+SUPPORT VINTAGEOUS
+------------------
+
+Is Vintageous worth your time? Developing Vintageous is hard work. If you use
+it often to get actual work done, please consider donating and make it worth
+my time too.
+
+    PayPal: http://www.pledgie.com/campaigns/19122
+    Gittip: https://www.gittip.com/guillermooo/
+
+I'm the creator and main author of Vintageous, but some generous people have
+contributed their time and effort as well. See the more active ones here; you
+may want to show them some gratitude too:
+
+https://github.com/guillermooo/Vintageous/graphs/contributors
+
+Thanks for reading and for using Vintageous!
+
+Guillermo

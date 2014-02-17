@@ -1,3 +1,23 @@
+2.9.4 - 17/02/13
+
+	- Enable cursor keys in visual modes.
+	- Re-enable basic visual block mode.
+	- Track movement direction while in visual block mode.
+	- Implement counts for j and k in visual block mode.
+	- Improve build scripts.
+	- Implement __vi_external_disable setting so plugins can disable
+	  Vintageous for specific views (experimental).
+	- New convenience command (Command Palette):
+
+		* Exit from command mode - Focibly enters insert mode.
+
+	- Improve select mode: J returns to normal mode.
+	- Improve select mode: j supports counts and gh selects the first instance.
+	- C command glues subsequent editing operations until next normal mode.
+	- Add more logging.
+	- Add more feedback to users.
+	- Esc only hides output panels when it's the only job left to be done.
+
 2.9.3 - 14/02/13
 
     - Fix z actions.
