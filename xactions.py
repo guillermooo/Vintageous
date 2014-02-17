@@ -201,10 +201,17 @@ class _enter_normal_mode(ViTextCommandBase):
         self.view.window().run_command('hide_auto_complete')
         self.view.window().run_command('hide_overlay')
 
-        if (not from_init and (mode == modes.NORMAL)) or not is_view(self.view):
+        if ((not from_init and (mode == modes.NORMAL) and not state.sequence) or
+             not is_view(self.view)):
             # When _enter_normal_mode is requested from _init_vintageous, we
             # should not hide output panels; hide them only if the user
-            # pressed Esc or a panel has the focus.
+            # pressed Esc and we're not cancelling partial state data, or if a
+            # panel has the focus.
+            # XXX: We are assuming that state.sequence will always be empty
+            #      when we do the check above. Is that so?
+            # XXX: The 'not is_view(self.view)' check above seems to be
+            #      redundant, since those views should be ignored by
+            #      Vintageous altogether.
             self.view.window().run_command('hide_panel', {'cancel': True})
 
         self.view.settings().set('command_mode', True)
