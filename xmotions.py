@@ -313,6 +313,22 @@ class _vi_h(ViTextCommandBase):
             # XXX: We should never reach this.
             return s
 
+        # For jagged selections (on the rhs), only those sticking out need to move leftwards.
+        # Example ([] denotes the selection):
+        #
+        #   10 foo bar foo [bar]
+        #   11 foo bar foo [bar foo bar]
+        #   12 foo bar foo [bar foo]
+        #
+        #  Only lines 11 and 12 should move when we press h.
+        baseline = 0
+        if mode == modes.VISUAL_BLOCK:
+            sel = self.view.sel()[0]
+            if sel.a < sel.b:
+                min_ = min(self.view.rowcol(r.b - 1)[1] for r in self.view.sel())
+                if any(self.view.rowcol(r.b - 1)[1] != min_ for r in self.view.sel()):
+                    baseline = min_
+
         regions_transformer(self.view, f)
         state = self.state
         state.xpos = self.view.rowcol(self.view.sel()[0].b)[1]

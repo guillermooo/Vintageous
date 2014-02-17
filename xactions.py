@@ -2091,3 +2091,20 @@ class _vi_at(IrreversibleTextCommand):
 
         if not (state.gluing_sequence or state.recording_macro):
             self.view.run_command('glue_marked_undo_groups')
+
+
+class _enter_visual_block_mode(ViTextCommandBase):
+    def run(self, edit, mode=None):
+        def f(view, s):
+            return sublime.Region(s.b, s.b + 1)
+        # Handling multiple visual blocks seems quite hard, so ensure we only
+        # have one.
+        first = list(self.view.sel())[0]
+        self.view.sel().clear()
+        self.view.sel().add(first)
+
+        state = State(self.view)
+        state.enter_visual_block_mode()
+
+        if not self.view.has_non_empty_selection_region():
+            regions_transformer(self.view, f)

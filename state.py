@@ -498,6 +498,9 @@ class State(object):
     def enter_select_mode(self):
         self.mode = modes.SELECT
 
+    def enter_visual_block_mode(self):
+        self.mode = modes.VISUAL_BLOCK
+
     def reset_sequence(self):
         self.sequence = ''
     def display_status(self):

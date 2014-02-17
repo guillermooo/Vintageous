@@ -617,3 +617,9 @@ def vi_ctrl_k_ctrl_b(state):
     cmd['action'] = 'toggle_side_bar'
     cmd['action_args'] = {}
     return cmd
+
+def vi_ctrl_v(state):
+    cmd = {}
+    cmd['action'] = '_enter_visual_block_mode'
+    cmd['action_args'] = {'mode': state.mode}
+    return cmd
