@@ -11,12 +11,18 @@ if(!$?){
 	exit 1
 }
 
+& "py.exe" "-3.3" (join-path $script:thisDir "check.py") $typeOfBuild
+if ($LASTEXITCODE -ne 0) {
+	"publish aborted"
+	exit 1
+}
+
 $typeOfBuild = if ($Release) {"release"} else {"dev"}
 # Run with the required Python version.
 & "py.exe" "-3.3" (join-path $script:thisDir "builder.py") "--release" $typeOfBuild
 
 if ($LASTEXITCODE -ne 0) {
-   write-error "Could not run py.exe." 
+   write-error "could not run builder.py"
    exit 1
 }
 

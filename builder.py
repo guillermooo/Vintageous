@@ -12,8 +12,6 @@ THIS_DIR = os.path.abspath(os.path.dirname(__file__))
 RESERVED = ['manifest.json', 'dist']
 
 
-
-
 def get_manifest():
     path = os.path.join(THIS_DIR, 'manifest.json')
     with open(path) as f:
