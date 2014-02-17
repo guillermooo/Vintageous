@@ -123,6 +123,24 @@ class ResetVintageous(sublime_plugin.WindowCommand):
         print("Package.Vintageous: State reset.")
         sublime.status_message("Vintageous: State reset")
 
+
+class ForceExitFromCommandMode(sublime_plugin.WindowCommand):
+    """
+    A sort of a panic button.
+    """
+    def run(self):
+        v = self.window.active_view()
+        v.settings().erase('vintage')
+        # XXX: What happens exactly when the user presses Esc again now? Which
+        #      more are we in?
+
+        v.settings().set('command_mode', False)
+        v.settings().set('inverse_caret_state', False)
+
+        print("Vintageous: Exiting from command mode.")
+        sublime.status_message("Vintageous: Exiting from command mode.")
+
+
 class VintageousToggleCtrlKeys(sublime_plugin.WindowCommand):
     def run(self):
         prefs = sublime.load_settings('Preferences.sublime-settings')
@@ -132,6 +150,7 @@ class VintageousToggleCtrlKeys(sublime_plugin.WindowCommand):
         status = 'enabled' if (not value) else 'disabled'
         print("Package.Vintageous: Use of Ctrl- keys {0}.".format(status))
         sublime.status_message("Vintageous: Use of Ctrl- keys {0}".format(status))
+
 
 class ReloadVintageousSettings(sublime_plugin.TextCommand):
     def run(self, edit):
