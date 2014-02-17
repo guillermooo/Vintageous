@@ -148,6 +148,7 @@ def vi_big_c(state):
     cmd = {}
     cmd['action'] = '_vi_big_c'
     cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    state.glue_until_normal_mode = True
     return cmd
 
 
