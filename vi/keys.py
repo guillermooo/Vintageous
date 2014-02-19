@@ -152,7 +152,7 @@ class cmds:
     BIG_R = 'vi_big_r'
     BIG_S = 'vi_big_s'
     BIG_T = 'vi_big_t'
-    BIG_U = 'vi_U'
+    BIG_U = 'vi_big_u'
     BIG_V = 'vi_big_v'
     BIG_W = 'vi_W'
     BIG_X = 'vi_big_x'
@@ -568,6 +568,7 @@ cmd_defs = {
         cmds.U:                         dict(name=cmds.U,                           input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.V:                         dict(name=cmds.V,                           input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.X:                         dict(name=cmds.X,                           input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
+        cmds.BIG_U:                     dict(name=cmds.BIG_U,                       input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
         cmds.A:                         dict(name=cmds.A,                           input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.BIG_A:                     dict(name=cmds.BIG_A,                       input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.BIG_I:                     dict(name=cmds.BIG_I,                       input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
@@ -831,6 +832,7 @@ mappings = {
         seqs.BIG_P: cmd_defs[modes.VISUAL][cmds.BIG_P],
         seqs.BIG_S: cmd_defs[modes.VISUAL][cmds.BIG_S],
         seqs.BIG_T: cmd_defs[modes.VISUAL][cmds.BIG_T],
+        seqs.BIG_U: cmd_defs[modes.VISUAL][cmds.BIG_U],
         seqs.BIG_V: cmd_defs[modes.VISUAL][cmds.BIG_V],
         seqs.BIG_W: cmd_defs[modes.VISUAL][cmds.BIG_W],
         seqs.BIG_X: cmd_defs[modes.VISUAL][cmds.BIG_X],
@@ -1117,6 +1119,7 @@ mappings = {
         seqs.BIG_R: cmd_defs[modes.VISUAL_LINE][cmds.BIG_R],
         seqs.BIG_S: cmd_defs[modes.VISUAL_LINE][cmds.BIG_S],
         seqs.BIG_T: cmd_defs[modes.VISUAL_LINE][cmds.BIG_T],
+        seqs.BIG_U: cmd_defs[modes.VISUAL_LINE][cmds.BIG_U],
         seqs.BIG_V: cmd_defs[modes.VISUAL_LINE][cmds.BIG_V],
         seqs.BIG_W: cmd_defs[modes.VISUAL_LINE][cmds.BIG_W],
         seqs.BIG_X: cmd_defs[modes.VISUAL_LINE][cmds.BIG_X],
@@ -1261,6 +1264,7 @@ mappings = {
         seqs.BIG_P: cmd_defs[modes.VISUAL_BLOCK][cmds.BIG_P],
         seqs.BIG_S: cmd_defs[modes.VISUAL_BLOCK][cmds.BIG_S],
         seqs.BIG_T: cmd_defs[modes.VISUAL_BLOCK][cmds.BIG_T],
+        seqs.BIG_U: cmd_defs[modes.VISUAL_BLOCK][cmds.BIG_U],
         seqs.BIG_V: cmd_defs[modes.VISUAL_BLOCK][cmds.BIG_V],
         seqs.BIG_W: cmd_defs[modes.VISUAL_BLOCK][cmds.BIG_W],
         seqs.BIG_X: cmd_defs[modes.VISUAL_BLOCK][cmds.BIG_X],

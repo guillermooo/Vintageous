@@ -174,10 +174,26 @@ def vi_gu(state):
 
 def vi_u(state):
     cmd = {}
+
+    if state.mode in (modes.VISUAL, modes.VISUAL_LINE, modes.VISUAL_BLOCK):
+        cmd['action'] = '_vi_visual_u'
+        cmd['action_args'] = {'count': state.count, 'mode': state.mode}
+        return cmd
+
     cmd['action'] = '_vi_u'
     cmd['action_args'] = {'count': state.count}
     return cmd
 
+
+def vi_big_u(state):
+    cmd = {}
+
+    if state.mode in (modes.VISUAL, modes.VISUAL_LINE, modes.VISUAL_BLOCK):
+        cmd['action'] = '_vi_visual_big_u'
+        cmd['action_args'] = {'count': state.count, 'mode': state.mode}
+        return cmd
+
+    return {}
 
 def vi_ctrl_r(state):
     cmd = {}

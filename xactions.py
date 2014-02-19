@@ -2143,6 +2143,24 @@ class _vi_g_tilde(ViTextCommandBase):
         self.enter_normal_mode(mode)
 
 
+class _vi_visual_u(ViTextCommandBase):
+    """
+    'u' action in visual modes.
+    """
+    def run(self, edit, mode=None, count=1):
+        for s in self.view.sel():
+            self.view.replace(edit, s, self.view.substr(s).lower())
+
+
+class _vi_visual_big_u(ViTextCommandBase):
+    """
+    'U' action in visual modes.
+    """
+    def run(self, edit, mode=None, count=1):
+        for s in self.view.sel():
+            self.view.replace(edit, s, self.view.substr(s).upper())
+
+
 class _vi_g_tilde_g_tilde(ViTextCommandBase):
     def run(self, edit, count=1, mode=None):
         def select(view, s):
