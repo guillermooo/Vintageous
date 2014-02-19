@@ -498,3 +498,12 @@ def vi_k_select(state):
     cmd['motion'] = 'soft_undo'
     cmd['motion_args'] = {} # {'mode': state.mode, 'count': state.count}
     return cmd
+
+
+def vi_gd(state):
+    cmd = {}
+    cmd['is_jump'] = True
+    cmd['motion'] = '_vi_go_to_symbol'
+    cmd['motion_args'] = {'mode': state.mode, 'count': state.count, 'globally': False}
+    return cmd
+

@@ -19,14 +19,6 @@ def vi_m(state):
     return cmd
 
 
-def vi_gd(state):
-    cmd = {}
-    cmd['is_jump'] = True
-    cmd['action'] = '_vi_go_to_symbol'
-    cmd['action_args'] = {'mode': state.mode, 'count': state.count, 'globally': False}
-    return cmd
-
-
 def vi_big_v(state):
     cmd = {}
     cmd['action'] = '_enter_visual_line_mode'

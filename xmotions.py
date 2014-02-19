@@ -1817,3 +1817,59 @@ class _vi_select_text_object(sublime_plugin.TextCommand):
             return s
 
         regions_transformer(self.view, f)
+
+
+class _vi_go_to_symbol(sublime_plugin.TextCommand):
+    """Go to local declaration. Differs from Vim because it leverages Sublime Text's ability to
+       actually locate symbols (Vim simply searches from the top of the file).
+    """
+    def find_symbol(self, r, globally=False):
+        query = self.view.substr(self.view.word(r))
+        fname = self.view.file_name().replace('\\', '/')
+
+        locations = self.view.window().lookup_symbol_in_index(query)
+        if not locations:
+            return
+
+        try:
+            if not globally:
+                location = [hit[2] for hit in locations if fname.endswith(hit[1])][0]
+                return location[0] - 1, location[1] - 1
+            else:
+                # TODO: There might be many symbols with the same name.
+                return locations[0]
+        except IndexError:
+            return
+
+
+    def run(self, edit, count=1, mode=None, globally=False):
+
+        def f(view, s):
+            if mode == modes.NORMAL:
+                return sublime.Region(location, location)
+
+            elif mode == modes.VISUAL:
+                return sublime.Region(s.a + 1, location)
+
+            elif mode == modes.INTERNAL_NORMAL:
+                return sublime.Region(s.a, location)
+
+            return s
+
+        current_sel = self.view.sel()[0]
+        self.view.sel().clear()
+        self.view.sel().add(current_sel)
+
+        location = self.find_symbol(current_sel, globally=globally)
+        if not location:
+            return
+
+        if globally:
+            # Global symbol; simply open the file; not a motion.
+            # TODO: Perhaps must be a motion if the target file happens to be the current one?
+            self.view.window().open_file(location[0] + ':' + ':'.join([str(x) for x in location[2]]), sublime.ENCODED_POSITION)
+            return
+
+        # Local symbol; select.
+        location = self.view.text_point(*location)
+        regions_transformer(self.view, f)
