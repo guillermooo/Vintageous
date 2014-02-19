@@ -1450,3 +1450,18 @@ def parse_sequence(s):
         else:
             yield s[idx]
         idx += 1
+
+
+def to_bare_command_name(seq):
+    """
+    Strips register and count data.
+    """
+    # Special case.
+    if seq == '0':
+        return seq
+
+    new_seq = re.sub(r'^(?:".)?(?:[1-9]+)?', '', seq)
+    # Account for d2d and similar sequences.
+    new_seq = list(parse_sequence(new_seq))
+
+    return ''.join(k for k in new_seq if not k.isdigit())

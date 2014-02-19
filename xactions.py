@@ -19,6 +19,7 @@ from Vintageous.vi.keys import cmds
 from Vintageous.vi.keys import mappings
 from Vintageous.vi.keys import parse_sequence
 from Vintageous.vi.keys import user_mappings
+from Vintageous.vi.keys import to_bare_command_name
 from Vintageous.vi.utils import gluing_undo_groups
 from Vintageous.vi.utils import IrreversibleTextCommand
 from Vintageous.vi.utils import jump_directions
@@ -627,7 +628,7 @@ class PressKey(ViWindowCommandBase):
 
         elif command['name'] == cmds.MISSING:
             # Check if we have a command like ys (action + qualifier, no pure namespace).
-            actual_seq = utils.strip_command_preamble(state.sequence)
+            actual_seq = to_bare_command_name(state.sequence)
             command = key_mappings.get_current(sequence=actual_seq)
             if command['name'] == cmds.MISSING:
                 _logger().info('[PressKey] unmapped sequence: {0}'.format(state.sequence))
@@ -639,7 +640,7 @@ class PressKey(ViWindowCommandBase):
                 # we're expecting a motion, but we could still get an action.
                 # For example, dd, g~g~ or g~~
                 # remove counts
-                action_seq = utils.strip_command_preamble(state.sequence)
+                action_seq = to_bare_command_name(state.sequence)
                 _logger().info('[PressKey] action seq: {0}'.format(action_seq))
                 command = key_mappings.get_current(sequence=action_seq)
                 if command['name'] == cmds.MISSING:

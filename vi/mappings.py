@@ -3,6 +3,7 @@ from Vintageous.vi.keys import parse_sequence
 from Vintageous.vi.keys import seq_to_command
 from Vintageous.vi.keys import mappings
 from Vintageous.vi.keys import cmd_types
+from Vintageous.vi.keys import to_bare_command_name
 from Vintageous.vi import utils
 
 
@@ -114,7 +115,7 @@ class Mappings(object):
         # we usually need to look at the partial sequence, but some commands do weird things,
         # like ys, which isn't a namespace but behaves as such sometimes.
         seq = sequence or self.state.partial_sequence
-        seq = utils.strip_command_preamble(seq)
+        seq = to_bare_command_name(seq)
 
         # TODO: Use same structure as in mappings (nested dicst).
         command = None

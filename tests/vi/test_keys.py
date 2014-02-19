@@ -9,6 +9,7 @@ from Vintageous.tests import add_sel
 from Vintageous.tests import make_region
 from Vintageous.tests import BufferTest
 from Vintageous.vi.keys import parse_sequence
+from Vintageous.vi.keys import to_bare_command_name
 
 
 _tests = (
@@ -26,7 +27,7 @@ _tests = (
 )
 
 
-class StateTestCase(BufferTest):
+class Test_parse_sequence(BufferTest):
     def parse(self, input_):
         return list(parse_sequence(input_))
 
@@ -34,3 +35,29 @@ class StateTestCase(BufferTest):
         for (i, t) in enumerate(_tests):
             input_, expected, msg = t
             self.assertEqual(self.parse(input_), expected, "{0} - {1}".format(i, msg))
+
+
+_command_name_tests = (
+    ('daw', 'daw', ''),
+    ('2daw', 'daw', ''),
+    ('d2aw', 'daw', ''),
+    ('2d2aw', 'daw', ''),
+    ('"a2d2aw', 'daw', ''),
+    ('"12d2aw', 'daw', ''),
+    ('<f7>', '<f7>', ''),
+    ('10<f7>', '<f7>', ''),
+    ('"a10<f7>', '<f7>', ''),
+    ('"a10<f7>', '<f7>', ''),
+    ('"210<f7>', '<f7>', ''),
+    ('0', '0', ''),
+)
+
+
+class Test_to_bare_command_name(BufferTest):
+    def transform(self, input_):
+        return to_bare_command_name(input_)
+
+    def testAll(self):
+        for (i, t) in enumerate(_command_name_tests):
+            input_, expected, msg = t
+            self.assertEqual(self.transform(input_), expected, "{0} - {1}".format(i, msg))

@@ -2,6 +2,7 @@ import re
 
 EOF = -1
 
+
 class Lexer(object):
     def __init__(self):
         self.c = None # current character

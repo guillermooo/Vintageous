@@ -156,13 +156,6 @@ def col_at(view, pt):
     return view.rowcol(pt)[1]
 
 
-def strip_command_preamble(seq):
-    """
-    Strips register and count data.
-    """
-    return re.sub(r'^(?:".)?(?:[1-9]+)?', '', seq)
-
-
 @contextmanager
 def gluing_undo_groups(view, state):
     state.gluing_sequence = True
