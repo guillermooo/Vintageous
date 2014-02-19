@@ -16,6 +16,13 @@ def mark_as_widget(view):
     example, when hiding panels in _vi_enter_normal_mode.
 
     Used prominently by '/', '?' and ':'.
+
+    XXX: This doesn't always work as we expect. For example, changing
+         settings to a panel created instants before does not make those
+         settings visible when the panel is activated. Investigate.
+         We still need this so that contexts will ignore widgets, though.
+         However, the fact that they are widgets should suffice to disable
+         Vim keys for them...
     """
     view.settings().set('is_vintageous_widget', True)
     return view

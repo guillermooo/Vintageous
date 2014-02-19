@@ -64,8 +64,10 @@ def _init_vintageous(view, new_session=False):
                 sublime.status_message('Vintageous: Vim emulation disabled for the current view')
         except AttributeError:
             _logger().info('[_init_vintageous] probably received the console view')
-            pass
-        return
+        except Exception:
+            _logger().error('[_init_vintageous] error initializing view')
+        finally:
+            return
 
     state = State(view)
 
@@ -160,6 +162,10 @@ class State(object):
         # (settings.window).
         # TODO: Make this a descriptor. Why isn't it?
         self.settings = SettingsManager(self.view)
+
+        _logger().info('[State] is .view an ST:Vintageous widget: {0}:{1}'.format(
+                                        bool(self.settings.view['is_widget']),
+                                        bool(self.settings.view['is_vintageous_widget'])))
 
     @property
     def glue_until_normal_mode(self):

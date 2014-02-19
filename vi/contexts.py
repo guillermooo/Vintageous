@@ -55,6 +55,7 @@ class KeyContext(object):
     def vi_is_view(self, key, operator, operand, match_all):
         value = utils.is_view(self.state.view)
         return self._check(value, operator, operand, match_all)
+
     # def vi_must_exit_to_insert_mode(self, key, operator, operand, match_all):
     #     # XXX: This conext most likely not needed any more.
     #     is_normal_mode = self.state.settings.view['command_mode']

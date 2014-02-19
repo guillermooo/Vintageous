@@ -28,6 +28,7 @@ from Vintageous.vi.utils import directions
 from Vintageous.vi.utils import IrreversibleTextCommand
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import regions_transformer
+from Vintageous.vi.utils import mark_as_widget
 
 
 class _vi_find_in_line(ViTextCommandBase):
@@ -158,8 +159,12 @@ class _vi_slash(IrreversibleTextCommand, ViTextCommandBase, BufferSearchBase):
         # on_change = self.on_change if state.settings.vi['incsearch'] else None
         on_change = self.on_change
 
-        self.view.window().show_input_panel('', default, self.on_done, on_change,
-                                            self.on_cancel)
+        mark_as_widget(self.view.window().show_input_panel(
+                                                            '',
+                                                            default,
+                                                            self.on_done,
+                                                            on_change,
+                                                            self.on_cancel))
 
     def on_done(self, s):
         state = self.state
@@ -1655,7 +1660,12 @@ class _vi_question_mark(IrreversibleTextCommand, ViTextCommandBase, BufferSearch
 
         state = self.state
         on_change = self.on_change if state.settings.vi['incsearch'] else None
-        self.view.window().show_input_panel('', '', self.on_done, on_change, self.on_cancel)
+        mark_as_widget(self.view.window().show_input_panel(
+                                                            '',
+                                                            '',
+                                                            self.on_done,
+                                                            on_change,
+                                                            self.on_cancel))
 
     def on_done(self, s):
         state = self.state

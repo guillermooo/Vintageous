@@ -1,6 +1,10 @@
 INBOX
 =====
 
+s: in visual mode
+panels
+? doesn't follow the conventions regarding nonínteractive status - see /
+
 op pending mode should not participate in building commands like g~~
 enter normal mode caret positioning
 CTRL+G == :f
