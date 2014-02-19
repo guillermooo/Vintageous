@@ -60,8 +60,10 @@ class ViColonInput(sublime_plugin.WindowCommand):
 
         FsCompletion.invalidate()
 
-        if VintageState(self.window.active_view()).mode in (modes.VISUAL, modes.VISUAL_LINE):
+        state = VintageState(self.window.active_view())
+        if state.mode in (modes.VISUAL, modes.VISUAL_LINE):
             initial_text = ":'<,'>" + initial_text[1:]
+
         v = mark_as_widget(show_ipanel(self.window,
                                        initial_text=initial_text,
                                        on_done=self.on_done,
@@ -69,6 +71,8 @@ class ViColonInput(sublime_plugin.WindowCommand):
         v.set_syntax_file('Packages/Vintageous/VintageousEx Cmdline.tmLanguage')
         v.settings().set('gutter', False)
         v.settings().set('rulers', [])
+
+        state.reset_during_init = False
 
     def on_change(self, s):
         if ViColonInput.interactive_call:
