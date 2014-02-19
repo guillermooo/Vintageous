@@ -669,3 +669,9 @@ def vi_g_big_u_big_u(state):
     cmd['action_args'] = {'mode': state.mode, 'count': state.count}
     return cmd
 
+
+def vi_g_big_u_g_big_u(state):
+    cmd = {}
+    cmd['action'] = '_vi_g_big_u_big_u'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd

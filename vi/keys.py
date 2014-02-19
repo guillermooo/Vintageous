@@ -57,7 +57,8 @@ class cmds:
     G_BIG_J = 'vi_g_big_j'
     G_BIG_T = 'vi_g_big_t'
     G_BIG_U = 'vi_gU'
-    G_BIG_U_BIG_U = 'vi_big_u_big_u'
+    G_BIG_U_BIG_U = 'vi_g_big_u_big_u'
+    G_BIG_U_G_BIG_U = 'vi_g_big_u_g_big_u'
     G_TILDE = 'vi_g_tilde'
     G_TILDE_G_TILDE = 'vi_g_tilde_g_tilde'
     G_TILDE_TILDE = 'vi_g_tilde_tilde'
@@ -357,6 +358,7 @@ class seqs:
     G_BIG_D = 'gD'
     G_BIG_U = 'gU'
     G_BIG_U_BIG_U = 'gUU'
+    G_BIG_U_G_BIG_U = 'gUgU'
     G_TILDE = 'g~'
     G_TILDE_G_TILDE = 'g~g~'
     G_TILDE_TILDE = 'g~~'
@@ -515,6 +517,7 @@ cmd_defs = {
         cmds.G_TILDE:                   dict(name=cmds.G_TILDE,                     input=None,                 type=cmd_types.ACTION, motion_required=True, multi_step=False, repeatable=True),
         cmds.G_BIG_U:                   dict(name=cmds.G_BIG_U,                     input=None,                 type=cmd_types.ACTION, motion_required=True, multi_step=False, repeatable=True),
         cmds.G_BIG_U_BIG_U:             dict(name=cmds.G_BIG_U_BIG_U,               input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
+        cmds.G_BIG_U_G_BIG_U:           dict(name=cmds.G_BIG_U_G_BIG_U,             input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
 
         cmds.CTRL_R:                    dict(name=cmds.CTRL_R,                      input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.DD:                        dict(name=cmds.DD,                          input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
@@ -727,6 +730,8 @@ mappings = {
         seqs.G_BIG_J: cmd_defs[modes.NORMAL][cmds.G_BIG_J],
         seqs.G_BIG_T: cmd_defs[modes.NORMAL][cmds.G_BIG_T],
         seqs.G_BIG_U: cmd_defs[modes.NORMAL][cmds.G_BIG_U],
+        seqs.G_BIG_U_BIG_U: cmd_defs[modes.NORMAL][cmds.G_BIG_U_BIG_U],
+        seqs.G_BIG_U_G_BIG_U: cmd_defs[modes.NORMAL][cmds.G_BIG_U_G_BIG_U],
         seqs.G_TILDE: cmd_defs[modes.NORMAL][cmds.G_TILDE],
         seqs.G_TILDE_G_TILDE: cmd_defs[modes.NORMAL][cmds.G_TILDE_G_TILDE],
         seqs.G_TILDE_TILDE: cmd_defs[modes.NORMAL][cmds.G_TILDE_TILDE],
@@ -969,6 +974,7 @@ mappings = {
         seqs.BIG_P: cmd_defs[modes.OPERATOR_PENDING][cmds.BIG_P],
         seqs.BIG_S: cmd_defs[modes.OPERATOR_PENDING][cmds.BIG_S],
         seqs.BIG_T: cmd_defs[modes.OPERATOR_PENDING][cmds.BIG_T],
+        seqs.BIG_U: cmd_defs[modes.OPERATOR_PENDING][cmds.BIG_U],
         seqs.BIG_W: cmd_defs[modes.OPERATOR_PENDING][cmds.BIG_W],
         seqs.BIG_X: cmd_defs[modes.OPERATOR_PENDING][cmds.BIG_X],
         seqs.BIG_Y: cmd_defs[modes.OPERATOR_PENDING][cmds.BIG_Y],
@@ -1016,6 +1022,8 @@ mappings = {
         seqs.G_BIG_J: cmd_defs[modes.OPERATOR_PENDING][cmds.G_BIG_J],
         seqs.G_BIG_T: cmd_defs[modes.OPERATOR_PENDING][cmds.G_BIG_T],
         seqs.G_BIG_U: cmd_defs[modes.OPERATOR_PENDING][cmds.G_BIG_U],
+        seqs.G_BIG_U_BIG_U: cmd_defs[modes.OPERATOR_PENDING][cmds.G_BIG_U_BIG_U],
+        seqs.G_BIG_U_G_BIG_U: cmd_defs[modes.OPERATOR_PENDING][cmds.G_BIG_U_G_BIG_U],
         seqs.G_TILDE: cmd_defs[modes.OPERATOR_PENDING][cmds.G_TILDE],
         seqs.G_TILDE_G_TILDE: cmd_defs[modes.OPERATOR_PENDING][cmds.G_TILDE_G_TILDE],
         seqs.G_TILDE_TILDE: cmd_defs[modes.OPERATOR_PENDING][cmds.G_TILDE_TILDE],

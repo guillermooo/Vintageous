@@ -2179,10 +2179,10 @@ class _vi_g_tilde_g_tilde(ViTextCommandBase):
 
 
 class _vi_g_big_u_big_u(ViTextCommandBase):
-    def run(self, edit, motion=None, count=1):
+    def run(self, edit, mode=None, count=1):
         def select(view, s):
             l = view.line(s.b)
-            return sublime.Region(s.end(), s.begin())
+            return sublime.Region(l.end(), l.begin())
 
         def to_upper(view, s):
             view.replace(edit, s, view.substr(s).upper())
