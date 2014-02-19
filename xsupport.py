@@ -11,6 +11,10 @@ from Vintageous.vi.utils import regions_transformer
 from Vintageous.vi.utils import modes
 from Vintageous.vi import utils
 from Vintageous.vi.dot_file import DotFile
+from Vintageous import local_logger
+
+
+_logger = local_logger(__name__)
 
 
 class _vi_slash_on_parser_done(sublime_plugin.WindowCommand):
@@ -47,7 +51,12 @@ class _vi_r_on_parser_done(sublime_plugin.WindowCommand):
 # TODO: Test me.
 class VintageStateTracker(sublime_plugin.EventListener):
     def on_load(self, view):
-        _init_vintageous(view)
+        try:
+            _init_vintageous(view)
+        except AttributeError:
+            _logger().error(
+                '[VintageStateTracker] .settings() missing during .on_load() for {0}'
+                    .format(view.file_name()))
 
     def on_post_save(self, view):
         # Ensure the carets are within valid bounds. For instance, this is a concern when
