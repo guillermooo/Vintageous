@@ -112,6 +112,7 @@ class cmds:
     SEMICOLON = 'vi_semicolon'
     SLASH = 'vi_slash'
     SLASH_IMPL = 'vi_slash_impl'
+    SPACE = 'vi_space'
     STAR = 'vi_star'
     T = 'vi_t'
     TILDE = 'vi_tilde'
@@ -489,6 +490,7 @@ cmd_defs = {
         cmds.QUOTE:                     dict(name=cmds.QUOTE,                       input='vi_quote',           type=cmd_types.MOTION, multi_step=False, updates_xpos=False, scroll_into_view=True),
         cmds.BACKTICK:                  dict(name=cmds.BACKTICK,                    input='vi_backtick',        type=cmd_types.MOTION, multi_step=False, updates_xpos=True, scroll_into_view=True),
         cmds.GD:                        dict(name=cmds.GD,                          input=None,                 type=cmd_types.MOTION, multi_step=False, updates_xpos=True, scroll_into_view=True),
+        cmds.SPACE:                     dict(name=cmds.L,                       input=None,                 type=cmd_types.MOTION, multi_step=False, updates_xpos=True, scroll_into_view=True),
 
         cmds.SLASH:                     dict(name=cmds.SLASH,                       input='vi_slash',           type=cmd_types.MOTION, multi_step=True, updates_xpos=True, scroll_into_view=True),
         cmds.QUESTION_MARK:             dict(name=cmds.QUESTION_MARK,               input='vi_question_mark',   type=cmd_types.MOTION, multi_step=True, updates_xpos=True, scroll_into_view=True),
@@ -785,6 +787,7 @@ mappings = {
         seqs.SHIFT_F3: cmd_defs[modes.NORMAL][cmds.SHIFT_F3],
         seqs.SHIFT_F4: cmd_defs[modes.NORMAL][cmds.SHIFT_F4],
         seqs.SLASH: cmd_defs[modes.NORMAL][cmds.SLASH],
+        seqs.SPACE: cmd_defs[modes.NORMAL][cmds.SPACE],
         seqs.STAR: cmd_defs[modes.NORMAL][cmds.STAR],
         seqs.T: cmd_defs[modes.NORMAL][cmds.T],
         seqs.TILDE: cmd_defs[modes.NORMAL][cmds.TILDE],
@@ -1068,6 +1071,7 @@ mappings = {
         seqs.SHIFT_CTRL_F12: cmd_defs[modes.OPERATOR_PENDING][cmds.SHIFT_CTRL_F12],
         seqs.SHIFT_ENTER: cmd_defs[modes.OPERATOR_PENDING][cmds.SHIFT_ENTER],
         seqs.SLASH: cmd_defs[modes.OPERATOR_PENDING][cmds.SLASH],
+        seqs.SPACE: cmd_defs[modes.OPERATOR_PENDING][cmds.SPACE],
         seqs.QUOTE: cmd_defs[modes.OPERATOR_PENDING][cmds.QUOTE],
         seqs.BACKTICK: cmd_defs[modes.OPERATOR_PENDING][cmds.BACKTICK],
         seqs.STAR: cmd_defs[modes.OPERATOR_PENDING][cmds.STAR],
