@@ -953,9 +953,7 @@ class _vi_d(ViTextCommandBase):
     def run(self, edit, mode=None, count=1, motion=None, register=None):
         def reverse(view, s):
             return sublime.Region(s.end(), s.begin())
-        # def f(view, s):
-        #     view.replace(edit, s, '')
-        #     return sublime.Region(s.b)
+
         if mode not in (modes.INTERNAL_NORMAL, modes.VISUAL,
                         modes.VISUAL_LINE):
             raise ValueError('wrong mode')
@@ -964,14 +962,22 @@ class _vi_d(ViTextCommandBase):
             raise ValueError('missing motion')
 
         if motion:
+            self.save_sel()
+
             self.view.run_command(motion['motion'], motion['motion_args'])
+
+            # The motion has failed, so abort.
+            if not self.has_sel_changed():
+                utils.blink()
+                self.enter_normal_mode(mode)
+                return
 
         state = self.state
         state.registers.yank(self, register)
+
         self.view.run_command('left_delete')
-        # regions_transformer(self.view, reverse)
-        # regions_transformer(self.view, f)
         self.view.run_command('_vi_adjust_carets')
+
         self.enter_normal_mode(mode)
 
 
