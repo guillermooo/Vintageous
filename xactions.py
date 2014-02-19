@@ -7,6 +7,7 @@ import logging
 
 from Vintageous import local_logger
 from Vintageous.state import State
+from Vintageous.state import _init_vintageous
 from Vintageous.vi import inputs
 from Vintageous.vi import motions
 from Vintageous.vi import utils
@@ -560,6 +561,16 @@ class PressKey(ViWindowCommandBase):
         _logger().info("[PressKey] pressed: {0}".format(key))
 
         state = self.state
+
+        # If the user has made selections with the mouse, we may be in an
+        # inconsistent state. Try to remedy that.
+        if (state.view.has_non_empty_selection_region() and
+            state.mode not in (modes.VISUAL,
+                               modes.VISUAL_LINE,
+                               modes.VISUAL_BLOCK,
+                               modes.SELECT)):
+                _init_vintageous(state.view)
+
 
         if key.lower() == '<esc>':
             self.window.run_command('_enter_normal_mode', {'mode': state.mode})
