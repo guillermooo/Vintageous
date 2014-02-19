@@ -131,6 +131,14 @@ def plugin_loaded():
     _init_vintageous(view, new_session=True)
 
 
+# TODO: Test me.
+def plugin_unloaded():
+    view = sublime.active_window().active_view()
+
+    view.settings().set('command_mode', False)
+    view.settings().set('inverse_caret_state', False)
+
+
 class State(object):
     """
     Manages global state needed to build commands and control modes, etc.

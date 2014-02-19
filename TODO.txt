@@ -3,6 +3,7 @@ INBOX
 
 op pending mode should not participate in building commands like g~~
 enter normal mode caret positioning
+CTRL+G == :f
 
 op pending commands -> trim
 tilde commands
