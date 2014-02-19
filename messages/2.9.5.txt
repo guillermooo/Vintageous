@@ -1,0 +1,49 @@
+==============================================================================
+Vintageous 2.9.5
+==============================================================================
+
+CHANGES
+-------
+
+    - C and S now always operate charwise.
+    - d operator aborts if motion failed.
+    - c operator aborts if motion failed.
+    - gd now behaves better in normal mode.
+    - Add commands modifying letter case.
+    - Marks are now inclusive in normal mode.
+    - Improve input parsing: d2d is now a valid command.
+    - Implement 'space' in normal mode.
+    - Selections generated outside of Vintageous are now interpreted as in
+      visual mode.
+    - Add handler to disable the plugin when ignored.
+    - Catch and log intermittent error related to loading files.
+    - Prevent the cmdline to reset the current state.
+
+
+FOUND BUGS?
+-----------
+
+Please report them here:
+
+    https://github.com/guillermooo/Vintageous/issues
+
+
+SUPPORT VINTAGEOUS
+------------------
+
+Is Vintageous worth your time? Developing Vintageous is hard work. If you use
+it often to get actual work done, please consider donating and make it worth
+my time too.
+
+    PayPal: http://www.pledgie.com/campaigns/19122
+    Gittip: https://www.gittip.com/guillermooo/
+
+I'm the creator and main author of Vintageous, but some generous people have
+contributed their time and effort as well. See the more active ones here; you
+may want to show them some gratitude too:
+
+https://github.com/guillermooo/Vintageous/graphs/contributors
+
+Thanks for reading and for using Vintageous!
+
+Guillermo

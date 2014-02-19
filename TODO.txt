@@ -1,7 +1,6 @@
 INBOX
 =====
 
-s: in visual mode
 panels
 ? doesn't follow the conventions regarding nonínteractive status - see /
 

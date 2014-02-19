@@ -1,3 +1,19 @@
+2.9.5 - 19/02/14
+
+	- C and S now always operate charwise.
+	- d operator aborts if motion failed.
+	- c operator aborts if motion failed.
+	- gd now behaves better in normal mode.
+	- Add commands modifying letter case.
+	- Marks are now inclusive in normal mode.
+	- Improve input parsing: d2d is now a valid command.
+	- Implement 'space' in normal mode.
+	- Selections generated outside of Vintageous are now interpreted as in
+	  visual mode.
+	- Add handler to disable the plugin when ignored.
+	- Catch and log intermittent error related to loading files.
+	- Prevent the cmdline from resetting the current state.
+
 2.9.4 - 17/02/14
 
 	- Enable cursor keys in visual modes.
