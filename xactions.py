@@ -155,7 +155,7 @@ class _vi_a(sublime_plugin.TextCommand):
         self.view.window().run_command('_enter_insert_mode')
 
 
-class _vi_c(sublime_plugin.TextCommand):
+class _vi_c(ViTextCommandBase):
     def run(self, edit, count=1, mode=None, motion=None):
         if mode is None:
             raise ValueError('mode required')
@@ -166,11 +166,19 @@ class _vi_c(sublime_plugin.TextCommand):
         if mode == modes.INTERNAL_NORMAL and motion['motion'] == '_vi_w':
             motion['motion'] = '_vi_e'
 
+        self.save_sel()
+
         if motion:
             self.view.run_command(motion['motion'], motion['motion_args'])
 
+            if not self.has_sel_changed():
+                utils.blink()
+                self.enter_normal_mode(mode)
+                return
+
         self.view.run_command('right_delete')
-        self.view.window().run_command('_enter_insert_mode')
+
+        self.enter_insert_mode(mode)
 
 
 class _enter_normal_mode(ViTextCommandBase):
