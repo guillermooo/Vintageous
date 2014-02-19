@@ -2094,3 +2094,82 @@ class _vi_select_j(ViWindowCommandBase):
 
         for i in range(count):
             self.window.run_command('find_under_expand')
+
+
+class _vi_tilde(ViTextCommandBase):
+    """
+    Implemented as if 'notildeopt' was `True`.
+    """
+    def run(self, edit, count=1, mode=None, motion=None):
+        def select(view, s):
+            return sublime.Region(s.begin(), s.end() + count)
+
+        # if motion:
+            # self.save_sel()
+
+            # self.view.run_command(motion['motion'], motion['motion_args'])
+
+            # if not self.has_sel_changed():
+                # utils.blink()
+                # self.enter_normal_mode(mode)
+                # return
+
+        regions_transformer(self.view, select)
+        self.view.run_command('swap_case')
+
+        self.enter_normal_mode(mode)
+
+
+class _vi_g_tilde(ViTextCommandBase):
+    def run(self, edit, count=1, mode=None, motion=None):
+        def f(view, s):
+            return sublime.Region(s.end(), s.begin())
+
+        if motion:
+            self.save_sel()
+
+            self.view.run_command(motion['motion'], motion['motion_args'])
+
+            if not self.has_sel_changed():
+                utils.blink()
+                self.enter_normal_mode(mode)
+                return
+
+        self.view.run_command('swap_case')
+
+        if motion:
+            regions_transformer(self.view, f)
+
+        self.enter_normal_mode(mode)
+
+
+class _vi_g_tilde_g_tilde(ViTextCommandBase):
+    def run(self, edit, count=1, mode=None):
+        def select(view, s):
+            l =  view.line(s.b)
+            return sublime.Region(l.end(), l.begin())
+
+        if mode != modes.INTERNAL_NORMAL:
+            raise ValueError('wrong mode')
+
+        regions_transformer(self.view, select)
+        self.view.run_command('swap_case')
+        # Ensure we leave the sel .b end where we want it.
+        regions_transformer(self.view, select)
+
+        self.enter_normal_mode(mode)
+
+
+class _vi_g_big_u_big_u(ViTextCommandBase):
+    def run(self, edit, motion=None, count=1):
+        def select(view, s):
+            l = view.line(s.b)
+            return sublime.Region(s.end(), s.begin())
+
+        def to_upper(view, s):
+            view.replace(edit, s, view.substr(s).upper())
+            return s
+
+        regions_transformer(self.view, select)
+        regions_transformer(self.view, to_upper)
+        self.enter_normal_mode(mode)

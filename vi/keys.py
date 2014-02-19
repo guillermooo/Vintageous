@@ -57,6 +57,7 @@ class cmds:
     G_BIG_J = 'vi_g_big_j'
     G_BIG_T = 'vi_g_big_t'
     G_BIG_U = 'vi_gU'
+    G_BIG_U_BIG_U = 'vi_big_u_big_u'
     G_TILDE = 'vi_g_tilde'
     G_TILDE_G_TILDE = 'vi_g_tilde_g_tilde'
     G_TILDE_TILDE = 'vi_g_tilde_tilde'
@@ -112,6 +113,7 @@ class cmds:
     SLASH_IMPL = 'vi_slash_impl'
     STAR = 'vi_star'
     T = 'vi_t'
+    TILDE = 'vi_tilde'
     U = 'vi_u'
     UNDERSCORE = 'vi_underscore'
     V = 'vi_v'
@@ -354,6 +356,7 @@ class seqs:
     G = 'g'
     G_BIG_D = 'gD'
     G_BIG_U = 'gU'
+    G_BIG_U_BIG_U = 'gUU'
     G_TILDE = 'g~'
     G_TILDE_G_TILDE = 'g~g~'
     G_TILDE_TILDE = 'g~~'
@@ -399,6 +402,7 @@ class seqs:
     SLASH = '/'
     STAR = '*'
     T = 't'
+    TILDE = '~'
     U = 'u'
     UNDERSCORE = '_'
     V = 'v'
@@ -501,6 +505,7 @@ cmd_defs = {
         cmds.BIG_C:                     dict(name=cmds.BIG_C,                       input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
         cmds.Y:                         dict(name=cmds.Y,                           input=None,                 type=cmd_types.ACTION, motion_required=True, multi_step=False, repeatable=False),
         cmds.EQUAL:                     dict(name=cmds.EQUAL,                       input=None,                 type=cmd_types.ACTION, motion_required=True, multi_step=True, repeatable=True),
+        cmds.TILDE:                     dict(name=cmds.TILDE,                       input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
         cmds.CTRL_V:                    dict(name=cmds.CTRL_V,                      input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=True, repeatable=False),
         cmds.GREATER_THAN:              dict(name=cmds.GREATER_THAN,                input=None,                 type=cmd_types.ACTION, motion_required=True, multi_step=True, repeatable=True),
         cmds.LESS_THAN:                 dict(name=cmds.LESS_THAN,                   input=None,                 type=cmd_types.ACTION, motion_required=True, multi_step=True, repeatable=True),
@@ -509,6 +514,7 @@ cmd_defs = {
         cmds.R:                         dict(name=cmds.R,                           input='vi_r',               type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
         cmds.G_TILDE:                   dict(name=cmds.G_TILDE,                     input=None,                 type=cmd_types.ACTION, motion_required=True, multi_step=False, repeatable=True),
         cmds.G_BIG_U:                   dict(name=cmds.G_BIG_U,                     input=None,                 type=cmd_types.ACTION, motion_required=True, multi_step=False, repeatable=True),
+        cmds.G_BIG_U_BIG_U:             dict(name=cmds.G_BIG_U_BIG_U,               input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
 
         cmds.CTRL_R:                    dict(name=cmds.CTRL_R,                      input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.DD:                        dict(name=cmds.DD,                          input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
@@ -530,7 +536,7 @@ cmd_defs = {
         cmds.CC:                        dict(name=cmds.CC,                          input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
         cmds.BIG_S:                     dict(name=cmds.BIG_S,                       input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
         cmds.G_TILDE_G_TILDE:           dict(name=cmds.G_TILDE_G_TILDE,             input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
-        cmds.G_TILDE_TILDE:             dict(name=cmds.G_TILDE_TILDE,               input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
+        cmds.G_TILDE_TILDE:             dict(name=cmds.G_TILDE_G_TILDE,             input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
 
         cmds.GU:                        dict(name=cmds.GU,                          input=None,                 type=cmd_types.ACTION, motion_required=True, multi_step=False, repeatable=True),
         cmds.GQ:                        dict(name=cmds.GQ,                          input=None,                 type=cmd_types.ACTION, motion_required=True, multi_step=False, repeatable=True),
@@ -775,6 +781,7 @@ mappings = {
         seqs.SLASH: cmd_defs[modes.NORMAL][cmds.SLASH],
         seqs.STAR: cmd_defs[modes.NORMAL][cmds.STAR],
         seqs.T: cmd_defs[modes.NORMAL][cmds.T],
+        seqs.TILDE: cmd_defs[modes.NORMAL][cmds.TILDE],
         seqs.U: cmd_defs[modes.NORMAL][cmds.U],
         seqs.UNDERSCORE: cmd_defs[modes.NORMAL][cmds.UNDERSCORE],
         seqs.UP: cmd_defs[modes.NORMAL][cmds.K],
@@ -877,7 +884,6 @@ mappings = {
         seqs.G_BIG_U: cmd_defs[modes.VISUAL][cmds.G_BIG_U],
         seqs.G_TILDE: cmd_defs[modes.VISUAL][cmds.G_TILDE],
         seqs.G_TILDE_G_TILDE: cmd_defs[modes.VISUAL][cmds.G_TILDE_G_TILDE],
-        seqs.G_TILDE_TILDE: cmd_defs[modes.VISUAL][cmds.G_TILDE_TILDE],
         seqs.G_UNDERSCORE: cmd_defs[modes.VISUAL][cmds.G_UNDERSCORE],
         seqs.GE: cmd_defs[modes.VISUAL][cmds.GE],
         seqs.GG: cmd_defs[modes.VISUAL][cmds.GG],
@@ -923,6 +929,7 @@ mappings = {
         seqs.SLASH: cmd_defs[modes.VISUAL][cmds.SLASH],
         seqs.STAR: cmd_defs[modes.VISUAL][cmds.STAR],
         seqs.T: cmd_defs[modes.VISUAL][cmds.T],
+        seqs.TILDE: cmd_defs[modes.NORMAL][cmds.TILDE],
         seqs.U: cmd_defs[modes.VISUAL][cmds.U],
         seqs.UNDERSCORE: cmd_defs[modes.VISUAL][cmds.UNDERSCORE],
         seqs.V: cmd_defs[modes.VISUAL][cmds.V],
@@ -1051,6 +1058,8 @@ mappings = {
         seqs.SHIFT_CTRL_F12: cmd_defs[modes.OPERATOR_PENDING][cmds.SHIFT_CTRL_F12],
         seqs.SHIFT_ENTER: cmd_defs[modes.OPERATOR_PENDING][cmds.SHIFT_ENTER],
         seqs.SLASH: cmd_defs[modes.OPERATOR_PENDING][cmds.SLASH],
+        seqs.QUOTE: cmd_defs[modes.OPERATOR_PENDING][cmds.QUOTE],
+        seqs.BACKTICK: cmd_defs[modes.OPERATOR_PENDING][cmds.BACKTICK],
         seqs.STAR: cmd_defs[modes.OPERATOR_PENDING][cmds.STAR],
         seqs.T: cmd_defs[modes.OPERATOR_PENDING][cmds.T],
         seqs.U: cmd_defs[modes.OPERATOR_PENDING][cmds.U],
@@ -1162,7 +1171,6 @@ mappings = {
         seqs.G_BIG_U: cmd_defs[modes.VISUAL_LINE][cmds.G_BIG_U],
         seqs.G_TILDE: cmd_defs[modes.VISUAL_LINE][cmds.G_TILDE],
         seqs.G_TILDE_G_TILDE: cmd_defs[modes.VISUAL_LINE][cmds.G_TILDE_G_TILDE],
-        seqs.G_TILDE_TILDE: cmd_defs[modes.VISUAL_LINE][cmds.G_TILDE_TILDE],
         seqs.G_UNDERSCORE: cmd_defs[modes.VISUAL_LINE][cmds.G_UNDERSCORE],
         seqs.GD: cmd_defs[modes.VISUAL_LINE][cmds.GD],
         seqs.GE: cmd_defs[modes.VISUAL_LINE][cmds.GE],
@@ -1204,6 +1212,7 @@ mappings = {
         seqs.SLASH: cmd_defs[modes.VISUAL_LINE][cmds.SLASH],
         seqs.STAR: cmd_defs[modes.VISUAL_LINE][cmds.STAR],
         seqs.T: cmd_defs[modes.VISUAL_LINE][cmds.T],
+        seqs.TILDE: cmd_defs[modes.NORMAL][cmds.TILDE],
         seqs.U: cmd_defs[modes.VISUAL_LINE][cmds.U],
         seqs.UNDERSCORE: cmd_defs[modes.VISUAL_LINE][cmds.UNDERSCORE],
         seqs.V: cmd_defs[modes.VISUAL_LINE][cmds.V],
@@ -1305,7 +1314,6 @@ mappings = {
         seqs.G_BIG_U: cmd_defs[modes.VISUAL_BLOCK][cmds.G_BIG_U],
         seqs.G_TILDE: cmd_defs[modes.VISUAL_BLOCK][cmds.G_TILDE],
         seqs.G_TILDE_G_TILDE: cmd_defs[modes.VISUAL_BLOCK][cmds.G_TILDE_G_TILDE],
-        seqs.G_TILDE_TILDE: cmd_defs[modes.VISUAL_BLOCK][cmds.G_TILDE_TILDE],
         seqs.G_UNDERSCORE: cmd_defs[modes.VISUAL_BLOCK][cmds.G_UNDERSCORE],
         seqs.GE: cmd_defs[modes.VISUAL_BLOCK][cmds.GE],
         seqs.GG: cmd_defs[modes.VISUAL_BLOCK][cmds.GG],
@@ -1351,6 +1359,7 @@ mappings = {
         seqs.SLASH: cmd_defs[modes.VISUAL_BLOCK][cmds.SLASH],
         seqs.STAR: cmd_defs[modes.VISUAL_BLOCK][cmds.STAR],
         seqs.T: cmd_defs[modes.VISUAL_BLOCK][cmds.T],
+        seqs.TILDE: cmd_defs[modes.NORMAL][cmds.TILDE],
         seqs.U: cmd_defs[modes.VISUAL_BLOCK][cmds.U],
         seqs.UNDERSCORE: cmd_defs[modes.VISUAL_BLOCK][cmds.UNDERSCORE],
         seqs.V: cmd_defs[modes.VISUAL_BLOCK][cmds.V],

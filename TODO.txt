@@ -1,6 +1,9 @@
 INBOX
 =====
 
+op pending mode should not participate in building commands like g~~
+enter normal mode caret positioning
+
 perhaps .set_regions() can help keep regions aligned if using multiple regions: for example, c with multiple regions doesn't work perfectly.
 change key names to C-a, etc.
 improve parser management

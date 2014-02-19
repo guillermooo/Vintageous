@@ -624,3 +624,32 @@ def vi_ctrl_v(state):
     cmd['action'] = '_enter_visual_block_mode'
     cmd['action_args'] = {'mode': state.mode}
     return cmd
+
+
+def vi_tilde(state):
+    cmd = {}
+    cmd['action'] = '_vi_tilde'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
+
+
+def vi_g_tilde(state):
+    cmd = {}
+    cmd['action'] = '_vi_g_tilde'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
+
+
+def vi_g_tilde_g_tilde(state):
+    cmd = {}
+    cmd['action'] = '_vi_g_tilde_g_tilde'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
+
+
+def vi_g_big_u_big_u(state):
+    cmd = {}
+    cmd['action'] = '_vi_g_big_u_big_u'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
+
