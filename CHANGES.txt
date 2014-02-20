@@ -1,3 +1,8 @@
+2.9.6 - 20/02/14
+
+    - Fix letter-case-related commands.
+    - Fix tests.
+
 2.9.5 - 19/02/14
 
 	- C and S now always operate charwise.
