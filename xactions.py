@@ -407,6 +407,8 @@ class _enter_replace_mode(ViTextCommandBase):
         regions_transformer(self.view, f)
         state.display_status()
         state.reset()
+
+
 # TODO: Remove this command once we don't need it any longer.
 class ToggleMode(ViWindowCommandBase):
     def run(self):
@@ -2163,6 +2165,8 @@ class _vi_visual_u(ViTextCommandBase):
         for s in self.view.sel():
             self.view.replace(edit, s, self.view.substr(s).lower())
 
+        self.enter_normal_mode(mode)
+
 
 class _vi_visual_big_u(ViTextCommandBase):
     """
@@ -2171,6 +2175,8 @@ class _vi_visual_big_u(ViTextCommandBase):
     def run(self, edit, mode=None, count=1):
         for s in self.view.sel():
             self.view.replace(edit, s, self.view.substr(s).upper())
+
+        self.enter_normal_mode(mode)
 
 
 class _vi_g_tilde_g_tilde(ViTextCommandBase):
@@ -2202,4 +2208,19 @@ class _vi_g_big_u_big_u(ViTextCommandBase):
 
         regions_transformer(self.view, select)
         regions_transformer(self.view, to_upper)
+        self.enter_normal_mode(mode)
+
+
+class _vi_guu(ViTextCommandBase):
+    def run(self, edit, mode=None, count=1):
+        def select(view, s):
+            l = view.line(s.b)
+            return sublime.Region(l.end(), l.begin())
+
+        def to_lower(view, s):
+            view.replace(edit, s, view.substr(s).lower())
+            return s
+
+        regions_transformer(self.view, select)
+        regions_transformer(self.view, to_lower)
         self.enter_normal_mode(mode)

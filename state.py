@@ -542,6 +542,7 @@ class State(object):
 
     def reset_sequence(self):
         self.sequence = ''
+
     def display_status(self):
         msg = "{0} {1}"
         mode_name = modes.to_friendly_name(self.mode)
@@ -550,6 +551,7 @@ class State(object):
 
     def reset_partial_sequence(self):
         self.partial_sequence = ''
+
     def reset_user_input(self):
         self.input_parsers = []
         self.user_input = ''

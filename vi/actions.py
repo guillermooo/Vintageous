@@ -168,7 +168,14 @@ def vi_gU(state):
 def vi_gu(state):
     cmd = {}
     cmd['action'] = '_vi_gu'
-    cmd['action_args'] = {'mode': state.mode}
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+    return cmd
+
+
+def vi_guu(state):
+    cmd = {}
+    cmd['action'] = '_vi_guu'
+    cmd['action_args'] = {'mode': state.mode, 'count': state.count}
     return cmd
 
 

@@ -75,6 +75,8 @@ class cmds:
     GREATER_THAN_GREATER_THAN = 'vi_greater_than_greater_than'
     GT = 'vi_gt'
     GU = 'vi_gu'
+    GUGU = 'vi_gugu'
+    GUU = 'vi_guu'
     GV = 'vi_gv'
     H = 'vi_h'
     HAT = 'vi_hat'
@@ -372,6 +374,8 @@ class seqs:
     GT ='gt'
     G_BIG_T ='gT'
     GU ='gu'
+    GUGU ='gugu'
+    GUU ='guu'
     GREATER_THAN = '>'
     GREATER_THAN_GREATER_THAN = '>>'
     H = 'h'
@@ -520,6 +524,9 @@ cmd_defs = {
         cmds.G_BIG_U:                   dict(name=cmds.G_BIG_U,                     input=None,                 type=cmd_types.ACTION, motion_required=True, multi_step=False, repeatable=True),
         cmds.G_BIG_U_BIG_U:             dict(name=cmds.G_BIG_U_BIG_U,               input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
         cmds.G_BIG_U_G_BIG_U:           dict(name=cmds.G_BIG_U_G_BIG_U,             input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
+        cmds.GU:                        dict(name=cmds.GU,                          input=None,                 type=cmd_types.ACTION, motion_required=True, multi_step=False, repeatable=True),
+        cmds.GUU:                       dict(name=cmds.GUU,                         input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
+        cmds.GUGU:                       dict(name=cmds.GUU,                         input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
 
         cmds.CTRL_R:                    dict(name=cmds.CTRL_R,                      input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.DD:                        dict(name=cmds.DD,                          input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
@@ -748,6 +755,8 @@ mappings = {
         seqs.GREATER_THAN: cmd_defs[modes.NORMAL][cmds.GREATER_THAN],
         seqs.GT: cmd_defs[modes.NORMAL][cmds.GT],
         seqs.GU: cmd_defs[modes.NORMAL][cmds.GU],
+        seqs.GUGU: cmd_defs[modes.NORMAL][cmds.GUGU],
+        seqs.GUU: cmd_defs[modes.NORMAL][cmds.GUU],
         seqs.GV: cmd_defs[modes.NORMAL][cmds.GV],
         seqs.H: cmd_defs[modes.NORMAL][cmds.H],
         seqs.HAT: cmd_defs[modes.NORMAL][cmds.HAT],
@@ -905,7 +914,6 @@ mappings = {
         seqs.GREATER_THAN_GREATER_THAN: cmd_defs[modes.VISUAL][cmds.GREATER_THAN_GREATER_THAN],
         seqs.GT: cmd_defs[modes.VISUAL][cmds.GT],
         seqs.GU: cmd_defs[modes.VISUAL][cmds.GU],
-        seqs.GU: cmd_defs[modes.VISUAL][cmds.GU],
         seqs.GV: cmd_defs[modes.VISUAL][cmds.GV],
         seqs.H: cmd_defs[modes.VISUAL][cmds.H],
         seqs.HAT: cmd_defs[modes.VISUAL][cmds.HAT],
@@ -1040,6 +1048,8 @@ mappings = {
         seqs.GREATER_THAN_GREATER_THAN: cmd_defs[modes.OPERATOR_PENDING][cmds.GREATER_THAN_GREATER_THAN],
         seqs.GT: cmd_defs[modes.OPERATOR_PENDING][cmds.GT],
         seqs.GU: cmd_defs[modes.OPERATOR_PENDING][cmds.GU],
+        seqs.GUGU: cmd_defs[modes.OPERATOR_PENDING][cmds.GUGU],
+        seqs.GUU: cmd_defs[modes.OPERATOR_PENDING][cmds.GUU],
         seqs.GV: cmd_defs[modes.OPERATOR_PENDING][cmds.GV],
         seqs.H: cmd_defs[modes.OPERATOR_PENDING][cmds.H],
         seqs.HAT: cmd_defs[modes.OPERATOR_PENDING][cmds.HAT],
