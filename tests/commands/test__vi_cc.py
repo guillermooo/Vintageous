@@ -28,7 +28,7 @@ class Test_vi_cc_InModeInternalNormal(BufferTest):
         self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo bar\n\nfoo bar\n')
 
     def testKeepsLeadingWhitespace(self):
-        set_text(self.view, ''.join(('\tfoo bar\nfoo bar\nfoo bar\n',)))
+        set_text(self.view, ''.join(('\tfoo bar\n\tfoo bar\nfoo bar\n',)))
         add_sel(self.view, self.R((1, 0), (1, 7)))
 
         self.view.run_command('_vi_cc_action', {'mode': _MODE_INTERNAL_NORMAL})

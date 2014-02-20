@@ -862,6 +862,7 @@ class _vi_cc_motion(ViTextCommandBase):
             if mode == modes.INTERNAL_NORMAL:
                 end = view.text_point(utils.row_at(self.view, s.b) + (count - 1), 0)
                 begin = view.line(s.b).a
+                begin = utils.next_non_white_space_char(view, begin, white_space=' \t')
                 return sublime.Region(begin, view.line(end).b)
 
             return s
@@ -875,24 +876,15 @@ class _vi_cc_action(ViTextCommandBase):
     _synthetize_new_line_at_eof = True
     _yanks_linewise = False
     _populates_small_delete_register = False
+
     def run(self, edit, mode=None, count=1):
-        # def f(view, s):
-        #     # We've made a selection with _vi_cc_motion just before this.
-        #     if mode == modes.INTERNAL_NORMAL:
-        #         view.erase(edit, s)
-        #         if utils.row_at(self.view, s.a) != utils.row_at(self.view, self.view.size()):
-        #             pt = utils.next_non_white_space_char(view, s.a, white_space=' \t')
-        #         else:
-        #             pt = utils.next_non_white_space_char(view,
-        #                                                  self.view.line(s.a).a,
-        #                                                  white_space=' \t')
-        #         return sublime.Region(pt)
-        #     return s
         self.view.run_command('_vi_cc_motion', {'mode': mode, 'count': count})
+
         state = self.state
         state.registers.yank(self)
+
         self.view.run_command('right_delete')
-        # regions_transformer_reversed(self.view, f)
+
         self.enter_insert_mode(mode)
         self.set_xpos(state)
 
@@ -1010,6 +1002,7 @@ class _vi_big_a(ViTextCommandBase):
                 if self.view.substr(s.b - 1) == '\n':
                     return sublime.Region(s.end() - 1)
                 return sublime.Region(s.end())
+
             elif mode == modes.VISUAL:
                 pt = s.b
                 if self.view.substr(s.b - 1) == '\n':
@@ -1017,8 +1010,17 @@ class _vi_big_a(ViTextCommandBase):
                 if s.a > s.b:
                     pt = view.line(s.a).a
                 return sublime.Region(pt)
+
+            elif mode == modes.VISUAL_LINE:
+                if s.a < s.b:
+                    if s.b < view.size():
+                        return sublime.Region(s.end() - 1)
+                    return sublime.Region(s.end())
+                return sublime.Region(s.begin())
+
             elif mode != modes.INTERNAL_NORMAL:
                 return s
+
             hard_eol = self.view.line(s.b).end()
             return sublime.Region(hard_eol, hard_eol)
 
@@ -1216,7 +1218,9 @@ class _vi_big_s_action(ViTextCommandBase):
                 if count == 1:
                     if view.line(s.b).size() > 0:
                         eol = view.line(s.b).b
-                        return sublime.Region(view.line(s.b).a, eol)
+                        begin = view.line(s.b).a
+                        begin = utils.next_non_white_space_char(view, begin, white_space=' \t')
+                        return sublime.Region(begin, eol)
                     return s
             return s
 

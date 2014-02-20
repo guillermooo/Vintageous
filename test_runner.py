@@ -47,7 +47,6 @@ TESTS_TEXT_OBJECTS = 'Vintageous.tests.vi.test_text_objects'
 TESTS_TEXT_OBJECTS_A_WORD = 'Vintageous.tests.vi.test_a_word'
 TESTS_TEXT_OBJECTS_PARAGRAPH = 'Vintageous.tests.vi.test_find_paragraph_text_object'
 
-TESTS_CMDS_SET_ACTION = 'Vintageous.tests.commands.test_set_action'
 TESTS_CMDS_SET_MOTION = 'Vintageous.tests.commands.test_set_motion'
 TESTS_CMDS_MOTION_VI_L = 'Vintageous.tests.commands.test__vi_l'
 TESTS_CMDS_MOTION_VI_H = 'Vintageous.tests.commands.test__vi_h'
@@ -80,7 +79,7 @@ TESTS_UNITS_WORD = 'Vintageous.tests.vi.test_word'
 TESTS_UNITS_BIG_WORD = 'Vintageous.tests.vi.test_big_word'
 TESTS_UNITS_WORD_END = 'Vintageous.tests.vi.test_word_end'
 
-TESTS_CMDS_ALL_SUPPORT = [TESTS_CMDS_SET_ACTION, TESTS_CMDS_SET_MOTION]
+TESTS_CMDS_ALL_SUPPORT = [TESTS_CMDS_SET_MOTION]
 
 TESTS_CMDS_ALL_ACTIONS = [
     TESTS_CMDS_ACTION_CTRL_X,

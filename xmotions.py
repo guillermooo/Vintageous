@@ -120,7 +120,7 @@ class _vi_reverse_find_in_line(ViTextCommandBase):
             if final_offset > -1:
                 pt = view.line(s.b).a + final_offset
 
-                if state.mode == modes.VISUAL or mode == modes.INTERNAL_NORMAL:
+                if mode == modes.VISUAL or mode == modes.INTERNAL_NORMAL:
                     if not inclusive:
                         return sublime.Region(s.a, pt + 1)
                     else:
@@ -885,7 +885,7 @@ class _vi_zero(ViTextCommandBase):
                 return sublime.Region(s.a, view.line(s.b).a)
             elif mode == modes.VISUAL:
                 if s.a < s.b:
-                    return sublime.Region(s.a + 1, view.line(s.b - 1).a)
+                    return sublime.Region(s.a, view.line(s.b - 1).a + 1)
                 else:
                     return sublime.Region(s.a, view.line(s.b).a)
             return s

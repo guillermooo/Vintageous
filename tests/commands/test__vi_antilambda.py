@@ -20,11 +20,11 @@ from Vintageous.tests import BufferTest
 test_data = namedtuple('test_data', 'initial_text regions cmd_params expected msg')
 
 TESTS = (
-    test_data('    abc',                   [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 1}, 'abc',               ''),
-    test_data('        abc',               [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 1}, '    abc',           ''),
-    test_data('    abc\n    abc',          [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 2}, 'abc\nabc',          ''),
-    test_data('    abc\n    abc\n    abc', [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 3}, 'abc\nabc\nabc',     ''),
-    test_data('    abc\n    abc\n    abc', [[(0, 0), (0, 0)], [(1, 0), (1, 0)]], {'mode': _MODE_INTERNAL_NORMAL, 'count': 1}, 'abc\nabc\n    abc', ''),
+    test_data('    abc',                   [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 1}, 'abc',               'failed in {0}'),
+    test_data('        abc',               [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 1}, '    abc',           'failed in {0}'),
+    test_data('    abc\n    abc',          [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 2}, 'abc\nabc',          'failed in {0}'),
+    test_data('    abc\n    abc\n    abc', [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 3}, 'abc\nabc\nabc',     'failed in {0}'),
+    test_data('    abc\n    abc\n    abc', [[(0, 0), (0, 0)], [(1, 0), (1, 0)]], {'mode': _MODE_INTERNAL_NORMAL, 'count': 1}, 'abc\nabc\n    abc', 'failed in {0}'),
 )
 
 
@@ -38,8 +38,8 @@ class Test__vi_double_antilambda(BufferTest):
             for region in data.regions:
                 add_sel(self.view, self.R(*region))
 
-            self.view.run_command('_vi_double_antilambda', data.cmd_params)
+            self.view.run_command('_vi_less_than_less_than', data.cmd_params)
 
             msg = "[{0}] {1}".format(i, data.msg)
             actual = self.view.substr(self.R(0, self.view.size()))
-            self.assertEqual(data.expected, actual, msg)
+            self.assertEqual(data.expected, actual, msg.format(i))
