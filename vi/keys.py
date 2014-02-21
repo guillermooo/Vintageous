@@ -118,6 +118,7 @@ class seqs:
     CTRL_l =                       '<ctrl+l>'
     CTRL_B =                       '<ctrl+b>'
     CTRL_F =                       '<ctrl+f>'
+    CTRL_G =                       '<ctrl+g>'
     CTRL_P =                       '<ctrl+p>'
     CTRL_U =                       '<ctrl+u>'
     CTRL_V =                       '<ctrl+v>'
@@ -283,6 +284,7 @@ mappings = {
         seqs.CTRL_E:                    cmd_defs[modes.NORMAL][cmds.CTRL_E],
         seqs.CTRL_F12:                  cmd_defs[modes.NORMAL][cmds.CTRL_F12],
         seqs.CTRL_F:                    cmd_defs[modes.NORMAL][cmds.CTRL_F],
+        seqs.CTRL_G:                    cmd_defs[modes.NORMAL][cmds.CTRL_G],
         seqs.CTRL_K:                    cmd_defs[modes.NORMAL][cmds.CTRL_K],
         seqs.CTRL_K_CTRL_B:             cmd_defs[modes.NORMAL][cmds.CTRL_K_CTRL_B],
         seqs.CTRL_P:                    cmd_defs[modes.NORMAL][cmds.CTRL_P],

@@ -175,6 +175,7 @@ class cmds:
     CTRL_D =                       'vi_ctrl_d'
     CTRL_E =                       'vi_ctrl_e'
     CTRL_F =                       'vi_ctrl_f'
+    CTRL_G =                       'vi_ctrl_g'
     CTRL_F11 =                     'vi_ctrl_f11'
     CTRL_F12 =                     'vi_ctrl_f12'
     CTRL_K =                       'vi_ctrl_k'
@@ -302,6 +303,7 @@ cmd_defs = {
         cmds.BIG_C:                     dict(name=cmds.BIG_C,                       input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
         cmds.BIG_D:                     dict(name=cmds.BIG_D,                       input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
         cmds.C:                         dict(name=cmds.C,                           input=None,                 type=cmd_types.ACTION, motion_required=True, multi_step=False, repeatable=True),
+        cmds.CTRL_G:                    dict(name=cmds.CTRL_G,                      input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=True, repeatable=False),
         cmds.CTRL_V:                    dict(name=cmds.CTRL_V,                      input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=True, repeatable=False),
         cmds.D:                         dict(name=cmds.D,                           input=None,                 type=cmd_types.ACTION, motion_required=True, multi_step=False, repeatable=True),
         cmds.EQUAL:                     dict(name=cmds.EQUAL,                       input=None,                 type=cmd_types.ACTION, motion_required=True, multi_step=True, repeatable=True),
