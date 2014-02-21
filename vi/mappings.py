@@ -103,14 +103,23 @@ class Mappings(object):
             self.state.logger.info("[Mappings] incomplete user mapping {0}".format(self.state.partial_sequence))
             return True
 
-    def get_current(self, sequence=None, check_user_mappings=True):
+    def get_current(self, sequence=None, mode=None, check_user_mappings=True):
         """
         Looks at the current global state and returns the command mapped to
-        the available sequence. It may be a MISSING command.
+        the available sequence. It may be a 'missing' command.
 
-        If a 'sequence' is passed, it is unsed instead of the global state's.
-        This is necessary for some commands that aren't name spaces but act
-        as them (for example, ys from the surround plugin).
+        @sequence
+            If a @sequence is passed, it is used instead of the global state's.
+            This is necessary for some commands that aren't name spaces but act
+            as them (for example, ys from the surround plugin).
+        @mode
+            If different than `None`, it will be used instead of the global
+            state's. This is necessary when we are in operator pending mode
+            and we receive a new action. By combining the existing action's
+            name with name of the action just received we could find a new
+            action.
+
+            For example, this is the case of g~~.
         """
         # we usually need to look at the partial sequence, but some commands do weird things,
         # like ys, which isn't a namespace but behaves as such sometimes.
@@ -120,6 +129,7 @@ class Mappings(object):
         # TODO: Use same structure as in mappings (nested dicst).
         command = None
         if check_user_mappings:
+            # TODO: We should be able to force a mode here too as, below.
             command = self.expand_first(seq)
 
         if command:
@@ -127,7 +137,7 @@ class Mappings(object):
             return {'name': command.mapping, 'type': cmd_types.USER}
         else:
             self.state.logger.info('[Mappings] looking up >{0}<'.format(seq))
-            command = seq_to_command(self.state, seq)
+            command = seq_to_command(self.state, seq, mode=mode)
             self.state.logger.info('[Mappings] got {0}'.format(command))
             return command
 

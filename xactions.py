@@ -640,22 +640,33 @@ class PressKey(ViWindowCommandBase):
             return
 
         elif command['name'] == cmds.MISSING:
-            # Check if we have a command like ys (action + qualifier, no pure namespace).
             actual_seq = to_bare_command_name(state.sequence)
-            command = key_mappings.get_current(sequence=actual_seq)
+
+            if state.mode == modes.OPERATOR_PENDING:
+                # We might be looking at a command like 'dd'. The first 'd' is
+                # mapped for normal mode, but the second is missing in
+                # operator pending mode, so we get a missing command. Try to
+                # build the full command now.
+                command = key_mappings.get_current(sequence=actual_seq,
+                                                   mode=modes.NORMAL)
+            else:
+                command = key_mappings.get_current(sequence=actual_seq)
+
             if command['name'] == cmds.MISSING:
                 _logger().info('[PressKey] unmapped sequence: {0}'.format(state.sequence))
+                utils.blink()
                 state.reset_command_data()
                 return
 
         if (state.mode == modes.OPERATOR_PENDING and
             command['type'] == cmd_types.ACTION):
+                # TODO: This may be unreachable code by now. ?????????????????
                 # we're expecting a motion, but we could still get an action.
                 # For example, dd, g~g~ or g~~
                 # remove counts
                 action_seq = to_bare_command_name(state.sequence)
                 _logger().info('[PressKey] action seq: {0}'.format(action_seq))
-                command = key_mappings.get_current(sequence=action_seq)
+                command = key_mappings.get_current(sequence=action_seq, mode=modes.NORMAL)
                 if command['name'] == cmds.MISSING:
                     _logger().info("[PressKey] unmapped sequence: {0}".format(state.sequence))
                     state.reset_command_data()
