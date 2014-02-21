@@ -35,7 +35,8 @@ def is_view(view):
     It returns `False` for views that have a `__vi_external_disable`
     setting set to `True`.
     """
-    return not any((is_widget(view), is_console(view), is_ignored(view)))
+    return not any((is_widget(view), is_console(view),
+                    is_ignored(view), is_ignored_but_command_mode(view)))
 
 
 def is_ignored(view):
@@ -46,6 +47,19 @@ def is_ignored(view):
     specific views.
     """
     return view.settings().get('__vi_external_disable', False)
+
+
+def is_ignored_but_command_mode(view):
+    """
+    Returns `True` if the view wants to be ignored by Vintageous.
+
+    Useful for external plugins that don't want Vintageous to be active for
+    specific views.
+
+    .is_ignored_but_command_mode() differs from .is_ignored() in that here
+    we declare that only keys should be disabled, not command mode.
+    """
+    return view.settings().get('__vi_external_disable_keys', False)
 
 
 def is_widget(view):

@@ -25,6 +25,7 @@ from Vintageous.vi.utils import get_logger
 from Vintageous.vi.utils import input_types
 from Vintageous.vi.utils import is_view
 from Vintageous.vi.utils import is_ignored
+from Vintageous.vi.utils import is_ignored_but_command_mode
 from Vintageous.vi.utils import jump_directions
 from Vintageous.vi.utils import modes
 
@@ -56,8 +57,9 @@ def _init_vintageous(view, new_session=False):
         _logger().info('[_init_vintageous] ignoring view: {0}'.format(view.name() or view.file_name() or '<???>'))
         try:
             # XXX: All this seems to be necessary here.
-            view.settings().set('command_mode', False)
-            view.settings().set('inverse_caret_state', False)
+            if not is_ignored_but_command_mode(view):
+                view.settings().set('command_mode', False)
+                view.settings().set('inverse_caret_state', False)
             view.settings().erase('vintage')
             if is_ignored(view):
                 # Someone has intentionally disabled Vintageous, so let the user know.

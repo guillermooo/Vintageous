@@ -336,11 +336,9 @@ class ExMap(sublime_plugin.TextCommand):
 
 class ExUnmap(sublime_plugin.TextCommand):
     def run(self, edit, mode=None, count=None, cmd=''):
-        pass
-        # try:
-            # del user_mappings[cmd]
-        # except IndexError:
-            # sublime.status_message('[Vintageous] Nothing to unmmap.')
+        mappings = Mappings(State(self.view))
+        # mappings.remove(cmd, modes.NORMAL)
+        # mappings.remove(cmd, modes.OPERATOR_PENDING)
 
 
 class ExAbbreviate(sublime_plugin.TextCommand):

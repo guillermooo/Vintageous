@@ -145,7 +145,7 @@ class Mappings(object):
     def add(self, mode, new, target):
         _mappings[mode][new] = {'name': target, 'type': cmd_types.USER}
 
-    def remove(self, mode, new, target):
+    def remove(self, mode, new):
         del _mappings[mode][new]
 
     def clear(self):
