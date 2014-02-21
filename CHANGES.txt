@@ -1,3 +1,16 @@
+2.9.7 - 21/02/14
+
+	- Increased segregation of key sequences by mode.
+	- A lof of code shuffled around.
+	- Add a selection at init time if none is found.
+	- Remove init .on_load() for Windows and Linux.
+	- Always switch to visual mode if there are non-empty selections in the
+	  view.
+	- c and s behave charwise on empty lines.
+	- Implement Ctrl+G in normal mode.
+	- Improve macros.
+	- x deletes the exact visually selected text.
+
 2.9.6 - 20/02/14
 
     - Fix letter-case-related commands.

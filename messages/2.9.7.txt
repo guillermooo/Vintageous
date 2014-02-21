@@ -1,0 +1,52 @@
+==============================================================================
+Vintageous 2.9.7
+==============================================================================
+
+
+		There have been quite a few low level changes in this version,
+		mostly related to code reorg in preparation for future releases.
+		Please report any problems you may encounter.
+
+
+CHANGES
+-------
+
+	- Increased segregation of key sequences by mode.
+	- A lof of code shuffled around.
+	- Add a selection at init time if none is found.
+	- Remove init .on_load() for Windows and Linux.
+	- Always switch to visual mode if there are non-empty selections in the
+	  view.
+	- c and s behave charwise on empty lines.
+	- Implement Ctrl+G in normal mode.
+	- Improve macros.
+	- x deletes the exact visually selected text.
+
+
+FOUND BUGS?
+-----------
+
+Please report them here:
+
+    https://github.com/guillermooo/Vintageous/issues
+
+
+SUPPORT VINTAGEOUS
+------------------
+
+Is Vintageous worth your time? Developing Vintageous is hard work. If you use
+it often to get actual work done, please consider donating and make it worth
+my time too.
+
+    PayPal: http://www.pledgie.com/campaigns/19122
+    Gittip: https://www.gittip.com/guillermooo/
+
+I'm the creator and main author of Vintageous, but some generous people have
+contributed their time and effort as well. See the more active ones here; you
+may want to show them some gratitude too:
+
+https://github.com/guillermooo/Vintageous/graphs/contributors
+
+Thanks for reading and for using Vintageous!
+
+Guillermo
