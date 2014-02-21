@@ -2161,6 +2161,11 @@ class _vi_visual_u(ViTextCommandBase):
         for s in self.view.sel():
             self.view.replace(edit, s, self.view.substr(s).lower())
 
+        def after(view, s):
+            return sublime.Region(s.begin())
+
+        regions_transformer(self.view, after)
+
         self.enter_normal_mode(mode)
 
 
@@ -2171,6 +2176,11 @@ class _vi_visual_big_u(ViTextCommandBase):
     def run(self, edit, mode=None, count=1):
         for s in self.view.sel():
             self.view.replace(edit, s, self.view.substr(s).upper())
+
+        def after(view, s):
+            return sublime.Region(s.begin())
+
+        regions_transformer(self.view, after)
 
         self.enter_normal_mode(mode)
 
