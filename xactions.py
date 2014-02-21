@@ -174,8 +174,7 @@ class _vi_c(ViTextCommandBase):
             self.view.run_command(motion['motion'], motion['motion_args'])
 
             if not self.has_sel_changed():
-                utils.blink()
-                self.enter_normal_mode(mode)
+                self.enter_insert_mode(mode)
                 return
 
         self.view.run_command('right_delete')
@@ -1214,15 +1213,27 @@ class _vi_s(ViTextCommandBase):
     _can_yank = True
     _populates_small_delete_register = True
     def run(self, edit, mode=None, count=1, register=None):
-        # def erase(view, s):
-        #     view.erase(edit, s)
-        #     return sublime.Region(s.begin())
-        self.view.run_command('_vi_l', {'mode': mode, 'count': count})
+        def select(view, s):
+            if view.line(s.b).empty():
+                return sublime.Region(s.b)
+            return sublime.Region(s.b, s.b + 1)
+
+        self.save_sel()
+
+        if mode not in (modes.VISUAL, modes.VISUAL_LINE, modes.VISUAL_BLOCK):
+            regions_transformer(self.view, select)
+
+            if not self.has_sel_changed():
+                self.enter_insert_mode(mode)
+                return
+
         state = self.state
+
         state.registers.yank(self, register)
         self.view.run_command('right_delete')
-        # regions_transformer_reversed(self.view, erase)
+
         self.enter_insert_mode(mode)
+
 
 class _vi_x(ViTextCommandBase):
     """
