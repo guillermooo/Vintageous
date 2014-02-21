@@ -1485,15 +1485,21 @@ class _vi_big_x(ViTextCommandBase):
         def select(view, s):
             if mode == modes.INTERNAL_NORMAL:
                 return sublime.Region(s.b, s.b - count)
+            elif mode == modes.VISUAL:
+                if s.a < s.b:
+                    return sublime.Region(view.full_line(s.b - 1).b,
+                                          view.line(s.a).a)
+                return sublime.Region(view.line(s.b).a,
+                                      view.full_line(s.a - 1).b)
             return sublme.Region(s.begin(), s.end())
-        # def delete(view, s):
-        #     view.erase(edit, s)
-        #     return s
+
         regions_transformer(self.view, select)
+
         state = self.state
         state.registers.yank(self, register)
+
         self.view.run_command('left_delete')
-        # regions_transformer_reversed(self.view, delete)
+
         self.enter_normal_mode(mode)
 
 class _vi_big_p(ViTextCommandBase):
@@ -2027,14 +2033,27 @@ class _vi_big_y(ViTextCommandBase):
 
     def run(self, edit, count=1, mode=None, register=None):
         def select(view, s):
-            pt = view.text_point(view.rowcol(s.b)[0] + (count - 1), 0)
-            return sublime.Region(view.full_line(pt).b, view.line(s.b).a)
+            if mode == modes.INTERNAL_NORMAL:
+                pt = view.text_point(view.rowcol(s.b)[0] + (count - 1), 0)
+                return sublime.Region(view.full_line(pt).b, view.line(s.b).a)
 
-        if mode != modes.INTERNAL_NORMAL:
+            elif mode == modes.VISUAL:
+                # TODO: Restore xpos after yanking.
+                if s.a < s.b:
+                    return sublime.Region(view.full_line(s.b - 1).b,
+                                          view.line(s.a).a)
+                return sublime.Region(view.line(s.b).a,
+                                      view.full_line(s.a - 1).b)
+
+            raise ValueError('unsupported mode')
+
+        try:
+            regions_transformer(self.view, select)
+        except ValueError:
             utils.blink()
+            self.enter_normal_mode(mode)
             return
 
-        regions_transformer(self.view, select)
         self.outline_target()
         self.state.registers.yank(self, register)
 

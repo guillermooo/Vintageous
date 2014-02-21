@@ -1794,7 +1794,7 @@ class _vi_ctrl_b(ViTextCommandBase):
     def run(self, edit, mode=None, count=1):
         if mode == modes.NORMAL:
             self.view.run_command('move', {'by': 'pages', 'forward': False})
-        elif vi_cmd_data['mode'] != modes.NORMAL:
+        elif mode != modes.NORMAL:
             return
 
 
