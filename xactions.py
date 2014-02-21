@@ -1239,18 +1239,18 @@ class _vi_x(ViTextCommandBase):
     """
     Implementation of Vim's x action.
     """
-    # Yank config data.
     _can_yank = True
     _populates_small_delete_register = True
+
     def run(self, edit, mode=None, count=1, register=None):
-        # def erase(view, s):
-        #     view.erase(edit, s)
-        #     return sublime.Region(s.begin())
         state = self.state
-        self.view.run_command('_vi_l', {'mode': mode, 'count': count})
+
+        if mode not in (modes.VISUAL, modes.VISUAL_LINE, modes.VISUAL_BLOCK):
+            self.view.run_command('_vi_l', {'mode': mode, 'count': count})
+
         state.registers.yank(self, register)
         self.view.run_command('right_delete')
-        # regions_transformer_reversed(self.view, erase)
+
         self.enter_normal_mode(mode)
 
 class _vi_r(ViTextCommandBase):
