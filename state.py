@@ -101,7 +101,7 @@ def _init_vintageous(view, new_session=False):
         # TODO: Don't we need to pass a mode here?
         view.window().run_command('_enter_normal_mode', {'from_init': True})
 
-    elif (view.has_non_empty_selection_region() and len(view.sel()) > 1 and
+    elif (view.has_non_empty_selection_region() and
           state.mode != modes.VISUAL):
           # Runs, for example, when we've performed a search via ST3 search
           # panel and we've pressed 'Find All'. In this case, we want to
