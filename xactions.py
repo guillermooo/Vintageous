@@ -321,14 +321,14 @@ class _enter_select_mode(ViWindowCommandBase):
         state.display_status()
 
 
-class _enter_insert_mode(ViWindowCommandBase):
-    def run(self, mode=None, count=1):
-        self.window.active_view().settings().set('inverse_caret_state', False)
-        self.window.active_view().settings().set('command_mode', False)
-        state = self.state
-        state.enter_insert_mode()
-        state.normal_insert_count = str(count)
-        state.display_status()
+class _enter_insert_mode(ViTextCommandBase):
+    def run(self, edit, mode=None, count=1):
+        self.view.settings().set('inverse_caret_state', False)
+        self.view.settings().set('command_mode', False)
+
+        self.state.enter_insert_mode()
+        self.state.normal_insert_count = str(count)
+        self.state.display_status()
 
 
 class _enter_visual_mode(ViTextCommandBase):
