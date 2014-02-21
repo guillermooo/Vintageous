@@ -87,6 +87,10 @@ def _init_vintageous(view, new_session=False):
     if not reset and (state.mode != modes.NORMAL):
         return
 
+    # If we have no selections, add one.
+    if len(state.view.sel()) == 0:
+        state.view.sel().add(sublime.Region(0))
+
     state.logger.info('[_init_vintageous] running init')
 
     if state.mode in (modes.VISUAL, modes.VISUAL_LINE):
