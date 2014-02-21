@@ -591,8 +591,17 @@ class PressKey(ViWindowCommandBase):
             return
 
         # if capturing input, we shall not pass this point
-        if self.handle_parser(key, do_eval):
-            return
+        if state.input_parsers:
+            if state.process_user_input(key):
+                if state.runnable():
+                    _logger().info('[PressKey] state holds complete command: {0} motion: {1} user input: {2}'.format(state.action,
+                                                                                                 state.motion,
+                                                                                                 state.user_input))
+                    if do_eval:
+                        _logger().info('[PressKey] evaluating complete command')
+                        state.eval()
+                        state.reset_command_data()
+                return
 
         if repeat_count:
             state.action_count = str(repeat_count)
@@ -702,62 +711,6 @@ class PressKey(ViWindowCommandBase):
                     _logger().info('[PressKey] motion count digit: {0}'.format(key))
                     state.motion_count += key
                     return True
-
-    def handle_parser(self, key, do_eval):
-        """
-        Returns `True` if processing of the current key needs to stop due
-        to some state related to the active parser.
-        """
-        state = State(self.window.active_view())
-        # if capturing input, we shall not pass this point
-        if state.input_parsers:
-            _logger().info('[PressKey] active input parsers: {0}'.format(state.input_parsers))
-
-            parser_name = state.input_parsers[-1]
-            parser, type_, post_parser = inputs.get(state, parser_name)
-
-            # TODO: use translate_key?
-            if key.lower() == '<cr>':
-                _logger().info('[PressKey] <cr> pressed, removing 1 parser')
-                state.pop_parser()
-
-                if post_parser:
-                    _logger().info('[PressKey] running post parser: {0}'.format(post_parser))
-                    self.window.run_command(post_parser, {'key': key})
-
-                if state.runnable():
-                    _logger().info('[PressKey] running command action: {0} motion: {1} user input: {2}'.format(state.action,
-                                                                                                 state.motion,
-                                                                                                 state.user_input))
-                    if do_eval:
-                        state.eval()
-                        state.reset_command_data()
-                    return True
-                else:
-                    return True
-
-            state.user_input += key
-
-            if state.input_parsers and callable(parser) and parser(key):
-                _logger().info('[PressKey] parser satistied, removing one parser')
-                state.pop_parser()
-
-                if post_parser:
-                    _logger().info('[PressKey] running post parser: {0}'.format(post_parser))
-                    self.window.run_command(post_parser)
-                if state.runnable():
-                    _logger().info('[PressKey] state holds complete command: {0} motion: {1} user input: {2}'.format(state.action,
-                                                                                                 state.motion,
-                                                                                                 state.user_input))
-                    if do_eval:
-                        _logger().info('[PressKey] evaluating complete command')
-                        state.eval()
-                        state.reset_command_data()
-                    return True
-            else:
-                _logger().info('[PressKey] more input expected by parser')
-                # we need to keep collecting input
-                return True
 
 
 class _vi_dot(ViWindowCommandBase):

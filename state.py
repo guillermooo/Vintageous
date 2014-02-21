@@ -653,6 +653,48 @@ class State(object):
 
         return False
 
+
+    def process_user_input(self, key):
+        """
+        Returns `True` if the current input parser is satistied by @key.
+        """
+        if not self.input_parsers:
+            return
+
+        _logger().info('[State] active input parsers: {0}'.format(self.input_parsers))
+
+        parser_name = self.input_parsers[-1]
+        parser, type_, post_parser = inputs.get(self, parser_name)
+
+        # TODO: use translate_key?
+        # XXX: Why can't we use the same logic as below?
+        if key.lower() == '<cr>':
+            _logger().info('[State] <cr> pressed, removing 1 parser')
+            self.pop_parser()
+
+            if post_parser:
+                _logger().info('[State] running post parser: {0}'.format(post_parser))
+                self.view.window().run_command(post_parser, {'key': key})
+
+            return True
+
+        self.user_input += key
+
+        if self.input_parsers and callable(parser) and parser(key):
+            _logger().info('[State] parser satistied, removing one parser')
+            self.pop_parser()
+
+            if post_parser:
+                _logger().info('[State] running post parser: {0}'.format(post_parser))
+                self.view.window().run_command(post_parser)
+
+            return True
+
+        else:
+            _logger().info('[State] more input expected by parser')
+            # we need to keep collecting input
+            return True
+
     def set_command(self, command):
         """
         Sets the current command to @command.
