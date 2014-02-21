@@ -9,8 +9,8 @@ from Vintageous.vi import actions
 from Vintageous.vi import inputs
 from Vintageous.vi import motions
 from Vintageous.vi import utils
-from Vintageous.vi.keys import cmd_types
-from Vintageous.vi.keys import cmds
+from Vintageous.vi.cmd_defs import cmds
+from Vintageous.vi.cmd_defs import cmd_types
 from Vintageous.vi.contexts import KeyContext
 from Vintageous.vi.dot_file import DotFile
 from Vintageous.vi.keys import mappings

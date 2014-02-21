@@ -3,15 +3,17 @@ import threading
 import sublime
 import sublime_plugin
 
+from Vintageous import local_logger
+from Vintageous.state import _init_vintageous
+from Vintageous.state import State
+from Vintageous.vi import utils
+from Vintageous.vi.cmd_defs import cmd_defs
+from Vintageous.vi.cmd_defs import cmds
+from Vintageous.vi.dot_file import DotFile
 from Vintageous.vi.keys import cmd_defs
 from Vintageous.vi.keys import cmds
-from Vintageous.state import State
-from Vintageous.state import _init_vintageous
-from Vintageous.vi.utils import regions_transformer
 from Vintageous.vi.utils import modes
-from Vintageous.vi import utils
-from Vintageous.vi.dot_file import DotFile
-from Vintageous import local_logger
+from Vintageous.vi.utils import regions_transformer
 
 
 _logger = local_logger(__name__)

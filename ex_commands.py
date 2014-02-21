@@ -14,21 +14,21 @@ from Vintageous.ex import shell
 from Vintageous.ex.plat.windows import get_oem_cp
 from Vintageous.ex.plat.windows import get_startup_info
 from Vintageous.ex_main import FsCompletion
+from Vintageous.state import State
 from Vintageous.state import user_mappings
 from Vintageous.state import VintageState
 from Vintageous.vi import abbrev
 from Vintageous.vi import utils
+from Vintageous.vi.cmd_defs import cmd_types
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
-from Vintageous.vi.keys import cmd_types
+from Vintageous.vi.mappings import Mappings
 from Vintageous.vi.settings import set_global
 from Vintageous.vi.settings import set_local
 from Vintageous.vi.sublime import has_dirty_buffers
 from Vintageous.vi.utils import IrreversibleTextCommand
 from Vintageous.vi.utils import modes
-from Vintageous.vi.mappings import Mappings
-from Vintageous.state import State
 
 
 GLOBAL_RANGES = []

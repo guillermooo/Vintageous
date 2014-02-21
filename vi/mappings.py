@@ -1,10 +1,10 @@
-from Vintageous.vi.utils import modes
+from Vintageous.vi import utils
+from Vintageous.vi.cmd_defs import cmd_types
+from Vintageous.vi.keys import mappings
 from Vintageous.vi.keys import parse_sequence
 from Vintageous.vi.keys import seq_to_command
-from Vintageous.vi.keys import mappings
-from Vintageous.vi.keys import cmd_types
 from Vintageous.vi.keys import to_bare_command_name
-from Vintageous.vi import utils
+from Vintageous.vi.utils import modes
 
 
 _mappings = {
