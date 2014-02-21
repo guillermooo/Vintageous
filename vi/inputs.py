@@ -1,5 +1,10 @@
+from collections import namedtuple
+
 from Vintageous.vi.utils import input_types
 from Vintageous.vi import utils
+
+
+parser_def = namedtuple('parsed_def', 'command input_param on_done type')
 
 
 def get(state, name):
@@ -9,7 +14,7 @@ def get(state, name):
     return parser_func(state)
 
 
-def default(in_):
+def one_char(in_):
     """
     Any input (character) satisfies this parser.
     """
@@ -18,64 +23,112 @@ def default(in_):
 
 
 def vi_f(state):
-    return (default, input_types.INMEDIATE, None)
+    p = parser_def(command=one_char,
+                   input_param=None,
+                   on_done=None,
+                   type=input_types.INMEDIATE)
+    return p
 
 
 def vi_big_f(state):
-    return (default, input_types.INMEDIATE, None)
+    p = parser_def(command=one_char,
+                   input_param=None,
+                   on_done=None,
+                   type=input_types.INMEDIATE)
+    return p
 
 
 def vi_big_t(state):
-    return (default, input_types.INMEDIATE, None)
+    p = parser_def(command=one_char,
+                   input_param=None,
+                   on_done=None,
+                   type=input_types.INMEDIATE)
+    return p
 
 
 def vi_t(state):
-    return (default, input_types.INMEDIATE, None)
+    p = parser_def(command=one_char,
+                   input_param=None,
+                   on_done=None,
+                   type=input_types.INMEDIATE)
+    return p
 
 
 # TODO: rename to "vi_a_text_object".
 def vi_inclusive_text_object(state):
-    return (default, input_types.INMEDIATE, None)
+    p = parser_def(command=one_char,
+                   input_param=None,
+                   on_done=None,
+                   type=input_types.INMEDIATE)
+    return p
 
 
 def vi_exclusive_text_object(state):
-    return (default, input_types.INMEDIATE, None)
+    p = parser_def(command=one_char,
+                   input_param=None,
+                   on_done=None,
+                   type=input_types.INMEDIATE)
+    return p
 
 
 def vi_m(state):
-    return (default, input_types.INMEDIATE, None)
-
-
-def vi_r(state):
-    return (default, input_types.INMEDIATE, None)
+    p = parser_def(command=one_char,
+                   input_param=None,
+                   on_done=None,
+                   type=input_types.INMEDIATE)
+    return p
 
 
 def vi_q(state):
-    return (default, input_types.INMEDIATE, None)
+    p = parser_def(command=one_char,
+                   input_param=None,
+                   on_done=None,
+                   type=input_types.INMEDIATE)
+    return p
 
 
 def vi_at(state):
-    return (default, input_types.INMEDIATE, None)
+    p = parser_def(command=one_char,
+                   input_param=None,
+                   on_done=None,
+                   type=input_types.INMEDIATE)
+    return p
 
 
 def vi_a_text_object(state):
-    return (default, input_types.INMEDIATE, None)
+    p = parser_def(command=one_char,
+                   input_param=None,
+                   on_done=None,
+                   type=input_types.INMEDIATE)
+    return p
 
 
 def vi_i_text_object(state):
-    return (default, input_types.INMEDIATE, None)
+    p = parser_def(command=one_char,
+                   input_param=None,
+                   on_done=None,
+                   type=input_types.INMEDIATE)
+    return p
 
 
 def vi_quote(state):
-    return (default, input_types.INMEDIATE, None)
-
-
+    p = parser_def(command=one_char,
+                   input_param=None,
+                   on_done=None,
+                   type=input_types.INMEDIATE)
+    return p
 def vi_r(state):
-    return (default, input_types.INMEDIATE, '_vi_r_on_parser_done')
-
-
+    p = parser_def(command=one_char,
+                   input_param=None,
+                   on_done='_vi_r_on_parser_done',
+                   type=input_types.INMEDIATE)
+    return p
 def vi_backtick(state):
-    return (default, input_types.INMEDIATE, None)
+    p = parser_def(command=one_char,
+                   input_param=None,
+                   on_done=None,
+                   type=input_types.INMEDIATE)
+    return p
 
 
 def vi_slash(state):
@@ -85,9 +138,15 @@ def vi_slash(state):
     """
     # Any input is valid; we're never satisfied.
     if state.non_interactive:
-        return (lambda x: False, input_types.INMEDIATE, '_vi_slash_on_parser_done')
+        return parser_def(command=lambda x: False,
+                          type=input_types.INMEDIATE,
+                          on_done='_vi_slash_on_parser_done',
+                          input_param='key')
     else:
-        return ('_vi_slash', input_types.VIA_PANEL, None)
+        return parser_def(command='_vi_slash',
+                          type=input_types.VIA_PANEL,
+                          on_done=None,
+                          input_param='default')
 
 
 def vi_question_mark(state):
@@ -96,8 +155,13 @@ def vi_question_mark(state):
     its input from an input panel.
     """
     # Any input is valid; we're never satisfied.
-
     if state.non_interactive:
-        return (lambda x: False, input_types.INMEDIATE, '_vi_question_mark_on_parser_done')
+        return parser_def(command=lambda x: False,
+                          type=input_types.INMEDIATE,
+                          on_done='_vi_question_mark_on_parser_done',
+                          input_param='key')
     else:
-        return ('_vi_question_mark', input_types.VIA_PANEL, None)
+        return parser_def(command='_vi_question_mark',
+                          type=input_types.VIA_PANEL,
+                          on_done=None,
+                          input_param='default')

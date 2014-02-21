@@ -1652,17 +1652,14 @@ class _vi_question_mark_impl(BufferSearchBase):
 
         regions_transformer(self.view, f)
         self.hilite(search_string)
-
-
 class _vi_question_mark(IrreversibleTextCommand, ViTextCommandBase, BufferSearchBase):
-    def run(self):
+    def run(self, default=''):
         self.state.reset_during_init = False
-
         state = self.state
         on_change = self.on_change if state.settings.vi['incsearch'] else None
         mark_as_widget(self.view.window().show_input_panel(
                                                             '',
-                                                            '',
+                                                            default,
                                                             self.on_done,
                                                             on_change,
                                                             self.on_cancel))

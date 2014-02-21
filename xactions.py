@@ -518,7 +518,7 @@ class PressKeys(ViWindowCommandBase):
         #
         #   * the motion is the one receiving data.
         #
-        _logger().info('[PressKeys] unsatisfied parser:', state.action, state.motion)
+        _logger().info('[PressKeys] unsatisfied parser: {0} {1}'.format(state.action, state.motion))
         if state.action and state.motion:
             # we have a parser an a motion that can collect data. Collect data interactively.
             motion_func = getattr(motions, state.motion['name'], None)
@@ -530,13 +530,12 @@ class PressKeys(ViWindowCommandBase):
             motion_data['motion_args']['default'] = state.user_input
             self.window.run_command(motion_data['motion'], motion_data['motion_args'])
             return
-
         try:
-            parser_name = state.input_parsers[-1]
-            _logger().info('[PressKeys] last attemp to collect input:', parser_name)
-            self.window.run_command('_' + parser_name, {'default': state.user_input})
+            parser_def = inputs.get(state, state.input_parsers[-1])
+            _logger().info('[PressKeys] last attemp to collect input: {0}'.format(parser_def.command))
+            self.window.run_command(parser_def.command, {'default': state.user_input})
         except IndexError:
-            print('[Vintageous] parser unsatisfied command not found')
+            _logger().info('[Vintageous] parser unsatisfied command not found')
             utils.blink()
         finally:
             state.non_interactive = False

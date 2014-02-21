@@ -648,15 +648,11 @@ class State(object):
         """
         if not self.input_parsers:
             return False
-
-        parser_name = self.input_parsers[-1]
-        parser, type_, post_parser = inputs.get(self, parser_name)
-
-        if type_ == input_types.VIA_PANEL:
+        parser_def = inputs.get(self, self.input_parsers[-1])
+        if parser_def.type == input_types.VIA_PANEL:
             # Let the input-collection command collect input.
-            sublime.active_window().run_command(parser)
+            sublime.active_window().run_command(parser_def.command)
             return True
-
         return False
 
 
@@ -669,30 +665,31 @@ class State(object):
 
         _logger().info('[State] active input parsers: {0}'.format(self.input_parsers))
 
-        parser_name = self.input_parsers[-1]
-        parser, type_, post_parser = inputs.get(self, parser_name)
-
+        parser_def = inputs.get(self, self.input_parsers[-1])
         # TODO: use translate_key?
         # XXX: Why can't we use the same logic as below?
         if key.lower() == '<cr>':
             _logger().info('[State] <cr> pressed, removing 1 parser')
             self.pop_parser()
 
-            if post_parser:
-                _logger().info('[State] running post parser: {0}'.format(post_parser))
-                self.view.window().run_command(post_parser, {'key': key})
+            if parser_def.on_done:
+                _logger().info('[State] running post parser: {0}'
+                                                .format(parser_def.on_done))
+                self.view.window().run_command(parser_def.on_done, {'key': key})
 
             return True
 
         self.user_input += key
 
-        if self.input_parsers and callable(parser) and parser(key):
-            _logger().info('[State] parser satistied, removing one parser')
+        if (self.input_parsers and callable(parser_def.command)
+                               and parser_def.command(key)):
+            _logger().info('[State] parser satisfied, removing one parser')
             self.pop_parser()
 
-            if post_parser:
-                _logger().info('[State] running post parser: {0}'.format(post_parser))
-                self.view.window().run_command(post_parser)
+            if parser_def.on_done:
+                _logger().info('[State] running post parser: {0}'
+                                                .format(parser_def.on_done))
+                self.view.window().run_command(parser_def.on_done, {'key': key})
 
             return True
 
