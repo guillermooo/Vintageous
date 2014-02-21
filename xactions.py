@@ -2114,20 +2114,18 @@ class _vi_tilde(ViTextCommandBase):
     """
     def run(self, edit, count=1, mode=None, motion=None):
         def select(view, s):
+            if mode == modes.VISUAL:
+                return sublime.Region(s.end(), s.begin())
             return sublime.Region(s.begin(), s.end() + count)
 
-        # if motion:
-            # self.save_sel()
-
-            # self.view.run_command(motion['motion'], motion['motion_args'])
-
-            # if not self.has_sel_changed():
-                # utils.blink()
-                # self.enter_normal_mode(mode)
-                # return
+        def after(view, s):
+            return sublime.Region(s.begin())
 
         regions_transformer(self.view, select)
         self.view.run_command('swap_case')
+
+        if mode in (modes.VISUAL, modes.VISUAL_LINE, modes.VISUAL_BLOCK):
+            regions_transformer(self.view, after)
 
         self.enter_normal_mode(mode)
 
