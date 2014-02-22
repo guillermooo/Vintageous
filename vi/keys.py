@@ -34,7 +34,7 @@ class seqs:
     """
 
     A =                            'a'
-    ALT_CTRL_P =                   '<ctrl+alt+p>'
+    ALT_CTRL_P =                   '<C-M-p>'
     AMPERSAND =                    '&'
     AW =                           'aw'
     B =                            'b'
@@ -49,39 +49,39 @@ class seqs:
     BIG_A =                        'A'
     SPACE =                        '<space>'
     BIG_B =                        'B'
-    CTRL_E =                       '<ctrl+e>'
-    CTRL_Y =                       '<ctrl+y>'
+    CTRL_E =                       '<C-e>'
+    CTRL_Y =                       '<C-y>'
     BIG_C =                        'C'
     BIG_D =                        'D'
     GH =                           'gh'
     BIG_E =                        'E'
     BIG_F =                        'F'
     BIG_G =                        'G'
-    CTRL_W =                       '<ctrl+w>'
-    CTRL_W_Q =                     '<ctrl+w>q'
+    CTRL_W =                       '<C-w>'
+    CTRL_W_Q =                     '<C-w>q'
 
-    CTRL_W_V =                     '<ctrl+w>v'
-    CTRL_W_L =                     '<ctrl+w>l'
-    CTRL_W_BIG_L =                 '<ctrl+w>L'
-    CTRL_K =                       '<ctrl+k>'
-    CTRL_K_CTRL_B =                '<ctrl+k><ctrl+b>'
-    CTRL_BIG_F =                   '<ctrl+F>'
-    CTRL_BIG_P =                   '<ctrl+P>'
-    CTRL_W_H =                     '<ctrl+w>h'
+    CTRL_W_V =                     '<C-w>v'
+    CTRL_W_L =                     '<C-w>l'
+    CTRL_W_BIG_L =                 '<C-w>L'
+    CTRL_K =                       '<C-k>'
+    CTRL_K_CTRL_B =                '<C-k><C-b>'
+    CTRL_BIG_F =                   '<C-F>'
+    CTRL_BIG_P =                   '<C-P>'
+    CTRL_W_H =                     '<C-w>h'
     Q =                            'q'
     AT =                           '@'
-    CTRL_W_BIG_H =                 '<ctrl+w>H'
+    CTRL_W_BIG_H =                 '<C-w>H'
     BIG_H =                        'H'
 
     BIG_J =                        'J'
     BIG_Z =                        'Z'
     G_BIG_J =                      'gJ'
-    CTRL_R=                        '<ctrl+r>'
-    CTRL_R_EQUAL =                 '<ctrl+r>='
-    CTRL_A =                       '<ctrl+a>'
-    CTRL_X =                       '<ctrl+x>'
+    CTRL_R=                        '<C-r>'
+    CTRL_R_EQUAL =                 '<C-r>='
+    CTRL_A =                       '<C-a>'
+    CTRL_X =                       '<C-x>'
     Z =                            'z'
-    Z_ENTER =                      'z<CR>'
+    Z_ENTER =                      'z<cr>'
     ZT =                           'zt'
     ZZ =                           'zz'
     Z_MINUS =                      'z-'
@@ -112,24 +112,24 @@ class seqs:
     CC =                           'cc'
     COLON =                        ':'
     COMMA =                        ','
-    CTRL_D =                       '<ctrl+d>'
-    CTRL_F12 =                     '<ctrl+f12>'
+    CTRL_D =                       '<C-d>'
+    CTRL_F12 =                     '<C-f12>'
     F11 =                          'f11'
-    CTRL_l =                       '<ctrl+l>'
-    CTRL_B =                       '<ctrl+b>'
-    CTRL_F =                       '<ctrl+f>'
-    CTRL_G =                       '<ctrl+g>'
-    CTRL_P =                       '<ctrl+p>'
-    CTRL_U =                       '<ctrl+u>'
-    CTRL_V =                       '<ctrl+v>'
+    CTRL_l =                       '<C-l>'
+    CTRL_B =                       '<C-b>'
+    CTRL_F =                       '<C-f>'
+    CTRL_G =                       '<C-g>'
+    CTRL_P =                       '<C-p>'
+    CTRL_U =                       '<C-u>'
+    CTRL_V =                       '<C-v>'
     D =                            'd'
     DD =                           'dd'
     DOLLAR =                       '$'
     DOT =                          '.'
     DOUBLE_QUOTE =                 '"'
     E =                            'e'
-    ENTER =                        '<CR>' # Or rather <Enter>?
-    SHIFT_ENTER =                  '<shift+cr>'
+    ENTER =                        '<cr>' # Or rather <Enter>?
+    SHIFT_ENTER =                  '<S-cr>'
     EQUAL =                        '='
     EQUAL_EQUAL =                  '=='
     ESC =                          '<esc>'
@@ -144,8 +144,8 @@ class seqs:
     F15 =                          '<f15>'
     F2 =                           '<f2>'
     F3 =                           '<f3>'
-    SHIFT_F3 =                     '<shift+f3>'
-    SHIFT_F4 =                     '<shift+f4>'
+    SHIFT_F3 =                     '<S-f3>'
+    SHIFT_F4 =                     '<S-f4>'
     F4 =                           '<f4>'
     F5 =                           '<f5>'
     F6 =                           '<f6>'
@@ -182,8 +182,8 @@ class seqs:
     LEFT_BRACE =                   '{'
     LEFT_SQUARE_BRACKET =          '['
     LEFT_PAREN =                   '('
-    LESS_THAN =                    '<'
-    LESS_THAN_LESS_THAN =          '<<'
+    LESS_THAN =                    '<lt>'
+    LESS_THAN_LESS_THAN =          '<lt><lt>'
     M =                            'm'
     N =                            'n'
     O =                            'o'
@@ -200,7 +200,7 @@ class seqs:
     RIGHT_PAREN =                  ')'
     S =                            's'
     SEMICOLON =                    ';'
-    SHIFT_CTRL_F12 =               '<shift+ctrl+f12>'
+    SHIFT_CTRL_F12 =               '<C-S-f12>'
     SLASH =                        '/'
     STAR =                         '*'
     T =                            't'
@@ -889,9 +889,9 @@ mappings = {
 
     modes.SELECT: {
         seqs.BIG_A: cmd_defs[modes.SELECT][cmds.BIG_A],
+        seqs.BIG_J: cmd_defs[modes.SELECT][cmds.BIG_J],
         seqs.I:     cmd_defs[modes.SELECT][cmds.I],
         seqs.J:     cmd_defs[modes.SELECT][cmds.J],
-        seqs.BIG_J: cmd_defs[modes.SELECT][cmds.BIG_J],
         seqs.K:     cmd_defs[modes.SELECT][cmds.K],
         seqs.L:     cmd_defs[modes.SELECT][cmds.L],
     },
@@ -912,66 +912,34 @@ user_mappings = {
 }
 
 
-# matches:
-#  <ctrl+p>
-#  <Esc>
-#  <CR>
-#  etc.
-# TODO: parse this properly.
-_control_key_rx = re.compile(r'<(?:(?:ctrl|alt|altgr|super|shift)(?:\+(?:ctrl|alt|altgr|super|shift)){0,2}\+(?:[Ff][0-9]{1,2}|[Ee][Ss][Cc]|.|[Cc][Rr]>)>|[Sp][Pp][As][Cc][Ee]>|[Ee][Ss][Cc]>|[Cc][Rr]>|[Ff][0-9]{1,2}>)')
-
-def parse_sequence(s):
-    """
-    Yields simple keys like 'a', 'A', etc. or long key names like <Esc>,
-    <ctrl+p>, etc.
-    """
-    def look_ahead(source, pat):
-        return pat.match(source) is not None
-
-    idx = 0
-    long_name = ''
-    while idx < len(s):
-        if ((s[idx] == '<') and look_ahead(s[idx:], _control_key_rx) and
-            not long_name):
-                long_name = '<'
-        elif long_name and (s[idx] == '>'):
-            # Special case for <ctrl+>>
-            if (len(s) - 1 > idx) and (s[idx + 1] == '>'):
-                idx += 1
-                long_name += '>'
-            yield long_name + '>'
-            long_name = ''
-        elif long_name:
-            long_name += s[idx]
-        else:
-            yield s[idx]
-        idx += 1
-
-
 EOF = -2
 
 class key_names:
-    BACKSPACE   = 'bs'
-    CR          = 'cr'
-    ENTER       = 'enter'
-    ESCAPE      = 'esc'
-    F1          = 'f1'
-    F2          = 'f2'
-    F3          = 'f3'
-    F4          = 'f4'
-    F5          = 'f5'
-    F6          = 'f6'
-    F7          = 'f7'
-    F8          = 'f8'
-    F9          = 'f9'
-    F10         = 'f10'
-    F11         = 'f11'
-    F12         = 'f12'
-    F13         = 'f13'
-    F14         = 'f14'
-    F15         = 'f15'
-    LESS_THAN   = 'lt'
-    SPACE       = 'sp'
+    """
+    Names of special keys.
+    """
+    BACKSPACE   = '<bs>'
+    CR          = '<cr>'
+    ENTER       = '<enter>'
+    ESCAPE      = '<esc>'
+    F1          = '<f1>'
+    F2          = '<f2>'
+    F3          = '<f3>'
+    F4          = '<f4>'
+    F5          = '<f5>'
+    F6          = '<f6>'
+    F7          = '<f7>'
+    F8          = '<f8>'
+    F9          = '<f9>'
+    F10         = '<f10>'
+    F11         = '<f11>'
+    F12         = '<f12>'
+    F13         = '<f13>'
+    F14         = '<f14>'
+    F15         = '<f15>'
+    LESS_THAN   = '<lt>'
+    SPACE       = '<sp>'
+    SPACE_LONG  = '<space>'
 
     as_list = [
         LESS_THAN,
@@ -980,6 +948,7 @@ class key_names:
         CR,
         BACKSPACE,
         SPACE,
+        SPACE_LONG,
         F1,
         F2,
         F3,
@@ -997,10 +966,18 @@ class key_names:
         F15,
     ]
 
-    max_len = len('<enter>')
+    max_len = len('<space>')
 
-class Lexer(object):
+
+class KeySequenceTokenizer(object):
+    """
+    Takes in a sequence of key names and tokenizes it.
+    """
     def __init__(self, source):
+        """
+        @source
+          A sequence of key names in Vim notation.
+        """
         self.idx = -1
         self.source = source
         self.in_named_key = False
@@ -1021,9 +998,20 @@ class Lexer(object):
         return key.lower() in key_names.as_list
 
     def sort_modifiers(self, modifiers):
-        if len(modifiers) > 2:
+        """
+        Ensures consistency in the order of modifier letters according to:
+
+          c > m > s
+        """
+        if len(modifiers) == 2:
             if modifiers.startswith('s-') and modifiers.endswith('c-'):
                 modifiers = 'c-s-'
+            elif modifiers.startswith('s-') and modifiers.endswith('m-'):
+                modifiers = 'm-s-'
+            elif modifiers.startswith('m-') and modifiers.endswith('c-'):
+                modifiers = 'c-m-'
+        elif len(modifiers) == 6:
+            modifiers = 'c-m-s-'
         return modifiers
 
     def long_key_name(self):
@@ -1034,7 +1022,10 @@ class Lexer(object):
         while True:
             c = self.consume()
 
-            if (c.lower() in ('c', 's')) and (self.peek_one() == '-'):
+            if c == EOF:
+                raise ValueError("expected '>' at index {0}".format(self.idx))
+
+            elif (c.lower() in ('c', 's', 'm')) and (self.peek_one() == '-'):
                 if c.lower() in modifiers.lower():
                     raise ValueError('invalid modifier sequence: {0}'.format(self.source))
 
@@ -1057,20 +1048,17 @@ class Lexer(object):
                         raise ValueError('wrong sequence {0}'.format(self.source))
                     return '<' + modifiers.upper() + key_name + '>'
 
-                elif self.is_named_key(key_name):
+                elif self.is_named_key('<' + key_name + '>'):
                     self.in_named_key = False
                     return '<' + modifiers.upper() + key_name.lower() + '>'
 
                 else:
                     raise ValueError("'{0}' is not a known key".format(key_name))
 
-            elif c == EOF:
-                raise ValueError("expected '>' at index {0}".format(self.idx))
-
             else:
                 key_name += c
 
-    def parse_one(self):
+    def tokenize_one(self):
         c = self.consume()
 
         if c == '<':
@@ -1078,9 +1066,9 @@ class Lexer(object):
         else:
             return c
 
-    def iter_parse(self):
+    def iter_tokenize(self):
         while True:
-            token = self.consume()
+            token = self.tokenize_one()
             yield token
             if token == EOF:
                 break
@@ -1096,6 +1084,6 @@ def to_bare_command_name(seq):
 
     new_seq = re.sub(r'^(?:".)?(?:[1-9]+)?', '', seq)
     # Account for d2d and similar sequences.
-    new_seq = list(parse_sequence(new_seq))
+    new_seq = list(KeySequenceTokenizer(new_seq).iter_tokenize())[:-1]
 
     return ''.join(k for k in new_seq if not k.isdigit())

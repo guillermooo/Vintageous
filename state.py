@@ -14,7 +14,6 @@ from Vintageous.vi.cmd_defs import cmd_types
 from Vintageous.vi.contexts import KeyContext
 from Vintageous.vi.dot_file import DotFile
 from Vintageous.vi.keys import mappings
-from Vintageous.vi.keys import parse_sequence
 from Vintageous.vi.keys import seq_to_command
 from Vintageous.vi.keys import user_mappings
 from Vintageous.vi.marks import Marks

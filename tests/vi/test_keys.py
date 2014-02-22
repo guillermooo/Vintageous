@@ -8,31 +8,35 @@ from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import make_region
 from Vintageous.tests import BufferTest
-from Vintageous.vi.keys import parse_sequence
 from Vintageous.vi.keys import to_bare_command_name
+from Vintageous.vi.keys import KeySequenceTokenizer
 
 
-_tests = (
-    ('p', ['p'], 'lower letter key'),
-    ('P', ['P'], 'upper case letter key'),
-    ('<ctrl+p>', ['<ctrl+p>'], 'ctrl-modified lower case letter key'),
-    ('<ctrl+P>', ['<ctrl+P>'], 'ctrl-modified upper case letter key'),
-    ('<ctrl+alt+p>', ['<ctrl+alt+p>'], 'ctrl-alt modified lower case letter key'),
-    ('<alt+ctrl+p>', ['<alt+ctrl+p>'], 'alt-ctrl modified lower case letter key'),
-    ('<Esc>', ['<Esc>'], 'esc key title case'),
-    ('<esc>', ['<esc>'], 'esc key lowercase'),
-    ('<eSc>', ['<eSc>'], 'esc key mixed case'),
-    ('<', ['<'], 'less than key'),
-    ('<space>', ['<'], 'space key'),
+_tests_tokenizer = (
+    ('p',            'p',            'lower letter key'),
+    ('P',            'P',            'upper case letter key'),
+    ('<C-p>',        '<C-p>',        'ctrl-modified lower case letter key'),
+    ('<C-P>',        '<C-P>',        'ctrl-modified upper case letter key'),
+    ('<C-S-.>',      '<C-S-.>',      'ctrl-shift modified period key'),
+    # ('<alt+ctrl+p>', '<alt+ctrl+p>', 'alt-ctrl modified lower case letter key'),
+    ('<Esc>',        '<esc>',        'esc key title case'),
+    ('<esc>',        '<esc>',        'esc key lowercase'),
+    ('<eSc>',        '<esc>',        'esc key mixed case'),
+    ('<lt>',         '<lt>',         'less than key'),
+    ('<Space>',      '<space>',      'space key'),
+    ('<c-Space>',    '<C-space>',    'ctrl-space key'),
+    ('0',            '0',            'zero key'),
+    ('<c-m-.>',      '<C-M-.>',      'ctrl-alt-period key'),
 )
 
 
-class Test_parse_sequence(BufferTest):
+class Test_KeySequenceTokenizer(BufferTest):
     def parse(self, input_):
-        return list(parse_sequence(input_))
+        tokenizer = KeySequenceTokenizer(input_)
+        return tokenizer.tokenize_one()
 
     def testAll(self):
-        for (i, t) in enumerate(_tests):
+        for (i, t) in enumerate(_tests_tokenizer):
             input_, expected, msg = t
             self.assertEqual(self.parse(input_), expected, "{0} - {1}".format(i, msg))
 

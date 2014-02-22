@@ -18,7 +18,7 @@ from Vintageous.vi.constants import regions_transformer_reversed
 from Vintageous.vi.core import ViTextCommandBase
 from Vintageous.vi.core import ViWindowCommandBase
 from Vintageous.vi.keys import mappings
-from Vintageous.vi.keys import parse_sequence
+from Vintageous.vi.keys import KeySequenceTokenizer
 from Vintageous.vi.keys import to_bare_command_name
 from Vintageous.vi.keys import user_mappings
 from Vintageous.vi.mappings import Mappings
@@ -449,7 +449,7 @@ class PressKeys(ViWindowCommandBase):
         # input collection in /foo<CR>.
         state.non_interactive = True
         leading_motions = ''
-        for key in parse_sequence(keys):
+        for key in KeySequenceTokenizer(keys).iter_tokenize():
             self.window.run_command('press_key', {'key': key,
                                                   'do_eval': False,
                                                   'repeat_count': repeat_count,
@@ -486,7 +486,7 @@ class PressKeys(ViWindowCommandBase):
         if not (state.motion and not state.action):
             with gluing_undo_groups(self.window.active_view(), state):
                 try:
-                    for key in parse_sequence(keys):
+                    for key in KeySequenceTokenizer(keys).iter_tokenize():
                         if key.lower() == '<esc>':
                             self.window.run_command('_enter_normal_mode')
                             continue

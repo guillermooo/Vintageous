@@ -1,9 +1,9 @@
 from Vintageous.vi import utils
 from Vintageous.vi.cmd_defs import cmd_types
 from Vintageous.vi.keys import mappings
-from Vintageous.vi.keys import parse_sequence
 from Vintageous.vi.keys import seq_to_command
 from Vintageous.vi.keys import to_bare_command_name
+from Vintageous.vi.keys import KeySequenceTokenizer
 from Vintageous.vi.utils import modes
 
 
@@ -69,7 +69,7 @@ class Mappings(object):
             return Mapping(seq, mapped_to['name'], seq,
                            mapping_status.COMPLETE)
 
-        for key in parse_sequence(seq):
+        for key in KeySequenceTokenizer(seq).iter_tokenize():
             head += key
             keys, mapped_to = self._find_full_match(self.state.mode, head)
             if keys:

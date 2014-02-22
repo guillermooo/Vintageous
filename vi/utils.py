@@ -247,10 +247,13 @@ def is_at_bol(view, reg):
 
 
 def translate_char(char):
-    if char.upper() == '<CR>':
+
+    if char.lower() in ('<enter>', '<cr>'):
         return '\n'
-    elif char.upper() == '<SPACE>':
+    elif char.lower() in ('<sp>', '<space>'):
         return ' '
+    elif char.lower() in '<lt>':
+        return '<'
     else:
         return char
 
