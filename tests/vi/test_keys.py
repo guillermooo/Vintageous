@@ -4,6 +4,7 @@ import sublime
 
 from Vintageous import state
 from Vintageous.vi.utils import modes
+from Vintageous.vi.utils import translate_char
 from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import make_region
@@ -18,11 +19,16 @@ _tests_tokenizer = (
     ('<C-p>',        '<C-p>',        'ctrl-modified lower case letter key'),
     ('<C-P>',        '<C-P>',        'ctrl-modified upper case letter key'),
     ('<C-S-.>',      '<C-S-.>',      'ctrl-shift modified period key'),
-    # ('<alt+ctrl+p>', '<alt+ctrl+p>', 'alt-ctrl modified lower case letter key'),
     ('<Esc>',        '<esc>',        'esc key title case'),
     ('<esc>',        '<esc>',        'esc key lowercase'),
     ('<eSc>',        '<esc>',        'esc key mixed case'),
     ('<lt>',         '<lt>',         'less than key'),
+    ('<HOME>',       '<home>',       'less than key'),
+    ('<enD>',        '<end>',        'less than key'),
+    ('<uP>',         '<up>',         'less than key'),
+    ('<DoWn>',       '<down>',       'less than key'),
+    ('<left>',       '<left>',       'less than key'),
+    ('<RigHt>',      '<right>',      'less than key'),
     ('<Space>',      '<space>',      'space key'),
     ('<c-Space>',    '<C-space>',    'ctrl-space key'),
     ('0',            '0',            'zero key'),
@@ -65,3 +71,20 @@ class Test_to_bare_command_name(BufferTest):
         for (i, t) in enumerate(_command_name_tests):
             input_, expected, msg = t
             self.assertEqual(self.transform(input_), expected, "{0} - {1}".format(i, msg))
+
+
+_tranlation_tests = (
+    ('<enter>', '\n', ''),
+    ('<cr>', '\n', ''),
+    ('<sp>', ' ', ''),
+    ('<space>', ' ', ''),
+    ('<lt>', '<', ''),
+    ('a', 'a', ''),
+)
+
+
+class Test_translate_char(BufferTest):
+    def testAll(self):
+        for (i, t) in enumerate(_tranlation_tests):
+            input_, expected, msg = t
+            self.assertEqual(translate_char(input_), expected, "{0} - {1}".format(i, msg))

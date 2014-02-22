@@ -247,12 +247,13 @@ def is_at_bol(view, reg):
 
 
 def translate_char(char):
-
+    # FIXME: What happens to keys like <home>, <up>, etc? We shouln't be
+    #        able to use those in some contexts, like as arguments to f, t...
     if char.lower() in ('<enter>', '<cr>'):
         return '\n'
     elif char.lower() in ('<sp>', '<space>'):
         return ' '
-    elif char.lower() in '<lt>':
+    elif char.lower() == '<lt>':
         return '<'
     else:
         return char

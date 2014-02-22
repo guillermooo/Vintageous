@@ -66,7 +66,7 @@ class Mappings(object):
         keys, mapped_to = self._find_full_match(self.state.mode, seq)
         if keys:
             self.state.logger.info("[Mappings] found full command: {0} -> {1}".format(keys, mapped_to))
-            return Mapping(seq, mapped_to['name'], seq,
+            return Mapping(seq, mapped_to['name'], seq[len(keys):],
                            mapping_status.COMPLETE)
 
         for key in KeySequenceTokenizer(seq).iter_tokenize():
@@ -146,7 +146,10 @@ class Mappings(object):
         _mappings[mode][new] = {'name': target, 'type': cmd_types.USER}
 
     def remove(self, mode, new):
-        del _mappings[mode][new]
+        try:
+            del _mappings[mode][new]
+        except KeyError:
+            raise KeyError('mapping not found')
 
     def clear(self):
         _mappings[modes.NORMAL] = {}

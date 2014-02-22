@@ -920,8 +920,18 @@ class key_names:
     """
     BACKSPACE   = '<bs>'
     CR          = '<cr>'
+    DOWN        = '<down>'
+    END         = '<end>'
     ENTER       = '<enter>'
     ESCAPE      = '<esc>'
+    HOME        = '<home>'
+    LEFT        = '<left>'
+    LESS_THAN   = '<lt>'
+    RIGHT       = '<right>'
+    SPACE       = '<sp>'
+    SPACE_LONG  = '<space>'
+    UP          = '<up>'
+
     F1          = '<f1>'
     F2          = '<f2>'
     F3          = '<f3>'
@@ -937,18 +947,22 @@ class key_names:
     F13         = '<f13>'
     F14         = '<f14>'
     F15         = '<f15>'
-    LESS_THAN   = '<lt>'
-    SPACE       = '<sp>'
-    SPACE_LONG  = '<space>'
 
     as_list = [
-        LESS_THAN,
+        BACKSPACE,
+        CR,
+        DOWN,
+        END,
         ENTER,
         ESCAPE,
-        CR,
-        BACKSPACE,
+        HOME,
+        LEFT,
+        LESS_THAN,
+        RIGHT,
         SPACE,
         SPACE_LONG,
+        UP,
+
         F1,
         F2,
         F3,
