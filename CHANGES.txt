@@ -13,6 +13,21 @@
 	- Changes to input parsing.
 	- Enable new key sequence tokenizer.
 
+2.9.9 - 22/02/14
+
+	- Fix Home and End keys.
+	- Fix Up, Down, Left and Right keys.
+	- Fix translation of <lt> sequence.
+
+2.9.8 - 22/02/14
+
+	- Improve caret positioning after ~ in visual modes.
+	- Improve caret positioning after u and U in visual modes.
+	- Improve support for ignoring views.
+	- Fix Home and End keys.
+	- Changes to input parsing.
+	- Enable new key sequence tokenizer.
+
 2.9.7 - 21/02/14
 
 	- Increased segregation of key sequences by mode.
