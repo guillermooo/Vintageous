@@ -36,13 +36,37 @@ _tests_tokenizer = (
 )
 
 
-class Test_KeySequenceTokenizer(BufferTest):
+class Test_KeySequenceTokenizer_tokenize_one(BufferTest):
     def parse(self, input_):
         tokenizer = KeySequenceTokenizer(input_)
         return tokenizer.tokenize_one()
 
     def testAll(self):
         for (i, t) in enumerate(_tests_tokenizer):
+            input_, expected, msg = t
+            self.assertEqual(self.parse(input_), expected, "{0} - {1}".format(i, msg))
+
+
+_tests_iter_tokenize = (
+    ('pp',         ['p', 'p'],                     'sequence'),
+    ('<C-p>',      ['<C-p>'],                      'sequence'),
+    ('<C-P>x',     ['<C-P>', 'x'],                 'sequence'),
+    ('<C-S-.>',    ['<C-S-.>'],                    'sequence'),
+    ('<Esc>ai',    ['<esc>', 'a', 'i'],            'sequence'),
+    ('<lt><lt>',   ['<lt>', '<lt>'],               'sequence'),
+    ('<DoWn>abc.', ['<down>', 'a', 'b', 'c', '.'], 'sequence'),
+    ('0<down>',    ['0', '<down>'],                'sequence'),
+    ('<c-m-.>',    ['<C-M-.>'],                    'sequence'),
+)
+
+
+class Test_KeySequenceTokenizer_iter_tokenize(BufferTest):
+    def parse(self, input_):
+        tokenizer = KeySequenceTokenizer(input_)
+        return list(tokenizer.iter_tokenize())
+
+    def testAll(self):
+        for (i, t) in enumerate(_tests_iter_tokenize):
             input_, expected, msg = t
             self.assertEqual(self.parse(input_), expected, "{0} - {1}".format(i, msg))
 

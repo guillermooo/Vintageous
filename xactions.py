@@ -727,8 +727,7 @@ class _vi_dot(ViWindowCommandBase):
             count = None
 
         type_, seq_or_cmd, old_mode, visual_data = repeat_data
-        _logger().info('[_vi_dot] ', type_, seq_or_cmd, old_mode)
-        _logger().info('[_vi_dot] Vintageous settings:', state.view.settings().get('vintage'))
+        _logger().info('[_vi_dot] type: {0} seq or cmd: {1} old mode: {2}'.format(type_, seq_or_cmd, old_mode))
 
         if visual_data and (mode != modes.VISUAL):
             s0 = state.view.sel()[0]

@@ -1083,9 +1083,9 @@ class KeySequenceTokenizer(object):
     def iter_tokenize(self):
         while True:
             token = self.tokenize_one()
-            yield token
             if token == EOF:
                 break
+            yield token
 
 
 def to_bare_command_name(seq):
@@ -1098,6 +1098,6 @@ def to_bare_command_name(seq):
 
     new_seq = re.sub(r'^(?:".)?(?:[1-9]+)?', '', seq)
     # Account for d2d and similar sequences.
-    new_seq = list(KeySequenceTokenizer(new_seq).iter_tokenize())[:-1]
+    new_seq = list(KeySequenceTokenizer(new_seq).iter_tokenize())
 
     return ''.join(k for k in new_seq if not k.isdigit())
