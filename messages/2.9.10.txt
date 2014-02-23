@@ -1,0 +1,45 @@
+==============================================================================
+Vintageous 2.9.10
+==============================================================================
+
+
+    Assorted fixes for bugs introduced in 2.9.8.
+
+
+CHANGES
+-------
+
+	- Re-enable t text object.
+	- Ignore EOF token in .iter_tokenize().
+	- Improve logging.
+
+
+FOUND BUGS?
+-----------
+
+Please report them here:
+
+    https://github.com/guillermooo/Vintageous/issues
+
+
+TIGERS
+------
+
+Tigers are the largest members of the felid species. They are wild and
+dangerous. Vintageous, on the other hand, is an open source project.
+Developing Vintageous is hard work. If it helps you, please consider donating.
+
+    PayPal: http://www.pledgie.com/campaigns/19122
+    Gittip: https://www.gittip.com/guillermooo/
+
+I'm the creator and main author of Vintageous, but some generous people have
+contributed their time and effort as well. See the more active ones here; you
+may want to show them some gratitude too:
+
+https://github.com/guillermooo/Vintageous/graphs/contributors
+
+Thanks for reading and for using Vintageous!
+
+(No tigers were harmed during the making of Vintageous.)
+
+Guillermo

@@ -1,3 +1,9 @@
+2.9.10 - 23/02/14
+
+	- Re-enable t text object.
+	- Ignore EOF token in .iter_tokenize().
+	- Improve logging.
+
 2.9.9 - 22/02/14
 
 	- Fix Home and End keys.
