@@ -141,9 +141,12 @@ def plugin_loaded():
 # TODO: Test me.
 def plugin_unloaded():
     view = sublime.active_window().active_view()
-
-    view.settings().set('command_mode', False)
-    view.settings().set('inverse_caret_state', False)
+    try:
+        view.settings().set('command_mode', False)
+        view.settings().set('inverse_caret_state', False)
+    except AttributeError:
+        _logger().error('could not access sublime.active_window().active_view().settings while unloading')
+        pass
 
 
 class State(object):
