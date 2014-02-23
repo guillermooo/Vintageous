@@ -10,7 +10,7 @@ from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import make_region
 from Vintageous.tests import BufferTest
-from Vintageous.vi.keys import cmd_types
+from Vintageous.vi.cmd_defs import cmd_types
 
 
 class StateTestCase(BufferTest):
