@@ -238,6 +238,13 @@ def previous_non_white_space_char(view, pt, white_space='\t \n'):
     return pt
 
 
+# deprecated
+def previous_white_space_char(view, pt, white_space='\t '):
+    while pt >= 0 and view.substr(pt) not in white_space:
+        pt -= 1
+    return pt
+
+
 def is_at_eol(view, reg):
     return view.line(reg.b).b == reg.b
 
