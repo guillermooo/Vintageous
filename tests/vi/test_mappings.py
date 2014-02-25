@@ -37,6 +37,17 @@ class Test_Mappings_AddingAndRemoving(BufferTest):
             self.assertEqual(_mappings[mode][keys], {'name': target, 'type': cmd_types.USER}, '{0} [{1}] failed'.format(msg, i))
             self.mappings.clear()
 
+    def testCanRemove(self):
+        for (i, data) in enumerate(adding_tests):
+            mode, keys, target, msg = data
+            self.mappings.add(mode, keys, target)
+            self.mappings.remove(mode, keys)
+
+        self.assertFalse(_mappings[modes.NORMAL])
+        self.assertFalse(_mappings[modes.VISUAL])
+        self.assertFalse(_mappings[modes.VISUAL_LINE])
+        self.assertFalse(_mappings[modes.VISUAL_BLOCK])
+
 
 expanding_tests = (
     ((modes.NORMAL, 'G',     'G_'),     ('G',      'G',     'G_',   '',   'G',      mapping_status.COMPLETE)),
