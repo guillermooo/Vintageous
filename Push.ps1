@@ -14,9 +14,21 @@ param([switch]$Force)
 # 	3. 'push' must be disabled under [alias] in .hg/hgrc
 
 
-if (!$Force -and (& hg qseries)) {
-	write-host "Cannot push: unfinalized patches" -foregroundcolor RED
-	exit
+$patches = (& hg qseries -s -v)
+if ($patches) {
+    foreach($line in $patches) {
+        if ($line -match '^\d+ A ') {
+            write-host "Cannot push: unfinalized applied patches:" -foregroundcolor RED
+            $line
+            exit 1
+        }
+    }
+
+    if (!$Force) {
+        write-host "Cannot push: unfinalized patches (force with -Force):" -foregroundcolor DARKRED
+        $patches
+        exit 1
+    }
 }
 
 if (@(& hg bookmarks).length -gt 1) {
@@ -26,5 +38,6 @@ if (@(& hg bookmarks).length -gt 1) {
 }
 
 # Override .hg/hgrc
-& hg --config "alias.push=push" push bb
-& hg --config "alias.push=push" push git
+"pushing..."
+# & hg --config "alias.push=push" push bb
+# & hg --config "alias.push=push" push git

@@ -30,8 +30,16 @@ def check_messages():
         if os.path.exists(os.path.join(_parent, path)):
             return True
 
+    def is_name_correct(key, path):
+        name = os.path.basename(path)
+        return (key == os.path.splitext(name)[0])
+
     # is there a file for each message?
-    for (_, rel_path) in msg_paths.items():
+    for (key, rel_path) in msg_paths.items():
+        if not is_name_correct(key, rel_path):
+            print('file name not correct: {0} ==> {1}'.format(key, rel_path))
+            sys.exit(1)
+
         if not exists(rel_path):
             print('message file not found: {0}'.format(rel_path))
             sys.exit(1)
