@@ -1,0 +1,92 @@
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+	    __     ___       _                                     _____
+	    \ \   / (_)_ __ | |_ __ _  __ _  ___  ___  _   _ ___  |___ /
+	     \ \ / /| | '_ \| __/ _` |/ _` |/ _ \/ _ \| | | / __|   |_ \
+	      \ V / | | | | | || (_| | (_| |  __/ (_) | |_| \__ \  ___) |
+	       \_/  |_|_| |_|\__\__,_|\__, |\___|\___/ \__,_|___/ |____/
+	                              |___/
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+
+    Vintageous 3 has arrived! And it even has a brand new Twitter account for
+    important announcements:
+
+    	https://twitter.com/VintageousS3
+
+
+    NEW FEATURES
+    ------------
+
+    - Limited ability to remap keys.
+    - Basic support for user dotfile to persist mappings.
+
+    CHANGES
+    -------
+
+    - Implement :map, :unmap.
+    - Implement :nmap, :nunmap.
+    - Implement :omap, :ounmap.
+    - Implement :vmap, :vunmap.
+    - Improve 'ge' motion.
+    - Override tab key in normal mode.
+    - Re-enable 'a' text object in visual mode.
+    - Implement plain Sublime Text bookmark-related keys.
+
+
+    ~ About mappings in Vintageous ~
+
+    Vintageous now lets you remap keys to a certain extent. Limitations in
+    this version:
+
+	    * Keys must be known to Vintageous.
+	    * Commands must be known to Vintageous (no external commands
+	      supported).
+	    * No ambiguous mappings supported.
+	    * No recursive or nested mappings supported.
+
+	~ Pesisting mappings between sessions ~
+
+	Vintageous now reads .vintageousrc from your Packages/User folder.
+	Currently, the only supported command is :map. This should help you
+	persist common mappings between sessions.
+
+	For example, this is how my .vintageousrc file looks like:
+
+		:map <space> :
+		:map zp <C-f12>
+		:map zP <C-S-f12>
+		:map <cr> /
+		:map <C-cr> ?
+
+
+	FOUND BUGS?
+	-----------
+
+	Please report them here:
+
+	    https://github.com/guillermooo/Vintageous/issues
+
+
+	SUPPORT VINTAGEOUS
+	------------------
+
+	Is Vintageous worth your time? Developing Vintageous is hard work. If you
+	use it often to get actual work done, please consider donating and make it
+	worth my time too.
+
+	    PayPal: http://www.pledgie.com/campaigns/19122
+	    Gittip: https://www.gittip.com/guillermooo/
+
+	I'm the creator and main author of Vintageous, but some generous people
+	have contributed their time and effort as well. See the more active ones
+	here; you may want to show them some gratitude too:
+
+	https://github.com/guillermooo/Vintageous/graphs/contributors
+
+	Thanks for reading and for using Vintageous!
+
+	Guillermo
