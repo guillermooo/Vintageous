@@ -108,8 +108,38 @@ EX_COMMANDS = {
                                 invocations=(re.compile(r"(?P<cmd>^.+$)"),),
                                 error_on=(ex_error.ERR_NO_RANGE_ALLOWED,)
                                 ),
+    ('omap', 'omap'): ex_cmd_data(
+                                command='ex_omap',
+                                invocations=(re.compile(r"(?P<cmd>^.+$)"),),
+                                error_on=(ex_error.ERR_NO_RANGE_ALLOWED,)
+                                ),
+    ('vmap', 'vmap'): ex_cmd_data(
+                                command='ex_vmap',
+                                invocations=(re.compile(r"(?P<cmd>^.+$)"),),
+                                error_on=(ex_error.ERR_NO_RANGE_ALLOWED,)
+                                ),
+    ('nmap', 'nmap'): ex_cmd_data(
+                                command='ex_nmap',
+                                invocations=(re.compile(r"(?P<cmd>^.+$)"),),
+                                error_on=(ex_error.ERR_NO_RANGE_ALLOWED,)
+                                ),
     ('unmap', 'unmap'): ex_cmd_data(
                                 command='ex_unmap',
+                                invocations=(re.compile(r"(?P<cmd>^.+$)"),),
+                                error_on=(ex_error.ERR_NO_RANGE_ALLOWED,)
+                                ),
+    ('ounmap', 'ounmap'): ex_cmd_data(
+                                command='ex_ounmap',
+                                invocations=(re.compile(r"(?P<cmd>^.+$)"),),
+                                error_on=(ex_error.ERR_NO_RANGE_ALLOWED,)
+                                ),
+    ('vunmap', 'vunmap'): ex_cmd_data(
+                                command='ex_vunmap',
+                                invocations=(re.compile(r"(?P<cmd>^.+$)"),),
+                                error_on=(ex_error.ERR_NO_RANGE_ALLOWED,)
+                                ),
+    ('nunmap', 'nunmap'): ex_cmd_data(
+                                command='ex_nunmap',
                                 invocations=(re.compile(r"(?P<cmd>^.+$)"),),
                                 error_on=(ex_error.ERR_NO_RANGE_ALLOWED,)
                                 ),

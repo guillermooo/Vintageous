@@ -328,17 +328,88 @@ class ExMap(sublime_plugin.TextCommand):
     Remaps keys.
     """
     def run(self, edit, mode=None, count=None, cmd=''):
-        keys, command = cmd.lstrip().split(' ', 1)
-        # mappings = Mappings(State(self.view))
-        # mappings.add(modes.NORMAL, keys, command)
-        # mappings.add(modes.OPERATOR_PENDING, keys, command)
+        try:
+            keys, command = cmd.lstrip().split(' ', 1)
+        except ValueError:
+            sublime.status_message('Vintageous: Bad mapping format')
+            return
+        else:
+            mappings = Mappings(State(self.view))
+            mappings.add(modes.NORMAL, keys, command)
+            mappings.add(modes.OPERATOR_PENDING, keys, command)
+            mappings.add(modes.VISUAL, keys, command)
 
 
 class ExUnmap(sublime_plugin.TextCommand):
     def run(self, edit, mode=None, count=None, cmd=''):
         mappings = Mappings(State(self.view))
-        # mappings.remove(cmd, modes.NORMAL)
-        # mappings.remove(cmd, modes.OPERATOR_PENDING)
+        try:
+            mappings.remove(modes.NORMAL, cmd)
+            mappings.remove(modes.OPERATOR_PENDING, cmd)
+            mappings.remove(modes.VISUAL, cmd)
+        except KeyError:
+            sublime.status_message('Vintageous: Mapping not found.')
+
+
+class ExNmap(sublime_plugin.TextCommand):
+    """
+    Remaps keys.
+    """
+    def run(self, edit, mode=None, count=None, cmd=''):
+        keys, command = cmd.lstrip().split(' ', 1)
+        mappings = Mappings(State(self.view))
+        mappings.add(modes.NORMAL, keys, command)
+
+
+class ExNunmap(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, count=None, cmd=''):
+        mappings = Mappings(State(self.view))
+        try:
+            mappings.remove(modes.NORMAL, cmd)
+        except KeyError:
+            sublime.status_message('Vintageous: Mapping not found.')
+
+
+class ExOmap(sublime_plugin.TextCommand):
+    """
+    Remaps keys.
+    """
+    def run(self, edit, mode=None, count=None, cmd=''):
+        keys, command = cmd.lstrip().split(' ', 1)
+        mappings = Mappings(State(self.view))
+        mappings.add(modes.OPERATOR_PENDING, keys, command)
+
+
+class ExOunmap(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, count=None, cmd=''):
+        mappings = Mappings(State(self.view))
+        try:
+            mappings.remove(modes.OPERATOR_PENDING, cmd)
+        except KeyError:
+            sublime.status_message('Vintageous: Mapping not found.')
+
+
+class ExVmap(sublime_plugin.TextCommand):
+    """
+    Remaps keys.
+    """
+    def run(self, edit, mode=None, count=None, cmd=''):
+        keys, command = cmd.lstrip().split(' ', 1)
+        mappings = Mappings(State(self.view))
+        mappings.add(modes.VISUAL, keys, command)
+        mappings.add(modes.VISUAL_LINE, keys, command)
+        mappings.add(modes.VISUAL_BLOCK, keys, command)
+
+
+class ExVunmap(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, count=None, cmd=''):
+        mappings = Mappings(State(self.view))
+        try:
+            mappings.remove(modes.VISUAL, cmd)
+            mappings.remove(modes.VISUAL_LINE, cmd)
+            mappings.remove(modes.VISUAL_BLOCK, cmd)
+        except KeyError:
+            sublime.status_message('Vintageous: Mapping  not found.')
 
 
 class ExAbbreviate(sublime_plugin.TextCommand):

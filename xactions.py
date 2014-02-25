@@ -11,7 +11,6 @@ from Vintageous.state import State
 from Vintageous.vi import inputs
 from Vintageous.vi import motions
 from Vintageous.vi import utils
-from Vintageous.vi.cmd_defs import cmd_defs
 from Vintageous.vi.cmd_defs import cmd_types
 from Vintageous.vi.cmd_defs import cmds
 from Vintageous.vi.constants import regions_transformer_reversed
@@ -19,13 +18,13 @@ from Vintageous.vi.core import ViTextCommandBase
 from Vintageous.vi.core import ViWindowCommandBase
 from Vintageous.vi.keys import mappings
 from Vintageous.vi.keys import KeySequenceTokenizer
+from Vintageous.vi.keys import EOF
 from Vintageous.vi.keys import to_bare_command_name
-from Vintageous.vi.keys import user_mappings
+from Vintageous.vi.keys import key_names
 from Vintageous.vi.mappings import Mappings
 from Vintageous.vi.utils import gluing_undo_groups
 from Vintageous.vi.utils import IrreversibleTextCommand
 from Vintageous.vi.utils import is_view
-from Vintageous.vi.utils import jump_directions
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import regions_transformer
 
@@ -432,54 +431,69 @@ class PressKeys(ViWindowCommandBase):
         Key sequence to be run.
     @repeat_count
         Count to be applied when repeating through the '.' command.
+    @check_user_mappings
+        Whether user mappings should be consulted to expand key sequences.
     """
     def run(self, keys, repeat_count=None, check_user_mappings=True):
-        # First, run any leading motions coming before the first action. We
-        # don't keep these in the undo stack, but they will still be repeated
-        # via '.'. This ensures that undoing will leave the caret where the
-        # sequence's first editing action started. For example, lldl would
-        # skip ll in the undo history, but store the full sequence for '.' to
-        # use.
         state = self.state
+        _logger().info("[PressKeys] seq received: {0} mode: {1}"
+                                                    .format(keys, state.mode))
         initial_mode = state.mode
-
-        _logger().info("[PressKeys] seq received: {0} mode: {1}".format(keys, state.mode))
-
         # Disable interactive prompts. For example, to supress interactive
         # input collection in /foo<CR>.
         state.non_interactive = True
+
+        # First, run any motions coming before the first action. We don't keep
+        # these in the undo stack, but they will still be repeated via '.'.
+        # This ensures that undoing will leave the caret where the  first
+        # editing action started. For example, 'lldl' would skip 'll' in the
+        # undo history, but store the full sequence for '.' to use.
         leading_motions = ''
         for key in KeySequenceTokenizer(keys).iter_tokenize():
-            self.window.run_command('press_key', {'key': key,
-                                                  'do_eval': False,
-                                                  'repeat_count': repeat_count,
-                                                  'check_user_mappings': check_user_mappings})
+            self.window.run_command('press_key', {
+                                'key': key,
+                                'do_eval': False,
+                                'repeat_count': repeat_count,
+                                'check_user_mappings': check_user_mappings
+                                })
             if state.action:
-                _logger().info('[PressKeys] first action found, no more leading motions in {0}'.format(state.sequence))
                 # The last key press has caused an action to be primed. That
-                # means there are no (more) leading motions. Break out of
-                # here.
+                # means there are no more leading motions. Break out of here.
+                _logger().info('[PressKeys] first action found in {0}'
+                                                      .format(state.sequence))
                 state.reset_command_data()
+                if state.mode == modes.OPERATOR_PENDING:
+                    state.mode = modes.NORMAL
                 break
 
             elif state.runnable():
+                # Run any primed motion.
                 leading_motions += state.sequence
                 state.eval()
                 state.reset_command_data()
 
             elif state.input_parsers:
+                # XXX: Unreachable?
                 pass
-                # leading_motions += key
 
             else:
+                # XXX: When do we reach here?
                 state.eval()
+
+        if state.input_parsers:
+            # State is requesting more input, so this is the last command in
+            # the sequence and it needs more input.
+            self.collect_input()
+            return
 
         # Strip the already run commands.
         if leading_motions:
-            if (len(leading_motions) == len(keys)) and (not state.input_parsers):
-                return
-            _logger().info('[PressKeys] original seq: {0}'.format(keys))
-            _logger().info('[PressKeys] leading motions seq: {0}'.format(leading_motions))
+            if ((len(leading_motions) == len(keys)) and
+                (not state.input_parsers)):
+                    return
+
+            _logger().info('[PressKeys] original seq/leading motions: {0}/{1}'
+                                               .format(keys, leading_motions))
             keys = keys[len(leading_motions):]
             _logger().info('[PressKeys] seq stripped to {0}'.format(keys))
 
@@ -487,58 +501,70 @@ class PressKeys(ViWindowCommandBase):
             with gluing_undo_groups(self.window.active_view(), state):
                 try:
                     for key in KeySequenceTokenizer(keys).iter_tokenize():
-                        if key.lower() == '<esc>':
+                        if key.lower() == key_names.ESC:
+                            # XXX: We should pass a mode here?
                             self.window.run_command('_enter_normal_mode')
                             continue
 
                         elif state.mode not in (modes.INSERT, modes.REPLACE):
-                            self.window.run_command('press_key', {'key': key,
-                                                                  'repeat_count': repeat_count,
-                                                                  'check_user_mappings': check_user_mappings})
+                            self.window.run_command('press_key', {
+                                    'key': key,
+                                    'repeat_count': repeat_count,
+                                    'check_user_mappings': check_user_mappings
+                                    })
                         else:
-                            self.window.active_view().run_command('insert',
-                                                                  {'characters': key})
+                            # TODO: remove active_view; window will route the
+                            #       cmd.
+                            self.window.active_view().run_command('insert', {
+                                                           'characters': key})
                     if not state.input_parsers:
                         return
                 finally:
                     state.non_interactive = False
                     # Ensure we set the full command for '.' to use, but don't
                     # store '.' alone.
-                    if (leading_motions + keys) not in ('.', 'u', '<ctrl+r>'):
-                            state.repeat_data = ('vi', leading_motions + keys, initial_mode, None)
+                    if (leading_motions + keys) not in ('.', 'u', '<C-r>'):
+                            state.repeat_data = (
+                                        'vi', (leading_motions + keys),
+                                        initial_mode, None)
 
         # We'll reach this point if we have a command that requests input
         # whose input parser isn't satistied. For example, `/foo`. Note that
         # `/foo<CR>`, on the contrary, would have satisfied the parser.
-        #
-        # Assume that:
-        #   * a command `_ + parser_name` exists that accepts a 'default'
-        #     parameter. This command should be the panel that would have run
-        #     in interactive mode to collect data from the user.
-        #
-        #   * the motion is the one receiving data.
-        #
-        _logger().info('[PressKeys] unsatisfied parser: {0} {1}'.format(state.action, state.motion))
-        if state.action and state.motion:
-            # we have a parser an a motion that can collect data. Collect data interactively.
+        _logger().info('[PressKeys] unsatisfied parser: {0} {1}'
+                                          .format(state.action, state.motion))
+        if (state.action and state.motion):
+            # We have a parser an a motion that can collect data. Collect data
+            # interactively.
             motion_func = getattr(motions, state.motion['name'], None)
+
             if motion_func is None:
                 utils.blink()
                 state.reset_command_data()
                 return
+
             motion_data = motion_func(state)
             motion_data['motion_args']['default'] = state.user_input
-            self.window.run_command(motion_data['motion'], motion_data['motion_args'])
+            self.window.run_command(motion_data['motion'],
+                                    motion_data['motion_args'])
             return
+
+        self.collect_input()
+
+    def collect_input(self):
         try:
-            parser_def = inputs.get(state, state.input_parsers[-1])
-            _logger().info('[PressKeys] last attemp to collect input: {0}'.format(parser_def.command))
-            self.window.run_command(parser_def.command, {'default': state.user_input})
+            parser_def = inputs.get(self.state, self.state.input_parsers[-1])
+            _logger().info('[PressKeys] last attemp to collect input: {0}'
+                                                  .format(parser_def.command))
+            if parser_def.interactive_command:
+                self.window.run_command(parser_def.interactive_command,
+                                           {'default': self.state.user_input})
         except IndexError:
-            _logger().info('[Vintageous] parser unsatisfied command not found')
+            _logger().info('[Vintageous] could not find a command to collect'
+                           'more user input')
             utils.blink()
         finally:
-            state.non_interactive = False
+            self.state.non_interactive = False
 
 
 class PressKey(ViWindowCommandBase):
@@ -619,7 +645,9 @@ class PressKey(ViWindowCommandBase):
             # we need to keep collecting input.
             return
 
-        _logger().info('[PressKey] getting cmd for seq/partial seq: {0} / {1}'.format(state.sequence, state.partial_sequence))
+        _logger().info('[PressKey] getting cmd for seq/partial seq in (mode): {0}/{1} ({2})'.format(state.sequence,
+                                                                                                    state.partial_sequence,
+                                                                                                    state.mode))
         command = key_mappings.get_current(check_user_mappings=check_user_mappings)
 
         if command['name'] == cmds.OPEN_REGISTERS:
@@ -636,7 +664,8 @@ class PressKey(ViWindowCommandBase):
                     command_name = command['name']
                     new_keys = state.sequence[:-len(state.partial_sequence)] + command['name']
                 state.reset_command_data()
-                _logger().info('[PressKey] running user mapping {0} via press_keys'.format(new_keys))
+                state.mode = modes.NORMAL
+                _logger().info('[PressKey] running user mapping {0} via press_keys starting in mode {1}'.format(new_keys, state.mode))
                 self.window.run_command('press_keys', {'keys': new_keys, 'check_user_mappings': False})
             return
 
@@ -647,27 +676,32 @@ class PressKey(ViWindowCommandBase):
             return
 
         elif command['name'] == cmds.MISSING:
-            actual_seq = to_bare_command_name(state.sequence)
+            bare_seq = to_bare_command_name(state.sequence)
 
             if state.mode == modes.OPERATOR_PENDING:
                 # We might be looking at a command like 'dd'. The first 'd' is
                 # mapped for normal mode, but the second is missing in
                 # operator pending mode, so we get a missing command. Try to
                 # build the full command now.
-                command = key_mappings.get_current(sequence=actual_seq,
-                                                   mode=modes.NORMAL)
+                #
+                # Exclude user mappings, since they've already been given a
+                # chance to evaluate.
+                command = key_mappings.get_current(sequence=bare_seq,
+                                                   mode=modes.NORMAL,
+                                                   check_user_mappings=False)
             else:
-                command = key_mappings.get_current(sequence=actual_seq)
+                command = key_mappings.get_current(sequence=bare_seq)
 
             if command['name'] == cmds.MISSING:
                 _logger().info('[PressKey] unmapped sequence: {0}'.format(state.sequence))
                 utils.blink()
+                state.mode = modes.NORMAL
                 state.reset_command_data()
                 return
 
         if (state.mode == modes.OPERATOR_PENDING and
             command['type'] == cmd_types.ACTION):
-                # TODO: This may be unreachable code by now. ?????????????????
+                # TODO: This may be unreachable code by now. ???
                 # we're expecting a motion, but we could still get an action.
                 # For example, dd, g~g~ or g~~
                 # remove counts

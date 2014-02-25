@@ -933,7 +933,7 @@ class key_names:
     DOWN        = '<down>'
     END         = '<end>'
     ENTER       = '<enter>'
-    ESCAPE      = '<esc>'
+    ESC         = '<esc>'
     HOME        = '<home>'
     LEFT        = '<left>'
     LESS_THAN   = '<lt>'
@@ -965,7 +965,7 @@ class key_names:
         DOWN,
         END,
         ENTER,
-        ESCAPE,
+        ESC,
         HOME,
         LEFT,
         LESS_THAN,

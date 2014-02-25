@@ -129,6 +129,7 @@ class Mappings(object):
         # TODO: Use same structure as in mappings (nested dicst).
         command = None
         if check_user_mappings:
+            self.state.logger.info('[Mappings] checking user mappings')
             # TODO: We should be able to force a mode here too as, below.
             command = self.expand_first(seq)
 
@@ -156,3 +157,4 @@ class Mappings(object):
         _mappings[modes.VISUAL] = {}
         _mappings[modes.VISUAL_LINE] = {}
         _mappings[modes.VISUAL_BLOCK] = {}
+        _mappings[modes.OPERATOR_PENDING] = {}
