@@ -38,6 +38,7 @@
 	{"keys": ["{"],		"command": "press_key", "args": {"key": "{"},		"context": [{"key": "vi_command_mode_aware"}]},
 	{"keys": ["]"],		"command": "press_key", "args": {"key": "]"},		"context": [{"key": "vi_command_mode_aware"}]},
 	{"keys": ["["],		"command": "press_key", "args": {"key": "["},		"context": [{"key": "vi_command_mode_aware"}]},
+	{"keys": ["tab"],	"command": "press_key", "args": {"key": "<tab>"},   "context": [{"key": "vi_command_mode_aware"}]},
 
 	{"keys": ["up"], 	"command": "press_key", "args": {"key": "<up>"},    "context": [{"key": "vi_command_mode_aware"}]},
 	{"keys": ["down"],  "command": "press_key", "args": {"key": "<down>"},  "context": [{"key": "vi_command_mode_aware"}]},

@@ -33,6 +33,7 @@ _tests_tokenizer = (
     ('<c-Space>',    '<C-space>',    'ctrl-space key'),
     ('0',            '0',            'zero key'),
     ('<c-m-.>',      '<C-M-.>',      'ctrl-alt-period key'),
+    ('<tab>',        '<tab>',        'tab key'),
 )
 
 

@@ -262,6 +262,8 @@ def translate_char(char):
         return ' '
     elif char.lower() == '<lt>':
         return '<'
+    elif char.lower() == '<tab>':
+        return '\t'
     else:
         return char
 

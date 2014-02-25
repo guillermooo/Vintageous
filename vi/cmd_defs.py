@@ -107,6 +107,7 @@ class cmds:
     SPACE =                        'vi_space'
     STAR =                         'vi_star'
     T =                            'vi_t'
+    TAB =                          'vi_tab'
     TILDE =                        'vi_tilde'
     U =                            'vi_u'
     UNDERSCORE =                   'vi_underscore'

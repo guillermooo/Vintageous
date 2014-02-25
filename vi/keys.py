@@ -204,6 +204,7 @@ class seqs:
     SLASH =                        '/'
     STAR =                         '*'
     T =                            't'
+    TAB =                          '<tab>'
     TILDE =                        '~'
     U =                            'u'
     UNDERSCORE =                   '_'
@@ -930,6 +931,7 @@ class key_names:
     RIGHT       = '<right>'
     SPACE       = '<sp>'
     SPACE_LONG  = '<space>'
+    TAB         = '<tab>'
     UP          = '<up>'
 
     F1          = '<f1>'
@@ -961,6 +963,7 @@ class key_names:
         RIGHT,
         SPACE,
         SPACE_LONG,
+        TAB,
         UP,
 
         F1,
