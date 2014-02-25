@@ -38,6 +38,5 @@ if (@(& hg bookmarks).length -gt 1) {
 }
 
 # Override .hg/hgrc
-"pushing..."
-# & hg --config "alias.push=push" push bb
-# & hg --config "alias.push=push" push git
+& hg --config "alias.push=push" push bb
+& hg --config "alias.push=push" push git
