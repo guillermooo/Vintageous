@@ -220,6 +220,57 @@ class cmds:
     F14 =                          'vi_f14'
     F15 =                          'vi_f15'
 
+    CTRL_F1 =                      'vi_ctrl_f1'
+    CTRL_F2 =                      'vi_ctrl_f2'
+    CTRL_F3 =                      'vi_ctrl_f3'
+    CTRL_F4 =                      'vi_ctrl_f4'
+    CTRL_F5 =                      'vi_ctrl_f5'
+    CTRL_F6 =                      'vi_ctrl_f6'
+    CTRL_F7 =                      'vi_ctrl_f7'
+    CTRL_F8 =                      'vi_ctrl_f8'
+    CTRL_F9 =                      'vi_ctrl_f9'
+    CTRL_F10 =                     'vi_ctrl_f10'
+    CTRL_F11 =                     'vi_ctrl_f11'
+    CTRL_F12 =                     'vi_ctrl_f12'
+    CTRL_F12 =                     'vi_ctrl_f12'
+    CTRL_F13 =                     'vi_ctrl_f13'
+    CTRL_F14 =                     'vi_ctrl_f14'
+    CTRL_F15 =                     'vi_ctrl_f15'
+
+    SHIFT_F1 =                     'vi_shift_f1'
+    SHIFT_F2 =                     'vi_shift_f2'
+    SHIFT_F3 =                     'vi_shift_f3'
+    SHIFT_F4 =                     'vi_shift_f4'
+    SHIFT_F5 =                     'vi_shift_f5'
+    SHIFT_F6 =                     'vi_shift_f6'
+    SHIFT_F7 =                     'vi_shift_f7'
+    SHIFT_F8 =                     'vi_shift_f8'
+    SHIFT_F9 =                     'vi_shift_f9'
+    SHIFT_F10 =                    'vi_shift_f10'
+    SHIFT_F11 =                    'vi_shift_f11'
+    SHIFT_F12 =                    'vi_shift_f12'
+    SHIFT_F12 =                    'vi_shift_f12'
+    SHIFT_F13 =                    'vi_shift_f13'
+    SHIFT_F14 =                    'vi_shift_f14'
+    SHIFT_F15 =                    'vi_shift_f15'
+
+    CTRL_SHIFT_F1 =                'vi_ctrl_shift_f1'
+    CTRL_SHIFT_F2 =                'vi_ctrl_shift_f2'
+    CTRL_SHIFT_F3 =                'vi_ctrl_shift_f3'
+    CTRL_SHIFT_F4 =                'vi_ctrl_shift_f4'
+    CTRL_SHIFT_F5 =                'vi_ctrl_shift_f5'
+    CTRL_SHIFT_F6 =                'vi_ctrl_shift_f6'
+    CTRL_SHIFT_F7 =                'vi_ctrl_shift_f7'
+    CTRL_SHIFT_F8 =                'vi_ctrl_shift_f8'
+    CTRL_SHIFT_F9 =                'vi_ctrl_shift_f9'
+    CTRL_SHIFT_F10 =               'vi_ctrl_shift_f10'
+    CTRL_SHIFT_F11 =               'vi_ctrl_shift_f11'
+    CTRL_SHIFT_F12 =               'vi_ctrl_shift_f12'
+    CTRL_SHIFT_F12 =               'vi_ctrl_shift_f12'
+    CTRL_SHIFT_F13 =               'vi_ctrl_shift_f13'
+    CTRL_SHIFT_F14 =               'vi_ctrl_shift_f14'
+    CTRL_SHIFT_F15 =               'vi_ctrl_shift_f15'
+
     # Special commands
 
     MISSING =                      '_missing'
@@ -403,11 +454,15 @@ cmd_defs = {
         cmds.DOUBLE_QUOTE:              dict(name=cmds.OPEN_REGISTERS,              input=None,                 type=cmd_types.OTHER, motion_required=False, multi_step=False, repeatable=False),
         cmds.F11:                       dict(name=cmds.F11,                         input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.F12:                       dict(name=cmds.F12,                         input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
+        cmds.F2:                        dict(name=cmds.F2,                          input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.F3:                        dict(name=cmds.F3,                          input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.F4:                        dict(name=cmds.F4,                          input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.F7:                        dict(name=cmds.F7,                          input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.G:                         dict(name=cmds.OPEN_NAME_SPACE,             input=None,                 type=cmd_types.OTHER, motion_required=False, multi_step=False, repeatable=False),
         cmds.SHIFT_CTRL_F12:            dict(name=cmds.SHIFT_CTRL_F12,              input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
+        cmds.CTRL_F2:                   dict(name=cmds.CTRL_F2,                    input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
+        cmds.SHIFT_F2:                  dict(name=cmds.SHIFT_F2,                    input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
+        cmds.CTRL_SHIFT_F2:             dict(name=cmds.CTRL_SHIFT_F2,               input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.SHIFT_F3:                  dict(name=cmds.SHIFT_F3,                    input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.SHIFT_F4:                  dict(name=cmds.SHIFT_F4,                    input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.Z:                         dict(name=cmds.OPEN_NAME_SPACE,             input=None,                 type=cmd_types.OTHER, motion_required=False, multi_step=False, repeatable=False),

@@ -144,6 +144,7 @@ class seqs:
     F15 =                          '<f15>'
     F2 =                           '<f2>'
     F3 =                           '<f3>'
+    SHIFT_F2 =                     '<S-f2>'
     SHIFT_F3 =                     '<S-f3>'
     SHIFT_F4 =                     '<S-f4>'
     F4 =                           '<f4>'
@@ -152,6 +153,8 @@ class seqs:
     F7 =                           '<f7>'
     F8 =                           '<f8>'
     F9 =                           '<f9>'
+    CTRL_F2 =                      '<C-f2>'
+    CTRL_SHIFT_F2 =                '<C-S-f2>'
     G =                            'g'
     G_BIG_D =                      'gD'
     G_BIG_U =                      'gU'
@@ -284,6 +287,7 @@ mappings = {
         seqs.CTRL_BIG_P:                cmd_defs[modes.NORMAL][cmds.CTRL_BIG_P],
         seqs.CTRL_D:                    cmd_defs[modes.NORMAL][cmds.CTRL_D],
         seqs.CTRL_E:                    cmd_defs[modes.NORMAL][cmds.CTRL_E],
+        seqs.CTRL_F2:                   cmd_defs[modes.NORMAL][cmds.CTRL_F2],
         seqs.CTRL_F12:                  cmd_defs[modes.NORMAL][cmds.CTRL_F12],
         seqs.CTRL_F:                    cmd_defs[modes.NORMAL][cmds.CTRL_F],
         seqs.CTRL_G:                    cmd_defs[modes.NORMAL][cmds.CTRL_G],
@@ -292,6 +296,7 @@ mappings = {
         seqs.CTRL_P:                    cmd_defs[modes.NORMAL][cmds.CTRL_P],
         seqs.CTRL_R:                    cmd_defs[modes.NORMAL][cmds.CTRL_R],
         seqs.CTRL_R_EQUAL:              cmd_defs[modes.NORMAL][cmds.CTRL_R_EQUAL],
+        seqs.CTRL_SHIFT_F2:             cmd_defs[modes.NORMAL][cmds.CTRL_SHIFT_F2],
         seqs.CTRL_U:                    cmd_defs[modes.NORMAL][cmds.CTRL_U],
         seqs.CTRL_V:                    cmd_defs[modes.NORMAL][cmds.CTRL_V],
         seqs.CTRL_W:                    cmd_defs[modes.NORMAL][cmds.CTRL_W],
@@ -317,6 +322,7 @@ mappings = {
         seqs.ESC:                       cmd_defs[modes.NORMAL][cmds.ESC],
         seqs.F11:                       cmd_defs[modes.NORMAL][cmds.F11],
         seqs.F12:                       cmd_defs[modes.NORMAL][cmds.F12],
+        seqs.F2:                        cmd_defs[modes.NORMAL][cmds.F2],
         seqs.F3:                        cmd_defs[modes.NORMAL][cmds.F3],
         seqs.F4:                        cmd_defs[modes.NORMAL][cmds.F4],
         seqs.F7:                        cmd_defs[modes.NORMAL][cmds.F7],
@@ -381,6 +387,7 @@ mappings = {
         seqs.SEMICOLON:                 cmd_defs[modes.NORMAL][cmds.SEMICOLON],
         seqs.SHIFT_CTRL_F12:            cmd_defs[modes.NORMAL][cmds.SHIFT_CTRL_F12],
         seqs.SHIFT_ENTER:               cmd_defs[modes.NORMAL][cmds.SHIFT_ENTER],
+        seqs.SHIFT_F2:                  cmd_defs[modes.NORMAL][cmds.SHIFT_F2],
         seqs.SHIFT_F3:                  cmd_defs[modes.NORMAL][cmds.SHIFT_F3],
         seqs.SHIFT_F4:                  cmd_defs[modes.NORMAL][cmds.SHIFT_F4],
         seqs.SLASH:                     cmd_defs[modes.NORMAL][cmds.SLASH],

@@ -56,6 +56,34 @@ def vi_ctrl_p(state):
     return cmd
 
 
+def vi_f2(state):
+    cmd = {}
+    cmd['action'] = 'next_bookmark'
+    cmd['action_args'] = {}
+    return cmd
+
+
+def vi_shift_f2(state):
+    cmd = {}
+    cmd['action'] = 'prev_bookmark'
+    cmd['action_args'] = {}
+    return cmd
+
+
+def vi_ctrl_f2(state):
+    cmd = {}
+    cmd['action'] = 'toggle_bookmark'
+    cmd['action_args'] = {}
+    return cmd
+
+
+def vi_ctrl_shift_f2(state):
+    cmd = {}
+    cmd['action'] = 'clear_bookmarks'
+    cmd['action_args'] = {}
+    return cmd
+
+
 def vi_f12(state):
     cmd = {}
     cmd['action'] = 'goto_definition'
