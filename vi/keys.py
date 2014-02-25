@@ -413,6 +413,7 @@ mappings = {
     #      are actually legal visual mode key sequences.
 
     modes.VISUAL: {
+        seqs.A:                     cmd_defs[modes.VISUAL][cmds.A],
         seqs.B:                     cmd_defs[modes.VISUAL][cmds.B],
         seqs.BACKTICK:              cmd_defs[modes.VISUAL][cmds.BACKTICK],
         seqs.BIG_B:                 cmd_defs[modes.VISUAL][cmds.BIG_B],
