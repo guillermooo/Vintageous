@@ -231,6 +231,7 @@ def seq_to_command(state, seq, mode=None):
     if state.mode in mappings:
         command = mappings[mode].get(seq, mappings['_missing'])
         return command
+
     return mappings['_missing']
 
 
@@ -986,6 +987,7 @@ class key_names:
     max_len = len('<space>')
 
 
+# TODO: detect counts, registers, marks...
 class KeySequenceTokenizer(object):
     """
     Takes in a sequence of key names and tokenizes it.
@@ -1020,15 +1022,15 @@ class KeySequenceTokenizer(object):
 
           c > m > s
         """
-        if len(modifiers) == 2:
+        if len(modifiers) == 6:
+            modifiers = 'c-m-s-'
+        elif len(modifiers) > 2:
             if modifiers.startswith('s-') and modifiers.endswith('c-'):
                 modifiers = 'c-s-'
             elif modifiers.startswith('s-') and modifiers.endswith('m-'):
                 modifiers = 'm-s-'
             elif modifiers.startswith('m-') and modifiers.endswith('c-'):
                 modifiers = 'c-m-'
-        elif len(modifiers) == 6:
-            modifiers = 'c-m-s-'
         return modifiers
 
     def long_key_name(self):
