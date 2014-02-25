@@ -1539,6 +1539,25 @@ class _vi_ge(ViTextCommandBase):
                                        'forward': False,
                                        'extend': extend})
 
+        def to_word_end(view, s):
+            pt = utils.previous_non_white_space_char(view, s.begin(), white_space=' \t')
+
+            if (pt == s.begin()) and (pt > 0):
+                pt -= 1
+
+            if mode == modes.INTERNAL_NORMAL:
+                return sublime.Region(s.a, pt)
+
+            elif mode == modes.NORMAL:
+                return sublime.Region(pt)
+
+            elif mode == modes.VISUAL:
+                return sublime.Region(s.a, pt)
+
+            return s
+
+        regions_transformer(self.view, to_word_end)
+
 
 class _vi_left_paren(ViTextCommandBase):
     def find_previous_sentence_end(self, r):
