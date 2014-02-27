@@ -260,9 +260,10 @@ class State(object):
         ',' and ';' change directions depending on whether 'f' or 't' was
         issued previously.
 
-        Returns `True` if the previous character search command was 'f'.
+        Returns the name of the last character search command, namely one of:
+        vi_f, vi_t, vi_big_f, vi_big_t.
         """
-        return self.settings.window['_vintageous_last_character_search_forward'] or False
+        return self.settings.window['_vintageous_last_character_search_forward'] or 'vi_f'
 
     @last_character_search_forward.setter
     def last_character_search_forward(self, value):

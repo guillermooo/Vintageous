@@ -35,14 +35,23 @@ class _vi_find_in_line(ViTextCommandBase):
     """Contrary to *f*, *t* does not look past the caret's position, so if ``character`` is under
        the caret, nothing happens.
     """
-    def run(self, edit, char=None, mode=None, count=1, change_direction=True,
-            inclusive=True):
+    def run(self, edit, char=None, mode=None, count=1, change_direction=False,
+            inclusive=True, skipping=False):
         def f(view, s):
             eol = view.line(s.b).end()
             if not s.empty():
                 eol = view.line(s.b - 1).end()
 
             match = s
+
+            if (mode in (modes.NORMAL, modes.INTERNAL_NORMAL) and
+                not inclusive
+                and skipping):
+                    # When repeating through ';', we must make sure we skip one
+                    # if we are at a match position.
+                    if view.substr(match.b + 1) == char:
+                        match = sublime.Region(match.b + 1)
+
             for i in range(count):
                 # Define search range as 'rest of the line to the right'.
                 if state.mode != modes.VISUAL:
@@ -81,11 +90,6 @@ class _vi_find_in_line(ViTextCommandBase):
         char = utils.translate_char(char)
 
         state = self.state
-        # TODO: Move this to command definition/parser.
-        state.last_character_search = char
-        # Change only if the command is f, F, t, T; not if it's ',' or ';'.
-        if change_direction:
-            state.last_character_search_forward = True
 
         regions_transformer(self.view, f)
 
@@ -94,8 +98,8 @@ class _vi_reverse_find_in_line(ViTextCommandBase):
     """Contrary to *F*, *T* does not look past the caret's position, so if ``character`` is right
        before the caret, nothing happens.
     """
-    def run(self, edit, char=None, mode=None, count=1, change_direction=True,
-            inclusive=True):
+    def run(self, edit, char=None, mode=None, count=1, change_direction=False,
+            inclusive=True, skipping=False):
         def f(view, s):
             if mode not in (modes.VISUAL, modes.VISUAL_LINE, modes.VISUAL_BLOCK):
                 a, b = view.line(s.b).a, s.b
@@ -139,12 +143,6 @@ class _vi_reverse_find_in_line(ViTextCommandBase):
         char = utils.translate_char(char)
 
         state = self.state
-        # TODO: store state per view.
-        state.last_character_search = char
-        # Change only if the command is f, F, t, T; not if it's ',' or ';'.
-        if change_direction:
-            state.last_character_search_forward = False
-
         regions_transformer(self.view, f)
 
 

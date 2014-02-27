@@ -46,17 +46,23 @@ def vi_l(state, **kwargs):
 
 def vi_t(state, **kwargs):
     cmd = {}
+    char = state.user_input
+    state.last_character_search_forward = 'vi_t'
+    state.last_character_search = char
     cmd['motion'] = '_vi_find_in_line'
-    cmd['motion_args'] = {'char': state.user_input, 'mode': state.mode,
+    cmd['motion_args'] = {'char': char, 'mode': state.mode,
                           'count': state.count, 'inclusive': False}
     return cmd
 
 
 def vi_f(state, **kwargs):
     cmd = {}
+    char = state.user_input
+    state.last_character_search_forward = 'vi_f'
+    state.last_character_search = char
     cmd['motion'] = '_vi_find_in_line'
-    cmd['motion_args'] = {'char': state.user_input, 'mode': state.mode,
-                          'count': state.count, 'inclusive': True}
+    cmd['motion_args'] = {'char': char, 'mode': state.mode,
+                          'count': state.count, 'inclusive': True,}
     return cmd
 
 
@@ -89,6 +95,7 @@ def vi_backtick(state, **kwargs):
 
 def vi_big_t(state, **kwargs):
     cmd = {}
+    state.last_character_search_forward = 'vi_big_t'
     cmd['motion'] = '_vi_reverse_find_in_line'
     cmd['motion_args'] = {'char': state.user_input, 'mode': state.mode,
                           'count': state.count, 'inclusive': False}
@@ -97,6 +104,7 @@ def vi_big_t(state, **kwargs):
 
 def vi_big_f(state, **kwargs):
     cmd = {}
+    state.last_character_search_forward = 'vi_big_f'
     cmd['motion'] = '_vi_reverse_find_in_line'
     cmd['motion_args'] = {'char': state.user_input, 'mode': state.mode,
                           'count': state.count, 'inclusive': True}
@@ -105,20 +113,33 @@ def vi_big_f(state, **kwargs):
 
 def vi_semicolon(state, **kwargs):
     cmd = {}
-    cmd['motion'] = '_vi_find_in_line' if state.last_character_search_forward else '_vi_reverse_find_in_line'
+    forward = state.last_character_search_forward in ('vi_t', 'vi_f')
+    inclusive = state.last_character_search_forward in ('vi_f', 'vi_big_f')
+
+    cmd['motion'] = ('_vi_find_in_line' if forward
+                                        else '_vi_reverse_find_in_line')
+
     cmd['motion_args'] = {'mode': state.mode, 'count': state.count,
                           'char': state.last_character_search,
-                          'change_direction': False}
+                          'change_direction': False,
+                          'inclusive': inclusive,
+                          'skipping': not inclusive}
 
     return cmd
 
 
 def vi_comma(state, **kwargs):
     cmd = {}
-    cmd['motion'] = '_vi_find_in_line' if not state.last_character_search_forward else '_vi_reverse_find_in_line'
+    forward = state.last_character_search_forward in ('vi_t', 'vi_f')
+    inclusive = state.last_character_search_forward in ('vi_f', 'vi_big_f')
+
+    cmd['motion'] = ('_vi_find_in_line' if not forward
+                                        else '_vi_reverse_find_in_line')
     cmd['motion_args'] = {'mode': state.mode, 'count': state.count,
                           'char': state.last_character_search,
-                          'change_direction': False}
+                          'change_direction': False,
+                          'inclusive': inclusive,
+                          'skipping': not inclusive}
 
     return cmd
 
