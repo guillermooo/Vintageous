@@ -1284,15 +1284,31 @@ class _vi_x(ViTextCommandBase):
     _populates_small_delete_register = True
 
     def run(self, edit, mode=None, count=1, register=None):
-        state = self.state
+        def select(view, s):
+            if mode == modes.INTERNAL_NORMAL:
+                return sublime.Region(s.b, s.b + count)
+            elif mode == modes.VISUAL:
+                if s.a < s.b:
+                    return sublime.Region(view.full_line(s.b - 1).b,
+                                          view.line(s.a).a)
+                return sublime.Region(view.line(s.b).a,
+                                      view.full_line(s.a - 1).b)
+            return sublime.Region(s.begin(), s.end())
 
-        if mode not in (modes.VISUAL, modes.VISUAL_LINE, modes.VISUAL_BLOCK):
-            self.view.run_command('_vi_l', {'mode': mode, 'count': count})
+        if mode not in (modes.VISUAL,
+                        modes.VISUAL_LINE,
+                        modes.VISUAL_BLOCK,
+                        modes.INTERNAL_NORMAL):
+            # error?
+            utils.blink()
+            self.enter_normal_mode(mode)
 
-        state.registers.yank(self, register)
+        regions_transformer(self.view, select)
+        self.state.registers.yank(self, register)
         self.view.run_command('right_delete')
 
         self.enter_normal_mode(mode)
+
 
 class _vi_r(ViTextCommandBase):
 
@@ -1464,7 +1480,6 @@ class _vi_equal(ViTextCommandBase):
         self.enter_normal_mode(mode)
 
 
-
 class _vi_big_o(ViTextCommandBase):
     def run(self, edit, count=1, mode=None):
         if mode == modes.INTERNAL_NORMAL:
@@ -1496,7 +1511,7 @@ class _vi_big_x(ViTextCommandBase):
                                           view.line(s.a).a)
                 return sublime.Region(view.line(s.b).a,
                                       view.full_line(s.a - 1).b)
-            return sublme.Region(s.begin(), s.end())
+            return sublime.Region(s.begin(), s.end())
 
         regions_transformer(self.view, select)
 
