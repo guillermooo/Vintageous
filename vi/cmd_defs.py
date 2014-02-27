@@ -44,6 +44,7 @@ class cmds:
     F =                            'vi_f'
     G =                            'vi_g'
     G_BIG_D =                      'vi_g_big_d'
+    G_BIG_H =                      'vi_g_big_h'
     G_BIG_J =                      'vi_g_big_j'
     G_BIG_T =                      'vi_g_big_t'
     G_BIG_U =                      'vi_gU'
@@ -385,6 +386,7 @@ cmd_defs = {
         cmds.BIG_P:                     dict(name=cmds.BIG_P,                       input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
         cmds.BIG_X:                     dict(name=cmds.BIG_X,                       input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
         cmds.GH:                        dict(name=cmds.GH,                          input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
+        cmds.G_BIG_H:                   dict(name=cmds.G_BIG_H,                     input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.O:                         dict(name=cmds.O,                           input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
         cmds.P:                         dict(name=cmds.P,                           input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=True),
         cmds.Q:                         dict(name=cmds.Q,                           input='vi_q',               type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),

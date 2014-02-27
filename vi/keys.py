@@ -54,6 +54,7 @@ class seqs:
     BIG_C =                        'C'
     BIG_D =                        'D'
     GH =                           'gh'
+    G_BIG_H =                      'gH'
     BIG_E =                        'E'
     BIG_F =                        'F'
     BIG_G =                        'G'
@@ -342,6 +343,7 @@ mappings = {
         seqs.GE:                        cmd_defs[modes.NORMAL][cmds.GE],
         seqs.GG:                        cmd_defs[modes.NORMAL][cmds.GG],
         seqs.GH:                        cmd_defs[modes.NORMAL][cmds.GH],
+        seqs.G_BIG_H:                   cmd_defs[modes.NORMAL][cmds.G_BIG_H],
         seqs.GJ:                        cmd_defs[modes.NORMAL][cmds.GJ],
         seqs.GK:                        cmd_defs[modes.NORMAL][cmds.GK],
         seqs.GQ:                        cmd_defs[modes.NORMAL][cmds.GQ],

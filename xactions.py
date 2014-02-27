@@ -2262,3 +2262,26 @@ class _vi_guu(ViTextCommandBase):
         regions_transformer(self.view, select)
         regions_transformer(self.view, to_lower)
         self.enter_normal_mode(mode)
+
+
+class _vi_g_big_h(ViWindowCommandBase):
+    """
+    Non-standard command.
+
+    After a search has been performed via '/' or '?', selects all matches and
+    enters select mode.
+    """
+    def run(self, mode=None, count=1):
+        view = self.window.active_view()
+
+        regs = view.get_regions('vi_search')
+        if regs:
+            view.sel().add_all(view.get_regions('vi_search'))
+
+            self.state.enter_select_mode()
+            self.state.display_status()
+            return
+
+        utils.blink()
+        sublime.status_message('Vintageous: No available search matches')
+        self.state.reset_command_data()

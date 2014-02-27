@@ -604,6 +604,11 @@ def vi_gh(state, **kwargs):
     cmd['action_args'] = {'mode': state.mode}
     return cmd
 
+def vi_g_big_h(state, **kwargs):
+    cmd = {}
+    cmd['action'] = '_vi_g_big_h'
+    cmd['action_args'] = {'mode': state.mode}
+    return cmd
 
 def vi_f4(state, **kwargs):
     cmd = {}
