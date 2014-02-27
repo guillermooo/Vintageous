@@ -1,0 +1,43 @@
+==============================================================================
+Vintageous 3.0.1
+==============================================================================
+
+
+CHANGES
+-------
+
+	- Implement gH: add ability to select all search matches.
+	- "+ yanks to the clipboard.
+	- Add :bp and :bn commands.
+	- Improve , and ;.
+	- s now accepts counts.
+	- x now accepts counts.
+
+
+FOUND BUGS?
+-----------
+
+Please report them here:
+
+    https://github.com/guillermooo/Vintageous/issues
+
+
+SUPPORT VINTAGEOUS
+------------------
+
+Is Vintageous worth your time? Developing Vintageous is hard work. If you use
+it often to get actual work done, please consider donating and make it worth
+my time too.
+
+    PayPal: http://www.pledgie.com/campaigns/19122
+    Gittip: https://www.gittip.com/guillermooo/
+
+I'm the creator and main author of Vintageous, but some generous people have
+contributed their time and effort as well. See the more active ones here; you
+may want to show them some gratitude too:
+
+https://github.com/guillermooo/Vintageous/graphs/contributors
+
+Thanks for reading and for using Vintageous!
+
+Guillermo
