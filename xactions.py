@@ -1290,12 +1290,6 @@ class _vi_x(ViTextCommandBase):
         def select(view, s):
             if mode == modes.INTERNAL_NORMAL:
                 return sublime.Region(s.b, s.b + count)
-            elif mode == modes.VISUAL:
-                if s.a < s.b:
-                    return sublime.Region(view.full_line(s.b - 1).b,
-                                          view.line(s.a).a)
-                return sublime.Region(view.line(s.b).a,
-                                      view.full_line(s.a - 1).b)
             return sublime.Region(s.begin(), s.end())
 
         if mode not in (modes.VISUAL,
