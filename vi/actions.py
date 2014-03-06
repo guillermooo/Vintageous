@@ -722,3 +722,17 @@ def vi_ctrl_g(state):
     cmd['action'] = 'ex_file'
     cmd['action_args'] = {}
     return cmd
+
+
+def vi_f6(state):
+    cmd = {}
+    cmd['action'] = 'toggle_setting'
+    cmd['action_args'] = {'setting': 'spell_check'}
+    return cmd
+
+
+def vi_f9(state):
+    cmd = {}
+    cmd['action'] = 'sort_lines'
+    cmd['action_args'] = {'case_sensitive': False}
+    return cmd

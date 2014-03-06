@@ -449,7 +449,7 @@ cmd_defs = {
         cmds.CTRL_BIG_F:                dict(name=cmds.CTRL_BIG_F,                  input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.CTRL_BIG_P:                dict(name=cmds.CTRL_BIG_P,                  input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.CTRL_F12:                  dict(name=cmds.CTRL_F12,                    input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
-        cmds.CTRL_K:                     dict(name=cmds.OPEN_NAME_SPACE,             input=None,                 type=cmd_types.OTHER, motion_required=False, multi_step=False, repeatable=False),
+        cmds.CTRL_K:                    dict(name=cmds.OPEN_NAME_SPACE,             input=None,                 type=cmd_types.OTHER, motion_required=False, multi_step=False, repeatable=False),
         cmds.CTRL_K_CTRL_B:             dict(name=cmds.CTRL_K_CTRL_B,               input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.CTRL_P:                    dict(name=cmds.CTRL_P,                      input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.CTRL_W:                    dict(name=cmds.OPEN_NAME_SPACE,             input=None,                 type=cmd_types.OTHER, motion_required=False, multi_step=False, repeatable=False),
@@ -460,9 +460,10 @@ cmd_defs = {
         cmds.F3:                        dict(name=cmds.F3,                          input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.F4:                        dict(name=cmds.F4,                          input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.F7:                        dict(name=cmds.F7,                          input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
+        cmds.F6:                        dict(name=cmds.F6,                          input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.G:                         dict(name=cmds.OPEN_NAME_SPACE,             input=None,                 type=cmd_types.OTHER, motion_required=False, multi_step=False, repeatable=False),
         cmds.SHIFT_CTRL_F12:            dict(name=cmds.SHIFT_CTRL_F12,              input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
-        cmds.CTRL_F2:                   dict(name=cmds.CTRL_F2,                    input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
+        cmds.CTRL_F2:                   dict(name=cmds.CTRL_F2,                     input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.SHIFT_F2:                  dict(name=cmds.SHIFT_F2,                    input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.CTRL_SHIFT_F2:             dict(name=cmds.CTRL_SHIFT_F2,               input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
         cmds.SHIFT_F3:                  dict(name=cmds.SHIFT_F3,                    input=None,                 type=cmd_types.ACTION, motion_required=False, multi_step=False, repeatable=False),
@@ -480,10 +481,12 @@ cmd_defs[modes.OPERATOR_PENDING][cmds.I] =    dict(name=cmds.I_TEXT_OBJECT,     
 cmd_defs[modes.VISUAL] = cmd_defs[modes.NORMAL].copy()
 cmd_defs[modes.VISUAL][cmds.A] =              dict(name=cmds.A_TEXT_OBJECT,         input='vi_a_text_object',   type=cmd_types.MOTION, multi_step=False)
 cmd_defs[modes.VISUAL][cmds.BIG_O] =          dict(name=cmds.O,                     input=None,                 type=cmd_types.ACTION, multi_step=False, motion_required=False, repeatable=False)
+cmd_defs[modes.VISUAL][cmds.F9] =             dict(name=cmds.F9,                    input=None,                 type=cmd_types.ACTION, multi_step=False, motion_required=False, repeatable=False)
 cmd_defs[modes.VISUAL][cmds.I] =              dict(name=cmds.I_TEXT_OBJECT,         input='vi_a_text_object',   type=cmd_types.MOTION, multi_step=False)
 
 cmd_defs[modes.VISUAL_LINE] = cmd_defs[modes.NORMAL].copy()
 cmd_defs[modes.VISUAL_LINE][cmds.BIG_O] =     dict(name=cmds.O,                     input=None,                 type=cmd_types.ACTION, multi_step=False, motion_required=False, repeatable=False)
+cmd_defs[modes.VISUAL_LINE][cmds.F9] =        dict(name=cmds.F9,                    input=None,                 type=cmd_types.ACTION, multi_step=False, motion_required=False, repeatable=False)
 
 cmd_defs[modes.VISUAL_BLOCK] = cmd_defs[modes.NORMAL].copy()
 

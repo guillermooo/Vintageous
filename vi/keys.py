@@ -145,6 +145,7 @@ class seqs:
     F15 =                          '<f15>'
     F2 =                           '<f2>'
     F3 =                           '<f3>'
+    F6 =                           '<f6>'
     SHIFT_F2 =                     '<S-f2>'
     SHIFT_F3 =                     '<S-f3>'
     SHIFT_F4 =                     '<S-f4>'
@@ -326,6 +327,7 @@ mappings = {
         seqs.F2:                        cmd_defs[modes.NORMAL][cmds.F2],
         seqs.F3:                        cmd_defs[modes.NORMAL][cmds.F3],
         seqs.F4:                        cmd_defs[modes.NORMAL][cmds.F4],
+        seqs.F6:                        cmd_defs[modes.NORMAL][cmds.F6],
         seqs.F7:                        cmd_defs[modes.NORMAL][cmds.F7],
         seqs.F:                         cmd_defs[modes.NORMAL][cmds.F],
         seqs.G:                         cmd_defs[modes.NORMAL][cmds.G],
@@ -477,6 +479,7 @@ mappings = {
         seqs.F11:                   cmd_defs[modes.VISUAL][cmds.F11],
         seqs.F12:                   cmd_defs[modes.VISUAL][cmds.F12],
         seqs.F7:                    cmd_defs[modes.VISUAL][cmds.F7],
+        seqs.F9:                    cmd_defs[modes.VISUAL][cmds.F9],
         seqs.F:                     cmd_defs[modes.VISUAL][cmds.F],
         seqs.G:                     cmd_defs[modes.VISUAL][cmds.G],
         seqs.G_BIG_J:               cmd_defs[modes.VISUAL][cmds.G_BIG_J],
