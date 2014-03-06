@@ -36,7 +36,7 @@ class Test_State(StateTestCase):
         s = state.State(self.view)
         # Make sure the actual usage of Vintageous doesn't change the pristine
         # state. This isn't great, though.
-        self.view.window().settings().erase('_vintageous_last_character_search_forward')
+        self.view.window().settings().erase('_vintageous_last_char_search_command')
         self.view.window().settings().erase('_vintageous_last_character_search')
         self.view.window().settings().erase('_vintageous_last_buffer_search')
 
@@ -51,7 +51,7 @@ class Test_State(StateTestCase):
         self.assertEqual(s.user_input, '')
         self.assertEqual(s.input_parsers, [])
         self.assertEqual(s.last_character_search, '')
-        self.assertEqual(s.last_character_search_forward, False)
+        self.assertEqual(s.last_char_search_command, False)
         self.assertEqual(s.non_interactive, False)
         self.assertEqual(s.capture_register, False)
         self.assertEqual(s.last_buffer_search, '')

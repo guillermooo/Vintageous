@@ -36,7 +36,7 @@
 					 "*.hg*",
 					 "*manifest.json",
 					 "Default.sublime-commands",
-					 "*test_harness.py"]
+					 "test_runner.py"]
 			],
 
 			["./vi/*.py", []],

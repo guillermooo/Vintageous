@@ -39,7 +39,7 @@ known_keys = [
     '_repeat_action',
     'last_buffer_search',
     'last_character_search',
-    'last_character_search_forward',
+    'last_char_search_command',
     'restore_original_carets',
     'xpos',
     'must_update_xpos',

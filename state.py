@@ -255,7 +255,7 @@ class State(object):
         self.settings.window['_vintageous_last_character_search'] = value
 
     @property
-    def last_character_search_forward(self):
+    def last_char_search_command(self):
         """
         ',' and ';' change directions depending on whether 'f' or 't' was
         issued previously.
@@ -263,12 +263,12 @@ class State(object):
         Returns the name of the last character search command, namely one of:
         vi_f, vi_t, vi_big_f, vi_big_t.
         """
-        return self.settings.window['_vintageous_last_character_search_forward'] or 'vi_f'
+        return self.settings.window['_vintageous_last_char_search_command'] or 'vi_f'
 
-    @last_character_search_forward.setter
-    def last_character_search_forward(self, value):
+    @last_char_search_command.setter
+    def last_char_search_command(self, value):
         # FIXME: It isn't working.
-        self.settings.window['_vintageous_last_character_search_forward'] = value
+        self.settings.window['_vintageous_last_char_search_command'] = value
 
     @property
     def capture_register(self):
