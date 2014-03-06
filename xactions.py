@@ -143,14 +143,17 @@ class _vi_ctrl_r(IrreversibleTextCommand):
 class _vi_a(sublime_plugin.TextCommand):
     def run(self, edit, count=1, mode=None):
         def f(view, s):
-            if mode == modes.INTERNAL_NORMAL:
+            if view.substr(s.b) != '\n':
                 return sublime.Region(s.b + 1)
-            if mode == modes.VISUAL:
-                return sublime.Region(s.b)
             return s
 
         if mode is None:
             raise ValueError('mode required')
+
+        # TODO: We should probably not define the keys for these modes
+        # in the first place.
+        elif mode != modes.INTERNAL_NORMAL:
+            return
 
         regions_transformer(self.view, f)
         self.view.window().run_command('_enter_insert_mode')
