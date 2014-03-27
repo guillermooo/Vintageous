@@ -667,7 +667,7 @@ class PressKey(ViWindowCommandBase):
         _logger().info('[PressKey] getting cmd for seq/partial seq in (mode): {0}/{1} ({2})'.format(state.sequence,
                                                                                                     state.partial_sequence,
                                                                                                     state.mode))
-        command = key_mappings.get_current(check_user_mappings=check_user_mappings)
+        command = key_mappings.resolve(check_user_mappings=check_user_mappings)
 
         if isinstance(command, cmd_defs.ViOpenRegister):
             _logger().info('[PressKey] requesting register name')
@@ -711,11 +711,11 @@ class PressKey(ViWindowCommandBase):
                 #
                 # Exclude user mappings, since they've already been given a
                 # chance to evaluate.
-                command = key_mappings.get_current(sequence=bare_seq,
+                command = key_mappings.resolve(sequence=bare_seq,
                                                    mode=modes.NORMAL,
                                                    check_user_mappings=False)
             else:
-                command = key_mappings.get_current(sequence=bare_seq)
+                command = key_mappings.resolve(sequence=bare_seq)
 
             if isinstance(command, cmd_base.ViMissingCommandDef):
                 _logger().info('[PressKey] unmapped sequence: {0}'.format(state.sequence))
@@ -732,7 +732,7 @@ class PressKey(ViWindowCommandBase):
                 # remove counts
                 action_seq = to_bare_command_name(state.sequence)
                 _logger().info('[PressKey] action seq: {0}'.format(action_seq))
-                command = key_mappings.get_current(sequence=action_seq, mode=modes.NORMAL)
+                command = key_mappings.resolve(sequence=action_seq, mode=modes.NORMAL)
                 # TODO: Make _missing a command.
                 if isinstance(command, cmd_base.ViMissingCommandDef):
                     _logger().info("[PressKey] unmapped sequence: {0}".format(state.sequence))

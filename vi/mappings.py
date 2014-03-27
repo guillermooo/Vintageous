@@ -90,9 +90,9 @@ class Mappings(object):
         full_match = self._find_full_match(self.state.mode, key)
         partial_matches = self._find_partial_match(self.state.mode, key)
         if partial_matches:
-            self.state.logger.info("[Mappings] use mapping found: {0} -> {1}".format(key, partial_matches))
+            self.state.logger.info("[Mappings] user mapping found: {0} -> {1}".format(key, partial_matches))
             return (True, full_match[0])
-        self.state.logger.info("[Mappings] use mapping not found: {0} -> {1}".format(key, partial_matches))
+        self.state.logger.info("[Mappings] user mapping not found: {0} -> {1}".format(key, partial_matches))
         return (False, True)
 
     # XXX: Provisional. Get rid of this as soon as possible.
@@ -103,7 +103,7 @@ class Mappings(object):
             self.state.logger.info("[Mappings] incomplete user mapping {0}".format(self.state.partial_sequence))
             return True
 
-    def get_current(self, sequence=None, mode=None, check_user_mappings=True):
+    def resolve(self, sequence=None, mode=None, check_user_mappings=True):
         """
         Looks at the current global state and returns the command mapped to
         the available sequence. It may be a 'missing' command.

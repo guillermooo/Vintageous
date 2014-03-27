@@ -10,9 +10,6 @@ from Vintageous.vi import utils
 from Vintageous.vi.utils import input_types
 from Vintageous.vi.contexts import KeyContext
 from Vintageous.vi.dot_file import DotFile
-from Vintageous.vi.keys import mappings
-from Vintageous.vi.keys import seq_to_command
-from Vintageous.vi.keys import user_mappings
 from Vintageous.vi.marks import Marks
 from Vintageous.vi.registers import Registers
 from Vintageous.vi.settings import SettingsManager
@@ -22,10 +19,10 @@ from Vintageous.vi.utils import input_types
 from Vintageous.vi.utils import is_view
 from Vintageous.vi.utils import is_ignored
 from Vintageous.vi.utils import is_ignored_but_command_mode
-from Vintageous.vi.utils import jump_directions
 from Vintageous.vi.utils import modes
 from Vintageous.vi import cmd_defs
 from Vintageous.vi import cmd_base
+from Vintageous.plugins import plugins
 
 
 # ============================================================================
@@ -356,7 +353,9 @@ class State(object):
     def action(self):
         val = self.settings.vi['action'] or None
         if val:
-            cls = getattr(cmd_defs, val['name'])
+            cls = getattr(cmd_defs, val['name'], None)
+            if cls is None:
+                cls = plugins.classes[val['name']]
             return cls.from_json(val['data'])
 
     @action.setter

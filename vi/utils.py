@@ -117,6 +117,7 @@ class modes:
     REPLACE = 'mode_replace'
     NORMAL_INSERT = 'mode_normal_insert'
     SELECT ='mode_select'
+
     @staticmethod
     def to_friendly_name(mode):
         # if name == COMMAND_LINE:

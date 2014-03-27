@@ -7,6 +7,7 @@ from Vintageous.vi import utils
 from Vintageous.vi.utils import input_types
 from Vintageous.vi.utils import modes
 from Vintageous.vi import cmd_base
+from Vintageous.plugins import plugins
 
 
 _logger = local_logger(__name__)
@@ -234,8 +235,15 @@ def seq_to_command(state, seq, mode=None):
 
     _logger().info('[seq_to_command] state/seq: {0}/{1}'.format(mode, seq))
 
-    if state.mode in mappings:
+    command = None
+
+    if state.mode in plugins.mappings:
+        command = plugins.mappings[mode].get(seq, None)
+
+    if not command and state.mode in mappings:
         command = mappings[mode].get(seq, cmd_base.ViMissingCommandDef())
+        return command
+    elif command:
         return command
 
     return cmd_base.ViMissingCommandDef()
@@ -460,7 +468,7 @@ def to_bare_command_name(seq):
     return ''.join(k for k in new_seq if not k.isdigit())
 
 
-def register(keys, *args, **kwargs):
+def assign(keys, *args, **kwargs):
     """
     Registers a 'key sequence' to 'command' mapping with Vintageous.
 
@@ -469,8 +477,8 @@ def register(keys, *args, **kwargs):
 
     The decorated class is instantiated with `*args` and `**kwargs`.
 
-    @mappings
-      A list of (`mode`, `sequence`) pairs to map the decorated
+    @keys
+      A list of (`mode:tuple`, `sequence:string`) pairs to map the decorated
       class to.
     """
     def inner(cls):

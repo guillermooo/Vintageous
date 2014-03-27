@@ -15,7 +15,6 @@ from Vintageous.ex.plat.windows import get_oem_cp
 from Vintageous.ex.plat.windows import get_startup_info
 from Vintageous.ex_main import FsCompletion
 from Vintageous.state import State
-from Vintageous.state import user_mappings
 from Vintageous.state import VintageState
 from Vintageous.vi import abbrev
 from Vintageous.vi import utils
