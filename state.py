@@ -795,9 +795,14 @@ class State(object):
                 motion_cmd = self.motion.to_json(self)
                 self.logger.info('[State] lone motion cmd: {0}'.format(motion_cmd))
 
-                sublime.active_window().run_command(
-                                                motion_cmd['motion'],
-                                                motion_cmd['motion_args'])
+                # We know that all motions are subclasses of ViTextCommandBase,
+                # so it's safe to call them from the current view.
+                # TODO: State should know about each command's type hierarchy.
+                #       Example:
+                #           runner = self.resolve_runner('_vi_dollar')
+                #           # runner ==> view.run_command
+                self.view.run_command(motion_cmd['motion'],
+                                      motion_cmd['motion_args'])
 
             if self.action:
                 action_cmd = self.action.to_json(self)

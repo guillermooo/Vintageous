@@ -167,11 +167,11 @@ class ViInsertLineBefore(ViOperatorDef):
         self.scroll_into_view = True
 
     def to_json(self, state):
+        state.glue_until_normal_mode = True
+
         cmd = {}
         cmd['action'] = '_vi_big_o'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
-        state.glue_until_normal_mode = True
-
         return cmd
 
 
@@ -336,7 +336,8 @@ class ViChangeByChars(ViOperatorDef):
         self.repeatable = True
 
     def to_json(self, state):
-        # XXX: Implement basic serialization in base class?
+        state.glue_until_normal_mode = True
+
         cmd = {}
         cmd['action'] = '_vi_c'
         cmd['action_args'] = {'mode': state.mode,
@@ -694,7 +695,7 @@ class ViInvertCaseByChars(ViOperatorDef):
 # TODO: Duplicated.
 class ViChangeToUpperCaseByChars(ViOperatorDef):
     """
-    Vim: `~`
+    Vim: `gU`
     """
 
     def __init__(self, *args, **kwargs):
@@ -706,7 +707,7 @@ class ViChangeToUpperCaseByChars(ViOperatorDef):
 
     def to_json(self, state):
         cmd = {}
-        cmd['action'] = '_vi_tilde'
+        cmd['action'] = '_vi_g_big_u'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
@@ -1688,10 +1689,11 @@ class ViEnterInserMode(ViOperatorDef):
         self.scroll_into_view = True
 
     def to_json(self, state):
+        state.glue_until_normal_mode = True
+
         cmd = {}
         cmd['action'] = '_enter_insert_mode'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
-        state.glue_until_normal_mode = True
         return cmd
 
 
@@ -2349,11 +2351,19 @@ class ViRepeatCharSearchForward(ViMotionDef):
 
     def to_json(self, state):
         cmd = {}
-        cmd['is_jump'] = True
-        cmd['motion'] = '_vi_semicolon'
-        cmd['motion_args'] = {'mode': state.mode,
-                              'count': state.count,
+        forward = state.last_char_search_command in ('vi_t', 'vi_f')
+        inclusive = state.last_char_search_command in ('vi_f', 'vi_big_f')
+
+        cmd['motion'] = ('_vi_find_in_line' if forward
+                                            else '_vi_reverse_find_in_line')
+
+        cmd['motion_args'] = {'mode': state.mode, 'count': state.count,
+                              'char': state.last_character_search,
+                              'change_direction': False,
+                              'inclusive': inclusive,
+                              'skipping': not inclusive
                               }
+
         return cmd
 
 
@@ -2382,12 +2392,15 @@ class ViGotoMark(ViMotionDef):
         return True
 
     def to_json(self, state):
-        if self.inp == "'":
-            return vi_quote_quote(state, **kwargs)
-
         cmd = {}
-        cmd['is_jump'] = True
 
+        if self.inp == "'":
+            cmd['is_jump'] = True
+            cmd['motion'] = '_vi_quote_quote'
+            cmd['motion_args'] = {} # {'mode': state.mode, 'count': state.count}
+            return cmd
+
+        cmd['is_jump'] = True
         cmd['motion'] = '_vi_quote'
         cmd['motion_args'] = {'mode': state.mode,
                               'count': state.count,
@@ -2835,6 +2848,7 @@ class ViReplaceCharacters(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
         self.updates_xpos = True
+        self.repeatable = True
 
         self.input_parser = parser_def(command=inputs.one_char,
                        interactive_command=None,

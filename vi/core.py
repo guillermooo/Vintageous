@@ -2,6 +2,7 @@ import sublime
 import sublime_plugin
 
 from Vintageous.state import State
+from Vintageous.vi.utils import IrreversibleTextCommand
 
 
 class ViTextCommandBase(sublime_plugin.TextCommand):
@@ -75,6 +76,13 @@ class ViTextCommandBase(sublime_plugin.TextCommand):
         sels = list(self.view.sel())
         sublime.set_timeout(lambda: self.view.erase_regions('vi_training_wheels'), 350)
         self.view.add_regions('vi_training_wheels', sels, 'comment', '', sublime.DRAW_NO_FILL)
+
+
+class ViMotionCommand(ViTextCommandBase, IrreversibleTextCommand):
+    """
+    Motions should bypass the undo stack.
+    """
+    pass
 
 
 class ViWindowCommandBase(sublime_plugin.WindowCommand):

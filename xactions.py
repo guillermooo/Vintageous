@@ -43,20 +43,26 @@ class _vi_g_big_u(ViTextCommandBase):
             # selection as we want it.
             return sublime.Region(s.b, s.a)
 
-        if mode != modes.INTERNAL_NORMAL:
+        if mode not in (modes.INTERNAL_NORMAL,
+                        modes.VISUAL,
+                        modes.VISUAL_LINE,
+                        modes.VISUAL_BLOCK):
             raise ValueError('bad mode: ' + mode)
 
-        if motion is None:
+        if motion is None and mode == modes.INTERNAL_NORMAL:
             raise ValueError('motion data required')
 
-        self.save_sel()
+        if mode == modes.INTERNAL_NORMAL:
+            self.save_sel()
 
-        self.view.run_command(motion['motion'], motion['motion_args'])
+            self.view.run_command(motion['motion'], motion['motion_args'])
 
-        if self.has_sel_changed():
-            regions_transformer(self.view, f)
+            if self.has_sel_changed():
+                regions_transformer(self.view, f)
+            else:
+                utils.blink()
         else:
-            utils.blink()
+                regions_transformer(self.view, f)
 
         self.enter_normal_mode(mode)
 
@@ -1158,6 +1164,7 @@ class _vi_backtick(ViTextCommandBase):
 
 class _vi_quote_quote(IrreversibleTextCommand):
     next_command = 'jump_back'
+
     def run(self):
         current = _vi_quote_quote.next_command
         self.view.window().run_command(current)
