@@ -1976,6 +1976,7 @@ class ViGotoSymbolInFile(ViMotionDef):
 
 
 @keys.assign(keys=[(seqs.L, _MODES_MOTION)])
+@keys.assign(keys=[(seqs.RIGHT, _MODES_MOTION)])
 class ViMoveRightByChars(ViMotionDef):
     """
     Vim: `l`
@@ -2282,6 +2283,7 @@ class ViGotoExactMarkXpos(ViMotionDef):
 
 
 @keys.assign(keys=[(seqs.DOLLAR, _MODES_MOTION)])
+@keys.assign(keys=[(seqs.END, _MODES_MOTION)])
 class ViMoveToEol(ViMotionDef):
     """
     Vim: `$`
@@ -2651,6 +2653,7 @@ class ViMoveByBigWordEnds(ViMotionDef):
 
 
 @keys.assign(keys=[(seqs.H, _MODES_MOTION)])
+@keys.assign(keys=[(seqs.LEFT, _MODES_MOTION)])
 class ViMoveLeftByChars(ViMotionDef):
     """
     Vim: `h`
@@ -2694,6 +2697,7 @@ class ViMoveByWords(ViMotionDef):
 
 
 @keys.assign(keys=[(seqs.J, _MODES_MOTION)])
+@keys.assign(keys=[(seqs.DOWN, _MODES_MOTION)])
 class ViMoveDownByLines(ViMotionDef):
     """
     Vim: `j`
@@ -2711,6 +2715,7 @@ class ViMoveDownByLines(ViMotionDef):
 
 
 @keys.assign(keys=[(seqs.K, _MODES_MOTION)])
+@keys.assign(keys=[(seqs.UP, _MODES_MOTION)])
 class ViMoveUpByLines(ViMotionDef):
     """
     Vim: `k`
@@ -2730,6 +2735,7 @@ class ViMoveUpByLines(ViMotionDef):
 
 
 @keys.assign(keys=[(seqs.HAT, _MODES_MOTION)])
+@keys.assign(keys=[(seqs.HOME, _MODES_MOTION)])
 class ViMoveToBol(ViMotionDef):
     """
     Vim: `^`

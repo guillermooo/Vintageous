@@ -1628,7 +1628,7 @@ class _vi_question_mark_impl(ViMotionCommand, BufferSearchBase):
         def f(view, s):
             # FIXME: readjust carets if we searched for '\n'.
             if mode == modes.VISUAL:
-                return sublime.region(s.end(), found.a)
+                return sublime.Region(s.end(), found.a)
 
             elif mode == modes.INTERNAL_NORMAL:
                 return sublime.Region(s.end(), found.a)
