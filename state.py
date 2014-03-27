@@ -22,7 +22,8 @@ from Vintageous.vi.utils import is_ignored_but_command_mode
 from Vintageous.vi.utils import modes
 from Vintageous.vi import cmd_defs
 from Vintageous.vi import cmd_base
-from Vintageous.plugins import plugins
+# !! Avoid error due to sublime_plugin.py:45 expectations.
+from Vintageous.plugins import plugins as user_plugins
 
 
 # ============================================================================
@@ -141,7 +142,7 @@ def plugin_unloaded():
         view.settings().set('command_mode', False)
         view.settings().set('inverse_caret_state', False)
     except AttributeError:
-        _logger().error('could not access sublime.active_window().active_view().settings while unloading')
+        _logger().warn('could not access sublime.active_window().active_view().settings while unloading')
         pass
 
 
@@ -355,7 +356,7 @@ class State(object):
         if val:
             cls = getattr(cmd_defs, val['name'], None)
             if cls is None:
-                cls = plugins.classes[val['name']]
+                cls = user_plugins.classes[val['name']]
             return cls.from_json(val['data'])
 
     @action.setter

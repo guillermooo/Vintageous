@@ -327,6 +327,8 @@ class ViChangeToEol(ViOperatorDef):
         self.repeatable = True
 
     def translate(self, state):
+        state.glue_until_normal_mode = True
+
         cmd = {}
         cmd['action'] = '_vi_big_c'
         cmd['action_args'] = {'mode': state.mode,
@@ -336,8 +338,8 @@ class ViChangeToEol(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.G_BIG_U, _MODES_ACTION),
-                     (seqs.G_BIG_U_G_BIG_U, _MODES_ACTION)])
+@keys.assign(keys=[(seqs.G_BIG_U_BIG_U, _MODES_ACTION)])
+@keys.assign(keys=[(seqs.G_BIG_U_G_BIG_U, _MODES_ACTION)])
 class ViChangeToUpperCaseByLines(ViOperatorDef):
     """
     Vim: `gUU`, `gUgU`
@@ -435,8 +437,8 @@ class ViIndentLine(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.GU, _MODES_ACTION),
-                     (seqs.GUGU, _MODES_ACTION)])
+@keys.assign(keys=[(seqs.GUGU, _MODES_ACTION)])
+@keys.assign(keys=[(seqs.GUU, _MODES_ACTION)])
 class ViChangeToLowerCaseByLines(ViOperatorDef):
     """
     Vim: `guu`, `gugu`
