@@ -27,7 +27,7 @@ from Vintageous.vi.utils import IrreversibleTextCommand
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import regions_transformer
 from Vintageous.vi.utils import mark_as_widget
-from Vintageous.vi import commands
+from Vintageous.vi import cmd_defs
 
 
 class _vi_find_in_line(ViMotionCommand):
@@ -167,7 +167,7 @@ class _vi_slash(ViMotionCommand, BufferSearchBase):
         state = self.state
         state.sequence += s + '<CR>'
         self.view.erase_regions('vi_inc_search')
-        state.motion = commands.ViSearchForwardImpl(term=s)
+        state.motion = cmd_defs.ViSearchForwardImpl(term=s)
 
         # If s is empty, we must repeat the last search.
         state.last_buffer_search = s or state.last_buffer_search
@@ -616,9 +616,11 @@ class _vi_k(ViMotionCommand):
                 self.view.show(new_region, False)
                 return
 
-            else:
+            elif modes.SELECT:
                 # Must remove last selection.
                 self.view.sel().subtract(self.view.sel()[-1])
+                return
+            else:
                 return
 
         regions_transformer(self.view, f)
@@ -1675,7 +1677,7 @@ class _vi_question_mark(ViMotionCommand, BufferSearchBase):
         state = self.state
         state.sequence += s + '<CR>'
         self.view.erase_regions('vi_inc_search')
-        state.motion = commands.ViSearchBackwardImpl(term=s)
+        state.motion = cmd_defs.ViSearchBackwardImpl(term=s)
 
         # If s is empty, we must repeat the last search.
         state.last_buffer_search = s or state.last_buffer_search

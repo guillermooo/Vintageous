@@ -9,132 +9,24 @@ from Vintageous.vi.inputs import input_types
 from Vintageous.vi.inputs import parser_def
 from Vintageous.vi import inputs
 from Vintageous.vi import utils
+from Vintageous.vi.cmd_base import ViOperatorDef
+from Vintageous.vi.cmd_base import ViMotionDef
+from Vintageous.vi.cmd_base import ViMissingCommandDef
+from Vintageous.vi import keys
+from Vintageous.vi.keys import seqs
 
 import sublime_plugin
 
 
-class cmd_types:
-    """
-    Types of command.
-    """
-    MOTION          = 1
-    ACTION          = 2
-    ANY             = 3
-    OTHER           = 4
-    USER            = 5
-    OPEN_NAME_SPACE = 6
+_MODES_MOTION = (modes.NORMAL, modes.OPERATOR_PENDING, modes.VISUAL,
+                 modes.VISUAL_LINE, modes.VISUAL_BLOCK)
+
+_MODES_ACTION = (modes.NORMAL, modes.VISUAL, modes.VISUAL_LINE,
+                 modes.VISUAL_BLOCK)
 
 
-class ViCommandDefBase(object):
-    """
-    Base class for all Vim commands.
-    """
 
-    _serializable = ['_inp',]
-
-    def __init__(self):
-        self.input_parser = None
-        self._inp = ''
-
-    def __getitem__(self, key):
-        # XXX: For compatibility. Should be removed eventually.
-        return self.__dict__[key]
-
-    @property
-    def accept_input(self):
-        return False
-
-    @property
-    def inp(self):
-        """
-        Current input for this command.
-        """
-        return self._inp
-
-    def accept(self, key):
-        """
-        Processes input for this command.
-        """
-        _name = self.__class__.__name__
-        assert self.input_parser, '{0} does not provide an input parser'.format(_name)
-        raise NotImplementedError(
-                '{0} must implement .accept()'.format(_name))
-
-    def reset(self):
-        self._inp = ''
-
-    def to_json(self, state):
-        """
-        Returns the command as a valid Json object containing all necessary
-        data to be run by Vintageous. This is usually the last step before
-        handing the command off to ST.
-
-        Every motion and operator must override this method.
-
-        @state
-          The current state.
-        """
-        raise NotImplementedError('command {0} must implement .to_json()'
-                                              .format(self.__class__.__name__)
-                                              )
-
-    @classmethod
-    def from_json(cls, data):
-        """
-        Instantiates a command from a valid Json object representing one.
-
-        @data
-          Serialized command data as provided by .serialize().
-        """
-        instance = cls()
-        instance.__dict__.update(data)
-        return instance
-
-    def serialize(self):
-        """
-        Returns a valid Json object representing this command in a format
-        Vintageous uses internally.
-        """
-        data = {'name': self.__class__.__name__,
-                'data': {k: v for k, v in self.__dict__.items()
-                              if k in self._serializable}
-                }
-        return data
-
-
-class ViMissingCommandDef(ViCommandDefBase):
-    def to_json(self):
-        raise TypeError(
-            'ViMissingCommandDef should not be used as a runnable command'
-            )
-
-
-class ViMotionDef(ViCommandDefBase):
-    """
-    Base class for all motions.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.updates_xpos = False
-        self.scroll_into_view = False
-        self.type = cmd_types.MOTION
-
-
-class ViOperatorDef(ViCommandDefBase):
-    """
-    Base class for all operators.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.updates_xpos = False
-        self.scroll_into_view = False
-        self.motion_required = False
-        self.type = cmd_types.ACTION
-        self.repeatable = False
-
-
+@keys.register(keys=[(seqs.D, _MODES_ACTION)])
 class ViDeleteByChars(ViOperatorDef):
     """
     Vim: `d`
@@ -147,7 +39,7 @@ class ViDeleteByChars(ViOperatorDef):
         self.motion_required = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_d'
         cmd['action_args'] = {'mode': state.mode,
@@ -157,6 +49,7 @@ class ViDeleteByChars(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_O, _MODES_ACTION)])
 class ViInsertLineBefore(ViOperatorDef):
     """
     Vim: `O`
@@ -166,7 +59,7 @@ class ViInsertLineBefore(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         state.glue_until_normal_mode = True
 
         cmd = {}
@@ -175,6 +68,7 @@ class ViInsertLineBefore(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.O, _MODES_ACTION)])
 class ViInsertLineAfter(ViOperatorDef):
     """
     Vim: `o`
@@ -184,7 +78,7 @@ class ViInsertLineAfter(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
 
         # XXX: Create a separate command?
@@ -202,6 +96,7 @@ class ViInsertLineAfter(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.X, _MODES_ACTION)])
 class ViRightDeleteChars(ViOperatorDef):
     """
     Vim: `x`
@@ -211,7 +106,7 @@ class ViRightDeleteChars(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_x'
         cmd['action_args'] = {'mode': state.mode,
@@ -221,6 +116,7 @@ class ViRightDeleteChars(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.S, _MODES_ACTION)])
 class ViSubstituteChar(ViOperatorDef):
     """
     Vim: `s`
@@ -230,7 +126,7 @@ class ViSubstituteChar(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         # XXX: Handle differently from State?
         state.glue_until_normal_mode = True
 
@@ -243,6 +139,7 @@ class ViSubstituteChar(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.Y, _MODES_ACTION)])
 class ViYankByChars(ViOperatorDef):
     """
     Vim: `y`
@@ -255,7 +152,7 @@ class ViYankByChars(ViOperatorDef):
         self.motion_required = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_y'
         cmd['action_args'] = {'mode': state.mode,
@@ -265,6 +162,7 @@ class ViYankByChars(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.EQUAL, _MODES_ACTION)])
 class ViReindent(ViOperatorDef):
     """
     Vim: `=`
@@ -277,7 +175,7 @@ class ViReindent(ViOperatorDef):
         self.motion_required = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_equal'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
@@ -285,6 +183,7 @@ class ViReindent(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.GREATER_THAN, _MODES_ACTION)])
 class ViIndent(ViOperatorDef):
     """
     Vim: `>`
@@ -297,13 +196,14 @@ class ViIndent(ViOperatorDef):
         self.motion_required = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_greater_than'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.LESS_THAN, _MODES_ACTION)])
 class ViUnindent(ViOperatorDef):
     """
     Vim: `<`
@@ -316,13 +216,14 @@ class ViUnindent(ViOperatorDef):
         self.motion_required = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_less_than'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.C, _MODES_ACTION)])
 class ViChangeByChars(ViOperatorDef):
     """
     Vim: `c`
@@ -335,7 +236,7 @@ class ViChangeByChars(ViOperatorDef):
         self.motion_required = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         state.glue_until_normal_mode = True
 
         cmd = {}
@@ -347,6 +248,7 @@ class ViChangeByChars(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.U, _MODES_ACTION)])
 class ViUndo(ViOperatorDef):
     """
     Vim: `u`
@@ -357,7 +259,7 @@ class ViUndo(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
 
         if state.mode in (modes.VISUAL,
@@ -372,6 +274,7 @@ class ViUndo(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_R, _MODES_ACTION)])
 class ViRedo(ViOperatorDef):
     """
     Vim: `C-r`
@@ -382,13 +285,14 @@ class ViRedo(ViOperatorDef):
         self.scroll_into_view = True
         self.updates_xpos = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_ctrl_r'
         cmd['action_args'] = {'count': state.count, 'mode': state.mode}
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_D, _MODES_ACTION)])
 class ViDeleteToEol(ViOperatorDef):
     """
     Vim: `D`
@@ -400,7 +304,7 @@ class ViDeleteToEol(ViOperatorDef):
         self.scroll_into_view = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_big_d'
         cmd['action_args'] = {'mode': state.mode,
@@ -410,6 +314,7 @@ class ViDeleteToEol(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_C, _MODES_ACTION)])
 class ViChangeToEol(ViOperatorDef):
     """
     Vim: `C`
@@ -421,7 +326,7 @@ class ViChangeToEol(ViOperatorDef):
         self.scroll_into_view = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_big_c'
         cmd['action_args'] = {'mode': state.mode,
@@ -431,6 +336,8 @@ class ViChangeToEol(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.G_BIG_U, _MODES_ACTION),
+                     (seqs.G_BIG_U_G_BIG_U, _MODES_ACTION)])
 class ViChangeToUpperCaseByLines(ViOperatorDef):
     """
     Vim: `gUU`, `gUgU`
@@ -442,13 +349,14 @@ class ViChangeToUpperCaseByLines(ViOperatorDef):
         self.scroll_into_view = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_g_big_u_big_u'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.CC, _MODES_ACTION)])
 class ViChangeLine(ViOperatorDef):
     """
     Vim: `cc`
@@ -460,7 +368,7 @@ class ViChangeLine(ViOperatorDef):
         self.scroll_into_view = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         state.glue_until_normal_mode = True
 
         cmd = {}
@@ -469,6 +377,7 @@ class ViChangeLine(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.DD, _MODES_ACTION)])
 class ViDeleteLine(ViOperatorDef):
     """
     Vim: `dd`
@@ -480,13 +389,14 @@ class ViDeleteLine(ViOperatorDef):
         self.scroll_into_view = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_dd_action'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_R, _MODES_ACTION)])
 class ViEnterReplaceMode(ViOperatorDef):
     """
     Vim: `R`
@@ -498,7 +408,7 @@ class ViEnterReplaceMode(ViOperatorDef):
         self.scroll_into_view = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_enter_replace_mode'
         cmd['action_args'] = {}
@@ -506,6 +416,7 @@ class ViEnterReplaceMode(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.GREATER_THAN_GREATER_THAN, _MODES_ACTION)])
 class ViIndentLine(ViOperatorDef):
     """
     Vim: `>>`
@@ -517,13 +428,15 @@ class ViIndentLine(ViOperatorDef):
         self.scroll_into_view = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_greater_than_greater_than'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.GU, _MODES_ACTION),
+                     (seqs.GUGU, _MODES_ACTION)])
 class ViChangeToLowerCaseByLines(ViOperatorDef):
     """
     Vim: `guu`, `gugu`
@@ -535,13 +448,14 @@ class ViChangeToLowerCaseByLines(ViOperatorDef):
         self.scroll_into_view = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_guu'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.GU, _MODES_ACTION)])
 class ViChangeToLowerCaseByChars(ViOperatorDef):
     """
     Vim: `gu`
@@ -554,13 +468,14 @@ class ViChangeToLowerCaseByChars(ViOperatorDef):
         self.motion_required = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_gu'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.EQUAL_EQUAL, _MODES_ACTION)])
 class ViReindentLine(ViOperatorDef):
     """
     Vim: `==`
@@ -572,13 +487,14 @@ class ViReindentLine(ViOperatorDef):
         self.scroll_into_view = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_equal_equal'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.LESS_THAN_LESS_THAN, _MODES_ACTION)])
 class ViUnindentLine(ViOperatorDef):
     """
     Vim: `<<`
@@ -590,13 +506,14 @@ class ViUnindentLine(ViOperatorDef):
         self.scroll_into_view = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_less_than_less_than'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.YY, _MODES_ACTION)])
 class ViYankLine(ViOperatorDef):
     """
     Vim: `yy`
@@ -608,7 +525,7 @@ class ViYankLine(ViOperatorDef):
         self.scroll_into_view = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_yy'
         cmd['action_args'] = {'mode': state.mode,
@@ -618,6 +535,7 @@ class ViYankLine(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.G_TILDE_TILDE, _MODES_ACTION)])
 class ViInvertCaseByLines(ViOperatorDef):
     """
     Vim: `g~~`
@@ -629,13 +547,14 @@ class ViInvertCaseByLines(ViOperatorDef):
         self.scroll_into_view = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_g_tilde_g_tilde'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.TILDE, _MODES_ACTION)])
 class ViForceInvertCaseByChars(ViOperatorDef):
     """
     Vim: `~`
@@ -647,13 +566,14 @@ class ViForceInvertCaseByChars(ViOperatorDef):
         self.scroll_into_view = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_tilde'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_S, _MODES_ACTION)])
 class ViSubstituteByLines(ViOperatorDef):
     """
     Vim: `S`
@@ -665,7 +585,7 @@ class ViSubstituteByLines(ViOperatorDef):
         self.scroll_into_view = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_big_s_action'
         cmd['action_args'] = {'mode': state.mode, 'count': 1, 'register': state.register}
@@ -673,6 +593,7 @@ class ViSubstituteByLines(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.G_TILDE, _MODES_ACTION)])
 class ViInvertCaseByChars(ViOperatorDef):
     """
     Vim: `g~`
@@ -685,7 +606,7 @@ class ViInvertCaseByChars(ViOperatorDef):
         self.motion_required = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_g_tilde'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
@@ -693,6 +614,7 @@ class ViInvertCaseByChars(ViOperatorDef):
 
 
 # TODO: Duplicated.
+@keys.register(keys=[(seqs.G_BIG_U, _MODES_ACTION)])
 class ViChangeToUpperCaseByChars(ViOperatorDef):
     """
     Vim: `gU`
@@ -705,13 +627,14 @@ class ViChangeToUpperCaseByChars(ViOperatorDef):
         self.motion_required = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_g_big_u'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_J, _MODES_ACTION)])
 class ViJoinLines(ViOperatorDef):
     """
     Vim: `J`
@@ -723,7 +646,7 @@ class ViJoinLines(ViOperatorDef):
         self.scroll_into_view = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
 
         if state.mode == modes.SELECT:
@@ -737,6 +660,7 @@ class ViJoinLines(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_X, _MODES_ACTION)])
 class ViSubtractFromNumber(ViOperatorDef):
     """
     Vim: `C-x`
@@ -748,7 +672,7 @@ class ViSubtractFromNumber(ViOperatorDef):
         self.scroll_into_view = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_modify_numbers'
         cmd['action_args'] = {'mode': state.mode,
@@ -758,6 +682,7 @@ class ViSubtractFromNumber(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_A, _MODES_ACTION)])
 class ViAddToNumber(ViOperatorDef):
     """
     Vim: `C-a`
@@ -769,13 +694,14 @@ class ViAddToNumber(ViOperatorDef):
         self.scroll_into_view = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_modify_numbers'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.YY, _MODES_ACTION)])
 class ViCopyLine(ViOperatorDef):
     """
     Vim: `yy`
@@ -787,13 +713,14 @@ class ViCopyLine(ViOperatorDef):
         self.scroll_into_view = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_big_y'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.G_BIG_J, _MODES_ACTION)])
 class ViJoinLinesNoSeparator(ViOperatorDef):
     """
     # FIXME: Doesn't work.
@@ -806,13 +733,14 @@ class ViJoinLinesNoSeparator(ViOperatorDef):
         self.scroll_into_view = True
         self.repeatable = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_g_big_j'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count, 'separator': None}
         return cmd
 
 
+@keys.register(keys=[(seqs.V, _MODES_ACTION)])
 class ViEnterVisualMode(ViOperatorDef):
     """
     Vim: `v`
@@ -823,13 +751,14 @@ class ViEnterVisualMode(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_enter_visual_mode'
         cmd['action_args'] = {'mode': state.mode}
         return cmd
 
 
+@keys.register(keys=[(seqs.Z_ENTER, _MODES_ACTION)])
 class ViScrollToScreenTop(ViOperatorDef):
     """
     Vim: `z<CR>`
@@ -840,13 +769,14 @@ class ViScrollToScreenTop(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_z_enter'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.ZB, _MODES_ACTION)])
 class ViScrollToScreenBottom(ViOperatorDef):
     """
     Vim: `zb`
@@ -857,13 +787,14 @@ class ViScrollToScreenBottom(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_z_minus'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.ZZ, _MODES_ACTION)])
 class ViScrollToScreenCenter(ViOperatorDef):
     """
     Vim: `zz`
@@ -875,13 +806,14 @@ class ViScrollToScreenCenter(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_zz'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.GQ, _MODES_ACTION)])
 class ViReformat(ViOperatorDef):
     """
     Vim: `gq`
@@ -894,7 +826,7 @@ class ViReformat(ViOperatorDef):
         self.motion_required = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_gq'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
@@ -902,6 +834,7 @@ class ViReformat(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.P, _MODES_ACTION)])
 class ViPasteAfter(ViOperatorDef):
     """
     Vim: `p`
@@ -913,7 +846,7 @@ class ViPasteAfter(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_p'
         cmd['action_args'] = {'mode': state.mode,
@@ -924,6 +857,7 @@ class ViPasteAfter(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_P, _MODES_ACTION)])
 class ViPasteBefore(ViOperatorDef):
     """
     Vim: `P`
@@ -935,7 +869,7 @@ class ViPasteBefore(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_big_p'
         cmd['action_args'] = {'mode': state.mode,
@@ -946,6 +880,7 @@ class ViPasteBefore(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_X, _MODES_ACTION)])
 class ViLeftDeleteChar(ViOperatorDef):
     """
     Vim: `X`
@@ -957,7 +892,7 @@ class ViLeftDeleteChar(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_big_x'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count, 'register': state.register}
@@ -965,6 +900,7 @@ class ViLeftDeleteChar(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_W_L, _MODES_ACTION)])
 class ViSendViewToRightPane(ViOperatorDef):
     """
     Vim: `<C-W-L>`
@@ -974,13 +910,14 @@ class ViSendViewToRightPane(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_ctrl_w_big_l'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_W_H, _MODES_ACTION)])
 class ViSendViewToLeftPane(ViOperatorDef):
     """
     Vim: `<C-W-H>`
@@ -990,13 +927,14 @@ class ViSendViewToLeftPane(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_ctrl_w_big_h'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.GT, _MODES_ACTION)])
 class ViActivateNextTab(ViOperatorDef):
     """
     Vim: `gt`
@@ -1006,13 +944,14 @@ class ViActivateNextTab(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_gt'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.G_BIG_T, _MODES_ACTION)])
 class ViActivatePreviousTab(ViOperatorDef):
     """
     Vim: `gT`
@@ -1022,13 +961,14 @@ class ViActivatePreviousTab(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_g_big_t'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_W_L, _MODES_ACTION)])
 class ViActivatePaneToTheRight(ViOperatorDef):
     """
     Vim: `<C-W-l>`
@@ -1038,13 +978,14 @@ class ViActivatePaneToTheRight(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_ctrl_w_l'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_W_H, _MODES_ACTION)])
 class ViActivatePaneToTheLeft(ViOperatorDef):
     """
     Vim: `<C-W-h>`
@@ -1054,13 +995,14 @@ class ViActivatePaneToTheLeft(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_ctrl_w_h'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_W_V, _MODES_ACTION)])
 class ViSplitVertically(ViOperatorDef):
     """
     Vim: `<C-W-v>`
@@ -1070,13 +1012,14 @@ class ViSplitVertically(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_ctrl_w_v'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_W_Q, _MODES_ACTION)])
 class ViDestroyCurrentPane(ViOperatorDef):
     """
     Vim: `<C-W-q>`
@@ -1086,13 +1029,14 @@ class ViDestroyCurrentPane(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_ctrl_w_q'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_V, _MODES_ACTION)])
 class ViEnterVisualLineMode(ViOperatorDef):
     """
     Vim: `V`
@@ -1103,13 +1047,14 @@ class ViEnterVisualLineMode(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_enter_visual_line_mode'
         cmd['action_args'] = {'mode': state.mode}
         return cmd
 
 
+@keys.register(keys=[(seqs.GV, _MODES_ACTION)])
 class ViRestoreVisualSelections(ViOperatorDef):
     """
     Vim: `gv`
@@ -1120,13 +1065,14 @@ class ViRestoreVisualSelections(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_gv'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_K_CTRL_B, _MODES_ACTION)])
 class StToggleSidebar(ViOperatorDef):
     """
     Vintageous: `<C-K-b>`
@@ -1137,13 +1083,14 @@ class StToggleSidebar(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'toggle_side_bar'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_BIG_F, _MODES_ACTION)])
 class StFinInFiles(ViOperatorDef):
     """
     Vintageous: `Ctrl+Shift+F`
@@ -1154,13 +1101,14 @@ class StFinInFiles(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'show_panel'
         cmd['action_args'] = {'panel': 'find_in_files'}
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_O, _MODES_ACTION)])
 class ViJumpBack(ViOperatorDef):
     """
     Vim: `<C-o>`
@@ -1171,13 +1119,14 @@ class ViJumpBack(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'jump_back'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_I, _MODES_ACTION)])
 class ViJumpForward(ViOperatorDef):
     """
     Vim: `<C-i>`
@@ -1188,13 +1137,14 @@ class ViJumpForward(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'jump_forward'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.SHIFT_CTRL_F12, _MODES_ACTION)])
 class StGotoSymbolInProject(ViOperatorDef):
     """
     Vintageous: `<C-S-f12>`
@@ -1205,13 +1155,14 @@ class StGotoSymbolInProject(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'goto_symbol_in_project'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_F12, _MODES_ACTION)])
 class StGotoSymbolInFile(ViOperatorDef):
     """
     Vintageous: `<C-f12>`
@@ -1222,13 +1173,14 @@ class StGotoSymbolInFile(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'show_overlay'
         cmd['action_args'] = {'overlay': 'goto', 'text': '@'}
         return cmd
 
 
+@keys.register(keys=[(seqs.F12, _MODES_ACTION)])
 class StGotoDefinition(ViOperatorDef):
     """
     Vintageous: `f12`
@@ -1239,13 +1191,14 @@ class StGotoDefinition(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'goto_definition'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_F12, _MODES_ACTION)])
 class StToggleBookmark(ViOperatorDef):
     """
     Vintageous: `<C-f2>`
@@ -1256,13 +1209,14 @@ class StToggleBookmark(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'toggle_bookmark'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_SHIFT_F2, _MODES_ACTION)])
 class StClearBookmarks(ViOperatorDef):
     """
     Vintageous: `<C-S-f2>`
@@ -1273,13 +1227,14 @@ class StClearBookmarks(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'clear_bookmarks'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.F2, _MODES_ACTION)])
 class StPrevBookmark(ViOperatorDef):
     """
     Vintageous: `f2`
@@ -1290,13 +1245,14 @@ class StPrevBookmark(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'prev_bookmark'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.SHIFT_F2, _MODES_ACTION)])
 class StNextBookmark(ViOperatorDef):
     """
     Vintageous: `<S-f2>`
@@ -1307,13 +1263,14 @@ class StNextBookmark(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'next_bookmark'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.DOT, _MODES_ACTION)])
 class ViRepeat(ViOperatorDef):
     """
     Vim: `.`
@@ -1324,7 +1281,7 @@ class ViRepeat(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_dot'
         cmd['action_args'] = {'mode': state.mode,
@@ -1334,6 +1291,7 @@ class ViRepeat(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_R, _MODES_ACTION)])
 class ViOpenRegisterFromInsertMode(ViOperatorDef):
     """
     TODO: Implement this.
@@ -1345,13 +1303,14 @@ class ViOpenRegisterFromInsertMode(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_ctrl_r'
         cmd['action_args'] = {'count': state.count, 'mode': state.mode}
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_Y, _MODES_ACTION)])
 class ViScrollByLinesUp(ViOperatorDef):
     """
     Vim: `<C-y>`
@@ -1362,13 +1321,14 @@ class ViScrollByLinesUp(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_ctrl_y'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_U, _MODES_ACTION)])
 class ViUndoLineChanges(ViOperatorDef):
     """
     TODO: Implement this.
@@ -1380,7 +1340,7 @@ class ViUndoLineChanges(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
 
         if state.mode in (modes.VISUAL,
@@ -1393,6 +1353,7 @@ class ViUndoLineChanges(ViOperatorDef):
         return {}
 
 
+@keys.register(keys=[(seqs.CTRL_E, _MODES_ACTION)])
 class ViScrollByLinesDown(ViOperatorDef):
     """
     Vim: `<C-e>`
@@ -1403,13 +1364,14 @@ class ViScrollByLinesDown(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_ctrl_e'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.F11, _MODES_ACTION)])
 class StToggleFullScreen(ViOperatorDef):
     """
     Vintageous: `f11`
@@ -1420,13 +1382,14 @@ class StToggleFullScreen(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'toggle_full_screen'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.F7, _MODES_ACTION)])
 class StBuild(ViOperatorDef):
     """
     Vintageous: `f7`
@@ -1437,13 +1400,14 @@ class StBuild(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'build'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.SHIFT_F4, _MODES_ACTION)])
 class StFindPrev(ViOperatorDef):
     """
     Vintageous: `Ctrl+F4`
@@ -1454,13 +1418,14 @@ class StFindPrev(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'find_prev'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.AT, _MODES_ACTION)])
 class ViOpenMacrosForRepeating(ViOperatorDef):
     """
     Vim: `@`
@@ -1486,7 +1451,7 @@ class ViOpenMacrosForRepeating(ViOperatorDef):
         self._inp = key
         return True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_at'
         cmd['action_args'] = {'name': self.inp,
@@ -1494,6 +1459,7 @@ class ViOpenMacrosForRepeating(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.Q, _MODES_ACTION)])
 class ViToggleMacroRecorder(ViOperatorDef):
     """
     Vim: `q`
@@ -1518,13 +1484,14 @@ class ViToggleMacroRecorder(ViOperatorDef):
         self._inp = key
         return True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_q'
         cmd['action_args'] = {'name': self.inp}
         return cmd
 
 
+@keys.register(keys=[(seqs.F3, _MODES_ACTION)])
 class StFindNext(ViOperatorDef):
     """
     Vintageous: `f3`
@@ -1535,13 +1502,14 @@ class StFindNext(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'find_next'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.F4, _MODES_ACTION)])
 class StFindNextResult(ViOperatorDef):
     """
     Vintageous: `f4`
@@ -1552,13 +1520,14 @@ class StFindNextResult(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'next_result'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.SHIFT_F4, _MODES_ACTION)])
 class StFindPrevResult(ViOperatorDef):
     """
     Vintageous: `Shift+F4`
@@ -1569,13 +1538,14 @@ class StFindPrevResult(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'prev_result'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_Z_BIG_Z, _MODES_ACTION)])
 class ViQuit(ViOperatorDef):
     """
     TODO: Is this used?
@@ -1587,13 +1557,14 @@ class ViQuit(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'ex_quit'
         cmd['action_args'] = {'forced': True, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.G_BIG_H, _MODES_ACTION)])
 class ViEnterSelectModeForSearch(ViOperatorDef):
     """
     Vim: `gH`
@@ -1604,13 +1575,14 @@ class ViEnterSelectModeForSearch(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_g_big_h'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.SHIFT_F4, _MODES_ACTION)])
 class StPrevResult(ViOperatorDef):
     """
     Vim: `Shift+F4`
@@ -1621,13 +1593,14 @@ class StPrevResult(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'prev_result'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.GH, _MODES_ACTION)])
 class ViEnterSelectMode(ViOperatorDef):
     """
     Vim: `gh`
@@ -1638,13 +1611,14 @@ class ViEnterSelectMode(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_enter_select_mode'
         cmd['action_args'] = {'mode': state.mode}
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_V, _MODES_ACTION)])
 class ViEnterVisualBlockMode(ViOperatorDef):
     """
     Vim: `<C-v>`
@@ -1655,13 +1629,14 @@ class ViEnterVisualBlockMode(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_enter_visual_block_mode'
         cmd['action_args'] = {'mode': state.mode}
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_P, _MODES_ACTION)])
 class StShowGotoAnything(ViOperatorDef):
     """
     Vintageous: `<C-p>`
@@ -1672,13 +1647,32 @@ class StShowGotoAnything(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'show_overlay'
         cmd['action_args'] = {'overlay': 'goto', 'show_files': True}
         return cmd
 
 
+@keys.register(keys=[(seqs.J, (modes.SELECT,))])
+class ViAddSelection(ViOperatorDef):
+    """
+    Vintageous: `<C-p>`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = '_vi_select_j'
+        cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+        return cmd
+
+
+@keys.register(keys=[(seqs.CTRL_BIG_P, _MODES_ACTION)])
 class StShowSwitchProject(ViOperatorDef):
     """
     Vintageous: `<C-M-p>`
@@ -1689,13 +1683,14 @@ class StShowSwitchProject(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'prompt_select_workspace'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_BIG_P, _MODES_ACTION)])
 class StShowCommandPalette(ViOperatorDef):
     """
     Vintageous: `<C-S-p>`
@@ -1706,13 +1701,14 @@ class StShowCommandPalette(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'show_overlay'
         cmd['action_args'] = {'overlay': 'command_palette'}
         return cmd
 
 
+@keys.register(keys=[(seqs.I, _MODES_ACTION + (modes.SELECT,))])
 class ViEnterInserMode(ViOperatorDef):
     """
     Vim: `i`
@@ -1722,7 +1718,7 @@ class ViEnterInserMode(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         state.glue_until_normal_mode = True
 
         cmd = {}
@@ -1731,6 +1727,7 @@ class ViEnterInserMode(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.ESC, _MODES_ACTION)])
 class ViEnterNormalMode(ViOperatorDef):
     """
     Vim: `<esc>`
@@ -1740,13 +1737,14 @@ class ViEnterNormalMode(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_enter_normal_mode'
         cmd['action_args'] = {'mode': state.mode}
         return cmd
 
 
+@keys.register(keys=[(seqs.A, _MODES_ACTION)])
 class ViInsertAfterChar(ViOperatorDef):
     """
     Vim: `a`
@@ -1756,7 +1754,7 @@ class ViInsertAfterChar(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_a'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
@@ -1767,6 +1765,7 @@ class ViInsertAfterChar(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_A, _MODES_ACTION + (modes.SELECT,))])
 class ViInsertAtEol(ViOperatorDef):
     """
     Vim: `A`
@@ -1776,7 +1775,7 @@ class ViInsertAtEol(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_big_a'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
@@ -1787,6 +1786,7 @@ class ViInsertAtEol(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_I, _MODES_ACTION)])
 class ViInsertAtBol(ViOperatorDef):
     """
     Vim: `I`
@@ -1796,7 +1796,7 @@ class ViInsertAtBol(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_big_i'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
@@ -1807,6 +1807,7 @@ class ViInsertAtBol(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.COLON, _MODES_ACTION)])
 class ViEnterCommandLineMode(ViOperatorDef):
     """
     Vim: `:`
@@ -1816,13 +1817,14 @@ class ViEnterCommandLineMode(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'vi_colon_input'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.F9, _MODES_ACTION)])
 class StSortLines(ViOperatorDef):
     """
     Vintageous: `f9`
@@ -1832,13 +1834,14 @@ class StSortLines(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'sort_lines'
         cmd['action_args'] = {'case_sensitive': False}
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_G, _MODES_ACTION)])
 class ViShowFileStatus(ViOperatorDef):
     """
     Vim: `<C-g>`
@@ -1848,13 +1851,14 @@ class ViShowFileStatus(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'ex_file'
         cmd['action_args'] = {}
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_Z_BIG_Q, _MODES_ACTION)])
 class ViExitEditor(ViOperatorDef):
     """
     Vim: `ZQ`
@@ -1864,13 +1868,14 @@ class ViExitEditor(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'ex_quit'
         cmd['action_args'] = {'forced': True, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_Z_BIG_Z, _MODES_ACTION)])
 class ViCloseFile(ViOperatorDef):
     """
     Vim: `ZZ`
@@ -1880,13 +1885,14 @@ class ViCloseFile(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'ex_exit'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 
+@keys.register(keys=[(seqs.F6, _MODES_ACTION)])
 class StToggleSpelling(ViOperatorDef):
     """
     Vintageous: `f6`
@@ -1896,13 +1902,14 @@ class StToggleSpelling(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = 'toggle_setting'
         cmd['action_args'] = {'setting': 'spell_check'}
         return cmd
 
 
+@keys.register(keys=[(seqs.G_BIG_D, _MODES_ACTION)])
 class ViGotoSymbolInProject(ViOperatorDef):
     """
     Vim: `gD`
@@ -1912,7 +1919,7 @@ class ViGotoSymbolInProject(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['is_jump'] = True
         cmd['action'] = '_vi_go_to_symbol'
@@ -1922,6 +1929,7 @@ class ViGotoSymbolInProject(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.K, (modes.SELECT,))])
 class ViDeselectInstance(ViOperatorDef):
     """
     Vim: `k`
@@ -1931,7 +1939,7 @@ class ViDeselectInstance(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         """
         Non-standard.
         """
@@ -1944,9 +1952,10 @@ class ViDeselectInstance(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.GD, _MODES_MOTION)])
 class ViGotoSymbolInFile(ViMotionDef):
     """
-    Vim: `gD`
+    Vim: `gd`
     """
 
     def __init__(self, *args, **kwargs):
@@ -1954,7 +1963,7 @@ class ViGotoSymbolInFile(ViMotionDef):
         self.scroll_into_view = True
         self.updates_xpos = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['is_jump'] = True
         cmd['motion'] = '_vi_go_to_symbol'
@@ -1964,6 +1973,7 @@ class ViGotoSymbolInFile(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.L, _MODES_MOTION)])
 class ViMoveRightByChars(ViMotionDef):
     """
     Vim: `l`
@@ -1974,7 +1984,7 @@ class ViMoveRightByChars(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
 
         if state.mode == modes.SELECT:
@@ -1987,6 +1997,7 @@ class ViMoveRightByChars(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.SHIFT_ENTER, _MODES_MOTION)])
 class ViShiftEnterMotion(ViMotionDef):
     """
     Vim: `<S-CR>`
@@ -1997,7 +2008,7 @@ class ViShiftEnterMotion(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_shift_enter'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
@@ -2005,6 +2016,7 @@ class ViShiftEnterMotion(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.B, _MODES_MOTION)])
 class ViMoveByWordsBackward(ViMotionDef):
     """
     Vim: `b`
@@ -2015,7 +2027,7 @@ class ViMoveByWordsBackward(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_b'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
@@ -2023,6 +2035,7 @@ class ViMoveByWordsBackward(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_B, _MODES_MOTION)])
 class ViMoveByBigWordsBackward(ViMotionDef):
     """
     Vim: `B`
@@ -2033,7 +2046,7 @@ class ViMoveByBigWordsBackward(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_big_b'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
@@ -2041,6 +2054,7 @@ class ViMoveByBigWordsBackward(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_W, _MODES_MOTION)])
 class ViMoveByBigWords(ViMotionDef):
     """
     Vim: `W`
@@ -2051,7 +2065,7 @@ class ViMoveByBigWords(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_big_w'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
@@ -2059,6 +2073,7 @@ class ViMoveByBigWords(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.E, _MODES_MOTION)])
 class ViMoveByWordEnds(ViMotionDef):
     """
     Vim: `e`
@@ -2069,7 +2084,7 @@ class ViMoveByWordEnds(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_e'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
@@ -2077,6 +2092,7 @@ class ViMoveByWordEnds(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_H, _MODES_MOTION)])
 class ViGotoScreenTop(ViMotionDef):
     """
     Vim: `H`
@@ -2087,7 +2103,7 @@ class ViGotoScreenTop(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_big_h'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
@@ -2095,6 +2111,7 @@ class ViGotoScreenTop(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.GE, _MODES_MOTION)])
 class ViMoveByWordEndsBackward(ViMotionDef):
     """
     Vim: `ge`
@@ -2105,7 +2122,7 @@ class ViMoveByWordEndsBackward(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_ge'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
@@ -2113,6 +2130,7 @@ class ViMoveByWordEndsBackward(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_L, _MODES_MOTION)])
 class ViGotoScreenBottom(ViMotionDef):
     """
     Vim: `L`
@@ -2123,7 +2141,7 @@ class ViGotoScreenBottom(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_big_l'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
@@ -2131,6 +2149,7 @@ class ViGotoScreenBottom(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_M, _MODES_MOTION)])
 class ViGotoScreenMiddle(ViMotionDef):
     """
     Vim: `M`
@@ -2141,7 +2160,7 @@ class ViGotoScreenMiddle(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_big_m'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
@@ -2149,6 +2168,7 @@ class ViGotoScreenMiddle(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_D, _MODES_MOTION)])
 class ViMoveHalfScreenDown(ViMotionDef):
     """
     Vim: `<C-d>`
@@ -2159,7 +2179,7 @@ class ViMoveHalfScreenDown(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_ctrl_d'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
@@ -2167,6 +2187,7 @@ class ViMoveHalfScreenDown(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_U, _MODES_MOTION)])
 class ViMoveHalfScreenUp(ViMotionDef):
     """
     Vim: `<C-u>`
@@ -2177,7 +2198,7 @@ class ViMoveHalfScreenUp(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_ctrl_u'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
@@ -2185,6 +2206,7 @@ class ViMoveHalfScreenUp(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_F, _MODES_MOTION)])
 class ViMoveScreenDown(ViMotionDef):
     """
     Vim: `<C-f>`
@@ -2195,7 +2217,7 @@ class ViMoveScreenDown(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_ctrl_f'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
@@ -2203,6 +2225,7 @@ class ViMoveScreenDown(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.CTRL_B, _MODES_MOTION)])
 class ViMoveScreenUp(ViMotionDef):
     """
     Vim: `<C-b>`
@@ -2213,7 +2236,7 @@ class ViMoveScreenUp(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_ctrl_b'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
@@ -2221,6 +2244,7 @@ class ViMoveScreenUp(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.BACKTICK, _MODES_MOTION)])
 class ViGotoExactMarkXpos(ViMotionDef):
     """
     Vim: ```
@@ -2245,7 +2269,7 @@ class ViGotoExactMarkXpos(ViMotionDef):
         self._inp = key
         return True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['is_jump'] = True
         cmd['motion'] = '_vi_backtick'
@@ -2255,6 +2279,7 @@ class ViGotoExactMarkXpos(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.DOLLAR, _MODES_MOTION)])
 class ViMoveToEol(ViMotionDef):
     """
     Vim: `$`
@@ -2265,7 +2290,7 @@ class ViMoveToEol(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['is_jump'] = True
         cmd['motion'] = '_vi_dollar'
@@ -2275,6 +2300,7 @@ class ViMoveToEol(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.ENTER, _MODES_MOTION)])
 class ViMotionEnter(ViMotionDef):
     """
     Vim: `<CR>`
@@ -2285,7 +2311,7 @@ class ViMotionEnter(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['is_jump'] = True
         cmd['motion'] = '_vi_enter'
@@ -2295,6 +2321,7 @@ class ViMotionEnter(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.G_UNDERSCORE, _MODES_MOTION)])
 class ViMoveToSoftEol(ViMotionDef):
     """
     Vim: `g_`
@@ -2305,7 +2332,7 @@ class ViMoveToSoftEol(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_g__'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
@@ -2313,6 +2340,7 @@ class ViMoveToSoftEol(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.GJ, _MODES_MOTION)])
 class ViMoveByScreenLineDown(ViMotionDef):
     """
     Vim: `gj`
@@ -2323,7 +2351,7 @@ class ViMoveByScreenLineDown(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['is_jump'] = True
         cmd['motion'] = '_vi_gj'
@@ -2333,6 +2361,7 @@ class ViMoveByScreenLineDown(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.GK, _MODES_MOTION)])
 class ViMoveByScreenLineUp(ViMotionDef):
     """
     Vim: `gk`
@@ -2343,7 +2372,7 @@ class ViMoveByScreenLineUp(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['is_jump'] = True
         cmd['motion'] = '_vi_gk'
@@ -2353,6 +2382,7 @@ class ViMoveByScreenLineUp(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.LEFT_BRACE, _MODES_MOTION)])
 class ViMoveByBlockUp(ViMotionDef):
     """
     Vim: `{`
@@ -2363,7 +2393,7 @@ class ViMoveByBlockUp(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['is_jump'] = True
         cmd['motion'] = '_vi_left_brace'
@@ -2373,6 +2403,7 @@ class ViMoveByBlockUp(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.SEMICOLON, _MODES_MOTION)])
 class ViRepeatCharSearchForward(ViMotionDef):
     """
     Vim: `;`
@@ -2383,7 +2414,7 @@ class ViRepeatCharSearchForward(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         forward = state.last_char_search_command in ('vi_t', 'vi_f')
         inclusive = state.last_char_search_command in ('vi_f', 'vi_big_f')
@@ -2401,6 +2432,7 @@ class ViRepeatCharSearchForward(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.QUOTE, _MODES_MOTION)])
 class ViGotoMark(ViMotionDef):
     """
     Vim: `'`
@@ -2425,7 +2457,7 @@ class ViGotoMark(ViMotionDef):
         self._inp = key
         return True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
 
         if self.inp == "'":
@@ -2443,6 +2475,7 @@ class ViGotoMark(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.RIGHT_BRACE, _MODES_MOTION)])
 class ViMoveByBlockDown(ViMotionDef):
     """
     Vim: `}`
@@ -2453,7 +2486,7 @@ class ViMoveByBlockDown(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['is_jump'] = True
         cmd['motion'] = '_vi_right_brace'
@@ -2463,6 +2496,7 @@ class ViMoveByBlockDown(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.LEFT_PAREN, _MODES_MOTION)])
 class ViMoveBySentenceUp(ViMotionDef):
     """
     Vim: `(`
@@ -2473,7 +2507,7 @@ class ViMoveBySentenceUp(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['is_jump'] = True
         cmd['motion'] = '_vi_left_paren'
@@ -2483,6 +2517,7 @@ class ViMoveBySentenceUp(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.RIGHT_PAREN, _MODES_MOTION)])
 class ViMoveBySentenceDown(ViMotionDef):
     """
     Vim: `)`
@@ -2493,7 +2528,7 @@ class ViMoveBySentenceDown(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['is_jump'] = True
         cmd['motion'] = '_vi_right_paren'
@@ -2503,6 +2538,7 @@ class ViMoveBySentenceDown(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.LEFT_SQUARE_BRACKET, _MODES_MOTION)])
 class ViMoveBySquareBracketUp(ViMotionDef):
     """
     Vim: `[`
@@ -2513,7 +2549,7 @@ class ViMoveBySquareBracketUp(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['is_jump'] = True
         cmd['motion'] = '_vi_left_square_bracket'
@@ -2523,6 +2559,7 @@ class ViMoveBySquareBracketUp(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.PERCENT, _MODES_MOTION)])
 class ViGotoLinesPercent(ViMotionDef):
     """
     Vim: `%`
@@ -2533,7 +2570,7 @@ class ViGotoLinesPercent(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_percent'
 
@@ -2546,6 +2583,7 @@ class ViGotoLinesPercent(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.COMMA, _MODES_MOTION)])
 class ViRepeatCharSearchBackward(ViMotionDef):
     """
     Vim: `,`
@@ -2556,7 +2594,7 @@ class ViRepeatCharSearchBackward(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         forward = state.last_char_search_command in ('vi_t', 'vi_f')
         inclusive = state.last_char_search_command in ('vi_f', 'vi_big_f')
@@ -2572,6 +2610,7 @@ class ViRepeatCharSearchBackward(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.PIPE, _MODES_MOTION)])
 class ViMoveByLineCols(ViMotionDef):
     """
     Vim: `|`
@@ -2582,7 +2621,7 @@ class ViMoveByLineCols(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_pipe'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
@@ -2590,6 +2629,7 @@ class ViMoveByLineCols(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_E, _MODES_MOTION)])
 class ViMoveByBigWordEnds(ViMotionDef):
     """
     Vim: `E`
@@ -2600,7 +2640,7 @@ class ViMoveByBigWordEnds(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_big_e'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
@@ -2608,6 +2648,7 @@ class ViMoveByBigWordEnds(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.H, _MODES_MOTION)])
 class ViMoveLeftByChars(ViMotionDef):
     """
     Vim: `h`
@@ -2618,7 +2659,7 @@ class ViMoveLeftByChars(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
 
         if state.mode == modes.SELECT:
@@ -2631,6 +2672,7 @@ class ViMoveLeftByChars(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.W, _MODES_MOTION)])
 class ViMoveByWords(ViMotionDef):
     """
     Vim: `w`
@@ -2641,7 +2683,7 @@ class ViMoveByWords(ViMotionDef):
         self.updates_xpos = True
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_w'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
@@ -2649,6 +2691,7 @@ class ViMoveByWords(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.J, _MODES_MOTION)])
 class ViMoveDownByLines(ViMotionDef):
     """
     Vim: `j`
@@ -2658,19 +2701,14 @@ class ViMoveDownByLines(ViMotionDef):
         ViMotionDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
-
-        if state.mode == modes.SELECT:
-            cmd['motion'] = '_vi_select_j'
-            cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
-            return cmd
-
         cmd['motion'] = '_vi_j'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count, 'xpos': state.xpos}
         return cmd
 
 
+@keys.register(keys=[(seqs.K, _MODES_MOTION)])
 class ViMoveUpByLines(ViMotionDef):
     """
     Vim: `k`
@@ -2680,7 +2718,7 @@ class ViMoveUpByLines(ViMotionDef):
         ViMotionDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_k'
         cmd['motion_args'] = {'mode': state.mode,
@@ -2689,6 +2727,7 @@ class ViMoveUpByLines(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.HAT, _MODES_MOTION)])
 class ViMoveToBol(ViMotionDef):
     """
     Vim: `^`
@@ -2699,7 +2738,7 @@ class ViMoveToBol(ViMotionDef):
         self.scroll_into_view = True
         self.updates_xpos = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_hat'
         cmd['motion_args'] = {'count': state.count, 'mode': state.mode}
@@ -2707,6 +2746,26 @@ class ViMoveToBol(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.UNDERSCORE, _MODES_MOTION)])
+class ViMoveToBol(ViMotionDef):
+    """
+    Vim: `^`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViMotionDef.__init__(self, *args, **kwargs)
+        self.scroll_into_view = True
+        self.updates_xpos = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['motion'] = '_vi_underscore'
+        cmd['motion_args'] = {'count': state.count, 'mode': state.mode}
+
+        return cmd
+
+
+@keys.register(keys=[(seqs.ZERO, _MODES_MOTION)])
 class ViMoveToHardBol(ViMotionDef):
     """
     Vim: `0`
@@ -2717,7 +2776,7 @@ class ViMoveToHardBol(ViMotionDef):
         self.scroll_into_view = True
         self.updates_xpos = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_zero'
         cmd['motion_args'] = {'count': state.count, 'mode': state.mode}
@@ -2725,6 +2784,7 @@ class ViMoveToHardBol(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.N, _MODES_MOTION)])
 class ViRepeatSearchForward(ViMotionDef):
     """
     Vim: `;`
@@ -2735,7 +2795,7 @@ class ViRepeatSearchForward(ViMotionDef):
         self.scroll_into_view = True
         self.updates_xpos = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_n'
         cmd['motion_args'] = {'mode': state.mode,
@@ -2745,6 +2805,7 @@ class ViRepeatSearchForward(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_N, _MODES_MOTION)])
 class ViRepeatSearchBackward(ViMotionDef):
     """
     Vim: `,`
@@ -2755,7 +2816,7 @@ class ViRepeatSearchBackward(ViMotionDef):
         self.scroll_into_view = True
         self.updates_xpos = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_big_n'
         cmd['motion_args'] = {'mode': state.mode,
@@ -2765,6 +2826,7 @@ class ViRepeatSearchBackward(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.STAR, _MODES_MOTION)])
 class ViFindWord(ViMotionDef):
     """
     Vim: `*`
@@ -2775,7 +2837,7 @@ class ViFindWord(ViMotionDef):
         self.scroll_into_view = True
         self.updates_xpos = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_star'
         cmd['motion_args'] = {'count': state.count, 'mode': state.mode}
@@ -2783,6 +2845,7 @@ class ViFindWord(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.OCTOTHORP, _MODES_MOTION)])
 class ViReverseFindWord(ViMotionDef):
     """
     Vim: `#`
@@ -2796,7 +2859,7 @@ class ViReverseFindWord(ViMotionDef):
         self.scroll_into_view = True
         self.updates_xpos = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_octothorp'
         cmd['motion_args'] = {'count': state.count, 'mode': state.mode}
@@ -2804,6 +2867,12 @@ class ViReverseFindWord(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.G,      _MODES_MOTION),
+                     (seqs.Z,      _MODES_MOTION),
+                     (seqs.CTRL_K, _MODES_MOTION),
+                     (seqs.CTRL_W, _MODES_MOTION),
+                     (seqs.BIG_Z,  _MODES_MOTION)])
+# TODO: This should not be a motions.
 class ViOpenNameSpace(ViMotionDef):
     """
     Vim: `g`, `z`, ...
@@ -2812,10 +2881,11 @@ class ViOpenNameSpace(ViMotionDef):
     def __init__(self, *args, **kwargs):
         ViMotionDef.__init__(self, *args, **kwargs)
 
-    def to_json(self, state):
+    def translate(self, state):
         return {}
 
 
+@keys.register(keys=[(seqs.DOUBLE_QUOTE, _MODES_MOTION)])
 class ViOpenRegister(ViMotionDef):
     """
     Vim: `"`
@@ -2824,10 +2894,11 @@ class ViOpenRegister(ViMotionDef):
     def __init__(self, *args, **kwargs):
         ViMotionDef.__init__(self, *args, **kwargs)
 
-    def to_json(self, state):
+    def translate(self, state):
         return {}
 
 
+@keys.register(keys=[(seqs.GG, _MODES_MOTION)])
 class ViGotoBof(ViMotionDef):
     """
     Vim: `gg`
@@ -2837,7 +2908,7 @@ class ViGotoBof(ViMotionDef):
         ViMotionDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         # cmd['is_jump'] = True
 
@@ -2851,6 +2922,7 @@ class ViGotoBof(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.BIG_G, _MODES_MOTION)])
 class ViGotoEof(ViMotionDef):
     """
     Vim: `G`
@@ -2860,7 +2932,7 @@ class ViGotoEof(ViMotionDef):
         ViMotionDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
 
         if state.action_count or state.motion_count:
@@ -2873,6 +2945,7 @@ class ViGotoEof(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.R, _MODES_ACTION)])
 class ViReplaceCharacters(ViOperatorDef):
     """
     Vim: `r`
@@ -2899,7 +2972,7 @@ class ViReplaceCharacters(ViOperatorDef):
         self._inp = utils.translate_char(key)
         return True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_r'
         cmd['action_args'] = {'mode': state.mode,
@@ -2910,6 +2983,7 @@ class ViReplaceCharacters(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.M, _MODES_ACTION)])
 class ViSetMark(ViOperatorDef):
     """
     Vim: `m`
@@ -2933,7 +3007,7 @@ class ViSetMark(ViOperatorDef):
         self._inp = key
         return True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_m'
         cmd['action_args'] = {'mode': state.mode,
@@ -2943,6 +3017,7 @@ class ViSetMark(ViOperatorDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.F, _MODES_MOTION)])
 class ViSearchCharForward(ViMotionDef):
     """
     Vim: `f`
@@ -2965,14 +3040,15 @@ class ViSearchCharForward(ViMotionDef):
         return self.inp == ''
 
     def accept(self, key):
-        assert len(key) == 1, '`f`, `t`, `F`, `T` only accept a single char'
-        self._inp = key
+        translated = utils.translate_char(key)
+        assert len(translated) == 1, '`f`, `t`, `F`, `T` only accept a single char'
+        self._inp = translated
         return True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         state.last_char_search_command = 'vi_f'
-        state.last_character_search = self.inp
+        state.last_character_search =  self.inp
         cmd['motion'] = '_vi_find_in_line'
         cmd['motion_args'] = {'char': self.inp,
                               'mode': state.mode,
@@ -2982,6 +3058,8 @@ class ViSearchCharForward(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.A, [modes.OPERATOR_PENDING, modes.VISUAL,
+                               modes.VISUAL_BLOCK])])
 class ViATextObject(ViMotionDef):
     """
     Vim: `a`
@@ -3009,7 +3087,7 @@ class ViATextObject(ViMotionDef):
         self._inp = key
         return True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_select_text_object'
         cmd['motion_args'] = {'mode': state.mode,
@@ -3020,6 +3098,8 @@ class ViATextObject(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.I, [modes.OPERATOR_PENDING, modes.VISUAL,
+                               modes.VISUAL_BLOCK])])
 class ViITextObject(ViMotionDef):
     """
     Vim: `i`
@@ -3046,7 +3126,7 @@ class ViITextObject(ViMotionDef):
         self._inp = key
         return True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_select_text_object'
         cmd['motion_args'] = {'mode': state.mode,
@@ -3057,6 +3137,7 @@ class ViITextObject(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.T, _MODES_MOTION)])
 class ViSearchCharBackward(ViMotionDef):
     """
     Vim: `t`
@@ -3080,11 +3161,12 @@ class ViSearchCharBackward(ViMotionDef):
         return self.inp == ''
 
     def accept(self, key):
-        assert len(key) == 1, '`t` only accepts a single char'
-        self._inp = key
+        translated = utils.translate_char(key)
+        assert len(translated) == 1, '`t` only accepts a single char'
+        self._inp = translated
         return True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         state.last_char_search_command = 'vi_big_f'
         state.last_character_search = self.inp
@@ -3097,6 +3179,7 @@ class ViSearchCharBackward(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.SLASH, _MODES_MOTION)])
 class ViSearchForward(ViMotionDef):
     """
     Vim: `/`
@@ -3123,7 +3206,7 @@ class ViSearchForward(ViMotionDef):
         self._inp += key
         return True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_slash'
         cmd['motion_args'] = {}
@@ -3142,7 +3225,7 @@ class ViSearchForwardImpl(ViMotionDef):
         self._inp = term
         self.updates_xpos = True
 
-    def to_json(self, state):
+    def translate(self, state):
         if not self.inp:
             self._inp = state.last_buffer_search
         cmd = {}
@@ -3156,6 +3239,7 @@ class ViSearchForwardImpl(ViMotionDef):
         return cmd
 
 
+@keys.register(keys=[(seqs.QUESTION_MARK, _MODES_MOTION)])
 class ViSearchBackward(ViMotionDef):
     """
     Vim: `?`
@@ -3182,7 +3266,7 @@ class ViSearchBackward(ViMotionDef):
         self._inp += key
         return True
 
-    def to_json(self, state):
+    def translate(self, state):
         cmd = {}
         cmd['motion'] = '_vi_question_mark'
         cmd['motion_args'] = {}
@@ -3200,7 +3284,7 @@ class ViSearchBackwardImpl(ViMotionDef):
         self.updates_xpos = True
         self._inp = term
 
-    def to_json(self, state):
+    def translate(self, state):
         if not self.inp:
             self._inp = state.last_buffer_search
         cmd = {}

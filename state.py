@@ -24,7 +24,8 @@ from Vintageous.vi.utils import is_ignored
 from Vintageous.vi.utils import is_ignored_but_command_mode
 from Vintageous.vi.utils import jump_directions
 from Vintageous.vi.utils import modes
-from Vintageous.vi import commands
+from Vintageous.vi import cmd_defs
+from Vintageous.vi import cmd_base
 
 
 # ============================================================================
@@ -355,7 +356,7 @@ class State(object):
     def action(self):
         val = self.settings.vi['action'] or None
         if val:
-            cls = getattr(commands, val['name'])
+            cls = getattr(cmd_defs, val['name'])
             return cls.from_json(val['data'])
 
     @action.setter
@@ -368,7 +369,7 @@ class State(object):
         val = self.settings.vi['motion'] or None
         if val:
             # TODO: Encapsulate further.
-            cls = getattr(commands, val['name'])
+            cls = getattr(cmd_defs, val['name'])
             return cls.from_json(val['data'])
 
     @motion.setter
@@ -670,10 +671,10 @@ class State(object):
         @command
           A command definition as found in `keys.py`.
         """
-        assert isinstance(command, commands.ViCommandDefBase), \
+        assert isinstance(command, cmd_base.ViCommandDefBase), \
                           'ViCommandDefBase expected, got {0}'.format(type(command))
 
-        if isinstance(command, commands.ViMotionDef):
+        if isinstance(command, cmd_base.ViMotionDef):
             if self.runnable():
                 # We already have a motion, so this looks like an error.
                 raise ValueError('too many motions')
@@ -685,7 +686,7 @@ class State(object):
             if self._set_parsers(command):
                 return
 
-        elif isinstance(command, commands.ViOperatorDef):
+        elif isinstance(command, cmd_base.ViOperatorDef):
             if self.runnable():
                 # We already have an action, so this looks like an error.
                 raise ValueError('too many actions')
@@ -759,8 +760,8 @@ class State(object):
         """
         if self.runnable():
             if self.action and self.motion:
-                action_cmd = self.action.to_json(self)
-                motion_cmd = self.motion.to_json(self)
+                action_cmd = self.action.translate(self)
+                motion_cmd = self.motion.translate(self)
                 self.logger.info('[State] full command, switching to internal normal mode')
                 self.mode = modes.INTERNAL_NORMAL
 
@@ -792,7 +793,7 @@ class State(object):
                 return
 
             if self.motion:
-                motion_cmd = self.motion.to_json(self)
+                motion_cmd = self.motion.translate(self)
                 self.logger.info('[State] lone motion cmd: {0}'.format(motion_cmd))
 
                 # We know that all motions are subclasses of ViTextCommandBase,
@@ -805,7 +806,7 @@ class State(object):
                                       motion_cmd['motion_args'])
 
             if self.action:
-                action_cmd = self.action.to_json(self)
+                action_cmd = self.action.translate(self)
                 self.logger.info('[Stage] lone action cmd '.format(action_cmd))
                 if self.mode == modes.NORMAL:
                     self.logger.info('[State] switching to internal normal mode')

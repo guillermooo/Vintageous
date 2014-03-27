@@ -4,7 +4,7 @@ from Vintageous.vi.keys import seq_to_command
 from Vintageous.vi.keys import to_bare_command_name
 from Vintageous.vi.keys import KeySequenceTokenizer
 from Vintageous.vi.utils import modes
-from Vintageous.vi.commands import cmd_types
+from Vintageous.vi.cmd_base import cmd_types
 
 
 _mappings = {

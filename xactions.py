@@ -25,9 +25,8 @@ from Vintageous.vi.utils import IrreversibleTextCommand
 from Vintageous.vi.utils import is_view
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import regions_transformer
-from Vintageous.vi.commands import ViOpenRegister
-from Vintageous.vi.commands import ViOpenNameSpace
-from Vintageous.vi import commands
+from Vintageous.vi import cmd_base
+from Vintageous.vi import cmd_defs
 
 _logger = local_logger(__name__)
 
@@ -548,7 +547,7 @@ class PressKeys(ViWindowCommandBase):
         if (state.action and state.motion):
             # We have a parser an a motion that can collect data. Collect data
             # interactively.
-            motion_data = state.motion.to_json(state) or None
+            motion_data = state.motion.translate(state) or None
 
             if motion_data is None:
                 utils.blink()
@@ -670,7 +669,7 @@ class PressKey(ViWindowCommandBase):
                                                                                                     state.mode))
         command = key_mappings.get_current(check_user_mappings=check_user_mappings)
 
-        if isinstance(command, ViOpenRegister):
+        if isinstance(command, cmd_defs.ViOpenRegister):
             _logger().info('[PressKey] requesting register name')
             state.capture_register = True
             return
@@ -695,13 +694,13 @@ class PressKey(ViWindowCommandBase):
                 self.window.run_command('press_keys', {'keys': new_keys, 'check_user_mappings': False})
             return
 
-        if isinstance(command, ViOpenNameSpace):
+        if isinstance(command, cmd_defs.ViOpenNameSpace):
             # Keep collecing input to complete the sequence. For example, we
             # may have typed 'g'.
             _logger().info("[PressKey] opening namespace: {0}".format(state.partial_sequence))
             return
 
-        elif isinstance(command, commands.ViMissingCommandDef):
+        elif isinstance(command, cmd_base.ViMissingCommandDef):
             bare_seq = to_bare_command_name(state.sequence)
 
             if state.mode == modes.OPERATOR_PENDING:
@@ -718,7 +717,7 @@ class PressKey(ViWindowCommandBase):
             else:
                 command = key_mappings.get_current(sequence=bare_seq)
 
-            if isinstance(command, commands.ViMissingCommandDef):
+            if isinstance(command, cmd_base.ViMissingCommandDef):
                 _logger().info('[PressKey] unmapped sequence: {0}'.format(state.sequence))
                 utils.blink()
                 state.mode = modes.NORMAL
@@ -726,7 +725,7 @@ class PressKey(ViWindowCommandBase):
                 return
 
         if (state.mode == modes.OPERATOR_PENDING and
-            isinstance(command, commands.ViOperatorDef)):
+            isinstance(command, cmd_defs.ViOperatorDef)):
                 # TODO: This may be unreachable code by now. ???
                 # we're expecting a motion, but we could still get an action.
                 # For example, dd, g~g~ or g~~
@@ -735,7 +734,7 @@ class PressKey(ViWindowCommandBase):
                 _logger().info('[PressKey] action seq: {0}'.format(action_seq))
                 command = key_mappings.get_current(sequence=action_seq, mode=modes.NORMAL)
                 # TODO: Make _missing a command.
-                if isinstance(command, commands.ViMissingCommandDef):
+                if isinstance(command, cmd_base.ViMissingCommandDef):
                     _logger().info("[PressKey] unmapped sequence: {0}".format(state.sequence))
                     state.reset_command_data()
                     return

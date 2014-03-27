@@ -10,7 +10,7 @@ from Vintageous.vi import utils
 from Vintageous.vi.dot_file import DotFile
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import regions_transformer
-from Vintageous.vi import commands
+from Vintageous.vi import cmd_defs
 
 
 _logger = local_logger(__name__)
@@ -19,14 +19,14 @@ _logger = local_logger(__name__)
 class _vi_slash_on_parser_done(sublime_plugin.WindowCommand):
     def run(self, key=None):
         state = State(self.window.active_view())
-        state.motion = commands.ViSearchForwardImpl()
+        state.motion = cmd_defs.ViSearchForwardImpl()
         state.last_buffer_search = state.motion._inp or state.last_buffer_search
 
 
 class _vi_question_mark_on_parser_done(sublime_plugin.WindowCommand):
     def run(self, key=None):
         state = State(self.window.active_view())
-        state.motion = commands.ViSearchBackwardImpl()
+        state.motion = cmd_defs.ViSearchBackwardImpl()
         state.last_buffer_search = state.motion._inp or state.last_buffer_search
 
 
