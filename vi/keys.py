@@ -79,6 +79,8 @@ class seqs:
     CTRL_R=                        '<C-r>'
     CTRL_R_EQUAL =                 '<C-r>='
     CTRL_A =                       '<C-a>'
+    CTRL_I =                       '<C-i>'
+    CTRL_O =                       '<C-o>'
     CTRL_X =                       '<C-x>'
     Z =                            'z'
     Z_ENTER =                      'z<cr>'
@@ -287,8 +289,10 @@ mappings = {
         seqs.CTRL_E:                        commands.ViScrollByLinesUp(),
         seqs.CTRL_F:                        commands.ViMoveScreenDown(),
         seqs.CTRL_G:                        commands.ViShowFileStatus(),
+        seqs.CTRL_I:                        commands.ViJumpForward(),
         seqs.CTRL_K:                        commands.ViOpenNameSpace(),
         seqs.CTRL_K_CTRL_B:                 commands.StToggleSidebar(),
+        seqs.CTRL_O:                        commands.ViJumpBack(),
         seqs.CTRL_P:                        commands.StShowGotoAnything(),
         seqs.CTRL_R:                        commands.ViRedo(),
         seqs.CTRL_U:                        commands.ViMoveHalfScreenUp(),

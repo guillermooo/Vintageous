@@ -1161,6 +1161,40 @@ class StFinInFiles(ViOperatorDef):
         return cmd
 
 
+class ViJumpBack(ViOperatorDef):
+    """
+    Vim: `<C-o>`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def to_json(self, state):
+        cmd = {}
+        cmd['action'] = 'jump_back'
+        cmd['action_args'] = {}
+        return cmd
+
+
+class ViJumpForward(ViOperatorDef):
+    """
+    Vim: `<C-i>`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def to_json(self, state):
+        cmd = {}
+        cmd['action'] = 'jump_forward'
+        cmd['action_args'] = {}
+        return cmd
+
+
 class StGotoSymbolInProject(ViOperatorDef):
     """
     Vintageous: `<C-S-f12>`
