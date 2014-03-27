@@ -1,0 +1,61 @@
+==============================================================================
+Vintageous 3.5.0
+==============================================================================
+
+
+Hi!
+
+This version introduces a major refactoring of Vintageous' command handling
+code. Since command definitions are now expressed differently, they had to be
+rewritten for every command and bugs may have been introduced along the way.
+Please report them through GitHub's issue tracker (see below).
+
+Guillermo
+
+
+*** Follow important announcements on Twitter: @VintageousS3 ***
+
+CHANGES
+-------
+
+	- Refactoring of core functionality.
+	- Experimental plugin support.
+	- Implement <C-o> and <C-i> for jump navigation.
+	- Assorted fixes.
+
+
+ABOUT PLUGIN SUPPORT
+--------------------
+
+Plugin support is experimental. There is no stable api for plugins. The only
+plugin currently available is a version of Vim's Surround plugin. You can
+find Vintageous's Surround plugin here:
+
+https://github.com/guillermooo/Vintageous_Plugin_Surround
+
+
+FOUND BUGS?
+-----------
+
+Please report them here:
+
+    https://github.com/guillermooo/Vintageous/issues
+
+
+SUPPORT VINTAGEOUS
+------------------
+
+Is Vintageous worth your time? Developing Vintageous is hard work. If you use
+it often to get actual work done, please consider donating and make it worth
+my time too.
+
+    PayPal: http://www.pledgie.com/campaigns/19122
+    Gittip: https://www.gittip.com/guillermooo/
+
+I'm the creator and main author of Vintageous, but some generous people have
+contributed their time and effort as well. See the more active ones here; you
+may want to show them some gratitude too:
+
+https://github.com/guillermooo/Vintageous/graphs/contributors
+
+Thanks for reading and for using Vintageous!

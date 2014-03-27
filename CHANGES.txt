@@ -1,3 +1,10 @@
+3.5.0 - 27/03/14
+
+	- Refactoring of core functionality.
+	- Experimental plugin support.
+	- Implement <C-o> and <C-i> for jump navigation.
+	- Assorted fixes.
+
 3.0.2 - 06/03/14
 
 	- Improve 'a' action.
