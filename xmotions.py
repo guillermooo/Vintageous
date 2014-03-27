@@ -10,8 +10,6 @@ from Vintageous import state as state_module
 from Vintageous.vi import units
 from Vintageous.vi import utils
 from Vintageous.vi.core import ViTextCommandBase
-from Vintageous.vi.keys import cmd_defs
-from Vintageous.vi.keys import cmds
 from Vintageous.vi.keys import mappings
 from Vintageous.vi.keys import seqs
 from Vintageous.vi.search import BufferSearchBase
@@ -29,6 +27,7 @@ from Vintageous.vi.utils import IrreversibleTextCommand
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import regions_transformer
 from Vintageous.vi.utils import mark_as_widget
+from Vintageous.vi import commands
 
 
 class _vi_find_in_line(ViTextCommandBase):
@@ -168,19 +167,10 @@ class _vi_slash(IrreversibleTextCommand, ViTextCommandBase, BufferSearchBase):
         state = self.state
         state.sequence += s + '<CR>'
         self.view.erase_regions('vi_inc_search')
-        state.motion = cmd_defs[state.mode][cmds.SLASH_IMPL]
+        state.motion = commands.ViSearchForwardImpl(term=s)
 
         # If s is empty, we must repeat the last search.
-
-        # The next time we set .user_input, the vi_forward_slash input parser will kick in. We
-        # therefore need to ensure we only set .user_input once.
-        state.user_input = s or state.last_buffer_search
         state.last_buffer_search = s or state.last_buffer_search
-        if state.input_parsers:
-            new_parsers = state.input_parsers
-            new_parsers.pop()
-            state.input_parsers = new_parsers
-
         state.eval()
 
     def on_change(self, s):
@@ -1685,19 +1675,10 @@ class _vi_question_mark(IrreversibleTextCommand, ViTextCommandBase, BufferSearch
         state = self.state
         state.sequence += s + '<CR>'
         self.view.erase_regions('vi_inc_search')
-        state.motion = cmd_defs[state.mode][cmds.QUESTION_MARK_IMPL]
+        state.motion = commands.ViSearchBackwardImpl(term=s)
 
         # If s is empty, we must repeat the last search.
-
-        # The next time we set .user_input, the vi_question_mark input parser will kick in. We
-        # therefore need to ensure we only set .user_input once.
-        state.user_input = s or state.last_buffer_search
         state.last_buffer_search = s or state.last_buffer_search
-        if state.input_parsers:
-            new_parsers = state.input_parsers
-            new_parsers.pop()
-            state.input_parsers = new_parsers
-
         state.eval()
 
     def on_change(self, s):

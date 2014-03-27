@@ -146,16 +146,20 @@ class modes:
         else:
             return 'REALLY UNKNOWN'
 
+
 class input_types:
     """
     Types of input parsers.
     """
-    INMEDIATE = 1
-    VIA_PANEL = 2
+    INMEDIATE    = 1
+    VIA_PANEL    = 2
+    AFTER_MOTION = 3
+
 
 class jump_directions:
     FORWARD = 1
     BACK = 0
+
 
 def regions_transformer(view, f):
     sels = list(view.sel())

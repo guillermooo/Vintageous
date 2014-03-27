@@ -129,6 +129,7 @@ def vi_quote(state):
                    on_done=None,
                    type=input_types.INMEDIATE)
     return p
+
 def vi_r(state):
     p = parser_def(command=one_char,
                    interactive_command=None,

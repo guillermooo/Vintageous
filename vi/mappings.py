@@ -1,10 +1,10 @@
 from Vintageous.vi import utils
-from Vintageous.vi.cmd_defs import cmd_types
 from Vintageous.vi.keys import mappings
 from Vintageous.vi.keys import seq_to_command
 from Vintageous.vi.keys import to_bare_command_name
 from Vintageous.vi.keys import KeySequenceTokenizer
 from Vintageous.vi.utils import modes
+from Vintageous.vi.commands import cmd_types
 
 
 _mappings = {
@@ -135,7 +135,8 @@ class Mappings(object):
 
         if command:
             self.state.logger.info('[Mappings] {0} equals command: {1}'.format(seq, command))
-            return {'name': command.mapping, 'type': cmd_types.USER}
+            return command
+            # return {'name': command.mapping, 'type': cmd_types.USER}
         else:
             self.state.logger.info('[Mappings] looking up >{0}<'.format(seq))
             command = seq_to_command(self.state, seq, mode=mode)

@@ -4,7 +4,6 @@ import sublime
 
 from Vintageous.state import state
 from Vintageous.vi.utils import modes
-from Vintageous.vi.cmd_defs import cmd_types
 from Vintageous.vi.mappings import Mappings
 from Vintageous.vi.mappings import _mappings
 from Vintageous.vi.mappings import mapping_status
@@ -12,6 +11,7 @@ from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import make_region
 from Vintageous.tests import BufferTest
+from Vintageous.vi.commands import cmd_types
 
 
 adding_tests = (

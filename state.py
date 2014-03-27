@@ -5,12 +5,9 @@ import sublime
 import sublime_plugin
 
 from Vintageous import local_logger
-from Vintageous.vi import actions
 from Vintageous.vi import inputs
-from Vintageous.vi import motions
 from Vintageous.vi import utils
-from Vintageous.vi.cmd_defs import cmds
-from Vintageous.vi.cmd_defs import cmd_types
+from Vintageous.vi.utils import input_types
 from Vintageous.vi.contexts import KeyContext
 from Vintageous.vi.dot_file import DotFile
 from Vintageous.vi.keys import mappings
@@ -27,6 +24,7 @@ from Vintageous.vi.utils import is_ignored
 from Vintageous.vi.utils import is_ignored_but_command_mode
 from Vintageous.vi.utils import jump_directions
 from Vintageous.vi.utils import modes
+from Vintageous.vi import commands
 
 
 # ============================================================================
@@ -230,20 +228,6 @@ class State(object):
         self.settings.vi['_vintageous_non_interactive'] = value
 
     @property
-    def input_parsers(self):
-        """
-        Contains parsers for user input, like '/' or 'f' need.
-        """
-        # TODO: Rename to 'validators'?
-        # TODO: Use window settings for storage?
-        # TODO: Enable setting lists directly.
-        return self.settings.vi['_vintageous_input_parsers'] or []
-
-    @input_parsers.setter
-    def input_parsers(self, value):
-        self.settings.vi['_vintageous_input_parsers'] = value
-
-    @property
     def last_character_search(self):
         """
         Last character used as input for 'f' or 't'.
@@ -369,19 +353,28 @@ class State(object):
 
     @property
     def action(self):
-        return self.settings.vi['action'] or None
+        val = self.settings.vi['action'] or None
+        if val:
+            cls = getattr(commands, val['name'])
+            return cls.from_json(val['data'])
 
     @action.setter
     def action(self, value):
-        self.settings.vi['action'] = value
+        v = value.serialize() if value else None
+        self.settings.vi['action'] = v
 
     @property
     def motion(self):
-        return self.settings.vi['motion'] or None
+        val = self.settings.vi['motion'] or None
+        if val:
+            # TODO: Encapsulate further.
+            cls = getattr(commands, val['name'])
+            return cls.from_json(val['data'])
 
     @motion.setter
     def motion(self, value):
-        self.settings.vi['motion'] = value
+        v = value.serialize() if value else None
+        self.settings.vi['motion'] = v
 
     @property
     def motion_count(self):
@@ -398,14 +391,6 @@ class State(object):
     @action_count.setter
     def action_count(self, value):
         self.settings.vi['action_count'] = value
-
-    @property
-    def user_input(self):
-        return self.settings.vi['user_input'] or ''
-
-    @user_input.setter
-    def user_input(self, value):
-        self.settings.vi['user_input'] = value
 
     @property
     def repeat_data(self):
@@ -522,11 +507,33 @@ class State(object):
         self.settings.vi['register'] = value
         self.capture_register = False
 
+    @property
+    def must_collect_input(self):
+        """
+        Returns `True` if state must collect input for the current motion or
+        operator.
+        """
+        if self.motion and self.action:
+            if self.motion.accept_input:
+                return True
+
+            return (self.action.accept_input and
+                    self.action.input_parser.type == input_types.AFTER_MOTION)
+
+        if (self.action and
+            self.action.accept_input and
+            self.action.input_parser.type == input_types.INMEDIATE):
+                return True
+
+        if self.motion:
+            return self.motion and self.motion.accept_input
+
     def pop_parser(self):
-        parsers = self.input_parsers
-        current = parsers.pop()
-        self.input_parsers = parsers
-        return current
+        # parsers = self.input_parsers
+        # current = parsers.pop()
+        # self.input_parsers = parsers
+        # return current
+        return None
 
     def enter_normal_mode(self):
         self.mode = modes.NORMAL
@@ -561,16 +568,12 @@ class State(object):
     def reset_partial_sequence(self):
         self.partial_sequence = ''
 
-    def reset_user_input(self):
-        self.input_parsers = []
-        self.user_input = ''
-
     def reset_register_data(self):
         self.register = '"'
         self.capture_register = False
 
     def must_scroll_into_view(self):
-        return (self.motion and self.motion.get('scroll_into_view'))
+        return (self.motion and self.motion.scroll_into_view)
 
     def scroll_into_view(self):
         v = sublime.active_window().active_view()
@@ -584,18 +587,20 @@ class State(object):
         self.update_xpos()
         if self.must_scroll_into_view():
             self.scroll_into_view()
+        self.action and self.action.reset()
         self.action = None
+        self.motion and self.motion.reset()
         self.motion = None
         self.action_count = ''
         self.motion_count = ''
 
         self.reset_sequence()
         self.reset_partial_sequence()
-        self.reset_user_input()
+        # self.reset_user_input()
         self.reset_register_data()
 
     def update_xpos(self):
-        if self.motion and self.motion.get('updates_xpos'):
+        if self.motion and self.motion.updates_xpos:
             try:
                 xpos = self.view.rowcol(self.view.sel()[0].b)[1]
             except Exception as e:
@@ -625,81 +630,38 @@ class State(object):
         Returns `True` if we've had to run an immediate parser via an input
         panel.
         """
-        if command.get('input'):
+        if command.accept_input:
+            return self._run_parser_via_panel(command)
 
-            # XXX: Special case. We should probably find a better solution.
-            if self.recording_macro and (command['input'] == 'vi_q'):
-                # We discard the parser, as we want to be able to press
-                # 'q' to stop the macro recorder.
-                return
-
-            # Our command requests input from the user. Let's see how we
-            # should go about it.
-            parser_name = command['input']
-
-            parser_list = self.input_parsers
-            parser_list.append(parser_name)
-            self.input_parsers = parser_list
-
-            return self._run_parser_via_panel()
-
-    def _run_parser_via_panel(self):
+    def _run_parser_via_panel(self, command):
         """
         Returns `True` if the current parser needs to be run via a panel.
 
         If needed, it runs the input-panel-based parser.
         """
-        if not self.input_parsers:
-            return False
-        parser_def = inputs.get(self, self.input_parsers[-1])
-        if parser_def.type == input_types.VIA_PANEL:
-            # Let the input-collection command collect input.
-            sublime.active_window().run_command(parser_def.command)
+        if command.input_parser.type == input_types.VIA_PANEL:
+            if self.non_interactive:
+                return False
+            sublime.active_window().run_command(command.input_parser.command)
             return True
         return False
 
+    def process_user_input2(self, key):
+        assert self.must_collect_input, "call only if input is required"
 
-    def process_user_input(self, key):
-        """
-        Returns `True` if the current input parser is satistied by @key.
-        """
-        if not self.input_parsers:
-            return
+        _logger().info('[State] processing input {0}'.format(key))
 
-        _logger().info('[State] active input parsers: {0}'.format(self.input_parsers))
+        if self.motion and self.motion.accept_input:
+            motion = self.motion
+            # TODO: Rmove this.
+            val = motion.accept(key)
+            self.motion = motion
+            return val
 
-        parser_def = inputs.get(self, self.input_parsers[-1])
-        # TODO: use translate_key?
-        # XXX: Why can't we use the same logic as below?
-        if key.lower() == '<cr>':
-            _logger().info('[State] <cr> pressed, removing 1 parser')
-            self.pop_parser()
-
-            if parser_def.on_done:
-                _logger().info('[State] running post parser: {0}'
-                                                .format(parser_def.on_done))
-                self.view.window().run_command(parser_def.on_done, {'key': key})
-
-            return True
-
-        self.user_input += key
-
-        if (self.input_parsers and callable(parser_def.command)
-                               and parser_def.command(key)):
-            _logger().info('[State] parser satisfied, removing one parser')
-            self.pop_parser()
-
-            if parser_def.on_done:
-                _logger().info('[State] running post parser: {0}'
-                                                .format(parser_def.on_done))
-                self.view.window().run_command(parser_def.on_done, {'key': key})
-
-            return True
-
-        else:
-            _logger().info('[State] more input expected by parser')
-            # we need to keep collecting input
-            return True
+        action = self.action
+        val = action.accept(key)
+        self.action = action
+        return val
 
     def set_command(self, command):
         """
@@ -708,7 +670,10 @@ class State(object):
         @command
           A command definition as found in `keys.py`.
         """
-        if command['type'] == cmd_types.MOTION:
+        assert isinstance(command, commands.ViCommandDefBase), \
+                          'ViCommandDefBase expected, got {0}'.format(type(command))
+
+        if isinstance(command, commands.ViMotionDef):
             if self.runnable():
                 # We already have a motion, so this looks like an error.
                 raise ValueError('too many motions')
@@ -720,14 +685,13 @@ class State(object):
             if self._set_parsers(command):
                 return
 
-        elif command['type'] == cmd_types.ACTION:
+        elif isinstance(command, commands.ViOperatorDef):
             if self.runnable():
                 # We already have an action, so this looks like an error.
                 raise ValueError('too many actions')
 
             self.action = command
-
-            if (self.action['motion_required'] and
+            if (self.action.motion_required and
                 not self.in_any_visual_mode()):
                     self.mode = modes.OPERATOR_PENDING
 
@@ -769,7 +733,7 @@ class State(object):
         """
         Returns `True` if we can run the state data as it is.
         """
-        if self.input_parsers:
+        if self.must_collect_input:
             return False
 
         if self.action and self.motion:
@@ -794,32 +758,9 @@ class State(object):
         Run data as a command if possible.
         """
         if self.runnable():
-            action_func = motion_func = None
-            action_cmd = motion_cmd = None
-
-            if self.action:
-                action_func = getattr(actions, self.action['name'], None)
-
-                if action_func is None:
-                    self.logger.info('[State] action not implemented: {0}'.format(self.action))
-                    self.reset_command_data()
-                    return
-
-                action_cmd = action_func(self)
-                self.logger.info('[State] action cmd data: {0}'.format(action_cmd))
-
-            if self.motion:
-                motion_func = getattr(motions, self.motion['name'], None)
-
-                if motion_func is None:
-                    self.logger.info('[State] motion not implemented: {0}'.format(self.motion))
-                    self.reset_command_data()
-                    return
-
-                motion_cmd = motion_func(self)
-                self.logger.info('[State] motion cmd data: {0}'.format(motion_cmd))
-
-            if action_func and motion_func:
+            if self.action and self.motion:
+                action_cmd = self.action.to_json(self)
+                motion_cmd = self.motion.to_json(self)
                 self.logger.info('[State] full command, switching to internal normal mode')
                 self.mode = modes.INTERNAL_NORMAL
 
@@ -845,19 +786,21 @@ class State(object):
 
                 sublime.active_window().run_command(action_cmd['action'], args)
                 if not self.non_interactive:
-                    if self.action['repeatable']:
+                    if self.action.repeatable:
                         self.repeat_data = ('vi', str(self.sequence), self.mode, None)
                 self.reset_command_data()
                 return
 
-            if motion_func:
+            if self.motion:
+                motion_cmd = self.motion.to_json(self)
                 self.logger.info('[State] lone motion cmd: {0}'.format(motion_cmd))
 
                 sublime.active_window().run_command(
                                                 motion_cmd['motion'],
                                                 motion_cmd['motion_args'])
 
-            if action_func:
+            if self.action:
+                action_cmd = self.action.to_json(self)
                 self.logger.info('[Stage] lone action cmd '.format(action_cmd))
                 if self.mode == modes.NORMAL:
                     self.logger.info('[State] switching to internal normal mode')
@@ -885,7 +828,7 @@ class State(object):
                                                 action_cmd['action_args'])
 
                 if not (self.gluing_sequence and self.glue_until_normal_mode):
-                    if action['repeatable']:
+                    if action.repeatable:
                         self.repeat_data = ('vi', seq, self.mode, visual_repeat_data)
 
 

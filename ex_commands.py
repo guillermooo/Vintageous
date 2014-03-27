@@ -19,7 +19,6 @@ from Vintageous.state import user_mappings
 from Vintageous.state import VintageState
 from Vintageous.vi import abbrev
 from Vintageous.vi import utils
-from Vintageous.vi.cmd_defs import cmd_types
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
