@@ -26,7 +26,7 @@ _MODES_ACTION = (modes.NORMAL, modes.VISUAL, modes.VISUAL_LINE,
 
 
 
-@keys.assign(keys=[(seqs.D, _MODES_ACTION)])
+@keys.assign(seq=seqs.D, modes=_MODES_ACTION)
 class ViDeleteByChars(ViOperatorDef):
     """
     Vim: `d`
@@ -49,7 +49,7 @@ class ViDeleteByChars(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_O, _MODES_ACTION)])
+@keys.assign(seq=seqs.BIG_O, modes=_MODES_ACTION)
 class ViInsertLineBefore(ViOperatorDef):
     """
     Vim: `O`
@@ -68,7 +68,7 @@ class ViInsertLineBefore(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.O, _MODES_ACTION)])
+@keys.assign(seq=seqs.O, modes=_MODES_ACTION)
 class ViInsertLineAfter(ViOperatorDef):
     """
     Vim: `o`
@@ -96,7 +96,7 @@ class ViInsertLineAfter(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.X, _MODES_ACTION)])
+@keys.assign(seq=seqs.X, modes=_MODES_ACTION)
 class ViRightDeleteChars(ViOperatorDef):
     """
     Vim: `x`
@@ -116,7 +116,7 @@ class ViRightDeleteChars(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.S, _MODES_ACTION)])
+@keys.assign(seq=seqs.S, modes=_MODES_ACTION)
 class ViSubstituteChar(ViOperatorDef):
     """
     Vim: `s`
@@ -139,7 +139,7 @@ class ViSubstituteChar(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.Y, _MODES_ACTION)])
+@keys.assign(seq=seqs.Y, modes=_MODES_ACTION)
 class ViYankByChars(ViOperatorDef):
     """
     Vim: `y`
@@ -162,7 +162,7 @@ class ViYankByChars(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.EQUAL, _MODES_ACTION)])
+@keys.assign(seq=seqs.EQUAL, modes=_MODES_ACTION)
 class ViReindent(ViOperatorDef):
     """
     Vim: `=`
@@ -183,7 +183,7 @@ class ViReindent(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.GREATER_THAN, _MODES_ACTION)])
+@keys.assign(seq=seqs.GREATER_THAN, modes=_MODES_ACTION)
 class ViIndent(ViOperatorDef):
     """
     Vim: `>`
@@ -203,7 +203,7 @@ class ViIndent(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.LESS_THAN, _MODES_ACTION)])
+@keys.assign(seq=seqs.LESS_THAN, modes=_MODES_ACTION)
 class ViUnindent(ViOperatorDef):
     """
     Vim: `<`
@@ -223,7 +223,7 @@ class ViUnindent(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.C, _MODES_ACTION)])
+@keys.assign(seq=seqs.C, modes=_MODES_ACTION)
 class ViChangeByChars(ViOperatorDef):
     """
     Vim: `c`
@@ -248,7 +248,7 @@ class ViChangeByChars(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.U, _MODES_ACTION)])
+@keys.assign(seq=seqs.U, modes=_MODES_ACTION)
 class ViUndo(ViOperatorDef):
     """
     Vim: `u`
@@ -274,7 +274,7 @@ class ViUndo(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_R, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_R, modes=_MODES_ACTION)
 class ViRedo(ViOperatorDef):
     """
     Vim: `C-r`
@@ -292,7 +292,7 @@ class ViRedo(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_D, _MODES_ACTION)])
+@keys.assign(seq=seqs.BIG_D, modes=_MODES_ACTION)
 class ViDeleteToEol(ViOperatorDef):
     """
     Vim: `D`
@@ -314,7 +314,7 @@ class ViDeleteToEol(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_C, _MODES_ACTION)])
+@keys.assign(seq=seqs.BIG_C, modes=_MODES_ACTION)
 class ViChangeToEol(ViOperatorDef):
     """
     Vim: `C`
@@ -338,8 +338,8 @@ class ViChangeToEol(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.G_BIG_U_BIG_U, _MODES_ACTION)])
-@keys.assign(keys=[(seqs.G_BIG_U_G_BIG_U, _MODES_ACTION)])
+@keys.assign(seq=seqs.G_BIG_U_BIG_U, modes=_MODES_ACTION)
+@keys.assign(seq=seqs.G_BIG_U_G_BIG_U, modes=_MODES_ACTION)
 class ViChangeToUpperCaseByLines(ViOperatorDef):
     """
     Vim: `gUU`, `gUgU`
@@ -358,7 +358,7 @@ class ViChangeToUpperCaseByLines(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CC, _MODES_ACTION)])
+@keys.assign(seq=seqs.CC, modes=_MODES_ACTION)
 class ViChangeLine(ViOperatorDef):
     """
     Vim: `cc`
@@ -379,7 +379,7 @@ class ViChangeLine(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.DD, _MODES_ACTION)])
+@keys.assign(seq=seqs.DD, modes=_MODES_ACTION)
 class ViDeleteLine(ViOperatorDef):
     """
     Vim: `dd`
@@ -398,7 +398,7 @@ class ViDeleteLine(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_R, _MODES_ACTION)])
+@keys.assign(seq=seqs.BIG_R, modes=_MODES_ACTION)
 class ViEnterReplaceMode(ViOperatorDef):
     """
     Vim: `R`
@@ -418,7 +418,7 @@ class ViEnterReplaceMode(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.GREATER_THAN_GREATER_THAN, _MODES_ACTION)])
+@keys.assign(seq=seqs.GREATER_THAN_GREATER_THAN, modes=_MODES_ACTION)
 class ViIndentLine(ViOperatorDef):
     """
     Vim: `>>`
@@ -437,8 +437,8 @@ class ViIndentLine(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.GUGU, _MODES_ACTION)])
-@keys.assign(keys=[(seqs.GUU, _MODES_ACTION)])
+@keys.assign(seq=seqs.GUGU, modes=_MODES_ACTION)
+@keys.assign(seq=seqs.GUU, modes=_MODES_ACTION)
 class ViChangeToLowerCaseByLines(ViOperatorDef):
     """
     Vim: `guu`, `gugu`
@@ -457,7 +457,7 @@ class ViChangeToLowerCaseByLines(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.GU, _MODES_ACTION)])
+@keys.assign(seq=seqs.GU, modes=_MODES_ACTION)
 class ViChangeToLowerCaseByChars(ViOperatorDef):
     """
     Vim: `gu`
@@ -477,7 +477,7 @@ class ViChangeToLowerCaseByChars(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.EQUAL_EQUAL, _MODES_ACTION)])
+@keys.assign(seq=seqs.EQUAL_EQUAL, modes=_MODES_ACTION)
 class ViReindentLine(ViOperatorDef):
     """
     Vim: `==`
@@ -496,7 +496,7 @@ class ViReindentLine(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.LESS_THAN_LESS_THAN, _MODES_ACTION)])
+@keys.assign(seq=seqs.LESS_THAN_LESS_THAN, modes=_MODES_ACTION)
 class ViUnindentLine(ViOperatorDef):
     """
     Vim: `<<`
@@ -515,7 +515,7 @@ class ViUnindentLine(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.YY, _MODES_ACTION)])
+@keys.assign(seq=seqs.YY, modes=_MODES_ACTION)
 class ViYankLine(ViOperatorDef):
     """
     Vim: `yy`
@@ -537,7 +537,7 @@ class ViYankLine(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.G_TILDE_TILDE, _MODES_ACTION)])
+@keys.assign(seq=seqs.G_TILDE_TILDE, modes=_MODES_ACTION)
 class ViInvertCaseByLines(ViOperatorDef):
     """
     Vim: `g~~`
@@ -556,7 +556,7 @@ class ViInvertCaseByLines(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.TILDE, _MODES_ACTION)])
+@keys.assign(seq=seqs.TILDE, modes=_MODES_ACTION)
 class ViForceInvertCaseByChars(ViOperatorDef):
     """
     Vim: `~`
@@ -575,7 +575,7 @@ class ViForceInvertCaseByChars(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_S, _MODES_ACTION)])
+@keys.assign(seq=seqs.BIG_S, modes=_MODES_ACTION)
 class ViSubstituteByLines(ViOperatorDef):
     """
     Vim: `S`
@@ -595,7 +595,7 @@ class ViSubstituteByLines(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.G_TILDE, _MODES_ACTION)])
+@keys.assign(seq=seqs.G_TILDE, modes=_MODES_ACTION)
 class ViInvertCaseByChars(ViOperatorDef):
     """
     Vim: `g~`
@@ -616,7 +616,7 @@ class ViInvertCaseByChars(ViOperatorDef):
 
 
 # TODO: Duplicated.
-@keys.assign(keys=[(seqs.G_BIG_U, _MODES_ACTION)])
+@keys.assign(seq=seqs.G_BIG_U, modes=_MODES_ACTION)
 class ViChangeToUpperCaseByChars(ViOperatorDef):
     """
     Vim: `gU`
@@ -636,7 +636,7 @@ class ViChangeToUpperCaseByChars(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_J, _MODES_ACTION + (modes.SELECT,))])
+@keys.assign(seq=seqs.BIG_J, modes=_MODES_ACTION + (modes.SELECT,))
 class ViJoinLines(ViOperatorDef):
     """
     Vim: `J`
@@ -662,7 +662,7 @@ class ViJoinLines(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_X, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_X, modes=_MODES_ACTION)
 class ViSubtractFromNumber(ViOperatorDef):
     """
     Vim: `C-x`
@@ -684,7 +684,7 @@ class ViSubtractFromNumber(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_A, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_A, modes=_MODES_ACTION)
 class ViAddToNumber(ViOperatorDef):
     """
     Vim: `C-a`
@@ -703,7 +703,7 @@ class ViAddToNumber(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.YY, _MODES_ACTION)])
+@keys.assign(seq=seqs.YY, modes=_MODES_ACTION)
 class ViCopyLine(ViOperatorDef):
     """
     Vim: `yy`
@@ -722,7 +722,7 @@ class ViCopyLine(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.G_BIG_J, _MODES_ACTION)])
+@keys.assign(seq=seqs.G_BIG_J, modes=_MODES_ACTION)
 class ViJoinLinesNoSeparator(ViOperatorDef):
     """
     # FIXME: Doesn't work.
@@ -742,7 +742,7 @@ class ViJoinLinesNoSeparator(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.V, _MODES_ACTION)])
+@keys.assign(seq=seqs.V, modes=_MODES_ACTION)
 class ViEnterVisualMode(ViOperatorDef):
     """
     Vim: `v`
@@ -760,7 +760,7 @@ class ViEnterVisualMode(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.Z_ENTER, _MODES_ACTION)])
+@keys.assign(seq=seqs.Z_ENTER, modes=_MODES_ACTION)
 class ViScrollToScreenTop(ViOperatorDef):
     """
     Vim: `z<CR>`
@@ -778,7 +778,7 @@ class ViScrollToScreenTop(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.ZB, _MODES_ACTION)])
+@keys.assign(seq=seqs.ZB, modes=_MODES_ACTION)
 class ViScrollToScreenBottom(ViOperatorDef):
     """
     Vim: `zb`
@@ -796,7 +796,7 @@ class ViScrollToScreenBottom(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.ZZ, _MODES_ACTION)])
+@keys.assign(seq=seqs.ZZ, modes=_MODES_ACTION)
 class ViScrollToScreenCenter(ViOperatorDef):
     """
     Vim: `zz`
@@ -815,7 +815,7 @@ class ViScrollToScreenCenter(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.GQ, _MODES_ACTION)])
+@keys.assign(seq=seqs.GQ, modes=_MODES_ACTION)
 class ViReformat(ViOperatorDef):
     """
     Vim: `gq`
@@ -836,7 +836,7 @@ class ViReformat(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.P, _MODES_ACTION)])
+@keys.assign(seq=seqs.P, modes=_MODES_ACTION)
 class ViPasteAfter(ViOperatorDef):
     """
     Vim: `p`
@@ -859,7 +859,7 @@ class ViPasteAfter(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_P, _MODES_ACTION)])
+@keys.assign(seq=seqs.BIG_P, modes=_MODES_ACTION)
 class ViPasteBefore(ViOperatorDef):
     """
     Vim: `P`
@@ -882,7 +882,7 @@ class ViPasteBefore(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_X, _MODES_ACTION)])
+@keys.assign(seq=seqs.BIG_X, modes=_MODES_ACTION)
 class ViLeftDeleteChar(ViOperatorDef):
     """
     Vim: `X`
@@ -902,7 +902,7 @@ class ViLeftDeleteChar(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_W_L, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_W_L, modes=_MODES_ACTION)
 class ViSendViewToRightPane(ViOperatorDef):
     """
     Vim: `<C-W-L>`
@@ -919,7 +919,7 @@ class ViSendViewToRightPane(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_W_H, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_W_H, modes=_MODES_ACTION)
 class ViSendViewToLeftPane(ViOperatorDef):
     """
     Vim: `<C-W-H>`
@@ -936,7 +936,7 @@ class ViSendViewToLeftPane(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.GT, _MODES_ACTION)])
+@keys.assign(seq=seqs.GT, modes=_MODES_ACTION)
 class ViActivateNextTab(ViOperatorDef):
     """
     Vim: `gt`
@@ -953,7 +953,7 @@ class ViActivateNextTab(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.G_BIG_T, _MODES_ACTION)])
+@keys.assign(seq=seqs.G_BIG_T, modes=_MODES_ACTION)
 class ViActivatePreviousTab(ViOperatorDef):
     """
     Vim: `gT`
@@ -970,7 +970,7 @@ class ViActivatePreviousTab(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_W_L, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_W_L, modes=_MODES_ACTION)
 class ViActivatePaneToTheRight(ViOperatorDef):
     """
     Vim: `<C-W-l>`
@@ -987,7 +987,7 @@ class ViActivatePaneToTheRight(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_W_H, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_W_H, modes=_MODES_ACTION)
 class ViActivatePaneToTheLeft(ViOperatorDef):
     """
     Vim: `<C-W-h>`
@@ -1004,7 +1004,7 @@ class ViActivatePaneToTheLeft(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_W_V, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_W_V, modes=_MODES_ACTION)
 class ViSplitVertically(ViOperatorDef):
     """
     Vim: `<C-W-v>`
@@ -1021,7 +1021,7 @@ class ViSplitVertically(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_W_Q, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_W_Q, modes=_MODES_ACTION)
 class ViDestroyCurrentPane(ViOperatorDef):
     """
     Vim: `<C-W-q>`
@@ -1038,7 +1038,7 @@ class ViDestroyCurrentPane(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_V, _MODES_ACTION)])
+@keys.assign(seq=seqs.BIG_V, modes=_MODES_ACTION)
 class ViEnterVisualLineMode(ViOperatorDef):
     """
     Vim: `V`
@@ -1056,7 +1056,7 @@ class ViEnterVisualLineMode(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.GV, _MODES_ACTION)])
+@keys.assign(seq=seqs.GV, modes=_MODES_ACTION)
 class ViRestoreVisualSelections(ViOperatorDef):
     """
     Vim: `gv`
@@ -1074,7 +1074,7 @@ class ViRestoreVisualSelections(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_K_CTRL_B, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_K_CTRL_B, modes=_MODES_ACTION)
 class StToggleSidebar(ViOperatorDef):
     """
     Vintageous: `<C-K-b>`
@@ -1092,7 +1092,7 @@ class StToggleSidebar(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_BIG_F, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_BIG_F, modes=_MODES_ACTION)
 class StFinInFiles(ViOperatorDef):
     """
     Vintageous: `Ctrl+Shift+F`
@@ -1110,7 +1110,7 @@ class StFinInFiles(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_O, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_O, modes=_MODES_ACTION)
 class ViJumpBack(ViOperatorDef):
     """
     Vim: `<C-o>`
@@ -1128,7 +1128,7 @@ class ViJumpBack(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_I, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_I, modes=_MODES_ACTION)
 class ViJumpForward(ViOperatorDef):
     """
     Vim: `<C-i>`
@@ -1146,7 +1146,7 @@ class ViJumpForward(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.SHIFT_CTRL_F12, _MODES_ACTION)])
+@keys.assign(seq=seqs.SHIFT_CTRL_F12, modes=_MODES_ACTION)
 class StGotoSymbolInProject(ViOperatorDef):
     """
     Vintageous: `<C-S-f12>`
@@ -1164,7 +1164,7 @@ class StGotoSymbolInProject(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_F12, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_F12, modes=_MODES_ACTION)
 class StGotoSymbolInFile(ViOperatorDef):
     """
     Vintageous: `<C-f12>`
@@ -1182,7 +1182,7 @@ class StGotoSymbolInFile(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.F12, _MODES_ACTION)])
+@keys.assign(seq=seqs.F12, modes=_MODES_ACTION)
 class StGotoDefinition(ViOperatorDef):
     """
     Vintageous: `f12`
@@ -1200,7 +1200,7 @@ class StGotoDefinition(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_F2, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_F2, modes=_MODES_ACTION)
 class StToggleBookmark(ViOperatorDef):
     """
     Vintageous: `<C-f2>`
@@ -1218,7 +1218,7 @@ class StToggleBookmark(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_SHIFT_F2, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_SHIFT_F2, modes=_MODES_ACTION)
 class StClearBookmarks(ViOperatorDef):
     """
     Vintageous: `<C-S-f2>`
@@ -1236,7 +1236,7 @@ class StClearBookmarks(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.F2, _MODES_ACTION)])
+@keys.assign(seq=seqs.F2, modes=_MODES_ACTION)
 class StPrevBookmark(ViOperatorDef):
     """
     Vintageous: `f2`
@@ -1254,7 +1254,7 @@ class StPrevBookmark(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.SHIFT_F2, _MODES_ACTION)])
+@keys.assign(seq=seqs.SHIFT_F2, modes=_MODES_ACTION)
 class StNextBookmark(ViOperatorDef):
     """
     Vintageous: `<S-f2>`
@@ -1272,7 +1272,7 @@ class StNextBookmark(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.DOT, _MODES_ACTION)])
+@keys.assign(seq=seqs.DOT, modes=_MODES_ACTION)
 class ViRepeat(ViOperatorDef):
     """
     Vim: `.`
@@ -1293,7 +1293,7 @@ class ViRepeat(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_R, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_R, modes=_MODES_ACTION)
 class ViOpenRegisterFromInsertMode(ViOperatorDef):
     """
     TODO: Implement this.
@@ -1312,7 +1312,7 @@ class ViOpenRegisterFromInsertMode(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_Y, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_Y, modes=_MODES_ACTION)
 class ViScrollByLinesUp(ViOperatorDef):
     """
     Vim: `<C-y>`
@@ -1330,7 +1330,7 @@ class ViScrollByLinesUp(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_U, _MODES_ACTION)])
+@keys.assign(seq=seqs.BIG_U, modes=_MODES_ACTION)
 class ViUndoLineChanges(ViOperatorDef):
     """
     TODO: Implement this.
@@ -1355,7 +1355,7 @@ class ViUndoLineChanges(ViOperatorDef):
         return {}
 
 
-@keys.assign(keys=[(seqs.CTRL_E, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_E, modes=_MODES_ACTION)
 class ViScrollByLinesDown(ViOperatorDef):
     """
     Vim: `<C-e>`
@@ -1373,7 +1373,7 @@ class ViScrollByLinesDown(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.F11, _MODES_ACTION)])
+@keys.assign(seq=seqs.F11, modes=_MODES_ACTION)
 class StToggleFullScreen(ViOperatorDef):
     """
     Vintageous: `f11`
@@ -1391,7 +1391,7 @@ class StToggleFullScreen(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.F7, _MODES_ACTION)])
+@keys.assign(seq=seqs.F7, modes=_MODES_ACTION)
 class StBuild(ViOperatorDef):
     """
     Vintageous: `f7`
@@ -1409,7 +1409,7 @@ class StBuild(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.SHIFT_F4, _MODES_ACTION)])
+@keys.assign(seq=seqs.SHIFT_F4, modes=_MODES_ACTION)
 class StFindPrev(ViOperatorDef):
     """
     Vintageous: `Ctrl+F4`
@@ -1427,7 +1427,7 @@ class StFindPrev(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.AT, _MODES_ACTION)])
+@keys.assign(seq=seqs.AT, modes=_MODES_ACTION)
 class ViOpenMacrosForRepeating(ViOperatorDef):
     """
     Vim: `@`
@@ -1461,7 +1461,7 @@ class ViOpenMacrosForRepeating(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.Q, _MODES_ACTION)])
+@keys.assign(seq=seqs.Q, modes=_MODES_ACTION)
 class ViToggleMacroRecorder(ViOperatorDef):
     """
     Vim: `q`
@@ -1493,7 +1493,7 @@ class ViToggleMacroRecorder(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.F3, _MODES_ACTION)])
+@keys.assign(seq=seqs.F3, modes=_MODES_ACTION)
 class StFindNext(ViOperatorDef):
     """
     Vintageous: `f3`
@@ -1511,7 +1511,7 @@ class StFindNext(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.F4, _MODES_ACTION)])
+@keys.assign(seq=seqs.F4, modes=_MODES_ACTION)
 class StFindNextResult(ViOperatorDef):
     """
     Vintageous: `f4`
@@ -1529,7 +1529,7 @@ class StFindNextResult(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.SHIFT_F4, _MODES_ACTION)])
+@keys.assign(seq=seqs.SHIFT_F4, modes=_MODES_ACTION)
 class StFindPrevResult(ViOperatorDef):
     """
     Vintageous: `Shift+F4`
@@ -1547,7 +1547,7 @@ class StFindPrevResult(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_Z_BIG_Z, _MODES_ACTION)])
+@keys.assign(seq=seqs.BIG_Z_BIG_Z, modes=_MODES_ACTION)
 class ViQuit(ViOperatorDef):
     """
     TODO: Is this used?
@@ -1566,7 +1566,7 @@ class ViQuit(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.G_BIG_H, _MODES_ACTION)])
+@keys.assign(seq=seqs.G_BIG_H, modes=_MODES_ACTION)
 class ViEnterSelectModeForSearch(ViOperatorDef):
     """
     Vim: `gH`
@@ -1584,7 +1584,7 @@ class ViEnterSelectModeForSearch(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.SHIFT_F4, _MODES_ACTION)])
+@keys.assign(seq=seqs.SHIFT_F4, modes=_MODES_ACTION)
 class StPrevResult(ViOperatorDef):
     """
     Vim: `Shift+F4`
@@ -1602,7 +1602,7 @@ class StPrevResult(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.GH, _MODES_ACTION)])
+@keys.assign(seq=seqs.GH, modes=_MODES_ACTION)
 class ViEnterSelectMode(ViOperatorDef):
     """
     Vim: `gh`
@@ -1620,7 +1620,7 @@ class ViEnterSelectMode(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_V, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_V, modes=_MODES_ACTION)
 class ViEnterVisualBlockMode(ViOperatorDef):
     """
     Vim: `<C-v>`
@@ -1638,7 +1638,7 @@ class ViEnterVisualBlockMode(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_P, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_P, modes=_MODES_ACTION)
 class StShowGotoAnything(ViOperatorDef):
     """
     Vintageous: `<C-p>`
@@ -1656,7 +1656,7 @@ class StShowGotoAnything(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.J, (modes.SELECT,))])
+@keys.assign(seq=seqs.J, modes=(modes.SELECT,))
 class ViAddSelection(ViOperatorDef):
     """
     Vintageous: `<C-p>`
@@ -1674,7 +1674,7 @@ class ViAddSelection(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.ALT_CTRL_P, _MODES_ACTION)])
+@keys.assign(seq=seqs.ALT_CTRL_P, modes=_MODES_ACTION)
 class StShowSwitchProject(ViOperatorDef):
     """
     Vintageous: `<C-M-p>`
@@ -1692,7 +1692,7 @@ class StShowSwitchProject(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_BIG_P, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_BIG_P, modes=_MODES_ACTION)
 class StShowCommandPalette(ViOperatorDef):
     """
     Vintageous: `<C-S-p>`
@@ -1710,7 +1710,7 @@ class StShowCommandPalette(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.I, _MODES_ACTION + (modes.SELECT,))])
+@keys.assign(seq=seqs.I, modes=_MODES_ACTION + (modes.SELECT,))
 class ViEnterInserMode(ViOperatorDef):
     """
     Vim: `i`
@@ -1729,7 +1729,7 @@ class ViEnterInserMode(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.ESC, _MODES_ACTION)])
+@keys.assign(seq=seqs.ESC, modes=_MODES_ACTION)
 class ViEnterNormalMode(ViOperatorDef):
     """
     Vim: `<esc>`
@@ -1746,7 +1746,7 @@ class ViEnterNormalMode(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.A, _MODES_ACTION)])
+@keys.assign(seq=seqs.A, modes=_MODES_ACTION)
 class ViInsertAfterChar(ViOperatorDef):
     """
     Vim: `a`
@@ -1767,7 +1767,7 @@ class ViInsertAfterChar(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_A, _MODES_ACTION + (modes.SELECT,))])
+@keys.assign(seq=seqs.BIG_A, modes=_MODES_ACTION + (modes.SELECT,))
 class ViInsertAtEol(ViOperatorDef):
     """
     Vim: `A`
@@ -1788,7 +1788,7 @@ class ViInsertAtEol(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_I, _MODES_ACTION)])
+@keys.assign(seq=seqs.BIG_I, modes=_MODES_ACTION)
 class ViInsertAtBol(ViOperatorDef):
     """
     Vim: `I`
@@ -1809,7 +1809,7 @@ class ViInsertAtBol(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.COLON, _MODES_ACTION)])
+@keys.assign(seq=seqs.COLON, modes=_MODES_ACTION)
 class ViEnterCommandLineMode(ViOperatorDef):
     """
     Vim: `:`
@@ -1826,7 +1826,7 @@ class ViEnterCommandLineMode(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.F9, _MODES_ACTION)])
+@keys.assign(seq=seqs.F9, modes=_MODES_ACTION)
 class StSortLines(ViOperatorDef):
     """
     Vintageous: `f9`
@@ -1843,7 +1843,7 @@ class StSortLines(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_G, _MODES_ACTION)])
+@keys.assign(seq=seqs.CTRL_G, modes=_MODES_ACTION)
 class ViShowFileStatus(ViOperatorDef):
     """
     Vim: `<C-g>`
@@ -1860,7 +1860,7 @@ class ViShowFileStatus(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_Z_BIG_Q, _MODES_ACTION)])
+@keys.assign(seq=seqs.BIG_Z_BIG_Q, modes=_MODES_ACTION)
 class ViExitEditor(ViOperatorDef):
     """
     Vim: `ZQ`
@@ -1877,7 +1877,7 @@ class ViExitEditor(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_Z_BIG_Z, _MODES_ACTION)])
+@keys.assign(seq=seqs.BIG_Z_BIG_Z, modes=_MODES_ACTION)
 class ViCloseFile(ViOperatorDef):
     """
     Vim: `ZZ`
@@ -1894,7 +1894,7 @@ class ViCloseFile(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.F6, _MODES_ACTION)])
+@keys.assign(seq=seqs.F6, modes=_MODES_ACTION)
 class StToggleSpelling(ViOperatorDef):
     """
     Vintageous: `f6`
@@ -1911,7 +1911,7 @@ class StToggleSpelling(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.G_BIG_D, _MODES_ACTION)])
+@keys.assign(seq=seqs.G_BIG_D, modes=_MODES_ACTION)
 class ViGotoSymbolInProject(ViOperatorDef):
     """
     Vim: `gD`
@@ -1931,7 +1931,7 @@ class ViGotoSymbolInProject(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.K, (modes.SELECT,))])
+@keys.assign(seq=seqs.K, modes=(modes.SELECT,))
 class ViDeselectInstance(ViOperatorDef):
     """
     Vim: `k`
@@ -1954,7 +1954,7 @@ class ViDeselectInstance(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.GD, _MODES_MOTION)])
+@keys.assign(seq=seqs.GD, modes=_MODES_MOTION)
 class ViGotoSymbolInFile(ViMotionDef):
     """
     Vim: `gd`
@@ -1975,8 +1975,8 @@ class ViGotoSymbolInFile(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.L, _MODES_MOTION)])
-@keys.assign(keys=[(seqs.RIGHT, _MODES_MOTION)])
+@keys.assign(seq=seqs.L, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.RIGHT, modes=_MODES_MOTION)
 class ViMoveRightByChars(ViMotionDef):
     """
     Vim: `l`
@@ -2000,7 +2000,7 @@ class ViMoveRightByChars(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.SHIFT_ENTER, _MODES_MOTION)])
+@keys.assign(seq=seqs.SHIFT_ENTER, modes=_MODES_MOTION)
 class ViShiftEnterMotion(ViMotionDef):
     """
     Vim: `<S-CR>`
@@ -2019,7 +2019,7 @@ class ViShiftEnterMotion(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.B, _MODES_MOTION)])
+@keys.assign(seq=seqs.B, modes=_MODES_MOTION)
 class ViMoveByWordsBackward(ViMotionDef):
     """
     Vim: `b`
@@ -2038,7 +2038,7 @@ class ViMoveByWordsBackward(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_B, _MODES_MOTION)])
+@keys.assign(seq=seqs.BIG_B, modes=_MODES_MOTION)
 class ViMoveByBigWordsBackward(ViMotionDef):
     """
     Vim: `B`
@@ -2057,7 +2057,7 @@ class ViMoveByBigWordsBackward(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_W, _MODES_MOTION)])
+@keys.assign(seq=seqs.BIG_W, modes=_MODES_MOTION)
 class ViMoveByBigWords(ViMotionDef):
     """
     Vim: `W`
@@ -2076,7 +2076,7 @@ class ViMoveByBigWords(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.E, _MODES_MOTION)])
+@keys.assign(seq=seqs.E, modes=_MODES_MOTION)
 class ViMoveByWordEnds(ViMotionDef):
     """
     Vim: `e`
@@ -2095,7 +2095,7 @@ class ViMoveByWordEnds(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_H, _MODES_MOTION)])
+@keys.assign(seq=seqs.BIG_H, modes=_MODES_MOTION)
 class ViGotoScreenTop(ViMotionDef):
     """
     Vim: `H`
@@ -2114,7 +2114,7 @@ class ViGotoScreenTop(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.GE, _MODES_MOTION)])
+@keys.assign(seq=seqs.GE, modes=_MODES_MOTION)
 class ViMoveByWordEndsBackward(ViMotionDef):
     """
     Vim: `ge`
@@ -2133,7 +2133,7 @@ class ViMoveByWordEndsBackward(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_L, _MODES_MOTION)])
+@keys.assign(seq=seqs.BIG_L, modes=_MODES_MOTION)
 class ViGotoScreenBottom(ViMotionDef):
     """
     Vim: `L`
@@ -2152,7 +2152,7 @@ class ViGotoScreenBottom(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_M, _MODES_MOTION)])
+@keys.assign(seq=seqs.BIG_M, modes=_MODES_MOTION)
 class ViGotoScreenMiddle(ViMotionDef):
     """
     Vim: `M`
@@ -2171,7 +2171,7 @@ class ViGotoScreenMiddle(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_D, _MODES_MOTION)])
+@keys.assign(seq=seqs.CTRL_D, modes=_MODES_MOTION)
 class ViMoveHalfScreenDown(ViMotionDef):
     """
     Vim: `<C-d>`
@@ -2190,7 +2190,7 @@ class ViMoveHalfScreenDown(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_U, _MODES_MOTION)])
+@keys.assign(seq=seqs.CTRL_U, modes=_MODES_MOTION)
 class ViMoveHalfScreenUp(ViMotionDef):
     """
     Vim: `<C-u>`
@@ -2209,8 +2209,8 @@ class ViMoveHalfScreenUp(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_F, _MODES_MOTION)])
-@keys.assign(keys=[(seqs.PAGE_UP, _MODES_MOTION)])
+@keys.assign(seq=seqs.CTRL_F, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.PAGE_UP, modes=_MODES_MOTION)
 class ViMoveScreenDown(ViMotionDef):
     """
     Vim: `<C-f>`
@@ -2229,8 +2229,8 @@ class ViMoveScreenDown(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.CTRL_B, _MODES_MOTION)])
-@keys.assign(keys=[(seqs.PAGE_DOWN, _MODES_MOTION)])
+@keys.assign(seq=seqs.CTRL_B, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.PAGE_DOWN, modes=_MODES_MOTION)
 class ViMoveScreenUp(ViMotionDef):
     """
     Vim: `<C-b>`
@@ -2249,7 +2249,7 @@ class ViMoveScreenUp(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BACKTICK, _MODES_MOTION)])
+@keys.assign(seq=seqs.BACKTICK, modes=_MODES_MOTION)
 class ViGotoExactMarkXpos(ViMotionDef):
     """
     Vim: ```
@@ -2284,8 +2284,8 @@ class ViGotoExactMarkXpos(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.DOLLAR, _MODES_MOTION)])
-@keys.assign(keys=[(seqs.END, _MODES_MOTION)])
+@keys.assign(seq=seqs.DOLLAR, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.END, modes=_MODES_MOTION)
 class ViMoveToEol(ViMotionDef):
     """
     Vim: `$`
@@ -2306,7 +2306,7 @@ class ViMoveToEol(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.ENTER, _MODES_MOTION)])
+@keys.assign(seq=seqs.ENTER, modes=_MODES_MOTION)
 class ViMotionEnter(ViMotionDef):
     """
     Vim: `<CR>`
@@ -2327,7 +2327,7 @@ class ViMotionEnter(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.G_UNDERSCORE, _MODES_MOTION)])
+@keys.assign(seq=seqs.G_UNDERSCORE, modes=_MODES_MOTION)
 class ViMoveToSoftEol(ViMotionDef):
     """
     Vim: `g_`
@@ -2346,7 +2346,7 @@ class ViMoveToSoftEol(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.GJ, _MODES_MOTION)])
+@keys.assign(seq=seqs.GJ, modes=_MODES_MOTION)
 class ViMoveByScreenLineDown(ViMotionDef):
     """
     Vim: `gj`
@@ -2367,7 +2367,7 @@ class ViMoveByScreenLineDown(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.GK, _MODES_MOTION)])
+@keys.assign(seq=seqs.GK, modes=_MODES_MOTION)
 class ViMoveByScreenLineUp(ViMotionDef):
     """
     Vim: `gk`
@@ -2388,7 +2388,7 @@ class ViMoveByScreenLineUp(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.LEFT_BRACE, _MODES_MOTION)])
+@keys.assign(seq=seqs.LEFT_BRACE, modes=_MODES_MOTION)
 class ViMoveByBlockUp(ViMotionDef):
     """
     Vim: `{`
@@ -2409,7 +2409,7 @@ class ViMoveByBlockUp(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.SEMICOLON, _MODES_MOTION)])
+@keys.assign(seq=seqs.SEMICOLON, modes=_MODES_MOTION)
 class ViRepeatCharSearchForward(ViMotionDef):
     """
     Vim: `;`
@@ -2438,7 +2438,7 @@ class ViRepeatCharSearchForward(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.QUOTE, _MODES_MOTION)])
+@keys.assign(seq=seqs.QUOTE, modes=_MODES_MOTION)
 class ViGotoMark(ViMotionDef):
     """
     Vim: `'`
@@ -2481,7 +2481,7 @@ class ViGotoMark(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.RIGHT_BRACE, _MODES_MOTION)])
+@keys.assign(seq=seqs.RIGHT_BRACE, modes=_MODES_MOTION)
 class ViMoveByBlockDown(ViMotionDef):
     """
     Vim: `}`
@@ -2502,7 +2502,7 @@ class ViMoveByBlockDown(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.LEFT_PAREN, _MODES_MOTION)])
+@keys.assign(seq=seqs.LEFT_PAREN, modes=_MODES_MOTION)
 class ViMoveBySentenceUp(ViMotionDef):
     """
     Vim: `(`
@@ -2523,7 +2523,7 @@ class ViMoveBySentenceUp(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.RIGHT_PAREN, _MODES_MOTION)])
+@keys.assign(seq=seqs.RIGHT_PAREN, modes=_MODES_MOTION)
 class ViMoveBySentenceDown(ViMotionDef):
     """
     Vim: `)`
@@ -2544,7 +2544,7 @@ class ViMoveBySentenceDown(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.LEFT_SQUARE_BRACKET, _MODES_MOTION)])
+@keys.assign(seq=seqs.LEFT_SQUARE_BRACKET, modes=_MODES_MOTION)
 class ViMoveBySquareBracketUp(ViMotionDef):
     """
     Vim: `[`
@@ -2565,7 +2565,7 @@ class ViMoveBySquareBracketUp(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.PERCENT, _MODES_MOTION)])
+@keys.assign(seq=seqs.PERCENT, modes=_MODES_MOTION)
 class ViGotoLinesPercent(ViMotionDef):
     """
     Vim: `%`
@@ -2589,7 +2589,7 @@ class ViGotoLinesPercent(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.COMMA, _MODES_MOTION)])
+@keys.assign(seq=seqs.COMMA, modes=_MODES_MOTION)
 class ViRepeatCharSearchBackward(ViMotionDef):
     """
     Vim: `,`
@@ -2616,7 +2616,7 @@ class ViRepeatCharSearchBackward(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.PIPE, _MODES_MOTION)])
+@keys.assign(seq=seqs.PIPE, modes=_MODES_MOTION)
 class ViMoveByLineCols(ViMotionDef):
     """
     Vim: `|`
@@ -2635,7 +2635,7 @@ class ViMoveByLineCols(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_E, _MODES_MOTION)])
+@keys.assign(seq=seqs.BIG_E, modes=_MODES_MOTION)
 class ViMoveByBigWordEnds(ViMotionDef):
     """
     Vim: `E`
@@ -2654,8 +2654,8 @@ class ViMoveByBigWordEnds(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.H, _MODES_MOTION)])
-@keys.assign(keys=[(seqs.LEFT, _MODES_MOTION)])
+@keys.assign(seq=seqs.H, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.LEFT, modes=_MODES_MOTION)
 class ViMoveLeftByChars(ViMotionDef):
     """
     Vim: `h`
@@ -2679,7 +2679,7 @@ class ViMoveLeftByChars(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.W, _MODES_MOTION)])
+@keys.assign(seq=seqs.W, modes=_MODES_MOTION)
 class ViMoveByWords(ViMotionDef):
     """
     Vim: `w`
@@ -2698,8 +2698,8 @@ class ViMoveByWords(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.J, _MODES_MOTION)])
-@keys.assign(keys=[(seqs.DOWN, _MODES_MOTION)])
+@keys.assign(seq=seqs.J, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.DOWN, modes=_MODES_MOTION)
 class ViMoveDownByLines(ViMotionDef):
     """
     Vim: `j`
@@ -2716,8 +2716,8 @@ class ViMoveDownByLines(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.K, _MODES_MOTION)])
-@keys.assign(keys=[(seqs.UP, _MODES_MOTION)])
+@keys.assign(seq=seqs.K, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.UP, modes=_MODES_MOTION)
 class ViMoveUpByLines(ViMotionDef):
     """
     Vim: `k`
@@ -2736,8 +2736,8 @@ class ViMoveUpByLines(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.HAT, _MODES_MOTION)])
-@keys.assign(keys=[(seqs.HOME, _MODES_MOTION)])
+@keys.assign(seq=seqs.HAT, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.HOME, modes=_MODES_MOTION)
 class ViMoveToBol(ViMotionDef):
     """
     Vim: `^`
@@ -2756,7 +2756,7 @@ class ViMoveToBol(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.UNDERSCORE, _MODES_MOTION)])
+@keys.assign(seq=seqs.UNDERSCORE, modes=_MODES_MOTION)
 class ViMoveToBol(ViMotionDef):
     """
     Vim: `^`
@@ -2775,7 +2775,7 @@ class ViMoveToBol(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.ZERO, _MODES_MOTION)])
+@keys.assign(seq=seqs.ZERO, modes=_MODES_MOTION)
 class ViMoveToHardBol(ViMotionDef):
     """
     Vim: `0`
@@ -2794,7 +2794,7 @@ class ViMoveToHardBol(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.N, _MODES_MOTION)])
+@keys.assign(seq=seqs.N, modes=_MODES_MOTION)
 class ViRepeatSearchForward(ViMotionDef):
     """
     Vim: `;`
@@ -2815,7 +2815,7 @@ class ViRepeatSearchForward(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_N, _MODES_MOTION)])
+@keys.assign(seq=seqs.BIG_N, modes=_MODES_MOTION)
 class ViRepeatSearchBackward(ViMotionDef):
     """
     Vim: `,`
@@ -2836,7 +2836,7 @@ class ViRepeatSearchBackward(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.STAR, _MODES_MOTION)])
+@keys.assign(seq=seqs.STAR, modes=_MODES_MOTION)
 class ViFindWord(ViMotionDef):
     """
     Vim: `*`
@@ -2855,7 +2855,7 @@ class ViFindWord(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.OCTOTHORP, _MODES_MOTION)])
+@keys.assign(seq=seqs.OCTOTHORP, modes=_MODES_MOTION)
 class ViReverseFindWord(ViMotionDef):
     """
     Vim: `#`
@@ -2877,12 +2877,12 @@ class ViReverseFindWord(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_Z, _MODES_MOTION)])
-@keys.assign(keys=[(seqs.CTRL_K, _MODES_MOTION)])
-@keys.assign(keys=[(seqs.CTRL_W, _MODES_MOTION)])
-@keys.assign(keys=[(seqs.G, _MODES_MOTION)])
-@keys.assign(keys=[(seqs.Z, _MODES_MOTION)])
-# TODO: This should not be a motion.
+@keys.assign(seq=seqs.BIG_Z, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.CTRL_K, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.CTRL_W, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.G, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.Z, modes=_MODES_MOTION)
+# FIXME: This should not be a motion.
 class ViOpenNameSpace(ViMotionDef):
     """
     Vim: `g`, `z`, ...
@@ -2895,7 +2895,7 @@ class ViOpenNameSpace(ViMotionDef):
         return {}
 
 
-@keys.assign(keys=[(seqs.DOUBLE_QUOTE, _MODES_MOTION)])
+@keys.assign(seq=seqs.DOUBLE_QUOTE, modes=_MODES_MOTION)
 class ViOpenRegister(ViMotionDef):
     """
     Vim: `"`
@@ -2908,7 +2908,7 @@ class ViOpenRegister(ViMotionDef):
         return {}
 
 
-@keys.assign(keys=[(seqs.GG, _MODES_MOTION)])
+@keys.assign(seq=seqs.GG, modes=_MODES_MOTION)
 class ViGotoBof(ViMotionDef):
     """
     Vim: `gg`
@@ -2932,7 +2932,7 @@ class ViGotoBof(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_G, _MODES_MOTION)])
+@keys.assign(seq=seqs.BIG_G, modes=_MODES_MOTION)
 class ViGotoEof(ViMotionDef):
     """
     Vim: `G`
@@ -2955,7 +2955,7 @@ class ViGotoEof(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.R, _MODES_ACTION)])
+@keys.assign(seq=seqs.R, modes=_MODES_ACTION)
 class ViReplaceCharacters(ViOperatorDef):
     """
     Vim: `r`
@@ -2993,7 +2993,7 @@ class ViReplaceCharacters(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.M, _MODES_ACTION)])
+@keys.assign(seq=seqs.M, modes=_MODES_ACTION)
 class ViSetMark(ViOperatorDef):
     """
     Vim: `m`
@@ -3027,8 +3027,8 @@ class ViSetMark(ViOperatorDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.T, _MODES_MOTION)])
-@keys.assign(keys=[(seqs.F, _MODES_MOTION)], inclusive=True)
+@keys.assign(seq=seqs.T, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.F, modes=_MODES_MOTION, inclusive=True)
 class ViSearchCharForward(ViMotionDef):
     """
     Vim: `f`, `t`
@@ -3069,8 +3069,9 @@ class ViSearchCharForward(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.A, [modes.OPERATOR_PENDING, modes.VISUAL,
-                               modes.VISUAL_BLOCK])])
+@keys.assign(seq=seqs.A, modes=[modes.OPERATOR_PENDING,
+                                modes.VISUAL,
+                                modes.VISUAL_BLOCK])
 class ViATextObject(ViMotionDef):
     """
     Vim: `a`
@@ -3109,8 +3110,9 @@ class ViATextObject(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.I, [modes.OPERATOR_PENDING, modes.VISUAL,
-                               modes.VISUAL_BLOCK])])
+@keys.assign(seq=seqs.I, modes=[modes.OPERATOR_PENDING,
+                                modes.VISUAL,
+                                modes.VISUAL_BLOCK])
 class ViITextObject(ViMotionDef):
     """
     Vim: `i`
@@ -3148,8 +3150,8 @@ class ViITextObject(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.BIG_T, _MODES_MOTION)])
-@keys.assign(keys=[(seqs.BIG_F, _MODES_MOTION)], inclusive=True)
+@keys.assign(seq=seqs.BIG_T, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.BIG_F, modes=_MODES_MOTION, inclusive=True)
 class ViSearchCharBackward(ViMotionDef):
     """
     Vim: `T`, `F`
@@ -3191,7 +3193,7 @@ class ViSearchCharBackward(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.SLASH, _MODES_MOTION)])
+@keys.assign(seq=seqs.SLASH, modes=_MODES_MOTION)
 class ViSearchForward(ViMotionDef):
     """
     Vim: `/`
@@ -3251,7 +3253,7 @@ class ViSearchForwardImpl(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.QUESTION_MARK, _MODES_MOTION)])
+@keys.assign(seq=seqs.QUESTION_MARK, modes=_MODES_MOTION)
 class ViSearchBackward(ViMotionDef):
     """
     Vim: `?`

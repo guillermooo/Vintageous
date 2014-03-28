@@ -470,7 +470,7 @@ def to_bare_command_name(seq):
     return ''.join(k for k in new_seq if not k.isdigit())
 
 
-def assign(keys, *args, **kwargs):
+def assign(seq, modes, *args, **kwargs):
     """
     Registers a 'key sequence' to 'command' mapping with Vintageous.
 
@@ -484,8 +484,7 @@ def assign(keys, *args, **kwargs):
       class to.
     """
     def inner(cls):
-        for (seq, modes) in keys:
-            for mode in modes:
-                mappings[mode][seq] = cls(*args, **kwargs)
+        for mode in modes:
+            mappings[mode][seq] = cls(*args, **kwargs)
         return cls
     return inner
