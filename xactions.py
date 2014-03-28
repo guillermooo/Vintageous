@@ -353,6 +353,10 @@ class _enter_visual_mode(ViTextCommandBase):
             self.view.run_command('_enter_normal_mode', {'mode': mode})
             return
         self.view.run_command('_enter_visual_mode_impl', {'mode': mode})
+
+        if any(s.empty() for s in self.view.sel()):
+            return
+
         state.enter_visual_mode()
         state.display_status()
 
@@ -367,6 +371,9 @@ class _enter_visual_mode_impl(sublime_plugin.TextCommand):
             if mode == modes.VISUAL_LINE:
                 return sublime.Region(s.a, s.b)
             else:
+                if s.empty() and (s.b == self.view.size()):
+                    utils.blink()
+                    return s
                 return sublime.Region(s.b, s.b + 1)
 
         regions_transformer(self.view, f)
