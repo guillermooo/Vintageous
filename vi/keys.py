@@ -196,6 +196,8 @@ class seqs:
     O =                            'o'
     P =                            'p'
     OCTOTHORP =                    '#'
+    PAGE_DOWN =                    'pagedown'
+    PAGE_UP =                      'pageup'
     PERCENT =                      '%'
     PIPE =                         '|'
     QUESTION_MARK =                '?'

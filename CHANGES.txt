@@ -1,3 +1,10 @@
+3.5.1 - 27/03/14
+
+	- Disable visual mode at EOF in normal mode.
+	- Improve r operator.
+	- Improve } motion.
+	- Enable 'pageup' and 'pagedown' keys.
+
 3.5.0 - 27/03/14
 
 	- Refactoring of core functionality.

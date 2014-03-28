@@ -5,6 +5,7 @@ syntax: glob
 *~
 *.TMP
 *.swp
+*.swo
 
 dist/
 

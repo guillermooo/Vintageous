@@ -2210,6 +2210,7 @@ class ViMoveHalfScreenUp(ViMotionDef):
 
 
 @keys.assign(keys=[(seqs.CTRL_F, _MODES_MOTION)])
+@keys.assign(keys=[(seqs.PAGE_UP, _MODES_MOTION)])
 class ViMoveScreenDown(ViMotionDef):
     """
     Vim: `<C-f>`
@@ -2229,6 +2230,7 @@ class ViMoveScreenDown(ViMotionDef):
 
 
 @keys.assign(keys=[(seqs.CTRL_B, _MODES_MOTION)])
+@keys.assign(keys=[(seqs.PAGE_DOWN, _MODES_MOTION)])
 class ViMoveScreenUp(ViMotionDef):
     """
     Vim: `<C-b>`
@@ -2875,11 +2877,11 @@ class ViReverseFindWord(ViMotionDef):
         return cmd
 
 
-@keys.assign(keys=[(seqs.G, _MODES_MOTION)])
-@keys.assign(keys=[(seqs.Z, _MODES_MOTION)])
+@keys.assign(keys=[(seqs.BIG_Z, _MODES_MOTION)])
 @keys.assign(keys=[(seqs.CTRL_K, _MODES_MOTION)])
 @keys.assign(keys=[(seqs.CTRL_W, _MODES_MOTION)])
-@keys.assign(keys=[(seqs.BIG_Z, _MODES_MOTION)])
+@keys.assign(keys=[(seqs.G, _MODES_MOTION)])
+@keys.assign(keys=[(seqs.Z, _MODES_MOTION)])
 # TODO: This should not be a motion.
 class ViOpenNameSpace(ViMotionDef):
     """
