@@ -1365,13 +1365,17 @@ class _vi_r(ViTextCommandBase):
                 else:
                     return sublime.Region(s.b)
 
-            if mode == modes.VISUAL:
+            if mode in (modes.VISUAL, modes.VISUAL_LINE, modes.VISUAL_BLOCK):
+                ends_in_newline = (view.substr(s.end() - 1) == '\n')
                 fragments = view.split_by_newlines(s)
 
                 new_framents = []
                 for fr in fragments:
                     new_framents.append(char * len(fr))
                 text = '\n'.join(new_framents)
+
+                if ends_in_newline:
+                    text += '\n'
 
                 view.replace(edit, s, text)
 
