@@ -898,7 +898,10 @@ class _vi_right_brace(ViMotionCommand):
                 return sublime.Region(s.a, par_as_region.b + 1)
 
             elif mode == modes.INTERNAL_NORMAL:
-                return sublime.Region(s.a, par_as_region.b - 1)
+                if view.substr(s.begin()) == '\n':
+                    return sublime.Region(s.a, par_as_region.b)
+                else:
+                    return sublime.Region(s.a, par_as_region.b - 1)
 
             elif mode == modes.VISUAL_LINE:
                 if s.a <= s.b:
