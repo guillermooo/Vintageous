@@ -1934,7 +1934,7 @@ class ViGotoSymbolInProject(ViOperatorDef):
 @keys.assign(seq=seqs.K, modes=(modes.SELECT,))
 class ViDeselectInstance(ViOperatorDef):
     """
-    Vim: `k`
+    Vintageous: `k` (select mode)
     """
 
     def __init__(self, *args, **kwargs):
@@ -1950,7 +1950,30 @@ class ViDeselectInstance(ViOperatorDef):
 
         cmd = {}
         cmd['action'] = 'soft_undo'
-        cmd['action_args'] = {} # {'mode': state.mode, 'count': state.count}
+        cmd['action_args'] = {}
+        return cmd
+
+
+@keys.assign(seq=seqs.L, modes=(modes.SELECT,))
+class ViSkipInstance(ViOperatorDef):
+    """
+    Vintageous: `l` (select mode)
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.scroll_into_view = True
+
+    def translate(self, state):
+        """
+        Non-standard.
+        """
+        if state.mode != modes.SELECT:
+            raise ValueError('bad mode, expected mode_select, got {0}'.format(state.mode))
+
+        cmd = {}
+        cmd['action'] = 'find_under_expand_skip'
+        cmd['action_args'] = {}
         return cmd
 
 
