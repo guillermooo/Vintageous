@@ -663,7 +663,7 @@ class ViJoinLines(ViOperatorDef):
 
 
 @keys.assign(seq=seqs.CTRL_X, modes=_MODES_ACTION)
-class ViSubtractFromNumber(ViOperatorDef):
+class ViDecrement(ViOperatorDef):
     """
     Vim: `C-x`
     """
@@ -685,7 +685,7 @@ class ViSubtractFromNumber(ViOperatorDef):
 
 
 @keys.assign(seq=seqs.CTRL_A, modes=_MODES_ACTION)
-class ViAddToNumber(ViOperatorDef):
+class ViIncrement(ViOperatorDef):
     """
     Vim: `C-a`
     """
@@ -2978,8 +2978,9 @@ class ViReplaceCharacters(ViOperatorDef):
         return self.inp == ''
 
     def accept(self, key):
-        assert len(key) == 1, '`r` only accepts a single char'
-        self._inp = utils.translate_char(key)
+        translated = utils.translate_char(key)
+        assert len(translated) == 1, '`r` only accepts a single char'
+        self._inp = translated
         return True
 
     def translate(self, state):
