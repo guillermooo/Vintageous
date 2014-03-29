@@ -2012,12 +2012,6 @@ class ViMoveRightByChars(ViMotionDef):
 
     def translate(self, state):
         cmd = {}
-
-        if state.mode == modes.SELECT:
-            cmd['motion'] = 'find_under_expand_skip'
-            cmd['motion_args'] = {}
-            return cmd
-
         cmd['motion'] = '_vi_l'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
