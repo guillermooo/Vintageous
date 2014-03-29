@@ -1,3 +1,9 @@
+3.5.2 - 29/03/14
+
+	- Enable repeating of operations done in visual line mode.
+	- Fix bug in initialization code when mode is unknown.
+	- Fix recognition of internal characters in 'r'.
+
 3.5.1 - 27/03/14
 
 	- Disable visual mode at EOF in normal mode.
