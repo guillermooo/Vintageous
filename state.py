@@ -718,17 +718,41 @@ class State(object):
         """
         Returns the data needed to repeat a visual mode command in normal mode.
         """
-        if self.mode != modes.VISUAL:
+        if self.mode not in (modes.VISUAL, modes.VISUAL_LINE):
             return
 
-        s0 = self.view.sel()[0]
-        lines = self.view.rowcol(s0.end())[0] - self.view.rowcol(s0.begin())[0]
+        first_sel = self.view.sel()[0]
+        lines = (utils.row_at(self.view, first_sel.end()) -
+                 utils.row_at(self.view, first_sel.begin()))
         if lines > 0:
-            chars = self.view.rowcol(s0.end())[1]
+            chars = self.view.rowcol(first_sel.end())[1]
         else:
-            chars = s0.size()
+            chars = first_sel.size()
 
-        return (lines, chars)
+        return (lines, chars, self.mode)
+
+    def restore_visual_data(self, data, old_mode):
+        row_count, chars, old_mode = data
+        first_sel = self.view.sel()[0]
+        if old_mode == modes.VISUAL:
+            if (data[0] > 0):
+                end = self.view.text_point(
+                                self.view.rowcol(first_sel.b)[0] + data[0],
+                                data[1])
+            else:
+                end = first_sel.b + data[1]
+            self.view.sel().add(sublime.Region(first_sel.b, end))
+            self.mode = modes.VISUAL
+
+        elif old_mode == modes.VISUAL_LINE:
+            row_count, _, old_mode = data
+            begin = self.view.line(first_sel.b).a
+            end = self.view.text_point(utils.row_at(self.view, begin) + row_count - 1, 0)
+            end = self.view.full_line(end).b
+            self.view.sel().add(sublime.Region(begin, end))
+            self.mode = modes.VISUAL_LINE
+        else:
+            pass
 
     def runnable(self):
         """

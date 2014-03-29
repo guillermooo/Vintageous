@@ -797,15 +797,7 @@ class _vi_dot(ViWindowCommandBase):
         _logger().info('[_vi_dot] type: {0} seq or cmd: {1} old mode: {2}'.format(type_, seq_or_cmd, old_mode))
 
         if visual_data and (mode != modes.VISUAL):
-            s0 = state.view.sel()[0]
-            if (visual_data[0] > 0):
-                end = state.view.text_point(
-                                state.view.rowcol(s0.b)[0] + visual_data[0],
-                                visual_data[1])
-            else:
-                end = s0.b + visual_data[1]
-            state.view.sel().add(sublime.Region(s0.b, end))
-            state.mode = modes.VISUAL
+            state.restore_visual_data(visual_data, old_mode)
         elif not visual_data and (mode == modes.VISUAL):
             # Can't repeat normal mode commands in visual mode.
             utils.blink()

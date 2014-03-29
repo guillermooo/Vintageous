@@ -1,6 +1,8 @@
 INBOX
 =====
 
+fix l in SELECT mode
+
 enter normal mode caret positioning
 
 op pending commands -> trim
