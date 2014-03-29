@@ -1269,28 +1269,32 @@ class _vi_octothorp(ViMotionCommand, ExactWordBufferSearchBase):
 
 
 class _vi_big_b(ViMotionCommand):
+    # TODO: Reimplement this.
     def run(self, count=1, mode=None):
-        if mode == modes.INTERNAL_NORMAL:
-            self.view.run_command('move', {'by': 'stops',
-                                           'word_begin': True,
-                                           'empty_line': True,
-                                           'separators': '',
-                                           'forward': False, 'extend': True})
-        elif mode == modes.VISUAL:
-            self.view.run_command('move', {'by': 'stops',
-                                           'word_begin': True,
-                                           'empty_line': True,
-                                           'separators': '',
-                                           'forward': False, 'extend': True})
-        elif mode == modes.VISUAL_BLOCK:
-            pass
-        else:
-            self.view.run_command('move', {'by': 'stops',
-                                           'word_begin': True,
-                                           'empty_line': True,
-                                           'separators': '',
-                                           'forward': False})
+        def move():
+            if mode == modes.INTERNAL_NORMAL:
+                self.view.run_command('move', {'by': 'stops',
+                                               'word_begin': True,
+                                               'empty_line': True,
+                                               'separators': '',
+                                               'forward': False, 'extend': True})
+            elif mode == modes.VISUAL:
+                self.view.run_command('move', {'by': 'stops',
+                                               'word_begin': True,
+                                               'empty_line': True,
+                                               'separators': '',
+                                               'forward': False, 'extend': True})
+            elif mode == modes.VISUAL_BLOCK:
+                pass
+            else:
+                self.view.run_command('move', {'by': 'stops',
+                                               'word_begin': True,
+                                               'empty_line': True,
+                                               'separators': '',
+                                               'forward': False})
 
+        for i in range(count):
+            move()
 
 
 class _vi_underscore(ViMotionCommand):
@@ -1747,31 +1751,32 @@ class _vi_big_e(ViMotionCommand):
 
     def run(self, mode=None, count=1):
 
-        if mode == modes.NORMAL:
-            self.view.run_command('move', {'by': 'stops', 'word_end': True, 'empty_line': True, 'separators': '', 'forward': True})
-        elif mode == modes.INTERNAL_NORMAL:
-            self.view.run_command('move', {'by': 'stops', 'word_end': True, 'empty_line': True, 'separators': '', 'forward': True, 'extend': True})
-        elif mode == modes.VISUAL:
-            self.view.run_command('move', {'by': 'stops', 'word_end': True, 'empty_line': True, 'separators': '', 'forward': True, 'extend': True})
-        elif mode == modes.VISUAL_BLOCK:
-            return
+        def move():
+            if mode == modes.NORMAL:
+                self.view.run_command('move', {'by': 'stops',
+                                               'word_end': True,
+                                               'empty_line': True,
+                                               'separators': '',
+                                               'forward': True})
+            elif mode == modes.INTERNAL_NORMAL:
+                self.view.run_command('move', {'by': 'stops',
+                                      'word_end': True,
+                                      'empty_line': True,
+                                      'separators': '',
+                                      'forward': True,
+                                      'extend': True})
+            elif mode == modes.VISUAL:
+                self.view.run_command('move', {'by': 'stops',
+                                      'word_end': True,
+                                      'empty_line': True,
+                                      'separators': '',
+                                      'forward': True,
+                                      'extend': True})
+            elif mode == modes.VISUAL_BLOCK:
+                return
 
-
-class _vi_big_b(ViMotionCommand):
-    def run(self, count=1, mode=None):
-
-
-        if mode == modes.NORMAL:
-            self.view.run_command('move', {'by': 'stops', 'word_begin': True, 'empty_line': True, 'separators': '', 'forward': False})
-
-        elif mode == modes.INTERNAL_NORMAL:
-            self.view.run_command('move', {'by': 'stops', 'word_begin': True, 'empty_line': True, 'separators': '', 'forward': False, 'extend': True})
-
-        elif mode == modes.VISUAL:
-            self.view.run_command('move', {'by': 'stops', 'word_begin': True, 'empty_line': True, 'separators': '', 'forward': False, 'extend': True})
-
-        elif mode == modes.VISUAL_BLOCK:
-            return
+        for i in range(count):
+            move()
 
 
 class _vi_ctrl_f(ViMotionCommand):
