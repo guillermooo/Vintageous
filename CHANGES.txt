@@ -1,3 +1,8 @@
+3.5.3 - 29/03/14
+
+	- Re-enable 'l' in select mode.
+	- W, B and E not support counts.
+
 3.5.2 - 29/03/14
 
 	- Enable repeating of operations done in visual line mode.
