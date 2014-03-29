@@ -82,7 +82,8 @@ def _init_vintageous(view, new_session=False):
     # init code. I believe this is due to Sublime Text (intentionally) not
     # serializing the inverted caret state and the command_mode setting when
     # first loading a file.
-    if not reset and (state.mode != modes.NORMAL):
+    # If the mode is unknown, it might be a new file. Let normal mode setup continue.
+    if not reset and (state.mode not in (modes.NORMAL, modes.UNKNOWN)):
         return
 
     # If we have no selections, add one.
