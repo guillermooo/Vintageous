@@ -732,7 +732,7 @@ class State(object):
 
         return (lines, chars, self.mode)
 
-    def restore_visual_data(self, data, old_mode):
+    def restore_visual_data(self, data):
         row_count, chars, old_mode = data
         first_sel = self.view.sel()[0]
         if old_mode == modes.VISUAL:

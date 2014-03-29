@@ -797,7 +797,7 @@ class _vi_dot(ViWindowCommandBase):
         _logger().info('[_vi_dot] type: {0} seq or cmd: {1} old mode: {2}'.format(type_, seq_or_cmd, old_mode))
 
         if visual_data and (mode != modes.VISUAL):
-            state.restore_visual_data(visual_data, old_mode)
+            state.restore_visual_data(visual_data)
         elif not visual_data and (mode == modes.VISUAL):
             # Can't repeat normal mode commands in visual mode.
             utils.blink()
