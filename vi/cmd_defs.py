@@ -2674,6 +2674,7 @@ class ViMoveByBigWordEnds(ViMotionDef):
 
 @keys.assign(seq=seqs.H, modes=_MODES_MOTION)
 @keys.assign(seq=seqs.LEFT, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.BACKSPACE, modes=_MODES_MOTION)
 class ViMoveLeftByChars(ViMotionDef):
     """
     Vim: `h`

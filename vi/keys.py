@@ -38,6 +38,7 @@ class seqs:
     AMPERSAND =                    '&'
     AW =                           'aw'
     B =                            'b'
+    BACKSPACE =                    '<bs>'
     GE =                           'ge'
     UP =                           '<up>'
     DOWN =                         '<down>'
