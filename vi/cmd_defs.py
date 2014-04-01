@@ -516,6 +516,7 @@ class ViUnindentLine(ViOperatorDef):
 
 
 @keys.assign(seq=seqs.YY, modes=_MODES_ACTION)
+@keys.assign(seq=seqs.BIG_Y, modes=_MODES_ACTION)
 class ViYankLine(ViOperatorDef):
     """
     Vim: `yy`
