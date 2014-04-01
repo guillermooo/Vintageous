@@ -1,5 +1,3 @@
-import unittest
-
 # from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
 from Vintageous.vi.constants import MODE_NORMAL
 # from Vintageous.vi.constants import MODE_VISUAL
