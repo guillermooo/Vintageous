@@ -1,3 +1,10 @@
+3.5.4 - 02/04/14
+
+	- Fix 'cc' on empty line.
+	- Modify test framework.
+	- Re-enable 'gj', 'gk' motions.
+	- Re-enable 'Y' operator.
+
 3.5.3 - 29/03/14
 
 	- Re-enable 'l' in select mode.
