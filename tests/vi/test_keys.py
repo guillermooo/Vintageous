@@ -8,7 +8,8 @@ from Vintageous.vi.utils import translate_char
 from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import make_region
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
+from Vintageous.tests import ViewTest
 from Vintageous.vi.keys import to_bare_command_name
 from Vintageous.vi.keys import KeySequenceTokenizer
 
@@ -37,7 +38,7 @@ _tests_tokenizer = (
 )
 
 
-class Test_KeySequenceTokenizer_tokenize_one(BufferTest):
+class Test_KeySequenceTokenizer_tokenize_one(ViewTest):
     def parse(self, input_):
         tokenizer = KeySequenceTokenizer(input_)
         return tokenizer.tokenize_one()
@@ -61,7 +62,7 @@ _tests_iter_tokenize = (
 )
 
 
-class Test_KeySequenceTokenizer_iter_tokenize(BufferTest):
+class Test_KeySequenceTokenizer_iter_tokenize(ViewTest):
     def parse(self, input_):
         tokenizer = KeySequenceTokenizer(input_)
         return list(tokenizer.iter_tokenize())
@@ -88,7 +89,7 @@ _command_name_tests = (
 )
 
 
-class Test_to_bare_command_name(BufferTest):
+class Test_to_bare_command_name(ViewTest):
     def transform(self, input_):
         return to_bare_command_name(input_)
 
@@ -108,7 +109,7 @@ _tranlation_tests = (
 )
 
 
-class Test_translate_char(BufferTest):
+class Test_translate_char(ViewTest):
     def testAll(self):
         for (i, t) in enumerate(_tranlation_tests):
             input_, expected, msg = t

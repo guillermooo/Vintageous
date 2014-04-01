@@ -9,10 +9,10 @@ from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 
 
-class Test_vi_cc_InModeInternalNormal(BufferTest):
+class Test_vi_cc_InModeInternalNormal(ViewTest):
     def testSelectsWholeLine(self):
         set_text(self.view, ''.join(('foo bar\nfoo bar\nfoo bar\n',)))
         add_sel(self.view, self.R((1, 2), (1, 2)))

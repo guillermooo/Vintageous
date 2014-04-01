@@ -12,10 +12,10 @@ from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 
 
-class Test_vi_enter_normal_mode__SingleSelection__LeftRoRight(BufferTest):
+class Test_vi_enter_normal_mode__SingleSelection__LeftRoRight(ViewTest):
     def testCaretEndsInExpectedRegion(self):
         set_text(self.view, ''.join(('foo bar\nfoo bar\nfoo bar\n',)))
         add_sel(self.view, self.R((1, 0), (1, 3)))
@@ -26,7 +26,7 @@ class Test_vi_enter_normal_mode__SingleSelection__LeftRoRight(BufferTest):
         self.assertEqual(self.R((1, 2), (1, 2)), first_sel(self.view))
 
 
-class Test_vi_enter_normal_mode__SingleSelection__RightToLeft(BufferTest):
+class Test_vi_enter_normal_mode__SingleSelection__RightToLeft(ViewTest):
 
     def testCaretEndsInExpectedRegion(self):
         set_text(self.view, ''.join(('foo bar\nfoo bar\nfoo bar\n',)))
@@ -38,7 +38,7 @@ class Test_vi_enter_normal_mode__SingleSelection__RightToLeft(BufferTest):
         self.assertEqual(self.R((1, 0), (1, 0)), first_sel(self.view))
 
 
-class Test_vi_r__SingleSelection__RightToLeft(BufferTest):
+class Test_vi_r__SingleSelection__RightToLeft(ViewTest):
     @unittest.skip("must fix this")
     def testCaretEndsInExpectedRegion(self):
         set_text(self.view, ''.join(('foo bar\nfoo bar\nfoo bar\n',)))

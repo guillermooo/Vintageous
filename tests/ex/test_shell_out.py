@@ -3,12 +3,12 @@ import unittest
 from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 
 import Vintageous.ex.plat as plat
 from Vintageous.ex.ex_command_parser import parse_command
 
-class Test_ex_shell_out_no_input(BufferTest):
+class Test_ex_shell_out_no_input(ViewTest):
     def testCommandOutput(self):
         test_string = 'Testing!'
         test_command_line = ':!echo "' + test_string + '"'
@@ -23,7 +23,7 @@ class Test_ex_shell_out_no_input(BufferTest):
         self.assertEqual(expected, actual)
 
 
-class Test_ex_shell_out_filter_through_shell(BufferTest):
+class Test_ex_shell_out_filter_through_shell(ViewTest):
     @staticmethod
     def getWordCountCommand():
         if plat.HOST_PLATFORM == plat.WINDOWS:

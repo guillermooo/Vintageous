@@ -9,12 +9,12 @@ from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 
 
 # The heavy lifting is done by units.* functions, but we refine some cases in the actual motion
 # command, so we need to test for that too here.
-class Test_vi_e_InNormalMode(BufferTest):
+class Test_vi_e_InNormalMode(ViewTest):
     def testMoveToEndOfWord_OnLastLine(self):
         set_text(self.view, 'abc\nabc\nabc')
         add_sel(self.view, self.R((2, 0), (2, 0)))

@@ -9,14 +9,14 @@ from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 
 from Vintageous.vi.text_objects import find_prev_lone_bracket
 from Vintageous.vi.text_objects import find_next_lone_bracket
 from Vintageous.vi.search import reverse_search_by_pt
 
 
-class Test_find_prev_lone_bracket_SingleLine_Flat(BufferTest):
+class Test_find_prev_lone_bracket_SingleLine_Flat(ViewTest):
     def testReturnsNoneIfNoPreviousLoneBracket(self):
         set_text(self.view, 'abc')
 
@@ -57,7 +57,7 @@ class Test_find_prev_lone_bracket_SingleLine_Flat(BufferTest):
         self.assertEqual(region, self.R(1, 2))
 
 
-class Test_find_prev_lone_bracket_SingleLine_Nested(BufferTest):
+class Test_find_prev_lone_bracket_SingleLine_Nested(ViewTest):
     def testFindsOuterFromRhs(self):
         set_text(self.view, 'foo {bar {foo} bar}')
 
@@ -89,7 +89,7 @@ class Test_find_prev_lone_bracket_SingleLine_Nested(BufferTest):
         self.assertEqual(region, self.R(9, 10))
 
 
-class Test_find_prev_lone_bracket_MultipleLines_Flat(BufferTest):
+class Test_find_prev_lone_bracket_MultipleLines_Flat(ViewTest):
     def testReturnsNoneIfNoPreviousLoneBracket(self):
         set_text(self.view, 'foo\nbar')
 
@@ -130,7 +130,7 @@ class Test_find_prev_lone_bracket_MultipleLines_Flat(BufferTest):
         self.assertEqual(region, self.R(1, 2))
 
 
-class Test_find_prev_lone_bracket_MultipleLines_Nested(BufferTest):
+class Test_find_prev_lone_bracket_MultipleLines_Nested(ViewTest):
     def testFindsOuterFromRhs(self):
         set_text(self.view, 'foo {bar\n{foo\nbar}\nfoo}')
 
@@ -162,7 +162,7 @@ class Test_find_prev_lone_bracket_MultipleLines_Nested(BufferTest):
         self.assertEqual(region, self.R(9, 10))
 
 
-class Test_find_find_next_lone_bracket_MultipleLines_Nested(BufferTest):
+class Test_find_find_next_lone_bracket_MultipleLines_Nested(ViewTest):
     # def testFindsOuterFromRhs(self):
     #     set_text(self.view, 'foo {bar\n{foo\nbar}\nfoo}')
 

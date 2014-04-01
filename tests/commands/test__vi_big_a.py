@@ -19,10 +19,10 @@ from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
 from Vintageous.tests import second_sel
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 
 
-class Test_vi_big_a_InNormalMode_SingleSel(BufferTest):
+class Test_vi_big_a_InNormalMode_SingleSel(ViewTest):
     def testMovesCaretToEol(self):
         set_text(self.view, 'abc')
         add_sel(self.view, self.R(0, 2))
@@ -31,7 +31,7 @@ class Test_vi_big_a_InNormalMode_SingleSel(BufferTest):
         self.assertEqual(self.R(3, 3), first_sel(self.view))
 
 
-class Test_vi_big_a_InNormalMode_MultipleSel(BufferTest):
+class Test_vi_big_a_InNormalMode_MultipleSel(ViewTest):
     def testMovesCaretToEol(self):
         set_text(self.view, 'abc\nabc')
         self.view.sel().add(self.R((0, 1), (0, 1)))
@@ -43,7 +43,7 @@ class Test_vi_big_a_InNormalMode_MultipleSel(BufferTest):
         self.assertEqual(self.R((1, 3), (1, 3)), second_sel(self.view))
 
 
-class Test_vi_big_a_InVisualMode_SingleSel(BufferTest):
+class Test_vi_big_a_InVisualMode_SingleSel(ViewTest):
     def testMovesCaretToEol(self):
         set_text(self.view, 'abc')
         add_sel(self.view, self.R((0, 0), (0, 2)))
@@ -53,7 +53,7 @@ class Test_vi_big_a_InVisualMode_SingleSel(BufferTest):
         self.assertEqual(self.R(2, 2), first_sel(self.view))
 
 
-class Test_vi_big_a_InVisualMode_MultipleSel(BufferTest):
+class Test_vi_big_a_InVisualMode_MultipleSel(ViewTest):
     def testMovesCaretToEol(self):
         set_text(self.view, 'abc\nabc')
         add_sel(self.view, self.R((0, 0), (0, 2)))
@@ -65,7 +65,7 @@ class Test_vi_big_a_InVisualMode_MultipleSel(BufferTest):
         self.assertEqual(self.R((1, 2), (1, 2)), second_sel(self.view))
 
 
-class Test_vi_big_a_InVisualLineMode_SingleSel(BufferTest):
+class Test_vi_big_a_InVisualLineMode_SingleSel(ViewTest):
     def testMovesCaretToEol(self):
         set_text(self.view, 'abc')
         add_sel(self.view, self.R((0, 0), (0, 3)))
@@ -75,7 +75,7 @@ class Test_vi_big_a_InVisualLineMode_SingleSel(BufferTest):
         self.assertEqual(self.R(3, 3), first_sel(self.view))
 
 
-class Test_vi_big_a_InVisualLineMode_MultipleSel(BufferTest):
+class Test_vi_big_a_InVisualLineMode_MultipleSel(ViewTest):
     def testMovesCaretToEol(self):
         set_text(self.view, 'abc\nabc')
         add_sel(self.view, self.R((0, 0), (0, 4)))
@@ -87,7 +87,7 @@ class Test_vi_big_a_InVisualLineMode_MultipleSel(BufferTest):
         self.assertEqual(self.R((1, 3), (1, 3)), second_sel(self.view))
 
 
-class Test_vi_big_a_InVisualBlockMode_SingleSel(BufferTest):
+class Test_vi_big_a_InVisualBlockMode_SingleSel(ViewTest):
     def testMovesCaretToEol(self):
         set_text(self.view, 'abc')
         add_sel(self.view, self.R((0, 0), (0, 2)))
@@ -97,7 +97,7 @@ class Test_vi_big_a_InVisualBlockMode_SingleSel(BufferTest):
         self.assertEqual(self.R(2, 2), first_sel(self.view))
 
 
-class Test_vi_big_a_InVisualBlockMode_MultipleSel(BufferTest):
+class Test_vi_big_a_InVisualBlockMode_MultipleSel(ViewTest):
     def testMovesCaretToEol(self):
         set_text(self.view, 'abc\nabc')
         add_sel(self.view, self.R((0, 0), (0, 2)))

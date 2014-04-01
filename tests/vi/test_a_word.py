@@ -3,14 +3,14 @@ import unittest
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
 
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 
 from Vintageous.vi.text_objects import a_word
 
 
-class Test_a_word_InInternalNormalMode_Inclusive(BufferTest):
+class Test_a_word_InInternalNormalMode_Inclusive(ViewTest):
     def testReturnsFullWord_CountOne(self):
         set_text(self.view, 'foo bar baz\n')
         r = self.R(5, 5)

@@ -10,7 +10,7 @@ from Vintageous.vi.mappings import mapping_status
 from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import make_region
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 from Vintageous.vi.cmd_base import cmd_types
 
 
@@ -23,10 +23,8 @@ adding_tests = (
 )
 
 
-class Test_Mappings_AddingAndRemoving(BufferTest):
+class Test_Mappings_AddingAndRemoving(ViewTest):
     def setUp(self):
-        super().setUp()
-        self.state = state.State(self.view)
         self.mappings = Mappings(self.state)
         self.mappings.clear()
 
@@ -57,10 +55,8 @@ expanding_tests = (
 )
 
 
-class Test_Mapping_Expanding(BufferTest):
+class Test_Mapping_Expanding(ViewTest):
     def setUp(self):
-        super().setUp()
-        self.state = state.State(self.view)
         self.mappings = Mappings(self.state)
         self.mappings.clear()
 

@@ -6,10 +6,10 @@ from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 
 
-class Test_vi_g_g_InNormalMode(BufferTest):
+class Test_vi_g_g_InNormalMode(ViewTest):
     def testCanMoveInNormalMode(self):
         set_text(self.view, 'abc\nabc')
         add_sel(self.view, self.R(5, 5))
@@ -25,7 +25,7 @@ class Test_vi_g_g_InNormalMode(BufferTest):
         self.assertEqual(self.R(0, 0), first_sel(self.view))
 
 
-class Test_vi_g_g_InVisualMode(BufferTest):
+class Test_vi_g_g_InVisualMode(ViewTest):
     def testCanMoveInVisualMode(self):
         set_text(self.view, 'abc\nabc\n')
         add_sel(self.view, self.R((0, 1), (0, 2)))
@@ -41,7 +41,7 @@ class Test_vi_g_g_InVisualMode(BufferTest):
         self.assertEqual(self.R((0, 2), (0, 0)), first_sel(self.view))
 
 
-class Test_vi_g_g_InInternalNormalMode(BufferTest):
+class Test_vi_g_g_InInternalNormalMode(ViewTest):
     def testCanMoveInModeInternalNormal(self):
         set_text(self.view, 'abc\nabc\n')
         add_sel(self.view, self.R(1, 1))
@@ -50,7 +50,7 @@ class Test_vi_g_g_InInternalNormalMode(BufferTest):
         self.assertEqual(self.R(4, 0), first_sel(self.view))
 
 
-class Test_vi_g_g_InVisualLineMode(BufferTest):
+class Test_vi_g_g_InVisualLineMode(ViewTest):
     def testCanMoveInModeVisualLine(self):
         set_text(self.view, 'abc\nabc\n')
         add_sel(self.view, self.R((0, 0), (0, 4)))

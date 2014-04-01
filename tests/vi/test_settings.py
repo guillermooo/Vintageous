@@ -1,5 +1,6 @@
 import unittest
 
+from Vintageous.tests import ViewTest
 from Vintageous.test_runner import TestsState
 from Vintageous.vi.settings import SettingsManager
 from Vintageous.vi.settings import SublimeSettings
@@ -12,23 +13,24 @@ from Vintageous.vi.settings import SCOPE_WINDOW
 from Vintageous.vi.settings import set_generic_view_setting
 from Vintageous.vi.settings import opt_bool_parser
 from Vintageous.vi.settings import set_minimap
+from Vintageous.vi.settings import set_sidebar
 from Vintageous.vi.settings import opt_rulers_parser
 
 
-class TestSublimeSettings(unittest.TestCase):
+class TestSublimeSettings(ViewTest):
     def setUp(self):
-      TestsState.view.settings().erase('foo')
-      self.setts = SublimeSettings(view=TestsState.view)
+      self.view.settings().erase('foo')
+      self.setts = SublimeSettings(view=self.view)
 
     def testCanInitializeClass(self):
-      self.assertEqual(self.setts.view, TestsState.view)
+      self.assertEqual(self.setts.view, self.view)
 
     def testCanSetSetting(self):
-      self.assertEqual(TestsState.view.settings().get('foo'), None)
+      self.assertEqual(self.view.settings().get('foo'), None)
       self.assertEqual(self.setts['foo'], None)
 
       self.setts['foo'] = 100
-      self.assertEqual(TestsState.view.settings().get('foo'), 100)
+      self.assertEqual(self.view.settings().get('foo'), 100)
 
     def testCanGetSetting(self):
       self.setts['foo'] = 100
@@ -38,20 +40,20 @@ class TestSublimeSettings(unittest.TestCase):
       self.assertEqual(self.setts['foo'], None)
 
 
-class TestVintageSettings(unittest.TestCase):
+class TestVintageSettings(ViewTest):
   def setUp(self):
-      TestsState.view.settings().erase('vintage')
-      self.setts = VintageSettings(view=TestsState.view)
+      self.view.settings().erase('vintage')
+      self.setts = VintageSettings(view=self.view)
 
   def testCanInitializeClass(self):
-      self.assertEqual(self.setts.view, TestsState.view)
-      self.assertEqual(TestsState.view.settings().get('vintage'), {})
+      self.assertEqual(self.setts.view, self.view)
+      self.assertEqual(self.view.settings().get('vintage'), {})
 
   def testCanSetSetting(self):
       self.assertEqual(self.setts['foo'], None)
 
       self.setts['foo'] = 100
-      self.assertEqual(TestsState.view.settings().get('vintage')['foo'], 100)
+      self.assertEqual(self.view.settings().get('vintage')['foo'], 100)
 
   def testCanGetSetting(self):
       self.setts['foo'] = 100
@@ -61,13 +63,13 @@ class TestVintageSettings(unittest.TestCase):
       self.assertEqual(self.setts['foo'], None)
 
 
-class TestSettingsManager(unittest.TestCase):
+class TestSettingsManager(ViewTest):
   def setUp(self):
-      TestsState.view.settings().erase('vintage')
-      self.settsman = SettingsManager(view=TestsState.view)
+      self.view.settings().erase('vintage')
+      self.settsman = SettingsManager(view=self.view)
 
   def testCanInitializeClass(self):
-      self.assertEqual(TestsState.view, self.settsman.v)
+      self.assertEqual(self.view, self.settsman.v)
 
   def testCanAccessViSsettings(self):
       self.settsman.vi['foo'] = 100
@@ -77,13 +79,14 @@ class TestSettingsManager(unittest.TestCase):
       self.settsman.view['foo'] = 100
       self.assertEqual(self.settsman.view['foo'], 100)
 
-class TestViEditorSettings(unittest.TestCase):
+
+class TestViEditorSettings(ViewTest):
   def setUp(self):
-      TestsState.view.settings().erase('vintage')
-      TestsState.view.settings().erase('vintageous_hlsearch')
-      TestsState.view.settings().erase('vintageous_foo')
-      TestsState.view.window().settings().erase('vintageous_foo')
-      self.settsman = VintageSettings(view=TestsState.view)
+      self.view.settings().erase('vintage')
+      self.view.settings().erase('vintageous_hlsearch')
+      self.view.settings().erase('vintageous_foo')
+      self.view.window().settings().erase('vintageous_foo')
+      self.settsman = VintageSettings(view=self.view)
 
   def testKnowsAllSettings(self):
       all_settings = [
@@ -94,19 +97,21 @@ class TestViEditorSettings(unittest.TestCase):
           'autoindent',
           'showminimap',
           'rulers',
+          'showsidebar',
       ]
 
       self.assertEqual(sorted(all_settings), sorted(list(VI_OPTIONS.keys())))
 
   def testSettingsAreCorrectlyDefined(self):
       KNOWN_OPTIONS = {
-          'hlsearch': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
-          'magic': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
-          'incsearch': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
-          'ignorecase': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=False, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
-          'autoindent': vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=None, action=set_generic_view_setting, noable=False),
-          'showminimap': vi_user_setting(scope=SCOPE_WINDOW, values=(True, False, '0', '1'), default=True, parser=None, action=set_minimap, noable=True),
-          'rulers': vi_user_setting(scope=SCOPE_VIEW, values=None, default=[], parser=opt_rulers_parser, action=set_generic_view_setting, noable=False),
+          'hlsearch':    vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True,  parser=opt_bool_parser,   action=set_generic_view_setting, noable=True),
+          'magic':       vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True,  parser=opt_bool_parser,   action=set_generic_view_setting, noable=True),
+          'incsearch':   vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True,  parser=opt_bool_parser,   action=set_generic_view_setting, noable=True),
+          'ignorecase':  vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=False, parser=opt_bool_parser,   action=set_generic_view_setting, noable=True),
+          'autoindent':  vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True,  parser=None,              action=set_generic_view_setting, noable=False),
+          'showminimap': vi_user_setting(scope=SCOPE_WINDOW,  values=(True, False, '0', '1'), default=True,  parser=None,              action=set_minimap,              noable=True),
+          'rulers':      vi_user_setting(scope=SCOPE_VIEW,    values=None,                    default=[],    parser=opt_rulers_parser, action=set_generic_view_setting, noable=False),
+          'showsidebar': vi_user_setting(scope=SCOPE_WINDOW,  values=(True, False, '0', '1'), default=True,  parser=None,              action=set_sidebar,              noable=True),
       }
 
       self.assertEqual(len(KNOWN_OPTIONS), len(VI_OPTIONS))
@@ -136,43 +141,43 @@ class TestViEditorSettings(unittest.TestCase):
       # VI_OPTIONS['foo'] = vi_user_setting(scope=SCOPE_VIEW, values=(True, False), default='buzz', parser=None)
 
 
-class Test_get_option(unittest.TestCase):
-  def setUp(self):
-      TestsState.view.settings().erase('vintage')
-      TestsState.view.settings().erase('vintageous_foo')
-      self.vi_settings = VintageSettings(view=TestsState.view)
+# class Test_get_option(unittest.TestCase):
+#   def setUp(self):
+#       TestsState.view.settings().erase('vintage')
+#       TestsState.view.settings().erase('vintageous_foo')
+#       self.vi_settings = VintageSettings(view=TestsState.view)
 
-  def testDefaultScopeIsView(self):
-      VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100,), default='bar', parser=None, action=None, noable=False)
-      self.vi_settings.view.settings().set('vintageous_foo', 100)
-      self.assertEqual(self.vi_settings['foo'], 100)
-      del VI_OPTIONS['foo']
+#   def testDefaultScopeIsView(self):
+#       VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100,), default='bar', parser=None, action=None, noable=False)
+#       self.vi_settings.view.settings().set('vintageous_foo', 100)
+#       self.assertEqual(self.vi_settings['foo'], 100)
+#       del VI_OPTIONS['foo']
 
-  def testReturnsDefaultValueIfUnset(self):
-      VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100,), default='bar', parser=None, action=None, noable=False)
-      self.assertEqual(self.vi_settings['foo'], 'bar')
-      del VI_OPTIONS['foo']
+#   def testReturnsDefaultValueIfUnset(self):
+#       VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100,), default='bar', parser=None, action=None, noable=False)
+#       self.assertEqual(self.vi_settings['foo'], 'bar')
+#       del VI_OPTIONS['foo']
 
-  def testReturnsDefaultValueIfSetToWrongValue(self):
-      VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100,), default='bar', parser=None, action=None, noable=False)
-      self.vi_settings.view.settings().set('vintageous_foo', 'maraca')
-      self.assertEqual(self.vi_settings['foo'], 'bar')
-      del VI_OPTIONS['foo']
+#   def testReturnsDefaultValueIfSetToWrongValue(self):
+#       VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100,), default='bar', parser=None, action=None, noable=False)
+#       self.vi_settings.view.settings().set('vintageous_foo', 'maraca')
+#       self.assertEqual(self.vi_settings['foo'], 'bar')
+#       del VI_OPTIONS['foo']
 
-  def testReturnsCorrectValue(self):
-      VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100, 200), default='bar', parser=None, action=None, noable=False)
-      self.vi_settings.view.settings().set('vintageous_foo', 200)
-      self.assertEqual(self.vi_settings['foo'], 200)
-      del VI_OPTIONS['foo']
+#   def testReturnsCorrectValue(self):
+#       VI_OPTIONS['foo'] = vi_user_setting(scope=None, values=(100, 200), default='bar', parser=None, action=None, noable=False)
+#       self.vi_settings.view.settings().set('vintageous_foo', 200)
+#       self.assertEqual(self.vi_settings['foo'], 200)
+#       del VI_OPTIONS['foo']
 
-  def testCanReturnWindowLevelSetting(self):
-      VI_OPTIONS['foo'] = vi_user_setting(scope=SCOPE_WINDOW, values=(100,), default='bar', parser=None, action=None, noable=False)
-      self.vi_settings.view.window().settings().set('vintageous_foo', 100)
-      self.assertEqual(self.vi_settings['foo'], 100)
-      del VI_OPTIONS['foo']
+#   def testCanReturnWindowLevelSetting(self):
+#       VI_OPTIONS['foo'] = vi_user_setting(scope=SCOPE_WINDOW, values=(100,), default='bar', parser=None, action=None, noable=False)
+#       self.vi_settings.view.window().settings().set('vintageous_foo', 100)
+#       self.assertEqual(self.vi_settings['foo'], 100)
+#       del VI_OPTIONS['foo']
 
-  def testCanReturnViewLevelSetting(self):
-      VI_OPTIONS['foo'] = vi_user_setting(scope=SCOPE_VIEW, values=(100,), default='bar', parser=None, action=None, noable=False)
-      self.vi_settings.view.settings().set('vintageous_foo', 100)
-      self.assertEqual(self.vi_settings['foo'], 100)
-      del VI_OPTIONS['foo']
+#   def testCanReturnViewLevelSetting(self):
+#       VI_OPTIONS['foo'] = vi_user_setting(scope=SCOPE_VIEW, values=(100,), default='bar', parser=None, action=None, noable=False)
+#       self.vi_settings.view.settings().set('vintageous_foo', 100)
+#       self.assertEqual(self.vi_settings['foo'], 100)
+#       del VI_OPTIONS['foo']

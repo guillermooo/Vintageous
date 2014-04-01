@@ -70,10 +70,10 @@ TESTS_CMDS_MOTION_VI_VISUAL_O = 'Vintageous.tests.commands.test__vi_visual_o'
 TESTS_CMDS_ACTION_VI_DD = 'Vintageous.tests.commands.test__vi_dd'
 TESTS_CMDS_ACTION_VI_BIG_J = 'Vintageous.tests.commands.test__vi_big_j'
 
-TESTS_EX_CMDS_COPY = 'Vintageous.tests.ex.test_copy'
-TESTS_EX_CMDS_MOVE = 'Vintageous.tests.ex.test_move'
-TESTS_EX_CMDS_DELETE = 'Vintageous.tests.ex.test_delete'
-TESTS_EX_CMDS_SHELL_OUT = 'Vintageous.tests.ex.test_shell_out'
+# TESTS_EX_CMDS_COPY = 'Vintageous.tests.ex.test_copy'
+# TESTS_EX_CMDS_MOVE = 'Vintageous.tests.ex.test_move'
+# TESTS_EX_CMDS_DELETE = 'Vintageous.tests.ex.test_delete'
+# TESTS_EX_CMDS_SHELL_OUT = 'Vintageous.tests.ex.test_shell_out'
 
 TESTS_UNITS_WORD = 'Vintageous.tests.vi.test_word'
 TESTS_UNITS_BIG_WORD = 'Vintageous.tests.vi.test_big_word'
@@ -115,10 +115,10 @@ TESTS_ALL_TEXT_OBJECTS = [
 ]
 
 TESTS_EX_CMDS = [
-    TESTS_EX_CMDS_COPY,
-    TESTS_EX_CMDS_MOVE,
-    TESTS_EX_CMDS_DELETE,
-    TESTS_EX_CMDS_SHELL_OUT,
+    # TESTS_EX_CMDS_COPY,
+    # TESTS_EX_CMDS_MOVE,
+    # TESTS_EX_CMDS_DELETE,
+    # TESTS_EX_CMDS_SHELL_OUT,
 ]
 
 TESTS_UNITS_ALL = [TESTS_UNITS_WORD,
@@ -160,13 +160,6 @@ all_tests = list(chain(*[data[1] for (key, data) in test_suites.items() if not k
 test_suites['_all_'] = ['_pt_run_tests', all_tests]
 
 
-class _ptPrintResults(sublime_plugin.TextCommand):
-    def run(self, edit, content):
-        view = sublime.active_window().new_file()
-        view.insert(edit, 0, content)
-        view.set_scratch(True)
-
-
 class ShowVintageousTestSuites(sublime_plugin.WindowCommand):
     """Displays a quick panel listing all available test stuites.
     """
@@ -187,56 +180,78 @@ class ShowVintageousTestSuites(sublime_plugin.WindowCommand):
 
 class _ptRunTests(sublime_plugin.WindowCommand):
     def run(self, suite_name):
-        make_temp_file()
-        # We open the file here, but Sublime Text loads it asynchronously, so we continue in an
-        # event handler, once it's been fully loaded.
-        self.window.open_file(TEST_DATA_PATH[1])
+        _, suite_names = test_suites[TestsState.suite]
+        suite = unittest.TestLoader().loadTestsFromNames(suite_names)
+        # path = os.path.join(sublime.packages_path(), 'Vintageous.tests')
+        # suite = unittest.TestLoader().discover(path)
+
+        bucket = OutputPanel('vintageous.tests')
+        bucket.show()
+        runner = unittest.TextTestRunner(stream=bucket, verbosity=1)
+        sublime.set_timeout_async(lambda: runner.run(suite), 0)
 
 
-class _ptTestDataDispatcher(sublime_plugin.EventListener):
-    def on_load(self, view):
-        try:
-            if (view.file_name() and view.file_name() == TEST_DATA_PATH[1] and
-                TestsState.running):
-
-                    TestsState.running = False
-                    TestsState.view = view
-
-                    _, suite_names = test_suites[TestsState.suite]
-                    suite = unittest.TestLoader().loadTestsFromNames(suite_names)
-
-                    bucket = io.StringIO()
-                    unittest.TextTestRunner(stream=bucket, verbosity=1).run(suite)
-
-                    view.run_command('_pt_print_results', {'content': bucket.getvalue()})
-                    w = sublime.active_window()
-                    # Close data view.
-                    w.run_command('prev_view')
-                    TestsState.view.set_scratch(True)
-                    w.run_command('close')
-                    w.run_command('next_view')
-                    # Ugly hack to return focus to the results view.
-                    w.run_command('show_panel', {'panel': 'console', 'toggle': True})
-                    w.run_command('show_panel', {'panel': 'console', 'toggle': True})
-        except Exception as e:
-            print(e)
-        finally:
-            try:
-                os.close(TEST_DATA_PATH[0])
-            except Exception as e:
-                print("Could not close temp file...")
-                print(e)
-
-
-class WriteToBuffer(sublime_plugin.TextCommand):
+class __vi_tests_write_buffer(sublime_plugin.TextCommand):
     """Replaces the buffer's content with the specified `text`.
 
        `text`: Text to be written to the buffer.
-       `file_name`: If this file name does not match the receiving view's, abort.
     """
-    def run(self, edit, file_name='', text=''):
-        if not file_name:
-            return
+    def run(self, edit, text=''):
+        self.view.replace(edit, sublime.Region(0, self.view.size()), text)
 
-        if self.view.file_name().lower() == file_name.lower():
-            self.view.replace(edit, sublime.Region(0, self.view.size()), text)
+
+class __vi_tests_erase_all(sublime_plugin.TextCommand):
+    """Replaces the buffer's content with the specified `text`.
+    """
+    def run(self, edit):
+        self.view.erase(edit, sublime.Region(0, self.view.size()))
+
+
+class OutputPanel(object):
+    def __init__(self, name, file_regex='', line_regex='', base_dir=None,
+                 word_wrap=False, line_numbers=False, gutter=False,
+                 scroll_past_end=False,
+                 syntax='Packages/Text/Plain text.tmLanguage',
+                 ):
+
+        self.name = name
+        self.window = sublime.active_window()
+
+        if not hasattr(self, 'output_view'):
+            # Try not to call get_output_panel until the regexes are assigned
+            self.output_view = self.window.create_output_panel(self.name)
+
+        # Default to the current file directory
+        if (not base_dir and self.window.active_view() and
+            self.window.active_view().file_name()):
+                base_dir = os.path.dirname(
+                        self.window.active_view().file_name()
+                        )
+
+        self.output_view.settings().set('result_file_regex', file_regex)
+        self.output_view.settings().set('result_line_regex', line_regex)
+        self.output_view.settings().set('result_base_dir', base_dir)
+        self.output_view.settings().set('word_wrap', word_wrap)
+        self.output_view.settings().set('line_numbers', line_numbers)
+        self.output_view.settings().set('gutter', gutter)
+        self.output_view.settings().set('scroll_past_end', scroll_past_end)
+        self.output_view.settings().set('syntax', syntax)
+
+        # Call create_output_panel a second time after assigning the above
+        # settings, so that it'll be picked up as a result buffer
+        self.window.create_output_panel('exec')
+
+    def write(self, s):
+        f = lambda: self.output_view.run_command('append', {'characters': s})
+        sublime.set_timeout(f, 0)
+
+    def flush(self):
+        pass
+
+    def show(self):
+        self.window.run_command(
+                            'show_panel', {'panel': 'output.' + self.name}
+                            )
+
+    def close(self):
+        pass

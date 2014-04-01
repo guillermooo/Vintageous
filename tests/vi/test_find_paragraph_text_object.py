@@ -3,14 +3,14 @@ import unittest
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
 
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 
 from Vintageous.vi.text_objects import find_paragraph_text_object
 
 
-class Test_find_paragraph_text_object_InInternalNormalMode_Inclusive(BufferTest):
+class Test_find_paragraph_text_object_InInternalNormalMode_Inclusive(ViewTest):
     def testReturnsFullParagraph_CountOne(self):
         text = (
             'line 1 in paragraph 1',
@@ -55,7 +55,7 @@ class Test_find_paragraph_text_object_InInternalNormalMode_Inclusive(BufferTest)
     #     self.assertEqual('   bar', self.view.substr(reg))
 
 
-class Test_find_paragraph_text_object_InInternalNormalMode_Exclusive(BufferTest):
+class Test_find_paragraph_text_object_InInternalNormalMode_Exclusive(ViewTest):
     def testReturnsFullParagraph_CountOne(self):
         text = (
             'line 1 in paragraph 1',

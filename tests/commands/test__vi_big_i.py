@@ -14,7 +14,7 @@ from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
 from Vintageous.tests import second_sel
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 
 
 test_data = namedtuple('test_data', 'initial_text regions cmd_params expected actual_func msg')
@@ -33,7 +33,7 @@ TESTS = (
 )
 
 
-class Test_vi_big_i(BufferTest):
+class Test_vi_big_i(ViewTest):
     def testAll(self):
         for (i, data) in enumerate(TESTS):
             # TODO: Perhaps we should ensure that other state is reset too?

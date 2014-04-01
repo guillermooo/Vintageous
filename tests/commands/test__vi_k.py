@@ -9,13 +9,13 @@ from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 
 
 # TODO: Test against folded regions.
 # TODO: Ensure that we only create empty selections while testing. Add assert_all_sels_empty()?
 # TODO: Test different values for xpos in combination with the starting col.
-class Test_vi_k_InNormalMode(BufferTest):
+class Test_vi_k_InNormalMode(ViewTest):
     def testMoveOne(self):
         set_text(self.view, 'abc\nabc\nabc')
         add_sel(self.view, self.R((1, 1), (1, 1)))
@@ -80,7 +80,7 @@ class Test_vi_k_InNormalMode(BufferTest):
         self.assertEqual(expected, first_sel(self.view))
 
 
-class Test_vi_k_InVisualMode(BufferTest):
+class Test_vi_k_InVisualMode(ViewTest):
     def testMoveOne(self):
         set_text(self.view, 'foo\nbar\nbaz\n')
         add_sel(self.view, self.R((1, 1), (1, 2)))
@@ -249,7 +249,7 @@ class Test_vi_k_InVisualMode(BufferTest):
 
 
 # # TODO: Ensure that we only create empty selections while testing. Add assert_all_sels_empty()?
-# class Test_vi_k_InInternalNormalMode(BufferTest):
+# class Test_vi_k_InInternalNormalMode(ViewTest):
 #     def testMoveOne(self):
 #         set_text(self.view, 'abc\nabc\nabc')
 #         add_sel(self.view, a=1, b=1)
@@ -335,7 +335,7 @@ class Test_vi_k_InVisualMode(BufferTest):
 #         self.assertEqual(expected, first_sel(self.view))
 
 
-# class Test_vi_k_InVisualLineMode(BufferTest):
+# class Test_vi_k_InVisualLineMode(ViewTest):
 #     def testMoveOne(self):
 #         set_text(self.view, 'abc\nabc\nabc')
 #         add_sel(self.view, a=0, b=4)

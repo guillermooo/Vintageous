@@ -9,10 +9,10 @@ from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 
 
-class Test_vi_dd_action_InNormalMode(BufferTest):
+class Test_vi_dd_action_InNormalMode(ViewTest):
     def testDeletesLastLine(self):
         set_text(self.view, 'abc\nabc\nabc')
         add_sel(self.view, self.R((2, 0), (2, 0)))

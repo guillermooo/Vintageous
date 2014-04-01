@@ -70,14 +70,14 @@ def opt_rulers_parser(value):
 
 
 VI_OPTIONS = {
-    'hlsearch':     vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
-    'magic':        vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
-    'ignorecase':   vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=False, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
-    'incsearch':    vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=opt_bool_parser, action=set_generic_view_setting, noable=True),
-    'autoindent':   vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True, parser=None, action=set_generic_view_setting, noable=False),
-    'showminimap':  vi_user_setting(scope=SCOPE_WINDOW, values=(True, False, '0', '1'), default=True, parser=None, action=set_minimap, noable=True),
-    'showsidebar':  vi_user_setting(scope=SCOPE_WINDOW, values=(True, False, '0', '1'), default=True, parser=None, action=set_sidebar, noable=True),
-    'rulers':       vi_user_setting(scope=SCOPE_VIEW, values=None, default=[], parser=opt_rulers_parser, action=set_generic_view_setting, noable=False),
+    'hlsearch':    vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True,  parser=opt_bool_parser,   action=set_generic_view_setting, noable=True),
+    'magic':       vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True,  parser=opt_bool_parser,   action=set_generic_view_setting, noable=True),
+    'ignorecase':  vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=False, parser=opt_bool_parser,   action=set_generic_view_setting, noable=True),
+    'incsearch':   vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True,  parser=opt_bool_parser,   action=set_generic_view_setting, noable=True),
+    'autoindent':  vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True,  parser=None,              action=set_generic_view_setting, noable=False),
+    'showminimap': vi_user_setting(scope=SCOPE_WINDOW,  values=(True, False, '0', '1'), default=True,  parser=None,              action=set_minimap,              noable=True),
+    'showsidebar': vi_user_setting(scope=SCOPE_WINDOW,  values=(True, False, '0', '1'), default=True,  parser=None,              action=set_sidebar,              noable=True),
+    'rulers':      vi_user_setting(scope=SCOPE_VIEW,    values=None,                    default=[],    parser=opt_rulers_parser, action=set_generic_view_setting, noable=False),
 }
 
 

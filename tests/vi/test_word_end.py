@@ -5,7 +5,7 @@ from Vintageous.vi.constants import MODE_NORMAL
 # from Vintageous.vi.constants import MODE_VISUAL
 # from Vintageous.vi.constants import MODE_VISUAL_LINE
 
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 
@@ -14,7 +14,7 @@ from Vintageous.vi.units import word_ends
 from Vintageous.vi.units import CLASS_VI_INTERNAL_WORD_START
 
 
-class Test_next_word_end_InNormalMode_FromWhitespace(BufferTest):
+class Test_next_word_end_InNormalMode_FromWhitespace(ViewTest):
     def testToWordStart(self):
         set_text(self.view, '  foo bar\n')
         r = self.R((0, 0), (0, 0))
@@ -104,7 +104,7 @@ class Test_next_word_end_InNormalMode_FromWhitespace(BufferTest):
         self.assertEqual(pt, 5)
 
 
-class Test_next_word_end_InNormalMode_FromWordStart(BufferTest):
+class Test_next_word_end_InNormalMode_FromWordStart(ViewTest):
     def testToWordStart(self):
         set_text(self.view, 'foo bar\n')
         r = self.R((0, 0), (0, 0))
@@ -194,7 +194,7 @@ class Test_next_word_end_InNormalMode_FromWordStart(BufferTest):
         self.assertEqual(pt, 3)
 
 
-class Test_next_word_end_InNormalMode_FromWord(BufferTest):
+class Test_next_word_end_InNormalMode_FromWord(ViewTest):
     def testToWordStart(self):
         set_text(self.view, 'foo bar\n')
         r = self.R((0, 1), (0, 1))
@@ -284,7 +284,7 @@ class Test_next_word_end_InNormalMode_FromWord(BufferTest):
         self.assertEqual(pt, 3)
 
 
-class Test_next_word_end_InNormalMode_FromPunctuationStart(BufferTest):
+class Test_next_word_end_InNormalMode_FromPunctuationStart(ViewTest):
     def testToWordStart(self):
         set_text(self.view, ':foo\n')
         r = self.R((0, 0), (0, 0))
@@ -374,7 +374,7 @@ class Test_next_word_end_InNormalMode_FromPunctuationStart(BufferTest):
         self.assertEqual(pt, 1)
 
 
-class Test_next_word_end_InNormalMode_FromEmptyLine(BufferTest):
+class Test_next_word_end_InNormalMode_FromEmptyLine(ViewTest):
     def testToWordStart(self):
         set_text(self.view, '\nfoo\n')
         r = self.R((0, 0), (0, 0))
@@ -464,7 +464,7 @@ class Test_next_word_end_InNormalMode_FromEmptyLine(BufferTest):
         self.assertEqual(pt, 3)
 
 
-class Test_next_word_end_InNormalMode_FromPunctuation(BufferTest):
+class Test_next_word_end_InNormalMode_FromPunctuation(ViewTest):
     def testToWordStart(self):
         set_text(self.view, '::foo\n')
         r = self.R((0, 1), (0, 1))
@@ -554,7 +554,7 @@ class Test_next_word_end_InNormalMode_FromPunctuation(BufferTest):
         self.assertEqual(pt, 2)
 
 
-class Test_next_word_end_InInternalNormalMode_FromWhitespace(BufferTest):
+class Test_next_word_end_InInternalNormalMode_FromWhitespace(ViewTest):
     def testToWhitespaceLine(self):
         set_text(self.view, '  \n  ')
         r = self.R((0, 0), (0, 0))
@@ -572,7 +572,7 @@ class Test_next_word_end_InInternalNormalMode_FromWhitespace(BufferTest):
         self.assertEqual(pt, 7)
 
 
-class Test_next_word_end_InInternalNormalMode_FromWordStart(BufferTest):
+class Test_next_word_end_InInternalNormalMode_FromWordStart(ViewTest):
     def testToWhitespaceLine(self):
         set_text(self.view, 'foo\n  ')
         r = self.R((0, 0), (0, 0))
@@ -590,7 +590,7 @@ class Test_next_word_end_InInternalNormalMode_FromWordStart(BufferTest):
         self.assertEqual(pt, 3)
 
 
-class Test_next_word_end_InInternalNormalMode_FromWord(BufferTest):
+class Test_next_word_end_InInternalNormalMode_FromWord(ViewTest):
     def testToWhitespaceLine(self):
         set_text(self.view, 'foo\n  ')
         r = self.R((0, 1), (0, 1))
@@ -608,7 +608,7 @@ class Test_next_word_end_InInternalNormalMode_FromWord(BufferTest):
         self.assertEqual(pt, 3)
 
 
-class Test_next_word_end_InInternalNormalMode_FromPunctuationStart(BufferTest):
+class Test_next_word_end_InInternalNormalMode_FromPunctuationStart(ViewTest):
     def testToWhitespaceLine(self):
         set_text(self.view, '.\n  ')
         r = self.R((0, 0), (0, 0))
@@ -626,7 +626,7 @@ class Test_next_word_end_InInternalNormalMode_FromPunctuationStart(BufferTest):
         self.assertEqual(pt, 1)
 
 
-class Test_next_word_end_InInternalNormalMode_FromPunctuation(BufferTest):
+class Test_next_word_end_InInternalNormalMode_FromPunctuation(ViewTest):
     def testToWhitespaceLine(self):
         set_text(self.view, '::\n  ')
         r = self.R((0, 1), (0, 1))
@@ -644,7 +644,7 @@ class Test_next_word_end_InInternalNormalMode_FromPunctuation(BufferTest):
         self.assertEqual(pt, 2)
 
 
-class Test_next_word_end_InInternalNormalMode_FromEmptyLine(BufferTest):
+class Test_next_word_end_InInternalNormalMode_FromEmptyLine(ViewTest):
     def testToWhitespaceLine(self):
         set_text(self.view, '\n  ')
         r = self.R((0, 0), (0, 0))
@@ -662,7 +662,7 @@ class Test_next_word_end_InInternalNormalMode_FromEmptyLine(BufferTest):
         self.assertEqual(pt, 5)
 
 
-class Test_words_InNormalMode(BufferTest):
+class Test_words_InNormalMode(ViewTest):
     def testMove1(self):
         set_text(self.view, 'foo bar\n')
         r = self.R((0, 0), (0, 0))
@@ -688,7 +688,7 @@ class Test_words_InNormalMode(BufferTest):
         self.assertEqual(pt, 34)
 
 
-class Test_words_InInternalNormalMode_FromEmptyLine(BufferTest):
+class Test_words_InInternalNormalMode_FromEmptyLine(ViewTest):
     # We can assume the stuff tested for normal mode applies to internal normal mode, so we
     # don't bother with that. Instead, we only test the differing behavior when advancing by
     # word starts in internal normal.
@@ -741,7 +741,7 @@ class Test_words_InInternalNormalMode_FromEmptyLine(BufferTest):
         self.assertEqual(pt, 7)
 
 
-class Test_words_InInternalNormalMode_FromOneWordLine(BufferTest):
+class Test_words_InInternalNormalMode_FromOneWordLine(ViewTest):
     # We can assume the stuff tested for normal mode applies to internal normal mode, so we
     # don't bother with that. Instead, we only test the differing behavior when advancing by
     # word starts in internal normal.
@@ -810,7 +810,7 @@ class Test_words_InInternalNormalMode_FromOneWordLine(BufferTest):
         self.assertEqual(pt, 10)
 
 
-class Test_word_ends_InInternalNormalMode_FromOneCharLongWord(BufferTest):
+class Test_word_ends_InInternalNormalMode_FromOneCharLongWord(ViewTest):
     def testMove1ToEol(self):
         set_text(self.view, 'x\n')
         r = self.R((0, 0), (0, 0))
@@ -828,7 +828,7 @@ class Test_word_ends_InInternalNormalMode_FromOneCharLongWord(BufferTest):
         self.assertEqual(pt, 2)
 
 
-class Test_words_InInternalNormalMode_FromLine(BufferTest):
+class Test_words_InInternalNormalMode_FromLine(ViewTest):
     def testMove2ToEol(self):
         set_text(self.view, 'foo bar\n')
         r = self.R((0, 0), (0, 0))

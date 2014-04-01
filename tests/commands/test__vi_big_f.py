@@ -4,12 +4,12 @@ from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 
 from Vintageous.vi.utils import modes
 
 
-class Test_vi_big_f_InVisualMode(BufferTest):
+class Test_vi_big_f_InVisualMode(ViewTest):
     def testCanSearch_OppositeEndSmaller_NoCrossOver(self):
         set_text(self.view, 'foo bar\n')
         add_sel(self.view, self.R((0, 2), (0, 6)))

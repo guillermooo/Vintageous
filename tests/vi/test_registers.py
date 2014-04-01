@@ -4,12 +4,11 @@ import builtins
 import sublime
 
 from unittest import mock
-from Vintageous.test_runner import TestsState
 from Vintageous.vi import registers
 from Vintageous.vi.registers import Registers
 from Vintageous.vi.settings import SettingsManager
 from Vintageous.state import VintageState
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 
 
 class TestCaseRegistersConstants(unittest.TestCase):
@@ -71,19 +70,22 @@ class TestCaseRegistersConstants(unittest.TestCase):
                              registers.REG_VALID_NAMES))
 
 
-class TestCaseRegisters(BufferTest):
+class TestCaseRegisters(ViewTest):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def setUp(self):
         super().setUp()
         sublime.set_clipboard('')
         registers._REGISTER_DATA = {}
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.settings().erase('vintageous_use_sys_clipboard')
-        # self.regs = Registers(view=TestsState.view,
-                              # settings=SettingsManager(view=TestsState.view))
-        self.regs = VintageState(TestsState.view).registers
+        self.view.settings().erase('vintage')
+        self.view.settings().erase('vintageous_use_sys_clipboard')
+        # self.regs = Registers(view=self.view,
+                              # settings=SettingsManager(view=self.view))
+        self.regs = VintageState(self.view).registers
 
     def testCanInitializeClass(self):
-        self.assertEqual(self.regs.view, TestsState.view)
+        self.assertEqual(self.regs.view, self.view)
         self.assertTrue(getattr(self.regs, 'settings'))
 
     def testCanSetUnanmedRegister(self):
@@ -188,7 +190,7 @@ class TestCaseRegisters(BufferTest):
 
     def testCanGetFileNameRegister(self):
         fname = self.regs.get(registers.REG_FILE_NAME)
-        self.assertEqual(fname, [TestsState.view.file_name()])
+        self.assertEqual(fname, [self.view.file_name()])
 
     def testCanGetClipboardRegisters(self):
         self.regs.set(registers.REG_SYS_CLIPBOARD_1, ['foo'])
@@ -254,9 +256,9 @@ class Test_get_selected_text(unittest.TestCase):
     def setUp(self):
         sublime.set_clipboard('')
         registers._REGISTER_DATA = {}
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.settings().erase('vintageous_use_sys_clipboard')
-        self.regs = VintageState(TestsState.view).registers
+        self.view.settings().erase('vintage')
+        self.view.settings().erase('vintageous_use_sys_clipboard')
+        self.regs = VintageState(self.view).registers
         self.regs.view = mock.Mock()
 
     def testExtractsSubstrings(self):
@@ -363,9 +365,9 @@ class Test_yank(unittest.TestCase):
     def setUp(self):
         sublime.set_clipboard('')
         registers._REGISTER_DATA = {}
-        TestsState.view.settings().erase('vintage')
-        TestsState.view.settings().erase('vintageous_use_sys_clipboard')
-        self.regs = VintageState(TestsState.view).registers
+        self.view.settings().erase('vintage')
+        self.view.settings().erase('vintageous_use_sys_clipboard')
+        self.regs = VintageState(self.view).registers
         self.regs.view = mock.Mock()
 
     def testDontYankIfWeDontHaveTo(self):

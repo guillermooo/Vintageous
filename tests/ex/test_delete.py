@@ -11,12 +11,12 @@ from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 
 from Vintageous.ex_commands import CURRENT_LINE_RANGE
 
 
-class Test_ex_delete_Deleting_InNormalMode_SingleLine_DefaultStart(BufferTest):
+class Test_ex_delete_Deleting_InNormalMode_SingleLine_DefaultStart(ViewTest):
     def testCanDeleteDefaultLineRange(self):
         set_text(self.view, 'abc\nxxx\nabc\nabc')
         add_sel(self.view, self.R((1, 0), (1, 0)))
@@ -82,7 +82,7 @@ class Test_ex_delete_Deleting_InNormalMode_SingleLine_DefaultStart(BufferTest):
 
 
 @unittest.skip("Fixme")
-class Test_ex_delete_Deleting_InNormalMode_MultipleLines(BufferTest):
+class Test_ex_delete_Deleting_InNormalMode_MultipleLines(ViewTest):
     def setUp(self):
         super().setUp()
         self.range = {'left_ref': None,'left_offset': None, 'left_search_offsets': [],
@@ -130,7 +130,7 @@ class Test_ex_delete_Deleting_InNormalMode_MultipleLines(BufferTest):
         self.assertEqual(expected, actual)
 
 
-class Test_ex_delete_InNormalMode_CaretPosition(BufferTest):
+class Test_ex_delete_InNormalMode_CaretPosition(ViewTest):
     def setUp(self):
         super().setUp()
         self.range = {'left_ref': None,'left_offset': None, 'left_search_offsets': [],
@@ -152,7 +152,7 @@ class Test_ex_delete_InNormalMode_CaretPosition(BufferTest):
     # TODO: test with multiple selections.
 
 
-class Test_ex_delete_ModeTransition(BufferTest):
+class Test_ex_delete_ModeTransition(ViewTest):
     def setUp(self):
         super().setUp()
         self.range = {'left_ref': None,'left_offset': None, 'left_search_offsets': [],

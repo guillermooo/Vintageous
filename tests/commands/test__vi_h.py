@@ -9,10 +9,10 @@ from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 
 
-class Test_vi_h_InNormalMode(BufferTest):
+class Test_vi_h_InNormalMode(ViewTest):
     def testCanMoveInNormalMode(self):
         set_text(self.view, 'abc')
         add_sel(self.view, a=1, b=1)
@@ -35,7 +35,7 @@ class Test_vi_h_InNormalMode(BufferTest):
         self.assertEqual(self.R(0, 0), first_sel(self.view))
 
 
-class Test_vi_h_InInternalNormalMode(BufferTest):
+class Test_vi_h_InInternalNormalMode(ViewTest):
     def testCanMoveInInternalNormalMode(self):
         set_text(self.view, 'abc')
         add_sel(self.view, a=1, b=1)
@@ -58,7 +58,7 @@ class Test_vi_h_InInternalNormalMode(BufferTest):
         self.assertEqual(self.R(1, 0), first_sel(self.view))
 
 
-class Test_vi_h_InVisualMode(BufferTest):
+class Test_vi_h_InVisualMode(ViewTest):
     def testCanMove(self):
         set_text(self.view, 'abc')
         add_sel(self.view, a=1, b=2)

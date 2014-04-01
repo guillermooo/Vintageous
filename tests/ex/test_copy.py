@@ -11,12 +11,12 @@ from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 
 from Vintageous.ex_commands import CURRENT_LINE_RANGE
 
 
-class Test_ex_copy_Copying_InNormalMode_SingleLine_DefaultStart(BufferTest):
+class Test_ex_copy_Copying_InNormalMode_SingleLine_DefaultStart(ViewTest):
     def testCanCopyDefaultLineRange(self):
         set_text(self.view, 'abc\nxxx\nabc\nabc')
         add_sel(self.view, self.R((1, 0), (1, 0)))
@@ -68,7 +68,7 @@ class Test_ex_copy_Copying_InNormalMode_SingleLine_DefaultStart(BufferTest):
         self.assertEqual(expected, actual)
 
 
-class Test_ex_copy_Copying_InNormalMode_MultipleLines(BufferTest):
+class Test_ex_copy_Copying_InNormalMode_MultipleLines(ViewTest):
     def setUp(self):
         super().setUp()
         self.range = {'left_ref': '.','left_offset': 0, 'left_search_offsets': [],
@@ -125,7 +125,7 @@ class Test_ex_copy_Copying_InNormalMode_MultipleLines(BufferTest):
         self.assertEqual(expected, actual)
 
 
-class Test_ex_copy_InNormalMode_CaretPosition(BufferTest):
+class Test_ex_copy_InNormalMode_CaretPosition(ViewTest):
     def testCanRepositionCaret(self):
         set_text(self.view, 'abc\nxxx\nabc\nabc')
         add_sel(self.view, self.R((1, 0), (1, 0)))
@@ -137,7 +137,7 @@ class Test_ex_copy_InNormalMode_CaretPosition(BufferTest):
         self.assertEqual(expected, actual)
 
 
-class Test_ex_copy_ModeTransition(BufferTest):
+class Test_ex_copy_ModeTransition(ViewTest):
     def testFromNormalModeToNormalMode(self):
         set_text(self.view, 'abc\nxxx\nabc\nabc')
         add_sel(self.view, self.R((1, 0), (1, 0)))

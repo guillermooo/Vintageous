@@ -9,13 +9,14 @@ from Vintageous.vi.utils import modes
 from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import make_region
-from Vintageous.tests import BufferTest
+from Vintageous.tests import ViewTest
 from Vintageous.vi.cmd_base import cmd_types
 
 
-class StateTestCase(BufferTest):
+class StateTestCase(ViewTest):
     def setUp(self):
         super().setUp()
+        self.create()
         self.state = state.State(self.view)
 
 
