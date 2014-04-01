@@ -1354,8 +1354,7 @@ class _vi_hat(ViMotionCommand):
         regions_transformer(self.view, f)
 
 
-
-class _vi_g_j(ViMotionCommand):
+class _vi_gj(ViMotionCommand):
     def run(self, mode=None, count=1):
         if mode == modes.NORMAL:
             for i in range(count):
@@ -1368,7 +1367,7 @@ class _vi_g_j(ViMotionCommand):
                 self.view.run_command('move', {'by': 'lines', 'forward': True, 'extend': False})
 
 
-class _vi_g_k(ViMotionCommand):
+class _vi_gk(ViMotionCommand):
     def run(self, mode=None, count=1):
         if mode == modes.NORMAL:
             for i in range(count):
