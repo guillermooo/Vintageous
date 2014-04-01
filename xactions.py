@@ -880,6 +880,9 @@ class _vi_cc_motion(ViTextCommandBase):
     def run(self, edit, mode=None, count=1):
         def f(view, s):
             if mode == modes.INTERNAL_NORMAL:
+                if view.line(s.b).empty():
+                    return s
+
                 end = view.text_point(utils.row_at(self.view, s.b) + (count - 1), 0)
                 begin = view.line(s.b).a
                 begin = utils.next_non_white_space_char(view, begin, white_space=' \t')
@@ -897,13 +900,15 @@ class _vi_cc_action(ViTextCommandBase):
     _yanks_linewise = False
     _populates_small_delete_register = False
 
-    def run(self, edit, mode=None, count=1):
+    def run(self, edit, mode=None, count=1, register='"'):
+        self.save_sel()
         self.view.run_command('_vi_cc_motion', {'mode': mode, 'count': count})
 
         state = self.state
-        state.registers.yank(self)
 
-        self.view.run_command('right_delete')
+        if self.has_sel_changed():
+            state.registers.yank(self)
+            self.view.run_command('right_delete')
 
         self.enter_insert_mode(mode)
         self.set_xpos(state)
