@@ -1,13 +1,6 @@
-import sublime
-
-import unittest
 from collections import namedtuple
 
-from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
-from Vintageous.vi.constants import MODE_NORMAL
-from Vintageous.vi.constants import MODE_VISUAL
-from Vintageous.vi.constants import MODE_VISUAL_LINE
-from Vintageous.vi.constants import MODE_VISUAL_BLOCK
+from Vintageous.vi.utils import modes
 
 from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
@@ -20,11 +13,11 @@ from Vintageous.tests import ViewTest
 test_data = namedtuple('test_data', 'initial_text regions cmd_params expected msg')
 
 TESTS = (
-    test_data('    abc',                   [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 1}, 'abc',               'failed in {0}'),
-    test_data('        abc',               [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 1}, '    abc',           'failed in {0}'),
-    test_data('    abc\n    abc',          [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 2}, 'abc\nabc',          'failed in {0}'),
-    test_data('    abc\n    abc\n    abc', [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 3}, 'abc\nabc\nabc',     'failed in {0}'),
-    test_data('    abc\n    abc\n    abc', [[(0, 0), (0, 0)], [(1, 0), (1, 0)]], {'mode': _MODE_INTERNAL_NORMAL, 'count': 1}, 'abc\nabc\n    abc', 'failed in {0}'),
+    test_data('    abc',                   [[(0, 0), (0, 0)]],                   {'mode': modes.INTERNAL_NORMAL, 'count': 1}, 'abc',               'failed in {0}'),
+    test_data('        abc',               [[(0, 0), (0, 0)]],                   {'mode': modes.INTERNAL_NORMAL, 'count': 1}, '    abc',           'failed in {0}'),
+    test_data('    abc\n    abc',          [[(0, 0), (0, 0)]],                   {'mode': modes.INTERNAL_NORMAL, 'count': 2}, 'abc\nabc',          'failed in {0}'),
+    test_data('    abc\n    abc\n    abc', [[(0, 0), (0, 0)]],                   {'mode': modes.INTERNAL_NORMAL, 'count': 3}, 'abc\nabc\nabc',     'failed in {0}'),
+    test_data('    abc\n    abc\n    abc', [[(0, 0), (0, 0)], [(1, 0), (1, 0)]], {'mode': modes.INTERNAL_NORMAL, 'count': 1}, 'abc\nabc\n    abc', 'failed in {0}'),
 )
 
 
@@ -34,7 +27,7 @@ class Test__vi_double_antilambda(ViewTest):
             # TODO: Perhaps we should ensure that other state is reset too?
             self.view.sel().clear()
 
-            set_text(self.view, data.initial_text)
+            self.write(data.initial_text)
             for region in data.regions:
                 add_sel(self.view, self.R(*region))
 

@@ -1,13 +1,6 @@
-import sublime
-
-import unittest
 from collections import namedtuple
 
-from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
-from Vintageous.vi.constants import MODE_NORMAL
-from Vintageous.vi.constants import MODE_VISUAL
-from Vintageous.vi.constants import MODE_VISUAL_LINE
-from Vintageous.vi.constants import MODE_VISUAL_BLOCK
+from Vintageous.vi.utils import modes
 
 from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
@@ -20,10 +13,10 @@ from Vintageous.tests import ViewTest
 test_data = namedtuple('test_data', 'initial_text regions cmd_params expected actual_func msg')
 
 TESTS = (
-    test_data('abc',      [[(0, 2), (0, 2)]], {'mode': MODE_NORMAL}, [(0, 0), (0, 0)], first_sel, ''),
-    test_data('abc',      [[(0, 2), (0, 2)]], {'mode': _MODE_INTERNAL_NORMAL}, [(0, 2), (0, 0)], first_sel, ''),
-    test_data('abc\nabc', [[(0, 2), (1, 3)]], {'mode': MODE_VISUAL},           [(0, 2), (1, 1)], first_sel, ''),
-    test_data('abc\nabc', [[(1, 3), (0, 2)]], {'mode': MODE_VISUAL},           [(1, 3), (0, 0)], first_sel, ''),
+    test_data('abc',      [[(0, 2), (0, 2)]], {'mode': modes.NORMAL}, [(0, 0), (0, 0)], first_sel, ''),
+    test_data('abc',      [[(0, 2), (0, 2)]], {'mode': modes.INTERNAL_NORMAL}, [(0, 2), (0, 0)], first_sel, ''),
+    test_data('abc\nabc', [[(0, 2), (1, 3)]], {'mode': modes.VISUAL},           [(0, 2), (1, 1)], first_sel, ''),
+    test_data('abc\nabc', [[(1, 3), (0, 2)]], {'mode': modes.VISUAL},           [(1, 3), (0, 0)], first_sel, ''),
 
     # TODO: Test multiple sels.
 )

@@ -1,11 +1,6 @@
-import unittest
 from collections import namedtuple
 
-from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
-from Vintageous.vi.constants import MODE_NORMAL
-from Vintageous.vi.constants import MODE_VISUAL
-from Vintageous.vi.constants import MODE_VISUAL_LINE
-from Vintageous.vi.constants import MODE_VISUAL_BLOCK
+from Vintageous.vi.utils import modes
 
 from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
@@ -17,39 +12,39 @@ from Vintageous.tests import ViewTest
 test_data = namedtuple('test_data', 'initial_text regions cmd_params expected msg')
 
 TESTS = (
-    test_data('abc\nabc\nabc',                           [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 1}, 'abc abc\nabc',        'should join 2 lines'),
-    test_data('abc\n    abc\nabc',                       [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 1}, 'abc abc\nabc',        'should join 2 lines'),
-    test_data('abc\nabc\nabc',                           [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 2}, 'abc abc\nabc',        'should join 2 lines'),
-    test_data('abc\n    abc\nabc',                       [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 2}, 'abc abc\nabc',        'should join 2 lines'),
-    test_data('abc\nabc\nabc',                           [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 3}, 'abc abc abc',         'should join 3 lines'),
-    test_data('abc\n    abc\n    abc',                   [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 3}, 'abc abc abc',         'should join 3 lines'),
-    test_data('abc\nabc\nabc\nabc\nabc',                 [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 5}, 'abc abc abc abc abc', 'should join 5 lines'),
-    test_data('abc\n    abc\n    abc\n    abc\n    abc', [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 5}, 'abc abc abc abc abc', 'should join 5 lines'),
-    test_data('abc\n\n',                                 [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 3}, 'abc ',                'should join 3 lines and add one trailing space'),
-    test_data('\n\nabc',                                 [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 3}, 'abc',                 'should join 3 lines without adding any spaces'),
-    test_data('abc \n    abc  \n  abc',                  [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 3}, 'abc abc  abc',        'should join 3 lines with leading spaces removed but trailing spaces intact'),
-    test_data('   abc\nabc   ',                          [[(0, 0), (0, 0)]],                   {'mode': _MODE_INTERNAL_NORMAL, 'count': 1}, '   abc abc   ',       'should join 2 lines with leading spaces of first line and trailing spaces of last line intact'),
-    test_data('abc\nabc\nabc',                           [[(0, 0), (0, 1)]],                   {'mode': MODE_VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
-    test_data('abc\n    abc\nabc',                       [[(0, 0), (0, 1)]],                   {'mode': MODE_VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
-    test_data('abc\nabc\nabc',                           [[(0, 0), (0, 1)]],                   {'mode': MODE_VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
-    test_data('abc\n    abc\nabc',                       [[(0, 0), (0, 1)]],                   {'mode': MODE_VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
-    test_data('abc\nabc\nabc',                           [[(0, 1), (0, 0)]],                   {'mode': MODE_VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
-    test_data('abc\n    abc\nabc',                       [[(0, 1), (0, 0)]],                   {'mode': MODE_VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
-    test_data('abc\nabc\nabc',                           [[(0, 1), (0, 0)]],                   {'mode': MODE_VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
-    test_data('abc\n    abc\nabc',                       [[(0, 1), (0, 0)]],                   {'mode': MODE_VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
-    test_data('abc\nabc\nabc',                           [[(0, 0), (1, 1)]],                   {'mode': MODE_VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
-    test_data('abc\n    abc\nabc',                       [[(0, 0), (1, 1)]],                   {'mode': MODE_VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
-    test_data('abc\nabc\nabc',                           [[(1, 1), (0, 0)]],                   {'mode': MODE_VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
-    test_data('abc\n    abc\nabc',                       [[(1, 1), (0, 0)]],                   {'mode': MODE_VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
-    test_data('abc\nabc\nabc',                           [[(0, 0), (2, 1)]],                   {'mode': MODE_VISUAL},                       'abc abc abc',         'should join 3 lines'),
-    test_data('abc\n    abc\nabc',                       [[(0, 0), (2, 1)]],                   {'mode': MODE_VISUAL},                       'abc abc abc',         'should join 3 lines'),
-    test_data('abc\nabc\nabc',                           [[(2, 1), (0, 0)]],                   {'mode': MODE_VISUAL},                       'abc abc abc',         'should join 3 lines'),
-    test_data('abc\n    abc\nabc',                       [[(2, 1), (0, 0)]],                   {'mode': MODE_VISUAL},                       'abc abc abc',         'should join 3 lines'),
-    test_data('abc\nabc\nabc',                           [[(0, 0), (1, 1)]],                   {'mode': MODE_VISUAL, 'count': 3},           'abc abc\nabc',        'should join 2 lines - count shouldn\'t matter'),
-    test_data('abc\n    abc\nabc',                       [[(0, 0), (1, 1)]],                   {'mode': MODE_VISUAL, 'count': 3},           'abc abc\nabc',        'should join 2 lines - count shouldn\'t matter'),
-    test_data('   abc\nabc   ',                          [[(0, 0), (1, 5)]],                   {'mode': MODE_VISUAL},                       '   abc abc   ',       'should join 2 lines with leading spaces of first line and trailing spaces of last line intact'),
-    test_data('    abc\n\n\n',                           [[(0, 0), (3, 0)]],                   {'mode': MODE_VISUAL_LINE},                  '    abc \n',          'should join 4 lines'),
-    test_data('    abc  \n   abc\nabc',                  [[(0, 0), (0, 1)], [(1, 0), (1, 1)]], {'mode': MODE_VISUAL_BLOCK},                 '    abc  abc\nabc',   'should join 2 lines'),
+    test_data('abc\nabc\nabc',                           [[(0, 0), (0, 0)]],                   {'mode': modes.INTERNAL_NORMAL, 'count': 1}, 'abc abc\nabc',        'should join 2 lines'),
+    test_data('abc\n    abc\nabc',                       [[(0, 0), (0, 0)]],                   {'mode': modes.INTERNAL_NORMAL, 'count': 1}, 'abc abc\nabc',        'should join 2 lines'),
+    test_data('abc\nabc\nabc',                           [[(0, 0), (0, 0)]],                   {'mode': modes.INTERNAL_NORMAL, 'count': 2}, 'abc abc\nabc',        'should join 2 lines'),
+    test_data('abc\n    abc\nabc',                       [[(0, 0), (0, 0)]],                   {'mode': modes.INTERNAL_NORMAL, 'count': 2}, 'abc abc\nabc',        'should join 2 lines'),
+    test_data('abc\nabc\nabc',                           [[(0, 0), (0, 0)]],                   {'mode': modes.INTERNAL_NORMAL, 'count': 3}, 'abc abc abc',         'should join 3 lines'),
+    test_data('abc\n    abc\n    abc',                   [[(0, 0), (0, 0)]],                   {'mode': modes.INTERNAL_NORMAL, 'count': 3}, 'abc abc abc',         'should join 3 lines'),
+    test_data('abc\nabc\nabc\nabc\nabc',                 [[(0, 0), (0, 0)]],                   {'mode': modes.INTERNAL_NORMAL, 'count': 5}, 'abc abc abc abc abc', 'should join 5 lines'),
+    test_data('abc\n    abc\n    abc\n    abc\n    abc', [[(0, 0), (0, 0)]],                   {'mode': modes.INTERNAL_NORMAL, 'count': 5}, 'abc abc abc abc abc', 'should join 5 lines'),
+    test_data('abc\n\n',                                 [[(0, 0), (0, 0)]],                   {'mode': modes.INTERNAL_NORMAL, 'count': 3}, 'abc ',                'should join 3 lines and add one trailing space'),
+    test_data('\n\nabc',                                 [[(0, 0), (0, 0)]],                   {'mode': modes.INTERNAL_NORMAL, 'count': 3}, 'abc',                 'should join 3 lines without adding any spaces'),
+    test_data('abc \n    abc  \n  abc',                  [[(0, 0), (0, 0)]],                   {'mode': modes.INTERNAL_NORMAL, 'count': 3}, 'abc abc  abc',        'should join 3 lines with leading spaces removed but trailing spaces intact'),
+    test_data('   abc\nabc   ',                          [[(0, 0), (0, 0)]],                   {'mode': modes.INTERNAL_NORMAL, 'count': 1}, '   abc abc   ',       'should join 2 lines with leading spaces of first line and trailing spaces of last line intact'),
+    test_data('abc\nabc\nabc',                           [[(0, 0), (0, 1)]],                   {'mode': modes.VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
+    test_data('abc\n    abc\nabc',                       [[(0, 0), (0, 1)]],                   {'mode': modes.VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
+    test_data('abc\nabc\nabc',                           [[(0, 0), (0, 1)]],                   {'mode': modes.VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
+    test_data('abc\n    abc\nabc',                       [[(0, 0), (0, 1)]],                   {'mode': modes.VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
+    test_data('abc\nabc\nabc',                           [[(0, 1), (0, 0)]],                   {'mode': modes.VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
+    test_data('abc\n    abc\nabc',                       [[(0, 1), (0, 0)]],                   {'mode': modes.VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
+    test_data('abc\nabc\nabc',                           [[(0, 1), (0, 0)]],                   {'mode': modes.VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
+    test_data('abc\n    abc\nabc',                       [[(0, 1), (0, 0)]],                   {'mode': modes.VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
+    test_data('abc\nabc\nabc',                           [[(0, 0), (1, 1)]],                   {'mode': modes.VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
+    test_data('abc\n    abc\nabc',                       [[(0, 0), (1, 1)]],                   {'mode': modes.VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
+    test_data('abc\nabc\nabc',                           [[(1, 1), (0, 0)]],                   {'mode': modes.VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
+    test_data('abc\n    abc\nabc',                       [[(1, 1), (0, 0)]],                   {'mode': modes.VISUAL},                       'abc abc\nabc',        'should join 2 lines'),
+    test_data('abc\nabc\nabc',                           [[(0, 0), (2, 1)]],                   {'mode': modes.VISUAL},                       'abc abc abc',         'should join 3 lines'),
+    test_data('abc\n    abc\nabc',                       [[(0, 0), (2, 1)]],                   {'mode': modes.VISUAL},                       'abc abc abc',         'should join 3 lines'),
+    test_data('abc\nabc\nabc',                           [[(2, 1), (0, 0)]],                   {'mode': modes.VISUAL},                       'abc abc abc',         'should join 3 lines'),
+    test_data('abc\n    abc\nabc',                       [[(2, 1), (0, 0)]],                   {'mode': modes.VISUAL},                       'abc abc abc',         'should join 3 lines'),
+    test_data('abc\nabc\nabc',                           [[(0, 0), (1, 1)]],                   {'mode': modes.VISUAL, 'count': 3},           'abc abc\nabc',        'should join 2 lines - count shouldn\'t matter'),
+    test_data('abc\n    abc\nabc',                       [[(0, 0), (1, 1)]],                   {'mode': modes.VISUAL, 'count': 3},           'abc abc\nabc',        'should join 2 lines - count shouldn\'t matter'),
+    test_data('   abc\nabc   ',                          [[(0, 0), (1, 5)]],                   {'mode': modes.VISUAL},                       '   abc abc   ',       'should join 2 lines with leading spaces of first line and trailing spaces of last line intact'),
+    test_data('    abc\n\n\n',                           [[(0, 0), (3, 0)]],                   {'mode': modes.VISUAL_LINE},                  '    abc \n',          'should join 4 lines'),
+    test_data('    abc  \n   abc\nabc',                  [[(0, 0), (0, 1)], [(1, 0), (1, 1)]], {'mode': modes.VISUAL_BLOCK},                 '    abc  abc\nabc',   'should join 2 lines'),
 )
 
 
@@ -59,7 +54,7 @@ class Test_vi_big_j(ViewTest):
             # TODO: Perhaps we should ensure that other state is reset too?
             self.view.sel().clear()
 
-            set_text(self.view, data.initial_text)
+            self.write(data.initial_text)
             for region in data.regions:
                 add_sel(self.view, self.R(*region))
 

@@ -1,11 +1,7 @@
 import unittest
 
-from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
-from Vintageous.vi.constants import MODE_NORMAL
-from Vintageous.vi.constants import MODE_VISUAL
-from Vintageous.vi.constants import MODE_VISUAL_LINE
+from Vintageous.vi.utils import modes
 
-from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
@@ -14,24 +10,27 @@ from Vintageous.tests import ViewTest
 
 class Test_vi_cc_InModeInternalNormal(ViewTest):
     def testSelectsWholeLine(self):
-        set_text(self.view, ''.join(('foo bar\nfoo bar\nfoo bar\n',)))
-        add_sel(self.view, self.R((1, 2), (1, 2)))
+        self.write(''.join(('foo bar\nfoo bar\nfoo bar\n',)))
+        self.clear_sel()
+        self.add_sel(self.R((1, 2), (1, 2)))
 
-        self.view.run_command('_vi_cc_motion', {'mode': _MODE_INTERNAL_NORMAL, 'count': 1})
+        self.view.run_command('_vi_cc_motion', {'mode': modes.INTERNAL_NORMAL, 'count': 1})
         self.assertEqual(self.R((1, 0), (1, 7)), first_sel(self.view))
 
     def testDeletesWholeLine(self):
-        set_text(self.view, ''.join(('foo bar\nfoo bar\nfoo bar\n',)))
-        add_sel(self.view, self.R((1, 0), (1, 7)))
+        self.write(''.join(('foo bar\nfoo bar\nfoo bar\n',)))
+        self.clear_sel()
+        self.add_sel(self.R((1, 0), (1, 7)))
 
-        self.view.run_command('_vi_cc_action', {'mode': _MODE_INTERNAL_NORMAL})
+        self.view.run_command('_vi_cc_action', {'mode': modes.INTERNAL_NORMAL})
         self.assertEqual(self.view.substr(self.R(0, self.view.size())), 'foo bar\n\nfoo bar\n')
 
     def testKeepsLeadingWhitespace(self):
-        set_text(self.view, ''.join(('\tfoo bar\n\tfoo bar\nfoo bar\n',)))
-        add_sel(self.view, self.R((1, 0), (1, 7)))
+        self.write(''.join(('\tfoo bar\n\tfoo bar\nfoo bar\n',)))
+        self.clear_sel()
+        self.add_sel(self.R((1, 0), (1, 7)))
 
-        self.view.run_command('_vi_cc_action', {'mode': _MODE_INTERNAL_NORMAL})
+        self.view.run_command('_vi_cc_action', {'mode': modes.INTERNAL_NORMAL})
         self.assertEqual(self.view.substr(self.R(0, self.view.size())), '\tfoo bar\n\t\nfoo bar\n')
 
     @unittest.skip("Implement")

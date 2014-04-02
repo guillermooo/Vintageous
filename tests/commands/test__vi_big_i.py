@@ -1,13 +1,6 @@
-import sublime
-
-import unittest
 from collections import namedtuple
 
-from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
-from Vintageous.vi.constants import MODE_NORMAL
-from Vintageous.vi.constants import MODE_VISUAL
-from Vintageous.vi.constants import MODE_VISUAL_LINE
-from Vintageous.vi.constants import MODE_VISUAL_BLOCK
+from Vintageous.vi.utils import modes
 
 from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
@@ -20,16 +13,16 @@ from Vintageous.tests import ViewTest
 test_data = namedtuple('test_data', 'initial_text regions cmd_params expected actual_func msg')
 
 TESTS = (
-    test_data('abc',           [[(0, 0), (0, 2)]],                   {'mode': _MODE_INTERNAL_NORMAL}, [(0, 0), (0, 0)], first_sel, ''),
-    test_data('abc\nabc',      [[(0, 1), (0, 1)], [(1, 1), (1, 1)]], {'mode': _MODE_INTERNAL_NORMAL}, [(0, 0), (0, 0)], first_sel, ''),
-    test_data('abc\nabc',      [[(0, 1), (0, 1)], [(1, 1), (1, 1)]], {'mode': _MODE_INTERNAL_NORMAL}, [(1, 0), (1, 0)], second_sel, ''),
-    test_data('abc',           [[(0, 0), (0, 2)]],                   {'mode': MODE_VISUAL},           [(0, 0), (0, 0)], first_sel, ''),
-    test_data('abc\nabc',      [[(0, 1), (0, 2)], [(1, 1), (1, 2)]], {'mode': MODE_VISUAL},           [(0, 0), (0, 0)], first_sel, ''),
-    test_data('abc\nabc',      [[(0, 1), (0, 2)], [(1, 1), (1, 2)]], {'mode': MODE_VISUAL},           [(1, 0), (1, 0)], second_sel, ''),
-    test_data('abc\nabc\nabc', [[(0, 0), (1, 4)]],                   {'mode': MODE_VISUAL_LINE},      [(0, 0), (0, 0)], first_sel, ''),
-    test_data('abc\nabc\nabc', [[(1, 0), (2, 4)]],                   {'mode': MODE_VISUAL_LINE},      [(1, 0), (1, 0)], first_sel, ''),
-    test_data('abc\nabc',      [[(0, 2), (0, 3)], [(1, 2), (1, 3)]], {'mode': MODE_VISUAL_BLOCK},     [(0, 2), (0, 2)], first_sel, ''),
-    test_data('abc\nabc',      [[(0, 2), (0, 3)], [(1, 2), (1, 3)]], {'mode': MODE_VISUAL_BLOCK},     [(1, 2), (1, 2)], second_sel, ''),
+    test_data('abc',           [[(0, 0), (0, 2)]],                   {'mode': modes.INTERNAL_NORMAL}, [(0, 0), (0, 0)], first_sel, ''),
+    test_data('abc\nabc',      [[(0, 1), (0, 1)], [(1, 1), (1, 1)]], {'mode': modes.INTERNAL_NORMAL}, [(0, 0), (0, 0)], first_sel, ''),
+    test_data('abc\nabc',      [[(0, 1), (0, 1)], [(1, 1), (1, 1)]], {'mode': modes.INTERNAL_NORMAL}, [(1, 0), (1, 0)], second_sel, ''),
+    test_data('abc',           [[(0, 0), (0, 2)]],                   {'mode': modes.VISUAL},           [(0, 0), (0, 0)], first_sel, ''),
+    test_data('abc\nabc',      [[(0, 1), (0, 2)], [(1, 1), (1, 2)]], {'mode': modes.VISUAL},           [(0, 0), (0, 0)], first_sel, ''),
+    test_data('abc\nabc',      [[(0, 1), (0, 2)], [(1, 1), (1, 2)]], {'mode': modes.VISUAL},           [(1, 0), (1, 0)], second_sel, ''),
+    test_data('abc\nabc\nabc', [[(0, 0), (1, 4)]],                   {'mode': modes.VISUAL_LINE},      [(0, 0), (0, 0)], first_sel, ''),
+    test_data('abc\nabc\nabc', [[(1, 0), (2, 4)]],                   {'mode': modes.VISUAL_LINE},      [(1, 0), (1, 0)], first_sel, ''),
+    test_data('abc\nabc',      [[(0, 2), (0, 3)], [(1, 2), (1, 3)]], {'mode': modes.VISUAL_BLOCK},     [(0, 2), (0, 2)], first_sel, ''),
+    test_data('abc\nabc',      [[(0, 2), (0, 3)], [(1, 2), (1, 3)]], {'mode': modes.VISUAL_BLOCK},     [(1, 2), (1, 2)], second_sel, ''),
 )
 
 
@@ -41,7 +34,7 @@ class Test_vi_big_i(ViewTest):
 
             set_text(self.view, data.initial_text)
             for region in data.regions:
-                add_sel(self.view, self.R(*region))
+                self.add_sel(self.R(*region))
 
             self.view.run_command('_vi_big_i', data.cmd_params)
 
