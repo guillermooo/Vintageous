@@ -777,7 +777,7 @@ class ExDelete(ExTextCommandBase):
     def run_ex_command(self, edit, line_range=None, register='', count=''):
         # XXX somewhat different to vim's behavior
         line_range = line_range if line_range else CURRENT_LINE_RANGE
-        if line_range['text_range'] == '0':
+        if line_range.get('text_range') == '0':
             # FIXME: This seems to be a bug in the parser or get_region_by_range.
             # We should be settings 'left_ref', not 'left_offset'.
             line_range['left_offset'] = 1

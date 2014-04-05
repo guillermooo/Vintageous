@@ -1,4 +1,5 @@
 import unittest
+import os
 
 from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
@@ -9,6 +10,7 @@ import Vintageous.ex.plat as plat
 from Vintageous.ex.ex_command_parser import parse_command
 
 class Test_ex_shell_out_no_input(ViewTest):
+    @unittest.skipIf(os.name == 'nt', 'not supported on Windows')
     def testCommandOutput(self):
         test_string = 'Testing!'
         test_command_line = ':!echo "' + test_string + '"'
@@ -20,6 +22,20 @@ class Test_ex_shell_out_no_input(ViewTest):
 
         actual = output_panel.substr(self.R(0, output_panel.size()))
         expected = test_string + '\n'
+        self.assertEqual(expected, actual)
+
+    @unittest.skipIf(os.name != 'nt', 'Windows')
+    def testCommandOutput(self):
+        test_string = 'Testing!'
+        test_command_line = ':!echo "' + test_string + '"'
+        ex_cmd = parse_command(test_command_line)
+        ex_cmd.args['line_range'] = ex_cmd.line_range
+
+        output_panel = self.view.window().get_output_panel('vi_out')
+        self.view.run_command(ex_cmd.command, ex_cmd.args)
+
+        actual = output_panel.substr(self.R(0, output_panel.size()))
+        expected = '\\"{0}\\"\n'.format(test_string)
         self.assertEqual(expected, actual)
 
     def tearDown(self):

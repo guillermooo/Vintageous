@@ -1,30 +1,4 @@
 {
-	"build_systems":
-	[
-		{
-			"name": "Vintageus: Debug",
-			"shell_cmd": "./build.sh",
-			"windows":
-			{
-				"shell_cmd": "powershell -noninteractive -file \"$project_path\\bin\\Build.ps1\""
-			},
-			"working_dir": "${project_path}"
-		},
-		{
-			"name": "Vintageous: Release",
-			"shell_cmd": "./build.sh --release release",
-			"windows":
-			{
-				"shell_cmd": "powershell -noninteractive -file \"$project_path\\bin\\Build.ps1\" -release -dontupload"
-			},
-			"working_dir": "${project_path}"
-		},
-		{
-			"name": "Vintageous: Run Tests",
-			"target": "run_vintageous_tests",
-			"working_dir": "${project_path}"
-		}
-	],
 	"folders":
 	[
 		{

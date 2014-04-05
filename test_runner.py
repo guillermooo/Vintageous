@@ -218,7 +218,7 @@ class OutputPanel(object):
 
         # Call create_output_panel a second time after assigning the above
         # settings, so that it'll be picked up as a result buffer
-        self.window.create_output_panel('exec')
+        self.window.create_output_panel(self.name)
 
     def write(self, s):
         f = lambda: self.output_view.run_command('append', {'characters': s})
@@ -251,9 +251,9 @@ class RunVintageousTests(sublime_plugin.WindowCommand):
     def run(self, **kwargs):
         with self.chdir(kwargs.get('working_dir')):
             suite = unittest.TestLoader().discover(os.getcwd())
-            print("HELLO WORLD FROM BUILD SYSTEM")
 
-            display = OutputPanel('vintageous.tests')
+            file_regex = r'^\s*File\s*"([^.].*?)",\s*line\s*(\d+),.*$'
+            display = OutputPanel('vintageous.tests', file_regex=file_regex)
             display.show()
             runner = unittest.TextTestRunner(stream=display, verbosity=1)
 

@@ -7,8 +7,6 @@ from Vintageous.vi.constants import MODE_VISUAL_LINE
 
 from Vintageous.state import VintageState
 
-from Vintageous.tests import set_text
-from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
 from Vintageous.tests import ViewTest
@@ -18,8 +16,9 @@ from Vintageous.ex_commands import CURRENT_LINE_RANGE
 
 class Test_ex_delete_Deleting_InNormalMode_SingleLine_DefaultStart(ViewTest):
     def testCanDeleteDefaultLineRange(self):
-        set_text(self.view, 'abc\nxxx\nabc\nabc')
-        add_sel(self.view, self.R((1, 0), (1, 0)))
+        self.write('abc\nxxx\nabc\nabc')
+        self.clear_sel()
+        self.add_sel(self.R((1, 0), (1, 0)))
 
         self.view.run_command('ex_delete')
 
@@ -28,8 +27,9 @@ class Test_ex_delete_Deleting_InNormalMode_SingleLine_DefaultStart(ViewTest):
         self.assertEqual(expected, actual)
 
     def testCanDeleteAtEof_NoNewLine(self):
-        set_text(self.view, 'abc\nabc\nabc\nxxx')
-        add_sel(self.view, self.R((3, 0), (3, 0)))
+        self.write('abc\nabc\nabc\nxxx')
+        self.clear_sel()
+        self.add_sel(self.R((3, 0), (3, 0)))
 
         r = CURRENT_LINE_RANGE.copy()
         r['left_ref'] = '4'
@@ -40,8 +40,9 @@ class Test_ex_delete_Deleting_InNormalMode_SingleLine_DefaultStart(ViewTest):
         self.assertEqual(expected, actual)
 
     def testCanDeleteAtEof_NewLine(self):
-        set_text(self.view, 'abc\nabc\nabc\nxxx\n')
-        add_sel(self.view, self.R((3, 0), (3, 0)))
+        self.write('abc\nabc\nabc\nxxx\n')
+        self.clear_sel()
+        self.add_sel(self.R((3, 0), (3, 0)))
 
         r = CURRENT_LINE_RANGE.copy()
         r['left_ref'] = '4'
@@ -52,8 +53,9 @@ class Test_ex_delete_Deleting_InNormalMode_SingleLine_DefaultStart(ViewTest):
         self.assertEqual(expected, actual)
 
     def testCanDeleteZeroLineRange(self):
-        set_text(self.view, 'xxx\nabc\nabc\nabc')
-        add_sel(self.view, self.R((1, 0), (1, 0)))
+        self.write('xxx\nabc\nabc\nabc')
+        self.clear_sel()
+        self.add_sel(self.R((1, 0), (1, 0)))
 
         r = CURRENT_LINE_RANGE.copy()
         r['text_range'] = '0'
@@ -66,8 +68,9 @@ class Test_ex_delete_Deleting_InNormalMode_SingleLine_DefaultStart(ViewTest):
         self.assertEqual(expected, actual)
 
     def testCanDeleteEmptyLine(self):
-        set_text(self.view, 'abc\nabc\n\nabc')
-        add_sel(self.view, self.R((1, 0), (1, 0)))
+        self.write('abc\nabc\n\nabc')
+        self.clear_sel()
+        self.add_sel(self.R((1, 0), (1, 0)))
 
         r = CURRENT_LINE_RANGE.copy()
         r['right_ref'] = None
@@ -90,8 +93,9 @@ class Test_ex_delete_Deleting_InNormalMode_MultipleLines(ViewTest):
                       'separator': ','}
 
     def testCanDeleteTwoLines(self):
-        set_text(self.view, 'abc\nxxx\nxxx\nabc\nabc')
-        add_sel(self.view, self.R((0, 0), (0, 0)))
+        self.write('abc\nxxx\nxxx\nabc\nabc')
+        self.clear_sel()
+        self.add_sel(self.R((0, 0), (0, 0)))
 
         self.range['left_offset'] = 2
         self.range['right_offset'] = 3
@@ -103,8 +107,9 @@ class Test_ex_delete_Deleting_InNormalMode_MultipleLines(ViewTest):
         self.assertEqual(expected, actual)
 
     def testCanDeleteThreeLines(self):
-        set_text(self.view, 'abc\nxxx\nxxx\nxxx\nabc\nabc')
-        add_sel(self.view, self.R((0, 0), (0, 0)))
+        self.write('abc\nxxx\nxxx\nxxx\nabc\nabc')
+        self.clear_sel()
+        self.add_sel(self.R((0, 0), (0, 0)))
 
         self.range['left_offset'] = 2
         self.range['right_offset'] = 4
@@ -117,8 +122,9 @@ class Test_ex_delete_Deleting_InNormalMode_MultipleLines(ViewTest):
 
     # TODO: fix this
     def testCanDeleteMultipleEmptyLines(self):
-        set_text(self.view, 'abc\n\n\n\nabc\nabc')
-        add_sel(self.view, self.R((0, 0), (0, 0)))
+        self.write('abc\n\n\n\nabc\nabc')
+        self.clear_sel()
+        self.add_sel(self.R((0, 0), (0, 0)))
 
         self.range['left_offset'] = 2
         self.range['right_offset'] = 4
@@ -138,8 +144,9 @@ class Test_ex_delete_InNormalMode_CaretPosition(ViewTest):
                       'separator': ','}
 
     def testCanRepositionCaret(self):
-        set_text(self.view, 'abc\nxxx\nabc\nabc')
-        add_sel(self.view, self.R((3, 0), (3, 0)))
+        self.write('abc\nxxx\nabc\nabc')
+        self.clear_sel()
+        self.add_sel(self.R((3, 0), (3, 0)))
 
         self.range['left_offset'] = 2
         self.range['text_range'] = '2,4'
@@ -160,8 +167,9 @@ class Test_ex_delete_ModeTransition(ViewTest):
                       'separator': ','}
 
     def testFromNormalModeToNormalMode(self):
-        set_text(self.view, 'abc\nxxx\nabc\nabc')
-        add_sel(self.view, self.R((1, 0), (1, 0)))
+        self.write('abc\nxxx\nabc\nabc')
+        self.clear_sel()
+        self.add_sel(self.R((1, 0), (1, 0)))
 
         state = VintageState(self.view)
         state.enter_normal_mode()
@@ -178,8 +186,9 @@ class Test_ex_delete_ModeTransition(ViewTest):
         self.assertEqual(prev_mode, new_mode)
 
     def testFromVisualModeToNormalMode(self):
-        set_text(self.view, 'abc\nxxx\nabc\nabc')
-        add_sel(self.view, self.R((1, 0), (1, 1)))
+        self.write('abc\nxxx\nabc\nabc')
+        self.clear_sel()
+        self.add_sel(self.R((1, 0), (1, 1)))
 
         state = VintageState(self.view)
         state.enter_visual_mode()

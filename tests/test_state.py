@@ -11,6 +11,7 @@ from Vintageous.tests import add_sel
 from Vintageous.tests import make_region
 from Vintageous.tests import ViewTest
 from Vintageous.vi.cmd_base import cmd_types
+from Vintageous.vi import cmd_defs
 
 
 class StateTestCase(ViewTest):
@@ -41,16 +42,14 @@ class Test_State(StateTestCase):
 
         self.assertEqual(s.sequence, '')
         self.assertEqual(s.partial_sequence, '')
-        self.assertEqual(s.mode, modes.UNKNOWN)
+        self.assertEqual(s.mode, modes.NORMAL)
         self.assertEqual(s.action, None)
         self.assertEqual(s.motion, None)
         self.assertEqual(s.action_count, '')
         self.assertEqual(s.glue_until_normal_mode, False)
         self.assertEqual(s.gluing_sequence, False)
-        self.assertEqual(s.user_input, '')
-        self.assertEqual(s.input_parsers, [])
         self.assertEqual(s.last_character_search, '')
-        self.assertEqual(s.last_char_search_command, False)
+        self.assertEqual(s.last_char_search_command, 'vi_f')
         self.assertEqual(s.non_interactive, False)
         self.assertEqual(s.capture_register, False)
         self.assertEqual(s.last_buffer_search, '')
@@ -59,28 +58,26 @@ class Test_State(StateTestCase):
     def test_must_scroll_into_view(self):
         self.assertFalse(self.state.must_scroll_into_view())
 
-        fake_motion = {'scroll_into_view': False}
-        self.state.motion = fake_motion
-        self.assertFalse(self.state.must_scroll_into_view())
-
-        fake_motion = {'scroll_into_view': True}
-        self.state.motion = fake_motion
+        motion = cmd_defs.ViGotoSymbolInFile()
+        self.state.motion = motion
         self.assertTrue(self.state.must_scroll_into_view())
 
 
 class Test_State_Mode_Switching(StateTestCase):
     def test_enter_normal_mode(self):
-        self.assertEqual(self.state.mode, modes.UNKNOWN)
+        self.assertEqual(self.state.mode, modes.NORMAL)
+        self.state.mode = modes.UNKNOWN
+        self.assertNotEqual(self.state.mode, modes.NORMAL)
         self.state.enter_normal_mode()
         self.assertEqual(self.state.mode, modes.NORMAL)
 
     def test_enter_visual_mode(self):
-        self.assertEqual(self.state.mode, modes.UNKNOWN)
+        self.assertEqual(self.state.mode, modes.NORMAL)
         self.state.enter_visual_mode()
         self.assertEqual(self.state.mode, modes.VISUAL)
 
     def test_enter_insert_mode(self):
-        self.assertEqual(self.state.mode, modes.UNKNOWN)
+        self.assertEqual(self.state.mode, modes.NORMAL)
         self.state.enter_insert_mode()
         self.assertEqual(self.state.mode, modes.INSERT)
 
@@ -96,18 +93,12 @@ class Test_State_Resetting_State(StateTestCase):
         self.state.reset_partial_sequence()
         self.assertEqual(self.state.partial_sequence, '')
 
-    def test_reset_user_input(self):
-        self.state.user_input = 'x'
-        self.state.reset_user_input()
-        self.assertEqual(self.state.user_input, '')
-
     def test_reset_command_data(self):
         self.state.sequence = 'abc'
         self.state.partial_sequence = 'x'
         self.state.user_input = 'f'
-        self.state.action = 'foobar'
-        # Just to make state happy.
-        self.state.motion = {'scroll_into_view': False}
+        self.state.action = cmd_defs.ViReplaceCharacters()
+        self.state.motion = cmd_defs.ViGotoSymbolInFile()
         self.state.action_count = '10'
         self.state.motion_count = '100'
         self.state.register = 'a'
@@ -122,7 +113,6 @@ class Test_State_Resetting_State(StateTestCase):
 
         self.assertEqual(self.state.sequence, '')
         self.assertEqual(self.state.partial_sequence, '')
-        self.assertEqual(self.state.user_input, '')
         self.assertEqual(self.state.register, '"')
         self.assertEqual(self.state.capture_register, False)
 
@@ -187,110 +177,85 @@ class Test_State_Runnability(StateTestCase):
     def test_can_run_action(self):
         self.assertEqual(self.state.can_run_action(), None)
 
-        self.state = state.State(self.view)
         self.state.mode = modes.VISUAL
         self.assertEqual(self.state.can_run_action(), None)
 
-        self.state = state.State(self.view)
-        self.state.action = {'name': 'fake_action', 'motion_required': True}
+        self.state.action = cmd_defs.ViDeleteByChars()
         self.state.mode = modes.VISUAL
         self.assertEqual(self.state.can_run_action(), True)
 
-        self.state = state.State(self.view)
-        self.state.action = {'name': 'fake_action', 'motion_required': False}
+        self.state.action = cmd_defs.ViDeleteLine()
         self.state.mode = modes.VISUAL
         self.assertEqual(self.state.can_run_action(), True)
 
-        self.state = state.State(self.view)
         self.state.mode = modes.NORMAL
-        self.state.action = {'motion_required': True}
+        self.state.action = cmd_defs.ViDeleteByChars()
         self.assertEqual(self.state.can_run_action(), None)
 
-        self.state = state.State(self.view)
         self.state.mode = modes.NORMAL
-        self.state.action = {'motion_required': False}
+        self.state.action = cmd_defs.ViDeleteLine()
         self.assertEqual(self.state.can_run_action(), True)
-
-    def test_runnable_AndParsers(self):
-        self.state.input_parsers.append('fake')
-        self.assertEqual(self.state.runnable(), False)
 
     def test_runnable_IfActionAndMotionAvailable(self):
         self.state.mode = modes.NORMAL
-        self.state.action = {'name': 'fake_action'}
-        self.state.motion = {'name': 'fake_motion'}
+        self.state.action = cmd_defs.ViDeleteLine()
+        self.state.motion = cmd_defs.ViMoveRightByChars()
         self.assertEqual(self.state.runnable(), True)
 
-        self.state = state.State(self.view)
         self.state.mode = 'junk'
-        self.state.action = {'name': 'fake_action'}
-        self.state.motion = {'name': 'fake_motion'}
+        self.state.action = cmd_defs.ViDeleteByChars()
+        self.state.motion = cmd_defs.ViMoveRightByChars()
         self.assertRaises(ValueError, self.state.runnable)
 
     def test_runnable_IfMotionAvailable(self):
         self.state.mode = modes.NORMAL
-        self.state.motion = {'name': 'fake_motion'}
+        self.state.motion = cmd_defs.ViMoveRightByChars()
         self.assertEqual(self.state.runnable(), True)
 
-        self.state = state.State(self.view)
         self.state.mode = modes.OPERATOR_PENDING
-        self.state.motion = {'name': 'fake_motion'}
+        self.state.motion = cmd_defs.ViMoveRightByChars()
         self.assertRaises(ValueError, self.state.runnable)
 
     def test_runnable_IfActionAvailable(self):
         self.state.mode = modes.NORMAL
-        self.state.action = {'name': 'fake_action', 'motion_required': False}
+        self.state.action = cmd_defs.ViDeleteLine()
         self.assertEqual(self.state.runnable(), True)
 
-        self.state = state.State(self.view)
-        self.state.action = {'name': 'fake_action', 'motion_required': True}
+        self.state.action = cmd_defs.ViDeleteByChars()
         self.assertEqual(self.state.runnable(), False)
 
-        self.state = state.State(self.view)
         self.state.mode = modes.OPERATOR_PENDING
         # ensure we can run the action
-        self.state.action = {'name': 'fake_action', 'motion_required': False}
+        self.state.action = cmd_defs.ViDeleteLine()
         self.assertRaises(ValueError, self.state.runnable)
 
 
 class Test_State_set_command(StateTestCase):
     def testRaiseErrorIfUnknownCommandType(self):
         fake_command = {'type': 'foo'}
-        self.assertRaises(ValueError, self.state.set_command, fake_command)
+        self.assertRaises(AssertionError, self.state.set_command, fake_command)
 
     def testRaisesErrorIfTooManyMotions(self):
-        fake_command_1 = {'type': cmd_types.MOTION, 'name': 'foo'}
-        fake_command_2 = {'type': cmd_types.MOTION, 'name': 'bar'}
+        self.state.motion = cmd_defs.ViMoveRightByChars()
 
-        self.state.motion = fake_command_1
-
-        self.assertRaises(ValueError, self.state.set_command, fake_command_2)
+        self.assertRaises(ValueError, self.state.set_command, cmd_defs.ViMoveRightByChars())
 
     def testChangesModeForLoneMotion(self):
         self.state.mode = modes.OPERATOR_PENDING
 
-        fake_command_1 = {'type': cmd_types.MOTION, 'name': 'foo'}
-        self.state.set_command(fake_command_1)
+        motion = cmd_defs.ViMoveRightByChars()
+        self.state.set_command(motion)
 
         self.assertEqual(self.state.mode, modes.NORMAL)
 
-    def testSetsParser(self):
-        fake_command_1 = {'type': cmd_types.MOTION, 'name': 'foo', 'input': 'vi_f'}
-        self.state.set_command(fake_command_1)
-
-        self.assertEqual(self.state.input_parsers[-1], 'vi_f')
-
     def testRaisesErrorIfTooManyActions(self):
-        fake_command_1 = {'type': cmd_types.ACTION, 'name': 'foo'}
-        fake_command_2 = {'type': cmd_types.ACTION, 'name': 'bar'}
+        self.state.motion = cmd_defs.ViDeleteLine()
 
-        self.state.motion = fake_command_1
-
-        self.assertRaises(ValueError, self.state.set_command, fake_command_2)
+        self.assertRaises(ValueError, self.state.set_command, cmd_defs.ViDeleteLine())
 
     def testChangesModeForLoneAction(self):
-        fake_command_1 = {'type': cmd_types.ACTION, 'name': 'foo', 'motion_required': True}
+        operator = cmd_defs.ViDeleteByChars()
 
-        self.state.set_command(fake_command_1)
+        self.state.set_command(operator)
 
         self.assertEqual(self.state.mode, modes.OPERATOR_PENDING)
