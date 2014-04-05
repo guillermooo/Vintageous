@@ -22,6 +22,11 @@ class Test_ex_shell_out_no_input(ViewTest):
         expected = test_string + '\n'
         self.assertEqual(expected, actual)
 
+    def tearDown(self):
+        self.view.window().run_command(
+                            'show_panel', {'panel': 'output.vintageous.tests'}
+                            )
+
 
 class Test_ex_shell_out_filter_through_shell(ViewTest):
     @staticmethod

@@ -6,6 +6,7 @@ import io
 import os
 import unittest
 import tempfile
+import contextlib
 
 
 # A tuple: (low level file_descriptor, path) as returned by `tempfile.mkstemp()`.
@@ -255,3 +256,31 @@ class OutputPanel(object):
 
     def close(self):
         pass
+
+
+class RunVintageousTests(sublime_plugin.WindowCommand):
+
+    @contextlib.contextmanager
+    def chdir(self, path=None):
+        old_path = os.getcwd()
+        if path is not None:
+            assert os.path.exists(path), "'path' is invalid"
+            os.chdir(path)
+        yield
+        if path is not None:
+            os.chdir(old_path)
+
+    def run(self, **kwargs):
+        with self.chdir(kwargs.get('working_dir')):
+            suite = unittest.TestLoader().discover(os.getcwd())
+            print("HELLO WORLD FROM BUILD SYSTEM")
+
+            display = OutputPanel('vintageous.tests')
+            display.show()
+            runner = unittest.TextTestRunner(stream=display, verbosity=1)
+
+            def run_and_display():
+                runner.run(suite)
+                display.show()
+
+            sublime.set_timeout_async(run_and_display, 0)

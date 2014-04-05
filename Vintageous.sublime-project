@@ -18,6 +18,11 @@
 				"shell_cmd": "powershell -noninteractive -file \"$project_path\\bin\\Build.ps1\" -release -dontupload"
 			},
 			"working_dir": "${project_path}"
+		},
+		{
+			"name": "Vintageous: Run Tests",
+			"target": "run_vintageous_tests",
+			"working_dir": "${project_path}"
 		}
 	],
 	"folders":
@@ -25,14 +30,12 @@
 		{
 			"follow_symlinks": true,
 			"path": "."
-		},
-		{
-			"follow_symlinks": true
 		}
 	],
 	"settings":
 	{
 		"ensure_new_line_at_eof_on_save": true,
-		"trim_trailing_white_space_on_save": true
+		"trim_trailing_white_space_on_save": true,
+		"default_line_ending": "unix"
 	}
 }
