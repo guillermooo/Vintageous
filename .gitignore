@@ -1,0 +1,17 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+
+# Distribution / packaging
+dist/
+
+
+# Editors
+*.sublime-workspace
+*.sublime-package
+
+*~
+*.TMP
+*.swp
+*.swo
