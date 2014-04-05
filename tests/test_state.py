@@ -16,8 +16,6 @@ from Vintageous.vi.cmd_base import cmd_types
 class StateTestCase(ViewTest):
     def setUp(self):
         super().setUp()
-        self.create()
-        self.state = state.State(self.view)
 
 
 class Test_State(StateTestCase):

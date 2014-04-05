@@ -5,22 +5,12 @@ from Vintageous.state import State
 from Vintageous.test_runner import TestsState
 
 
-class BufferTest(unittest.TestCase):
-    def setUp(self):
-        TestsState.reset_view_state()
-        self.view = TestsState.view
-        self.view.sel().clear()
-
-    def R(self, a, b):
-        return make_region(self.view, a, b)
-
-
 class ViewTest(unittest.TestCase):
     """
     New-style tests.
     """
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+
+    def setUp(self):
         self.view = sublime.active_window().new_file()
         self.view.set_scratch(True)
 

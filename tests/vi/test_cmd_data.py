@@ -66,6 +66,7 @@ known_keys = [
 
 class Test_CmdData(unittest.TestCase):
     def setUp(self):
+        super().setUp()
         state = mock.Mock()
         state.count = 100
         state.user_provided_count = 200

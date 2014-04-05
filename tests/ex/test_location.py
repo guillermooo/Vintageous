@@ -97,6 +97,7 @@ class TestSearchHelpers(unittest.TestCase):
         self.assertEquals(calculate_relative_ref(g_test_view, '.'), 200)
 
     def setUp(self):
+        super().setUp()
         select_line(g_test_view, 1)
 
     def tearDown(self):

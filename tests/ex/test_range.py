@@ -68,6 +68,7 @@ class TestCalculatingRanges(unittest.TestCase):
 
 class CalculateAddress(unittest.TestCase):
     def setUp(self):
+        super().setUp()
         select_eof(g_test_view)
 
     def tearDown(self):

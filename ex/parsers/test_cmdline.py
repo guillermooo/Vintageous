@@ -4,6 +4,7 @@ from Vintageous.ex.parsers import cmd_line
 
 class ParserBase(unittest.TestCase):
     def setUp(self):
+        super().setUp()
         self.parser = cmd_line.ParserBase("foo")
 
     def testIsInitCorrect(self):
