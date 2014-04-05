@@ -2,7 +2,6 @@ import unittest
 
 import sublime
 
-from Vintageous.test_runner import TestsState
 from Vintageous.tests import ViewTest
 from Vintageous.vi import marks
 from Vintageous.state import VintageState

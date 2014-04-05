@@ -2,7 +2,6 @@ import unittest
 
 import sublime
 
-from Vintageous.test_runner import TestsState
 from unittest import mock
 from Vintageous.vi.constants import MODE_INSERT
 from Vintageous.vi.constants import MODE_NORMAL
@@ -180,19 +179,19 @@ class Test_mode_to_str(unittest.TestCase):
 
 class Test_regions_transformer(unittest.TestCase):
     def tearDown(self):
-        TestsState.view.sel().clear()
-        TestsState.view.sel().add(sublime.Region(0, 0))
+        self.view.sel().clear()
+        self.view.sel().add(sublime.Region(0, 0))
 
     def testCanTransformRegions(self):
-        TestsState.view.sel().clear()
-        TestsState.view.sel().add(sublime.Region(0, 100))
-        TestsState.view.sel().add(sublime.Region(200, 300))
-        TestsState.view.sel().add(sublime.Region(400, 500))
+        self.view.sel().clear()
+        self.view.sel().add(sublime.Region(0, 100))
+        self.view.sel().add(sublime.Region(200, 300))
+        self.view.sel().add(sublime.Region(400, 500))
 
         transf = lambda view, x: sublime.Region(x.a, x.b - (x.size() - 1))
-        regions_transformer(TestsState.view, transf)
+        regions_transformer(self.view, transf)
 
-        regions = list(TestsState.view.sel())
+        regions = list(self.view.sel())
 
         for r in regions:
             self.assertEqual(r.size(), 1)

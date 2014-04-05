@@ -20,23 +20,6 @@ def make_temp_file():
     TEST_DATA_PATH = tempfile.mkstemp()
 
 
-class TestsState(object):
-    running = False
-    view = None
-    suite = None
-
-    @staticmethod
-    def reset():
-        TestsState.view = None
-        TestsState.suite = None
-
-    @staticmethod
-    def reset_view_state():
-        TestsState.view.settings().set('vintage', {})
-        TestsState.view.sel().clear()
-        TestsState.view.sel().add(sublime.Region(0, 0))
-
-
 TESTS_SETTINGS = 'Vintageous.tests.vi.test_settings'
 TESTS_REGISTERS = 'Vintageous.tests.vi.test_registers'
 TESTS_MARKS = 'Vintageous.tests.vi.test_marks'
@@ -165,7 +148,6 @@ class ShowVintageousTestSuites(sublime_plugin.WindowCommand):
     """Displays a quick panel listing all available test stuites.
     """
     def run(self):
-        TestsState.running = True
         self.window.show_quick_panel(sorted(test_suites.keys()), self.run_suite)
 
     def run_suite(self, idx):
@@ -173,7 +155,6 @@ class ShowVintageousTestSuites(sublime_plugin.WindowCommand):
         return
 
       suite_name = sorted(test_suites.keys())[idx]
-      TestsState.suite = suite_name
       command_to_run, _ = test_suites[suite_name]
 
       self.window.run_command(command_to_run, dict(suite_name=suite_name))
@@ -181,10 +162,7 @@ class ShowVintageousTestSuites(sublime_plugin.WindowCommand):
 
 class _ptRunTests(sublime_plugin.WindowCommand):
     def run(self, suite_name):
-        _, suite_names = test_suites[TestsState.suite]
         suite = unittest.TestLoader().loadTestsFromNames(suite_names)
-        # path = os.path.join(sublime.packages_path(), 'Vintageous.tests')
-        # suite = unittest.TestLoader().discover(path)
 
         bucket = OutputPanel('vintageous.tests')
         bucket.show()

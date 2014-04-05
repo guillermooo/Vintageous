@@ -1,7 +1,6 @@
 import unittest
 
 from Vintageous.tests import ViewTest
-from Vintageous.test_runner import TestsState
 from Vintageous.vi.settings import SettingsManager
 from Vintageous.vi.settings import SublimeSettings
 from Vintageous.vi.settings import VI_OPTIONS

@@ -2,7 +2,6 @@ import sublime
 import unittest
 
 from Vintageous.state import State
-from Vintageous.test_runner import TestsState
 
 
 class ViewTest(unittest.TestCase):
