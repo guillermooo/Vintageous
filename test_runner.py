@@ -9,17 +9,6 @@ import tempfile
 import contextlib
 
 
-# A tuple: (low level file_descriptor, path) as returned by `tempfile.mkstemp()`.
-TEST_DATA_PATH = None
-
-
-def make_temp_file():
-    """Creates an new temporary file.
-    """
-    global TEST_DATA_PATH
-    TEST_DATA_PATH = tempfile.mkstemp()
-
-
 TESTS_SETTINGS = 'Vintageous.tests.vi.test_settings'
 TESTS_REGISTERS = 'Vintageous.tests.vi.test_registers'
 TESTS_MARKS = 'Vintageous.tests.vi.test_marks'

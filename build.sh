@@ -7,3 +7,7 @@ case `uname` in
     cp -f ./dist/Vintageous.sublime-package ~/Library/Application\ Support/Sublime\ Text\ 3/Installed\ Packages
     ;;
 esac
+
+killall sublime_text
+sleep 0.2
+subl
