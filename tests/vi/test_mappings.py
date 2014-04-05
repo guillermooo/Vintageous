@@ -25,6 +25,7 @@ adding_tests = (
 
 class Test_Mappings_AddingAndRemoving(ViewTest):
     def setUp(self):
+        super().setUp()
         self.mappings = Mappings(self.state)
         self.mappings.clear()
 
@@ -57,6 +58,7 @@ expanding_tests = (
 
 class Test_Mapping_Expanding(ViewTest):
     def setUp(self):
+        super().setUp()
         self.mappings = Mappings(self.state)
         self.mappings.clear()
 

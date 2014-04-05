@@ -8,6 +8,7 @@ from Vintageous.ex.parsers.parsing import EOF
 
 class TestRegexToken(unittest.TestCase):
     def setUp(self):
+        super().setUp()
         self.token = RegexToken("f[o]+")
 
     def testCanTestMembership(self):
@@ -20,6 +21,7 @@ class TestRegexToken(unittest.TestCase):
 
 class TestLexer(unittest.TestCase):
     def setUp(self):
+        super().setUp()
         self.lexer = Lexer()
 
     def testEmptyInputSetsCursorToEOF(self):
@@ -56,6 +58,7 @@ class TestLexer(unittest.TestCase):
 
 class TestSubstituteLexer(unittest.TestCase):
     def setUp(self):
+        super().setUp()
         self.lexer = SubstituteLexer()
 
     def testCanParseEmptyInput(self):

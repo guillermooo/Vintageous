@@ -32,6 +32,7 @@ class Window(object):
 
 class MarksTests(ViewTest):
     def setUp(self):
+        super().setUp()
         marks._MARKS = {}
         self.view.sel().clear()
         self.view.sel().add(sublime.Region(0, 0))

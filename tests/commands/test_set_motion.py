@@ -5,6 +5,7 @@ from Vintageous.test_runner import TestsState
 
 class TestSetMotion(unittest.TestCase):
     def setUp(self):
+        super().setUp()
         TestsState.reset_view_state()
 
     @unittest.skip("Can't set motion because will be run straight away.")

@@ -19,6 +19,7 @@ from Vintageous.vi.settings import opt_rulers_parser
 
 class TestSublimeSettings(ViewTest):
     def setUp(self):
+      super().setUp()
       self.view.settings().erase('foo')
       self.setts = SublimeSettings(view=self.view)
 
@@ -42,6 +43,7 @@ class TestSublimeSettings(ViewTest):
 
 class TestVintageSettings(ViewTest):
   def setUp(self):
+      super().setUp()
       self.view.settings().erase('vintage')
       self.setts = VintageSettings(view=self.view)
 
@@ -65,6 +67,7 @@ class TestVintageSettings(ViewTest):
 
 class TestSettingsManager(ViewTest):
   def setUp(self):
+      super().setUp()
       self.view.settings().erase('vintage')
       self.settsman = SettingsManager(view=self.view)
 
@@ -82,6 +85,7 @@ class TestSettingsManager(ViewTest):
 
 class TestViEditorSettings(ViewTest):
   def setUp(self):
+      super().setUp()
       self.view.settings().erase('vintage')
       self.view.settings().erase('vintageous_hlsearch')
       self.view.settings().erase('vintageous_foo')

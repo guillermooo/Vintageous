@@ -11,6 +11,7 @@ PATH_TO_KEYMAP = os.path.abspath(os.path.join(HERE, '..', 'Default.sublime-keyma
 
 class TestKeyBindings(unittest.TestCase):
     def setUp(self):
+        super().setUp()
         self.kbs = sublime.decode_value(sublime.load_resource('Packages/Vintageous/Default.sublime-keymap'))
         self.known_kbs = sublime.decode_value(sublime.load_resource('Packages/Vintageous/tests/data/Default.sublime-keymap_'))
 

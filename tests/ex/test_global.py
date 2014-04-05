@@ -5,6 +5,7 @@ from Vintageous.ex.parsers.g_cmd import GlobalLexer
 
 class TestGlobalLexer(unittest.TestCase):
     def setUp(self):
+        super().setUp()
         self.lexer = GlobalLexer()
 
     def testCanMatchFullPattern(self):
