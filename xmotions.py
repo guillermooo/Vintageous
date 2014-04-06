@@ -278,7 +278,7 @@ class _vi_l(ViMotionCommand):
 
 
 class _vi_h(ViMotionCommand):
-    def run(self, count=None, mode=None):
+    def run(self, count=1, mode=None):
         def f(view, s):
             if mode == modes.INTERNAL_NORMAL:
                 x_limit = max(view.line(s.b).a, s.b - count)
@@ -353,7 +353,7 @@ class _vi_j(ViMotionCommand):
             pass
         return pt
 
-    def run(self, count=None, mode=None, xpos=0, no_translation=False):
+    def run(self, count=1, mode=None, xpos=0, no_translation=False):
         def f(view, s):
             if mode == modes.NORMAL:
                 current_row = view.rowcol(s.b)[0]
@@ -365,7 +365,7 @@ class _vi_j(ViMotionCommand):
                 if view.line(target_pt).empty():
                     return sublime.Region(target_pt, target_pt)
 
-                target_pt = min(target_pt + xpos, view.line(target_pt).b - 1)
+                target_pt = min(target_pt + xpos, view.full_line(target_pt).b)
                 return sublime.Region(target_pt, target_pt)
 
             if mode == modes.INTERNAL_NORMAL:
@@ -495,7 +495,7 @@ class _vi_k(ViMotionCommand):
             pass
         return pt
 
-    def run(self, count=None, mode=None, xpos=0, no_translation=False):
+    def run(self, count=1, mode=None, xpos=0, no_translation=False):
         def f(view, s):
             if mode == modes.NORMAL:
                 current_row = view.rowcol(s.b)[0]
@@ -725,7 +725,7 @@ class _vi_big_g(ViMotionCommand):
 
 
 class _vi_dollar(ViMotionCommand):
-    def run(self, mode=None, count=None):
+    def run(self, mode=None, count=1):
         def f(view, s):
             if mode == modes.NORMAL:
                 if count > 1:

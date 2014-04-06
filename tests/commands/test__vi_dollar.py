@@ -1,4 +1,5 @@
 import unittest
+from collections import namedtuple
 
 from Vintageous.vi.utils import modes
 
@@ -9,123 +10,76 @@ from Vintageous.tests import first_sel
 from Vintageous.tests import ViewTest
 
 
-class Test_vi_dollar_InNormalMode(ViewTest):
-    def testCanMoveInNormalMode(self):
-        self.write('abc\nabc\n')
-        self.clear_sel()
-        self.add_sel(a=0, b=0)
+def get_text(test):
+    return test.view.substr(test.R(0, test.view.size()))
 
-        self.view.run_command('_vi_dollar', {'mode': modes.NORMAL, 'count': 1})
-        self.assertEqual(self.R(2, 2), first_sel(self.view))
-
-    def testCanMoveInNormalModeWithCount(self):
-        self.write(''.join(('abc\n',) * 10))
-        self.clear_sel()
-        self.add_sel(a=0, b=0)
-
-        self.view.run_command('_vi_dollar', {'mode': modes.NORMAL, 'count': 5})
-        self.assertEqual(self.R(18, 18), first_sel(self.view))
-
-    def testStaysPutOnEmptyLineInNormalMode(self):
-        self.write('abc\n\nabc\n')
-        self.clear_sel()
-        self.add_sel(a=4, b=4)
-
-        self.view.run_command('_vi_dollar', {'mode': modes.NORMAL, 'count': 1})
-        self.assertEqual(self.R(4, 4), first_sel(self.view))
+def  first_sel_wrapper(test):
+    return first_sel(test.view)
 
 
-class Test_vi_dollar_InVisualMode(ViewTest):
-    def testCanMoveInVisualMode(self):
-        self.write('abc\nabc\n')
-        self.clear_sel()
-        self.add_sel(a=0, b=1)
+test_data = namedtuple('test_data', 'cmd initial_text regions cmd_params expected actual_func msg')
+region_data = namedtuple('region_data', 'regions')
 
-        self.view.run_command('_vi_dollar', {'mode': modes.VISUAL, 'count': 1})
-        self.assertEqual(self.R(0, 4), first_sel(self.view))
+TESTS_INTERNAL_NORMAL = (
+    # NORMAL mode
+    test_data(cmd='_vi_dollar', initial_text='abc\nabc\n', regions=[[(0, 0), (0, 0)]], cmd_params={'mode': modes.NORMAL},
+              expected=region_data([(0, 2), (0, 2)]), actual_func=first_sel_wrapper, msg=''),
 
-    def testCanMoveInVisualModeWithCount(self):
-        self.write(''.join(('abc\n',) * 10))
-        self.clear_sel()
-        self.add_sel(a=0, b=1)
+    test_data(cmd='_vi_dollar', initial_text=('abc\n' * 10), regions=[[(0, 0), (0, 0)]], cmd_params={'mode': modes.NORMAL, 'count': 5},
+              expected=region_data([18, 18]), actual_func=first_sel_wrapper, msg=''),
 
-        self.view.run_command('_vi_dollar', {'mode': modes.VISUAL, 'count': 5})
-        self.assertEqual(self.R(0, 20), first_sel(self.view))
+    test_data(cmd='_vi_dollar', initial_text=('abc\n\nabc\n'), regions=[[4, 4]], cmd_params={'mode': modes.NORMAL, 'count': 1},
+              expected=region_data([4, 4]), actual_func=first_sel_wrapper, msg='should not move on empty line'),
 
-    def testStaysPutOnEmptyLineInVisualMode(self):
-        self.write('abc\n\nabc\n')
-        self.clear_sel()
-        self.add_sel(a=4, b=5)
+    # VISUAL mode
+    test_data(cmd='_vi_dollar', initial_text='abc\nabc\n', regions=[[0, 1]], cmd_params={'mode': modes.VISUAL},
+              expected=region_data([0, 4]), actual_func=first_sel_wrapper, msg=''),
 
-        self.view.run_command('_vi_dollar', {'mode': modes.VISUAL, 'count': 1})
-        self.assertEqual(self.R(4, 5), first_sel(self.view))
+    test_data(cmd='_vi_dollar', initial_text=('abc\n' * 10), regions=[[0, 1]], cmd_params={'mode': modes.VISUAL, 'count': 5},
+              expected=region_data([0, 20]), actual_func=first_sel_wrapper, msg=''),
 
-    def testCanMoveInVisualModeWithReversedSelectionNoCrossOver(self):
-        self.write('abc\nabc\n')
-        self.clear_sel()
-        self.add_sel(a=6, b=1)
+    test_data(cmd='_vi_dollar', initial_text=('abc\n\nabc\n'), regions=[[4, 5]], cmd_params={'mode': modes.VISUAL, 'count': 1},
+              expected=region_data([4, 5]), actual_func=first_sel_wrapper, msg=''),
 
-        self.view.run_command('_vi_dollar', {'mode': modes.VISUAL, 'count': 1})
-        self.assertEqual(self.R(6, 3), first_sel(self.view))
+    test_data(cmd='_vi_dollar', initial_text=('abc\nabc\n'), regions=[[6, 1]], cmd_params={'mode': modes.VISUAL, 'count': 1},
+              expected=region_data([6, 3]), actual_func=first_sel_wrapper, msg='can move in visual mode with reversed sel no cross over'),
 
-    def testCanMoveInVisualModeWithReversedSelectionAtEol(self):
-        self.write('abc\nabc\n')
-        self.clear_sel()
-        self.add_sel(a=5, b=4)
+    test_data(cmd='_vi_dollar', initial_text=('abc\nabc\n'), regions=[[3, 2]], cmd_params={'mode': modes.VISUAL, 'count': 1},
+              expected=region_data([2, 4]), actual_func=first_sel_wrapper, msg='can move in visual mode with revesed sel at eol'),
 
-        self.view.run_command('_vi_dollar', {'mode': modes.VISUAL, 'count': 1})
-        self.assertEqual(self.R(4, 8), first_sel(self.view))
+    test_data(cmd='_vi_dollar', initial_text=('abc\nabc\n'), regions=[[5, 4]], cmd_params={'mode': modes.VISUAL, 'count': 2},
+              expected=region_data([4, 8]), actual_func=first_sel_wrapper, msg='can move in visual mode with revesed sel cross over'),
 
-    def testCanMoveInVisualModeWithReversedSelectionCrossOver(self):
-        self.write('abc\nabc\n')
-        self.clear_sel()
-        self.add_sel(a=5, b=4)
+    test_data(cmd='_vi_dollar', initial_text=('abc\nabc\nabc\n'), regions=[[0, 4]], cmd_params={'mode': modes.VISUAL_LINE, 'count': 1},
+              expected=region_data([0, 4]), actual_func=first_sel_wrapper, msg='can move in visual mode with revesed sel cross over'),
 
-        self.view.run_command('_vi_dollar', {'mode': modes.VISUAL, 'count': 2})
-        self.assertEqual(self.R(4, 8), first_sel(self.view))
+    test_data(cmd='_vi_dollar', initial_text='abc\nabc\n', regions=[[0, 0]], cmd_params={'mode': modes.INTERNAL_NORMAL},
+              expected=region_data([0, 3]), actual_func=first_sel_wrapper, msg=''),
 
-    def testCanMoveInVisualLineMode(self):
-        self.write('abc\nabc\nabc\n')
-        self.clear_sel()
-        self.add_sel(a=0, b=4)
-
-        self.view.run_command('_vi_dollar', {'mode': modes.VISUAL_LINE, 'count': 1})
-        self.assertEqual(self.R(0, 4), first_sel(self.view))
+    test_data(cmd='_vi_dollar', initial_text='abc\nabc\nabc\nabc\n', regions=[[0, 0]], cmd_params={'mode': modes.INTERNAL_NORMAL, 'count': 3},
+              expected=region_data([0, 12]), actual_func=first_sel_wrapper, msg=''),
+    )
 
 
-class Test_vi_dollar_InVisualLineMode(ViewTest):
-    @unittest.skip("Maybe later")
-    def testCanMoveInVisualLineModeWithCount(self):
-        self.write('abc\nabc\nabc\nabc\n')
-        self.clear_sel()
-        self.add_sel(a=0, b=4)
-
-        self.view.run_command('_vi_dollar', {'mode': modes.VISUAL_LINE, 'count': 3})
-        self.assertEqual(self.R(0, 12), first_sel(self.view))
-
-    @unittest.skip("Maybe later")
-    def testCanMoveInVisualLineModeWithReversedSelection(self):
-        self.write('abc\nabc\nabc\nabc\n')
-        self.clear_sel()
-        self.add_sel(a=4, b=0)
-
-        self.view.run_command('_vi_dollar', {'mode': modes.VISUAL_LINE, 'count': 1})
-        self.assertEqual(self.R(4, 1), first_sel(self.view))
+TESTS = TESTS_INTERNAL_NORMAL
 
 
-class Test_vi_dollar_InInternalNormalMode(ViewTest):
-    def testCanMoveInInternalNormalMode(self):
-        self.write('abc\nabc\n')
-        self.clear_sel()
-        self.add_sel(a=0, b=0)
+class Test_vi_dollar(ViewTest):
+    def testAll(self):
+        for (i, data) in enumerate(TESTS):
+            # TODO: Perhaps we should ensure that other state is reset too?
+            self.view.sel().clear()
 
-        self.view.run_command('_vi_dollar', {'mode': modes.INTERNAL_NORMAL, 'count': 1})
-        self.assertEqual(self.R(0, 3), first_sel(self.view))
+            self.write(data.initial_text)
+            for region in data.regions:
+                self.add_sel(self.R(*region))
 
-    def testCanMoveInInternalNormalModeWithCount(self):
-        self.write('abc\nabc\nabc\nabc\n')
-        self.clear_sel()
-        self.add_sel(a=0, b=0)
+            self.view.run_command(data.cmd, data.cmd_params)
 
-        self.view.run_command('_vi_dollar', {'mode': modes.INTERNAL_NORMAL, 'count': 3})
-        self.assertEqual(self.R(0, 12), first_sel(self.view))
+            msg = "failed at test index {0} {1}".format(i, data.msg)
+            actual = data.actual_func(self)
+
+            if isinstance(data.expected, region_data):
+                self.assertEqual(self.R(*data.expected.regions), actual, msg)
+            else:
+                self.assertEqual(data.expected, actual, msg)
