@@ -3,6 +3,8 @@ from Vintageous.vi.constants import MODE_NORMAL
 # from Vintageous.vi.constants import MODE_VISUAL
 # from Vintageous.vi.constants import MODE_VISUAL_LINE
 
+from collections import namedtuple
+
 from Vintageous.tests import ViewTest
 from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
@@ -11,185 +13,59 @@ from Vintageous.vi.units import next_big_word_start
 from Vintageous.vi.units import big_word_starts
 from Vintageous.vi.units import CLASS_VI_INTERNAL_WORD_START
 
+# TODO: Test against folded regions.
+# TODO: Ensure that we only create empty selections while testing. Add assert_all_sels_empty()?
+test_data = namedtuple('test_data', 'initial_text region expected msg')
+region_data = namedtuple('region_data', 'regions')
 
-class Test_next_big_word_start_InNormalMode_FromWhitespace(ViewTest):
-    def testToWordStart(self):
+
+def get_text(test):
+    return test.view.substr(test.R(0, test.view.size()))
+
+def  first_sel_wrapper(test):
+    return first_sel(test.view)
+
+
+TESTS_MOVE_FORWARD = (
+    test_data(initial_text='  foo bar\n', region=(0, 0), expected=2, msg=''),
+    test_data(initial_text='  (foo)\n', region=(0, 0), expected=2, msg=''),
+    test_data(initial_text='  \n\n\n', region=(0, 0), expected=3, msg=''),
+    test_data(initial_text='  \n  \n\n', region=(0, 0), expected=3, msg=''),
+    test_data(initial_text='  \n', region=(0, 0), expected=3, msg=''),
+    test_data(initial_text='   ', region=(0, 0), expected=3, msg=''),
+    test_data(initial_text='   \nfoo\nbar', region=(0, 0), expected=4, msg=''),
+    test_data(initial_text='   \n foo\nbar', region=(0, 0), expected=4, msg=''),
+    test_data(initial_text='  a foo bar\n', region=(0, 0), expected=2, msg=''),
+    test_data(initial_text='  \na\n\n', region=(0, 0), expected=3, msg=''),
+    test_data(initial_text='  \n a\n\n', region=(0, 0), expected=3, msg=''),
+
+    test_data(initial_text='(foo) bar\n', region=(0, 0), expected=6, msg=''),
+    test_data(initial_text='(foo) (bar)\n', region=(0, 0), expected=6, msg=''),
+    test_data(initial_text='(foo)\n\n\n', region=(0, 0), expected=6, msg=''),
+    test_data(initial_text='(foo)\n  \n\n', region=(0, 0), expected=6, msg=''),
+    test_data(initial_text='(foo)\n', region=(0, 0), expected=6, msg=''),
+    test_data(initial_text='(foo)', region=(0, 0), expected=5, msg=''),
+    test_data(initial_text='(foo)\nbar\nbaz', region=(0, 0), expected=6, msg=''),
+    test_data(initial_text='(foo)\n bar\nbaz', region=(0, 0), expected=6, msg=''),
+    test_data(initial_text='(foo) a bar\n', region=(0, 0), expected=6, msg=''),
+    test_data(initial_text='(foo)\na\n\n', region=(0, 0), expected=6, msg=''),
+    test_data(initial_text='(foo)\n a\n\n', region=(0, 0), expected=6, msg=''),
+)
+
+
+class Test_big_word_all(ViewTest):
+    def testAll(self):
         set_text(self.view, '  foo bar\n')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
 
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 2)
+        for (i, data) in enumerate(TESTS_MOVE_FORWARD):
+            self.view.sel().clear()
 
-    def testToPunctuationStart(self):
-        set_text(self.view, '  (foo)\n')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
+            self.write(data.initial_text)
+            r = self.R(*region)
+            self.add_sel(r)
 
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 2)
-
-    def testToEmptyLine(self):
-        set_text(self.view, '  \n\n\n')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 3)
-
-    def testToWhitespaceLine(self):
-        set_text(self.view, '  \n  \n\n')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 3)
-
-    def testToEofWithNewline(self):
-        set_text(self.view, '  \n')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 3)
-
-    def testToEof(self):
-        set_text(self.view, '   ')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 3)
-
-    def testToOneWordLine(self):
-        set_text(self.view, '   \nfoo\nbar')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 4)
-
-    def testToOneWordLineWithLeadingWhitespace(self):
-        set_text(self.view, '   \n foo\nbar')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 4)
-
-    def testToOneCharWord(self):
-        set_text(self.view, '  a foo bar\n')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 2)
-
-    def testToOneCharLine(self):
-        set_text(self.view, '  \na\n\n')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 3)
-
-    def testToOneCharLineWithLeadingWhitespace(self):
-        set_text(self.view, '  \n a\n\n')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 3)
-
-
-class Test_next_big_word_start_InNormalMode_FromWordStart(ViewTest):
-    def testToWordStart(self):
-        set_text(self.view, '(foo) bar\n')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 6)
-
-    def testToPunctuationStart(self):
-        set_text(self.view, '(foo) (bar)\n')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 6)
-
-    def testToEmptyLine(self):
-        set_text(self.view, '(foo)\n\n\n')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 6)
-
-    def testToWhitespaceLine(self):
-        set_text(self.view, '(foo)\n  \n\n')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 6)
-
-    def testToEofWithNewline(self):
-        set_text(self.view, '(foo)\n')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 6)
-
-    def testToEof(self):
-        set_text(self.view, '(foo)')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 5)
-
-    def testToOneWordLine(self):
-        set_text(self.view, '(foo)\nbar\nbaz')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 6)
-
-    def testToOneWordLineWithLeadingWhitespace(self):
-        set_text(self.view, '(foo)\n bar\nbaz')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 6)
-
-    def testToOneCharWord(self):
-        set_text(self.view, '(foo) a bar\n')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 6)
-
-    def testToOneCharLine(self):
-        set_text(self.view, '(foo)\na\n\n')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 6)
-
-    def testToOneCharLineWithLeadingWhitespace(self):
-        set_text(self.view, '(foo)\n a\n\n')
-        r = self.R((0, 0), (0, 0))
-        add_sel(self.view, r)
-
-        pt = next_big_word_start(self.view, r.b)
-        self.assertEqual(pt, 6)
+            pt = next_big_word_start(self.view, r.b)
+            self.assertEqual(pt, data.expected, 'failed at test index {0}'.format(i))
 
 
 class Test_next_big_word_start_InNormalMode_FromWord(ViewTest):
