@@ -61,7 +61,7 @@ class Test_big_word_all(ViewTest):
             self.view.sel().clear()
 
             self.write(data.initial_text)
-            r = self.R(*region)
+            r = self.R(*data.region)
             self.add_sel(r)
 
             pt = next_big_word_start(self.view, r.b)

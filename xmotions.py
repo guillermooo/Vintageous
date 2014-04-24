@@ -783,12 +783,14 @@ class _vi_w(ViMotionCommand):
                                                             white_space='\n')
                 return sublime.Region(pt, pt)
             elif mode == modes.VISUAL:
-                pt = units.word_starts(view, start=s.b - 1, count=count)
-                if s.a > s.b and pt >= s.a:
+                start = (s.b - 1) if (s.a < s.b) else s.b
+                pt = units.word_starts(view, start=start, count=count)
+
+                if (s.a > s.b) and (pt >= s.a):
                     return sublime.Region(s.a - 1, pt + 1)
                 elif s.a > s.b:
                     return sublime.Region(s.a, pt)
-                elif (view.size() == pt):
+                elif view.size() == pt:
                     pt -= 1
                 return sublime.Region(s.a, pt + 1)
             elif mode == modes.INTERNAL_NORMAL:
@@ -1717,15 +1719,29 @@ class _vi_question_mark(ViMotionCommand, BufferSearchBase):
 
 class _vi_b(ViMotionCommand):
     def run(self, mode=None, count=1):
-        # FIXME: b is a huge mess. Fix it.
+        def reverse_sels(view, s):
+            return sublime.Region(s.end(), s.begin())
 
+        if all(s.size() == 1 for s in self.view.sel()):
+            regions_transformer(self.view, reverse_sels)
+
+        # TODO: reimplement this motion in Python.
         for i in range(count):
             if mode == modes.NORMAL:
-                self.view.run_command('move', {'by': 'stops', 'word_begin': True, 'punct_begin': True, 'empty_line': True, 'forward': False})
+                self.view.run_command('move', {
+                        'by': 'stops', 'word_begin': True,
+                        'punct_begin': True, 'empty_line': True,
+                        'forward': False})
             if mode == modes.INTERNAL_NORMAL:
-                self.view.run_command('move', {'by': 'stops', 'word_begin': True, 'punct_begin': True, 'empty_line': True, 'forward': False, 'extend': True})
+                self.view.run_command('move', {
+                        'by': 'stops', 'word_begin': True,
+                        'punct_begin': True, 'empty_line': True,
+                        'forward': False, 'extend': True})
             elif mode == modes.VISUAL:
-                self.view.run_command('move', {'by': 'stops', 'word_begin': True, 'punct_begin': True, 'empty_line': True, 'forward': False, 'extend': True})
+                self.view.run_command('move', {
+                        'by': 'stops', 'word_begin': True,
+                        'punct_begin': True, 'empty_line': True,
+                        'forward': False, 'extend': True})
             elif mode == modes.VISUAL_BLOCK:
                 pass
 

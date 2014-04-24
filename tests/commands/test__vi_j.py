@@ -18,6 +18,7 @@ region_data = namedtuple('region_data', 'regions')
 def get_text(test):
     return test.view.substr(test.R(0, test.view.size()))
 
+
 def  first_sel_wrapper(test):
     return first_sel(test.view)
 
