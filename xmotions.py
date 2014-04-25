@@ -1273,6 +1273,12 @@ class _vi_octothorp(ViMotionCommand, ExactWordBufferSearchBase):
 class _vi_big_b(ViMotionCommand):
     # TODO: Reimplement this.
     def run(self, count=1, mode=None):
+        def reverse_sels(view, s):
+            return sublime.Region(s.end(), s.begin())
+
+        if all(s.size() == 1 for s in self.view.sel()):
+            regions_transformer(self.view, reverse_sels)
+
         def move():
             if mode == modes.INTERNAL_NORMAL:
                 self.view.run_command('move', {'by': 'stops',
