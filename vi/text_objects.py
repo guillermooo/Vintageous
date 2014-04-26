@@ -466,7 +466,7 @@ def find_paragraph_text_object(view, s, inclusive=True):
     return sublime.Region(begin, end)
 
 
-def word_reverse(view, pt, count=1):
+def word_reverse(view, pt, count=1, big=False):
     t = pt
     for _ in range(count):
         t = view.find_by_class(t, forward=False,
@@ -474,8 +474,8 @@ def word_reverse(view, pt, count=1):
         if t == 0:
             break
 
-        # Skip over punctuation characters.
-        while not any((view.substr(t - 1) in '\n\t ',
-                       t <= 0)):
-            t -= 1
+        if big:
+            # Skip over punctuation characters.
+            while not ((view.substr(t - 1) in '\n\t ') or (t <= 0)):
+                t -= 1
     return t

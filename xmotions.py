@@ -1271,9 +1271,8 @@ class _vi_octothorp(ViMotionCommand, ExactWordBufferSearchBase):
         regions_transformer(self.view, f)
 
 
-class _vi_big_b(ViMotionCommand):
-    # TODO: Reimplement this.
-    def run(self, count=1, mode=None):
+class _vi_b(ViMotionCommand):
+    def run(self, mode=None, count=1):
         def do_motion(view, s):
             if mode == modes.NORMAL:
                 pt = word_reverse(self.view, s.b, count)
@@ -1291,6 +1290,33 @@ class _vi_big_b(ViMotionCommand):
                     return sublime.Region(s.a, pt + 1)
                 elif s.b < s.a:
                     pt = word_reverse(self.view, s.b, count)
+                    return sublime.Region(s.a, pt)
+
+            return s
+
+        regions_transformer(self.view, do_motion)
+
+
+class _vi_big_b(ViMotionCommand):
+    # TODO: Reimplement this.
+    def run(self, count=1, mode=None):
+        def do_motion(view, s):
+            if mode == modes.NORMAL:
+                pt = word_reverse(self.view, s.b, count, big=True)
+                return sublime.Region(pt)
+
+            elif mode == modes.INTERNAL_NORMAL:
+                pt = word_reverse(self.view, s.b, count, big=True)
+                return sublime.Region(s.a, pt)
+
+            elif mode in (modes.VISUAL, modes.VISUAL_BLOCK):
+                if s.a < s.b:
+                    pt = word_reverse(self.view, s.b - 1, count, big=True)
+                    if pt < s.a:
+                        return sublime.Region(s.a + 1, pt)
+                    return sublime.Region(s.a, pt + 1)
+                elif s.b < s.a:
+                    pt = word_reverse(self.view, s.b, count, big=True)
                     return sublime.Region(s.a, pt)
 
             return s
@@ -1714,35 +1740,6 @@ class _vi_question_mark(ViMotionCommand, BufferSearchBase):
 
         if not self.view.visible_region().contains(self.view.sel()[0]):
             self.view.show(self.view.sel()[0])
-
-
-class _vi_b(ViMotionCommand):
-    def run(self, mode=None, count=1):
-        def reverse_sels(view, s):
-            return sublime.Region(s.end(), s.begin())
-
-        if all(s.size() == 1 for s in self.view.sel()):
-            regions_transformer(self.view, reverse_sels)
-
-        # TODO: reimplement this motion in Python.
-        for i in range(count):
-            if mode == modes.NORMAL:
-                self.view.run_command('move', {
-                        'by': 'stops', 'word_begin': True,
-                        'punct_begin': True, 'empty_line': True,
-                        'forward': False})
-            if mode == modes.INTERNAL_NORMAL:
-                self.view.run_command('move', {
-                        'by': 'stops', 'word_begin': True,
-                        'punct_begin': True, 'empty_line': True,
-                        'forward': False, 'extend': True})
-            elif mode == modes.VISUAL:
-                self.view.run_command('move', {
-                        'by': 'stops', 'word_begin': True,
-                        'punct_begin': True, 'empty_line': True,
-                        'forward': False, 'extend': True})
-            elif mode == modes.VISUAL_BLOCK:
-                pass
 
 
 class _vi_n(ViMotionCommand):

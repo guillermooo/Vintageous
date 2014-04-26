@@ -17,8 +17,8 @@ TESTS = (
     test_data(content='abc\nabc\nabc', args=(8, 1), expected=4, msg='find word start from different line'),
     test_data(content='abc\n\nabc',    args=(5, 1), expected=4, msg='stop at empty line'),
     test_data(content='abc a abc',     args=(6, 1), expected=4, msg='stop at single-char word'),
-    test_data(content='(abc) abc',     args=(6, 1), expected=0, msg='skip over punctuation simple'),
-    test_data(content='abc.(abc)',     args=(6, 1), expected=0, msg='skip over punctuation complex'),
+    test_data(content='(abc) abc',     args=(6, 1), expected=4, msg='skip over punctuation simple'),
+    test_data(content='abc.(abc)',     args=(5, 1), expected=3, msg='skip over punctuation complex'),
     test_data(content='abc == abc',     args=(7, 1), expected=4, msg='stop at isolated punctuation word'),
 )
 
@@ -27,7 +27,7 @@ class Test_word_reverse(ViewTest):
     def testAll(self):
         for (i, data) in enumerate(TESTS):
             self.write(data.content)
-            actual = word_reverse(self.view, *data.args, big=True)
+            actual = word_reverse(self.view, *data.args)
 
             msg = "failed at test index {0}: {1}".format(i, data.msg)
             self.assertEqual(data.expected, actual, msg)
