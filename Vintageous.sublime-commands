@@ -2,4 +2,5 @@
     { "caption": "Vintageous: Reset", "command": "reset_vintageous" },
     { "caption": "Vintageous: Toggle Vim Ctrl Keys", "command": "vintageous_toggle_ctrl_keys" },
     { "caption": "Vintageous: Exit from command mode", "command": "force_exit_from_command_mode" }
+    {"caption": "Toggle Full Screen", "command": "toggle_full_screen"}
 ]
