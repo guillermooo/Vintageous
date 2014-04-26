@@ -31,7 +31,7 @@ ANCHOR_NEXT_WORD_BOUNDARY = CLASS_WORD_START | CLASS_PUNCTUATION_START | \
 ANCHOR_PREVIOUS_WORD_BOUNDARY = CLASS_WORD_END | CLASS_PUNCTUATION_END | \
                                 CLASS_LINE_START
 
-BIG_WORD_REVERSE_STOPS = CLASS_WORD_START | CLASS_EMPTY_LINE | \
+WORD_REVERSE_STOPS = CLASS_WORD_START | CLASS_EMPTY_LINE | \
                          CLASS_PUNCTUATION_START
 
 
@@ -466,11 +466,11 @@ def find_paragraph_text_object(view, s, inclusive=True):
     return sublime.Region(begin, end)
 
 
-def big_word_reverse(view, pt, count=1):
+def word_reverse(view, pt, count=1):
     t = pt
     for _ in range(count):
         t = view.find_by_class(t, forward=False,
-                    classes=BIG_WORD_REVERSE_STOPS)
+                    classes=WORD_REVERSE_STOPS)
         if t == 0:
             break
 

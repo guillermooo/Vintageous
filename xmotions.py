@@ -28,7 +28,7 @@ from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import regions_transformer
 from Vintageous.vi.utils import mark_as_widget
 from Vintageous.vi import cmd_defs
-from Vintageous.vi.text_objects import big_word_reverse
+from Vintageous.vi.text_objects import word_reverse
 
 
 class _vi_find_in_line(ViMotionCommand):
@@ -1276,21 +1276,21 @@ class _vi_big_b(ViMotionCommand):
     def run(self, count=1, mode=None):
         def do_motion(view, s):
             if mode == modes.NORMAL:
-                pt = big_word_reverse(self.view, s.b, count)
+                pt = word_reverse(self.view, s.b, count)
                 return sublime.Region(pt)
 
             elif mode == modes.INTERNAL_NORMAL:
-                pt = big_word_reverse(self.view, s.b, count)
+                pt = word_reverse(self.view, s.b, count)
                 return sublime.Region(s.a, pt)
 
             elif mode in (modes.VISUAL, modes.VISUAL_BLOCK):
                 if s.a < s.b:
-                    pt = big_word_reverse(self.view, s.b - 1, count)
+                    pt = word_reverse(self.view, s.b - 1, count)
                     if pt < s.a:
                         return sublime.Region(s.a + 1, pt)
                     return sublime.Region(s.a, pt + 1)
                 elif s.b < s.a:
-                    pt = big_word_reverse(self.view, s.b, count)
+                    pt = word_reverse(self.view, s.b, count)
                     return sublime.Region(s.a, pt)
 
             return s

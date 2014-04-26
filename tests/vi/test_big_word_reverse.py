@@ -1,7 +1,7 @@
 import unittest
 from collections import namedtuple
 
-from Vintageous.vi.text_objects import big_word_reverse
+from Vintageous.vi.text_objects import word_reverse
 from Vintageous.vi.utils import modes
 from Vintageous.tests import first_sel
 from Vintageous.tests import ViewTest
@@ -23,11 +23,11 @@ TESTS = (
 )
 
 
-class Test_big_word_reverse(ViewTest):
+class Test_word_reverse(ViewTest):
     def testAll(self):
         for (i, data) in enumerate(TESTS):
             self.write(data.content)
-            actual = big_word_reverse(self.view, *data.args)
+            actual = word_reverse(self.view, *data.args)
 
             msg = "failed at test index {0}: {1}".format(i, data.msg)
             self.assertEqual(data.expected, actual, msg)
