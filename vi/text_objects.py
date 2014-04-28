@@ -469,8 +469,7 @@ def find_paragraph_text_object(view, s, inclusive=True):
 def word_reverse(view, pt, count=1, big=False):
     t = pt
     for _ in range(count):
-        t = view.find_by_class(t, forward=False,
-                    classes=WORD_REVERSE_STOPS)
+        t = view.find_by_class(t, forward=False, classes=WORD_REVERSE_STOPS)
         if t == 0:
             break
 
