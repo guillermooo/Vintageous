@@ -1267,6 +1267,7 @@ class _vi_big_s_action(ViTextCommandBase):
 
         self.view.sel().add_all(self.view.get_regions('vi_empty_sels'))
         self.view.erase_regions('vi_empty_sels')
+        self.view.run_command('reindent')
 
         self.enter_insert_mode(mode)
 
