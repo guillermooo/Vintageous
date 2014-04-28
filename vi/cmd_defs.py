@@ -762,6 +762,7 @@ class ViEnterVisualMode(ViOperatorDef):
 
 
 @keys.assign(seq=seqs.Z_ENTER, modes=_MODES_ACTION)
+@keys.assign(seq=seqs.ZT, modes=_MODES_ACTION)
 class ViScrollToScreenTop(ViOperatorDef):
     """
     Vim: `z<CR>`
