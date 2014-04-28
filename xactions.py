@@ -1443,7 +1443,9 @@ class _vi_equal_equal(ViTextCommandBase):
 class _vi_greater_than_greater_than(ViTextCommandBase):
     def run(self, edit, mode=None, count=1):
         def f(view, s):
-            return sublime.Region(s.begin())
+            bol = view.line(s.begin()).a
+            pt = utils.next_non_white_space_char(view, bol, white_space='\t ')
+            return sublime.Region(pt)
 
         def select():
             s0 = self.view.sel()[0]
