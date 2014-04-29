@@ -33,6 +33,8 @@ ANCHOR_PREVIOUS_WORD_BOUNDARY = CLASS_WORD_END | CLASS_PUNCTUATION_END | \
 
 WORD_REVERSE_STOPS = CLASS_WORD_START | CLASS_EMPTY_LINE | \
                          CLASS_PUNCTUATION_START
+WORD_END_REVERSE_STOPS = CLASS_WORD_END | CLASS_EMPTY_LINE | \
+                         CLASS_PUNCTUATION_END
 
 
 
@@ -478,3 +480,24 @@ def word_reverse(view, pt, count=1, big=False):
             while not ((view.substr(t - 1) in '\n\t ') or (t <= 0)):
                 t -= 1
     return t
+
+
+def word_end_reverse(view, pt, count=1, big=False):
+    t = pt
+    for _ in range(count):
+        if big:
+            # Skip over punctuation characters.
+            while not ((view.substr(t - 1) in '\n\t ') or (t <= 0)):
+                t -= 1
+
+        if (not view.substr(t).isalnum() and
+            not view.substr(t).isspace() and
+            view.substr(t - 1).isalnum() and
+            t > 0):
+                pass
+        else:
+            t = view.find_by_class(t, forward=False, classes=WORD_END_REVERSE_STOPS)
+        if t == 0:
+            break
+
+    return max(t - 1, 0)

@@ -2152,6 +2152,25 @@ class ViMoveByWordEndsBackward(ViMotionDef):
         return cmd
 
 
+@keys.assign(seq=seqs.G_BIG_E, modes=_MODES_MOTION)
+class ViMoveByBigWordEndsBackward(ViMotionDef):
+    """
+    Vim: `gE`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViMotionDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['motion'] = '_vi_g_big_e'
+        cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
+
+        return cmd
+
+
 @keys.assign(seq=seqs.BIG_L, modes=_MODES_MOTION)
 class ViGotoScreenBottom(ViMotionDef):
     """
