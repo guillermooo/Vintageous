@@ -44,7 +44,7 @@ class seqs:
     UP =                           '<up>'
     DOWN =                         '<down>'
     LEFT =                         '<left>'
-    RIGHT =                        '<right'
+    RIGHT =                        '<right>'
     HOME =                         '<home>'
     END =                          '<end>'
     BACKTICK =                     '`'
