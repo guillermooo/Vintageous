@@ -1,3 +1,14 @@
+3.5.5 - 30/04/2014
+
+	- Fix 'w' motion in visual mode.
+	- Fix 'b' motion in visual mode.
+	- Improve 'B' motion.
+	- Improve '>>' operator (caret positioning).
+	- Implement 'zt'.
+	- Improve 'S' operator: reindent empty lines.
+	- Improve 'ge' motion.
+	- Implement 'gE' motion.
+
 3.5.4 - 02/04/14
 
 	- Fix 'cc' on empty line.
