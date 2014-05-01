@@ -2002,6 +2002,7 @@ class ViGotoSymbolInFile(ViMotionDef):
 
 @keys.assign(seq=seqs.L, modes=_MODES_MOTION)
 @keys.assign(seq=seqs.RIGHT, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.SPACE, modes=_MODES_MOTION)
 class ViMoveRightByChars(ViMotionDef):
     """
     Vim: `l`
