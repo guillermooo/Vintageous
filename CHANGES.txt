@@ -1,3 +1,11 @@
+3.5.6 - 01-05-2014
+
+	- Fix 'x' now can be repeated with '.'.
+	- Make space key behave like l in motion modes.
+	- Add helper script for building version files.
+	- Add tests for key sequence names
+	- Fix typo in sequence names causing '<right>' to break.
+
 3.5.5 - 30/04/2014
 
 	- Fix 'w' motion in visual mode.
