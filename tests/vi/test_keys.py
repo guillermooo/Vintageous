@@ -172,6 +172,7 @@ TESTS_KNOWN_SEQUENCES = (
     seq_test(actual=seqs.CTRL_I,          expected='<C-i>'),
     seq_test(actual=seqs.CTRL_O,          expected='<C-o>'),
     seq_test(actual=seqs.CTRL_X,          expected='<C-x>'),
+    seq_test(actual=seqs.CTRL_X_CTRL_L,   expected='<C-x><C-l>'),
     seq_test(actual=seqs.Z,               expected='z'),
     seq_test(actual=seqs.Z_ENTER,         expected='z<cr>'),
     seq_test(actual=seqs.ZT,              expected='zt'),

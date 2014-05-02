@@ -2924,6 +2924,8 @@ class ViReverseFindWord(ViMotionDef):
 @keys.assign(seq=seqs.CTRL_W, modes=_MODES_MOTION)
 @keys.assign(seq=seqs.G, modes=_MODES_MOTION)
 @keys.assign(seq=seqs.Z, modes=_MODES_MOTION)
+# TODO: This is called a 'submode' in the vim docs.
+@keys.assign(seq=seqs.CTRL_X, modes=[modes.INSERT])
 # FIXME: This should not be a motion.
 class ViOpenNameSpace(ViMotionDef):
     """
@@ -3352,3 +3354,24 @@ class ViSearchBackwardImpl(ViMotionDef):
                               'count': state.count,
                               }
         return cmd
+
+
+@keys.assign(seq=seqs.CTRL_X_CTRL_L, modes=[modes.INSERT])
+class ViInsertLineWithCommonPrefix(ViOperatorDef):
+    """
+    Vim: `i_CTRL_X_CTRL_L`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.scroll_into_view = True
+        self.updates_xpos = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = '_vi_ctrl_x_ctrl_l'
+        cmd['action_args'] = {'mode': state.mode,
+                              'register': state.register,
+                              }
+        return cmd
+

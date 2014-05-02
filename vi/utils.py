@@ -117,6 +117,7 @@ class modes:
     REPLACE = 'mode_replace'
     NORMAL_INSERT = 'mode_normal_insert'
     SELECT ='mode_select'
+    CTRL_X = 'mode_control_x'
 
     @staticmethod
     def to_friendly_name(mode):
@@ -144,6 +145,8 @@ class modes:
             return 'INSERT'
         if mode == modes.SELECT:
             return 'SELECT'
+        if mode == modes.CTRL_X:
+            return 'Mode ^X'
         else:
             return 'REALLY UNKNOWN'
 

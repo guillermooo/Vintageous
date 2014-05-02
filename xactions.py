@@ -27,6 +27,7 @@ from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import regions_transformer
 from Vintageous.vi import cmd_base
 from Vintageous.vi import cmd_defs
+from Vintageous.vi import search
 
 _logger = local_logger(__name__)
 
@@ -1952,7 +1953,7 @@ class _vi_modify_numbers(sublime_plugin.TextCommand):
 
         pts = self.find_next_num(regs)
         if not pts:
-            utils.utils.blink()
+            utils.blink()
             return
 
         count = count if not subtract else -count
@@ -2344,3 +2345,67 @@ class _vi_g_big_h(ViWindowCommandBase):
         utils.blink()
         sublime.status_message('Vintageous: No available search matches')
         self.state.reset_command_data()
+
+
+class _vi_ctrl_x_ctrl_l(ViTextCommandBase):
+    """
+    http://vimdoc.sourceforge.net/htmldoc/insert.html#i_CTRL-X_CTRL-L
+    """
+    MAX_MATCHES = 20
+    def find_matches(self, prefix, end):
+        escaped = re.escape(prefix)
+        matches = []
+        while end > 0:
+            match = search.reverse_search(self.view,
+                                          r'^\s*{0}'.format(escaped),
+                                          0, end, flags=0)
+            if (match is None) or (len(matches) == self.MAX_MATCHES):
+                break
+            line = self.view.line(match.begin())
+            end = line.begin()
+            text = self.view.substr(line).lstrip()
+            if text not in matches:
+                matches.append(text)
+        return matches
+
+    def run(self, edit, mode=None, register='"'):
+        # TODO: Must exit to insert mode. As we're using a quick panel, the
+        #       mode is being reset in _init_vintageous.
+        assert mode == modes.INSERT, 'bad mode'
+
+        if (len(self.view.sel()) > 1 or
+            not self.view.sel()[0].empty()):
+                utils.blink()
+                return
+
+        s = self.view.sel()[0]
+        line_begin = self.view.text_point(utils.row_at(self.view, s.b), 0)
+        prefix = self.view.substr(sublime.Region(line_begin, s.b)).lstrip()
+        self._matches = self.find_matches(prefix, end=self.view.line(s.b).a)
+        if self._matches:
+            self.show_matches(self._matches)
+            state = State(self.view)
+            state.reset_during_init = False
+            state.reset_command_data()
+            return
+        utils.blink()
+
+    def show_matches(self, items):
+        self.view.window().show_quick_panel(items, self.replace,
+                                            sublime.MONOSPACE_FONT)
+
+    def replace(self, s):
+        self.view.run_command('__replace_line',
+                              {'with_what': self._matches[s]})
+        del self.__dict__['_matches']
+        pt = self.view.sel()[0].b
+        self.view.sel().clear()
+        self.view.sel().add(sublime.Region(pt))
+
+
+class __replace_line(sublime_plugin.TextCommand):
+    def run(self, edit, with_what):
+        b = self.view.line(self.view.sel()[0].b).a
+        pt = utils.next_non_white_space_char(self.view, b, white_space=' \t')
+        self.view.replace(edit, sublime.Region(pt, self.view.line(pt).b),
+                          with_what)

@@ -71,6 +71,8 @@ class seqs:
     CTRL_BIG_F =                   '<C-F>'
     CTRL_BIG_P =                   '<C-P>'
     CTRL_W_H =                     '<C-w>h'
+    CTRL_X =                       '<C-x>'
+    CTRL_X_CTRL_L =                '<C-x><C-l>'
     Q =                            'q'
     AT =                           '@'
     CTRL_W_BIG_H =                 '<C-w>H'
@@ -253,6 +255,7 @@ def seq_to_command(state, seq, mode=None):
 # 'key sequence' is a sequence of key presses.
 #
 mappings = {
+    modes.INSERT: {},
     modes.NORMAL: {},
     modes.VISUAL: {},
     modes.OPERATOR_PENDING: {},

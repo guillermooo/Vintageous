@@ -8,6 +8,7 @@ from Vintageous.vi.cmd_base import cmd_types
 
 
 _mappings = {
+    modes.INSERT: {},
     modes.NORMAL: {},
     modes.VISUAL: {},
     modes.VISUAL_LINE: {},
