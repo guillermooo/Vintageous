@@ -468,6 +468,7 @@ def find_paragraph_text_object(view, s, inclusive=True):
     return sublime.Region(begin, end)
 
 
+# TODO: Move this to units.py.
 def word_reverse(view, pt, count=1, big=False):
     t = pt
     for _ in range(count):
@@ -482,13 +483,21 @@ def word_reverse(view, pt, count=1, big=False):
     return t
 
 
+# TODO: Move this to units.py.
 def word_end_reverse(view, pt, count=1, big=False):
     t = pt
-    for _ in range(count):
+    for i in range(count):
         if big:
             # Skip over punctuation characters.
             while not ((view.substr(t - 1) in '\n\t ') or (t <= 0)):
                 t -= 1
+
+        # `ge` should stop at the previous word end if starting at a space
+        # immediately after a word.
+        if (i == 0 and
+            view.substr(t).isspace() and
+            not view.substr(t - 1).isspace()):
+                continue
 
         if (not view.substr(t).isalnum() and
             not view.substr(t).isspace() and

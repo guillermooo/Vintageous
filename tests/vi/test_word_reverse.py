@@ -19,7 +19,7 @@ TESTS = (
     test_data(content='abc a abc',     args=(6, 1), expected=4, msg='stop at single-char word'),
     test_data(content='(abc) abc',     args=(6, 1), expected=4, msg='skip over punctuation simple'),
     test_data(content='abc.(abc)',     args=(5, 1), expected=3, msg='skip over punctuation complex'),
-    test_data(content='abc == abc',     args=(7, 1), expected=4, msg='stop at isolated punctuation word'),
+    test_data(content='abc == abc',    args=(7, 1), expected=4, msg='stop at isolated punctuation word'),
 )
 
 

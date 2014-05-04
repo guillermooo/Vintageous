@@ -22,6 +22,7 @@ TESTS = (
     test_data(content='abc abc.abc',   args=(7, 1), expected=6, msg='stop at previous word end from contiguous punctuation'),
 
     test_data(content='abc abc.abc',   args=(10, 1, True), expected=2, msg='skip over punctuation'),
+    test_data(content='abc ',          args=(3, 1), expected=2, msg='stop at previous word end if starting from contiguous space'),
 )
 
 
