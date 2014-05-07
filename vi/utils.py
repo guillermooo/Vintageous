@@ -253,6 +253,12 @@ def previous_white_space_char(view, pt, white_space='\t '):
     return pt
 
 
+def move_backward_while(view, pt, func):
+    while (pt >= 0) and func(pt):
+        pt -= 1
+    return pt
+
+
 def is_at_eol(view, reg):
     return view.line(reg.b).b == reg.b
 

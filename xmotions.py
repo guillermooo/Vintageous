@@ -30,6 +30,8 @@ from Vintageous.vi.utils import mark_as_widget
 from Vintageous.vi import cmd_defs
 from Vintageous.vi.text_objects import word_reverse
 from Vintageous.vi.text_objects import word_end_reverse
+from Vintageous.vi.text_objects import get_closest_tag
+from Vintageous.vi.text_objects import find_containing_tag
 
 
 class _vi_find_in_line(ViMotionCommand):
@@ -959,12 +961,41 @@ class _vi_percent(ViMotionCommand):
             ('(', ')'),
             ('[', ']'),
             ('{', '}'),
+            ('<', '>'),
     )
+
+    def find_tag(self, pt):
+        if (self.view.score_selector(0, 'text.html') == 0 and
+            self.view.score_selector(0, 'text.xml') == 0):
+                print("XXX")
+                return None
+
+        if any([self.view.substr(pt) in p for p in self.pairs]):
+            print("AAA")
+            return None
+
+        _, tag = get_closest_tag(self.view, pt)
+        if tag.contains(pt):
+            print("HELLO")
+            begin_tag, end_tag, _ = find_containing_tag(self.view, pt)
+            if begin_tag:
+                return begin_tag if end_tag.contains(pt) else end_tag
+        print("BYE, BYE")
+
 
     def run(self, percent=None, mode=None):
         if percent == None:
             def move_to_bracket(view, s):
                 def find_bracket_location(pt):
+
+                    pt = s.b
+                    if s.size() > 0 and s.b > s.a:
+                        pt = s.b - 1
+
+                    tag = self.find_tag(pt)
+                    if tag:
+                        return tag.a
+
                     bracket, brackets, bracket_pt = self.find_a_bracket(pt)
                     if not bracket:
                         return

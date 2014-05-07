@@ -17,7 +17,8 @@ from Vintageous.vi import search
 import re
 
 
-RX_ANY_TAG = r'</?([0-9A-Za-z]+).*?>'
+RX_ANY_TAG = r'</?([0-9A-Za-z-]+).*?>'
+RX_ANY_TAG_NAMED_TPL = r'</?({0}) *?.*?>'
 RXC_ANY_TAG = re.compile(r'</?([0-9A-Za-z]+).*?>')
 # According to the HTML 5 editor's draft, only 0-9A-Za-z characters can be
 # used in tag names. TODO: This won't be enough in Dart Polymer projects,
@@ -227,7 +228,11 @@ def get_text_object_region(view, s, text_object, inclusive=False, count=1):
         return s
 
     if type_ == TAG:
-        return find_tag_text_object(view, s, inclusive)
+        begin_tag, end_tag, _ = find_containing_tag(view, s.b)
+        if inclusive:
+            return sublime.Region(begin_tag.a, end_tag.b)
+        else:
+            return sublime.Region(begin_tag.b, end_tag.a)
 
     if type_ == PARAGRAPH:
         return find_paragraph_text_object(view, s, inclusive)
@@ -310,86 +315,6 @@ def get_text_object_region(view, s, text_object, inclusive=False, count=1):
 
 
     return s
-
-
-def get_tag_name(tag):
-    return re.match(RXC_ANY_TAG, tag).groups()[0]
-
-
-def find_tag_text_object(view, s, inclusive=False):
-
-    if (view.score_selector(s.b, 'text.html') == 0 and
-        view.score_selector(s.b, 'text.xml') == 0):
-            # TODO: What happens with other xml formats?
-            return s
-
-    # TODO: Receive the actual mode in the parameter list?
-    current_pt = (s.b - 1) if view.has_non_empty_selection_region() else s.b
-    start_pt = utils.previous_white_space_char(view, current_pt,
-                                               white_space=' \t\n') + 1
-
-    if view.substr(sublime.Region(start_pt, start_pt + 2)) == '</':
-        closing_tag = view.find(RX_ANY_END_TAG, start_pt, sublime.IGNORECASE)
-        name = get_tag_name(view.substr(closing_tag))
-        start_tag_pattern = r'<({0}).*?>'.format(name)
-        start_tag = search.reverse_search_by_pt(view, start_tag_pattern, 0,
-                                                start_pt)
-    elif view.substr(start_pt) == '<':
-        start_tag = view.find(RX_ANY_START_TAG, start_pt, sublime.IGNORECASE)
-        if start_tag.a != start_pt:
-            return s
-    else:
-        start_tag = search.reverse_search_by_pt(view, RX_ANY_START_TAG, 0,
-                                                start_pt)
-
-    if not start_tag:
-        return s
-
-    tag_name = get_tag_name(view.substr(start_tag))
-
-    literal_end_tag = r'</{0}>'.format(tag_name)
-    end_tag = None
-    current_pt = start_tag.b
-    while True:
-        temp_end_tag = view.find(literal_end_tag, current_pt,
-                                 sublime.IGNORECASE)
-        if not end_tag and not temp_end_tag:
-            return s
-        elif not temp_end_tag:
-            break
-
-        end_tag = temp_end_tag
-        current_pt = end_tag.b
-
-        where = view.substr(sublime.Region(start_pt, end_tag.end()))
-        opening_tags = re.findall(r'<{0}.*?>'.format(tag_name), where,
-                                  re.IGNORECASE)
-        closing_tags = re.findall(literal_end_tag, where, sublime.IGNORECASE)
-
-        if len(opening_tags) == len(closing_tags):
-            break
-
-    if not end_tag:
-        return s
-
-    # Perhaps this should be handled further up by the command itself?
-    was_visual = view.has_non_empty_selection_region()
-    if not inclusive:
-        if not was_visual:
-            return sublime.Region(start_tag.b, end_tag.a)
-        else:
-            if start_tag.b == end_tag.a:
-                return sublime.Region(start_tag.b, start_tag.b + 1)
-            else:
-                return sublime.Region(start_tag.b, end_tag.a)
-
-    if not was_visual:
-        return sublime.Region(start_tag.a, end_tag.b)
-    else:
-        if start_tag.a == end_tag.b:
-            return sublime.Region(start_tag.a, start_tag.a + 1)
-        else:
-            return sublime.Region(start_tag.a, end_tag.b)
 
 
 def find_next_lone_bracket(view, start, items, unbalanced=0):
@@ -510,3 +435,116 @@ def word_end_reverse(view, pt, count=1, big=False):
             break
 
     return max(t - 1, 0)
+
+
+def next_end_tag(view, pattern=RX_ANY_TAG, start=0, end=-1):
+    region = view.find(pattern, start, sublime.IGNORECASE)
+    if region.a == -1:
+        return None, None, None
+    match = re.search(pattern, view.substr(region))
+    return (region, match.group(1), match.group(0).startswith('</'))
+
+
+def previous_begin_tag(view, pattern, start=0, end=0):
+    assert pattern, 'bad call'
+    region = reverse_search_by_pt(view, RX_ANY_TAG, start, end,
+                                  sublime.IGNORECASE)
+    if not region:
+        return None, None, None
+    match = re.search(RX_ANY_TAG, view.substr(region))
+    return (region, match.group(1), match.group(0)[1] != '/')
+
+
+def get_region_end(r):
+    return {'end': r.end()}
+
+
+def get_region_begin(r):
+    return {'start': 0, 'end': r.begin()}
+
+
+def get_closest_tag(view, pt):
+    while pt > 0 and view.substr(pt) != '<':
+        pt -= 1
+
+    if view.substr(pt) != '<':
+        return None
+
+    next_tag = view.find(RX_ANY_TAG, pt)
+    if next_tag.a != pt:
+        return None
+
+    return pt, next_tag
+
+
+def find_containing_tag(view, start):
+    # BUG: fails if start < first begin tag
+    # TODO: Should not select tags in PCDATA sections.
+    _, closest_tag = get_closest_tag(view, start)
+    if not closest_tag:
+        return None, None, None
+
+    start = closest_tag.a if ((closest_tag.contains(start)) and
+                              (view.substr(closest_tag)[1] == '/')) else start
+
+    search_forward_args = {
+        'pattern': RX_ANY_TAG,
+        'start': start,
+    }
+    end_region, tag_name = next_unbalanced_tag(view,
+                                 search=next_end_tag,
+                                 search_args=search_forward_args,
+                                 restart_at=get_region_end)
+
+    if not end_region:
+        return None, None, None
+
+    search_backward_args = {
+        'pattern': RX_ANY_TAG_NAMED_TPL.format(tag_name),
+        'start': 0,
+        'end': end_region.a
+    }
+    begin_region, _ = next_unbalanced_tag(view,
+                                 search=previous_begin_tag,
+                                 search_args=search_backward_args,
+                                 restart_at=get_region_begin)
+
+    if not end_region:
+        return None, None, None
+
+    return begin_region, end_region, tag_name
+
+
+def next_unbalanced_tag(view,
+                        search=None,
+                        search_args={},
+                        restart_at=None,
+                        tags=[]):
+    assert search and restart_at, 'wrong call'
+
+    region, tag, is_end_tag = search(view, **search_args)
+
+    if not region:
+        return None, None
+
+    if not is_end_tag:
+        tags.append(tag)
+        search_args.update(restart_at(region))
+        return next_unbalanced_tag(view,
+                                   search,
+                                   search_args,
+                                   restart_at,
+                                   tags)
+
+    if not tags or (tag not in tags):
+        return region, tag
+
+    while tag != tags.pop():
+        continue
+
+    search_args.update(restart_at(region))
+    return next_unbalanced_tag(view,
+                               search,
+                               search_args,
+                               restart_at,
+                               tags)
