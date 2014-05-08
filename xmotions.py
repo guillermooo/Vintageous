@@ -786,7 +786,7 @@ class _vi_w(ViMotionCommand):
                     pt = utils.previous_non_white_space_char(view, pt - 1,
                                                             white_space='\n')
                 return sublime.Region(pt, pt)
-            elif mode == modes.VISUAL:
+            elif mode in (modes.VISUAL, modes.VISUAL_BLOCK):
                 start = (s.b - 1) if (s.a < s.b) else s.b
                 pt = units.word_starts(view, start=start, count=count)
 
