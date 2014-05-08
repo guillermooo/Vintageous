@@ -13,7 +13,7 @@ mappings = {
 classes = {}
 
 
-def register(keys, *args, **kwargs):
+def register(seq, modes, *args, **kwargs):
     """
     Registers a 'key sequence' to 'command' mapping with Vintageous.
 
@@ -27,8 +27,7 @@ def register(keys, *args, **kwargs):
       class to.
     """
     def inner(cls):
-        for (seq, modes) in keys:
-            for mode in modes:
+        for mode in modes:
                 mappings[mode][seq] = cls(*args, **kwargs)
                 classes[cls.__name__] = cls
         return cls
