@@ -1319,11 +1319,15 @@ class _vi_x(ViTextCommandBase):
     _can_yank = True
     _populates_small_delete_register = True
 
+    def line_end(self, pt):
+        return self.view.line(pt).end()
+
     def run(self, edit, mode=None, count=1, register=None):
         def select(view, s):
             if mode == modes.INTERNAL_NORMAL:
-                return sublime.Region(s.b, s.b + count)
-            return sublime.Region(s.begin(), s.end())
+                limit = self.line_end(s.b)
+                return sublime.Region(s.b, min(s.b + count, limit))
+            return s
 
         if mode not in (modes.VISUAL,
                         modes.VISUAL_LINE,
@@ -1537,10 +1541,14 @@ class _vi_big_x(ViTextCommandBase):
     _can_yank = True
     _populates_small_delete_register = True
 
+    def line_start(self, pt):
+        return self.view.line(pt).begin()
+
     def run(self, edit, mode=None, count=1, register=None):
         def select(view, s):
             if mode == modes.INTERNAL_NORMAL:
-                return sublime.Region(s.b, s.b - count)
+                return sublime.Region(s.b, max(s.b - count,
+                                               self.line_start(s.b)))
             elif mode == modes.VISUAL:
                 if s.a < s.b:
                     return sublime.Region(view.full_line(s.b - 1).b,
