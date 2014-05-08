@@ -252,6 +252,11 @@ class _enter_normal_mode(ViTextCommandBase):
             # TODO: Calculate size the view has grown by and place the caret
             # after the newly inserted text.
             sels = list(self.view.sel())
+            self.view.sel().clear()
+            new_sels = [sublime.Region(s.b + 1) if self.view.substr(s.b) != '\n'
+                                                else s
+                                                for s in sels]
+            self.view.sel().add_all(new_sels)
             times = int(state.normal_insert_count) - 1
             state.normal_insert_count = '1'
             self.view.window().run_command('_vi_dot', {
@@ -260,9 +265,11 @@ class _enter_normal_mode(ViTextCommandBase):
                                 'repeat_data': state.repeat_data,
                                 })
             self.view.sel().clear()
-            self.view.sel().add_all(sels)
+            self.view.sel().add_all(new_sels)
         state.xpos = self.view.rowcol(self.view.sel()[0].b)[1]
         sublime.status_message('')
+
+
 class _enter_normal_mode_impl(sublime_plugin.TextCommand):
     def run(self, edit, mode=None):
         def f(view, s):
