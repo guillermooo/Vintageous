@@ -1,3 +1,9 @@
+3.5.7 - 08-05-2014
+
+	- Improve tag text object.
+	- Improve 'ge' and 'gE'.
+	- Implement Ctrl-x, Ctrl-l command (insert mode).
+
 3.5.6 - 01-05-2014
 
 	- Fix 'x' now can be repeated with '.'.
