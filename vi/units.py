@@ -150,13 +150,18 @@ def big_word_starts(view, start, count=1, internal=False):
     return pt
 
 
-def word_ends(view, start, count=1, internal=False):
+def word_ends(view, start, count=1, internal=False, big=False):
     assert start >= 0
     assert count > 0
 
     pt = start
 
     for i in range(count):
+
+        if big:
+            while pt < view.size() and at_punctuation(view, pt):
+                pt += 1
+
         # TODO: In Vim, cw on the last word char deletes up to the current word's end or eol
         # (exclusive). However, ce at the same position deletes up to the next word's end. Remember
         # that normally cw is translated to ce. In order to be 100% Vim-compatible, we need to know
