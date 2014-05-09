@@ -844,27 +844,30 @@ class _vi_e(ViMotionCommand):
         def f(view, s):
             if mode == modes.NORMAL:
                 pt = units.word_ends(view, start=s.b, count=count)
-
-                if (view.substr(pt) == '\n' and not view.line(pt).empty()):
-                    return sublime.Region(pt - 1, pt - 1)
-                elif (view.line(pt).empty()):
+                if (view.substr(pt) == '\n') and not view.line(pt).empty():
+                    return sublime.Region(pt - 1)
+                elif view.line(pt).empty():
                     return s
+                return sublime.Region(pt)
 
-                return sublime.Region(pt, pt)
             elif mode == modes.VISUAL:
                 pt = units.word_ends(view, start=s.b - 1, count=count)
-                if s.a > s.b and pt >= s.a:
+                if (s.a > s.b) and (pt >= s.a):
                     return sublime.Region(s.a - 1, pt + 1)
-                elif s.a > s.b:
+                elif (s.a > s.b):
                     return sublime.Region(s.a, pt)
                 elif (view.size() == pt):
                     pt -= 1
                 return sublime.Region(s.a, pt + 1)
+
             elif mode == modes.INTERNAL_NORMAL:
                 a = s.a
-                pt = units.word_ends(view, start=s.b, count=count, internal=True)
+                pt = units.word_ends(view,
+                                     start=s.b,
+                                     count=count,
+                                     internal=True)
                 if (not view.substr(view.line(s.a)).strip() and
-                    (view.line(s.b) != view.line(pt))):
+                    view.line(s.b) != view.line(pt)):
                         a = view.line(s.a).a
                 return sublime.Region(a, pt + 1)
             return s
