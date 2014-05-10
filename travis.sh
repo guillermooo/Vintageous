@@ -26,3 +26,10 @@ if [ ! -d $STP/$PACKAGE ]; then
     echo symlink the package to sublime package directory
     ln -s $PWD $STP/$PACKAGE
 fi
+
+if [ ! -d $STP/UnitTesting ]; then
+    echo download latest UnitTesting release
+    # for stability, you may consider a fixed version of UnitTesting, eg TAG=0.1.4
+    TAG=`git ls-remote --tags https://github.com/randy3k/UnitTesting | sed 's|.*/\([^/]*$\)|\1|' | sort -r | head -1`
+    git clone --branch $TAG https://github.com/randy3k/UnitTesting $STP/UnitTesting
+fi
