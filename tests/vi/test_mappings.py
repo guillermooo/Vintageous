@@ -2,7 +2,7 @@ import unittest
 
 import sublime
 
-from Vintageous.state import state
+from Vintageous.state import State
 from Vintageous.vi.utils import modes
 from Vintageous.vi.mappings import Mappings
 from Vintageous.vi.mappings import _mappings
