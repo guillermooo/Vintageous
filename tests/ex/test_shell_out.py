@@ -57,8 +57,9 @@ class Test_ex_shell_out_filter_through_shell(ViewTest):
         # TODO implement test for Windows.
         if not word_count_command:
             return True
-        set_text(self.view, 'One two three four\nfive six seven eight\nnine ten.')
-        add_sel(self.view, self.R((0, 8), (1, 3)))
+        self.view.sel().clear()
+        self.write('One two three four\nfive six seven eight\nnine ten.')
+        self.add_sel(self.R((0, 8), (1, 3)))
 
         test_command_line = ":'<,'>!" + word_count_command
         ex_cmd = parse_command(test_command_line)
@@ -79,7 +80,8 @@ class Test_ex_shell_out_filter_through_shell(ViewTest):
         # TODO implement test for Windows.
         if not word_count_command:
             return True
-        set_text(self.view, '''Beginning of test!
+        self.view.sel().clear()
+        self.write('''Beginning of test!
 One two three four
 five six seven eight
 nine ten.
@@ -93,8 +95,8 @@ twelve
 End of Test!
 ''')
         # Two selections touching all numeric word lines.
-        add_sel(self.view, self.R((1, 11), (3, 1)))
-        add_sel(self.view, self.R((6, 1), (10, 5)))
+        self.add_sel(self.R((1, 11), (3, 1)))
+        self.add_sel(self.R((6, 1), (10, 5)))
 
         test_command_line = ":'<,'>!" + word_count_command
         ex_cmd = parse_command(test_command_line)
