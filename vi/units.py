@@ -150,29 +150,23 @@ def big_word_starts(view, start, count=1, internal=False):
     return pt
 
 
-def word_ends(view, start, count=1, internal=False, big=False):
-    assert start >= 0
-    assert count > 0
+def word_ends(view, start, count=1, big=False):
+    assert start >= 0 and count > 0, 'bad call'
 
     pt = start
+    if not view.substr(start).isspace():
+        pt = start + 1
 
     for i in range(count):
-
         if big:
-            while pt < view.size() and at_punctuation(view, pt):
-                pt += 1
-
-        # TODO: In Vim, cw on the last word char deletes up to the current word's end or eol
-        # (exclusive). However, ce at the same position deletes up to the next word's end. Remember
-        # that normally cw is translated to ce. In order to be 100% Vim-compatible, we need to know
-        # that the translation has taken place. For the moment, just unify 'e' and 'w' behavior at
-        # the word's last char. Also, it seems that 'ce' translates to a especial motion, not
-        # simply 'cw'. That should be easier to implement.
-        offset = 1
-        if internal:
-            offset = 1 if not (at_word_end(view, pt + 1) or
-                               at_punctuation_end(view, pt + 1)) else 0
-        pt = next_word_end(view, pt + offset)
+            while True:
+                pt = next_word_end(view, pt)
+                if pt >= view.size() or view.substr(pt).isspace():
+                    if pt > view.size():
+                        pt = view.size()
+                    break
+        else:
+            pt = next_word_end(view, pt)
 
     # FIXME: We should return the actual word end and not pt - 1 ??
-    return pt - 1
+    return pt

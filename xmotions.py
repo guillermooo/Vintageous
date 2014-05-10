@@ -844,32 +844,27 @@ class _vi_e(ViMotionCommand):
         def f(view, s):
             if mode == modes.NORMAL:
                 pt = units.word_ends(view, start=s.b, count=count)
-                if (view.substr(pt) == '\n') and not view.line(pt).empty():
-                    return sublime.Region(pt - 1)
-                elif view.line(pt).empty():
-                    return s
-                return sublime.Region(pt)
+                return sublime.Region(pt - 1)
 
             elif mode == modes.VISUAL:
                 pt = units.word_ends(view, start=s.b - 1, count=count)
                 if (s.a > s.b) and (pt >= s.a):
-                    return sublime.Region(s.a - 1, pt + 1)
+                    return sublime.Region(s.a - 1, pt)
                 elif (s.a > s.b):
                     return sublime.Region(s.a, pt)
                 elif (view.size() == pt):
                     pt -= 1
-                return sublime.Region(s.a, pt + 1)
+                return sublime.Region(s.a, pt)
 
             elif mode == modes.INTERNAL_NORMAL:
                 a = s.a
                 pt = units.word_ends(view,
                                      start=s.b,
-                                     count=count,
-                                     internal=True)
+                                     count=count)
                 if (not view.substr(view.line(s.a)).strip() and
                     view.line(s.b) != view.line(pt)):
                         a = view.line(s.a).a
-                return sublime.Region(a, pt + 1)
+                return sublime.Region(a, pt)
             return s
 
         regions_transformer(self.view, f)
@@ -970,20 +965,16 @@ class _vi_percent(ViMotionCommand):
     def find_tag(self, pt):
         if (self.view.score_selector(0, 'text.html') == 0 and
             self.view.score_selector(0, 'text.xml') == 0):
-                print("XXX")
                 return None
 
         if any([self.view.substr(pt) in p for p in self.pairs]):
-            print("AAA")
             return None
 
         _, tag = get_closest_tag(self.view, pt)
         if tag.contains(pt):
-            print("HELLO")
             begin_tag, end_tag, _ = find_containing_tag(self.view, pt)
             if begin_tag:
                 return begin_tag if end_tag.contains(pt) else end_tag
-        print("BYE, BYE")
 
 
     def run(self, percent=None, mode=None):
@@ -1788,39 +1779,26 @@ class _vi_big_n(ViMotionCommand):
 
 
 class _vi_big_e(ViMotionCommand):
-    # NORMAL mode movement:
-    #   ST does what Vim does (TODO: always?).
-    #
-    # modes.INTERNAL_NORMAL
-
     def run(self, mode=None, count=1):
-
-        def move():
+        def do_move(view, s):
             if mode == modes.NORMAL:
-                self.view.run_command('move', {'by': 'stops',
-                                               'word_end': True,
-                                               'empty_line': True,
-                                               'separators': '',
-                                               'forward': True})
-            elif mode == modes.INTERNAL_NORMAL:
-                self.view.run_command('move', {'by': 'stops',
-                                      'word_end': True,
-                                      'empty_line': True,
-                                      'separators': '',
-                                      'forward': True,
-                                      'extend': True})
-            elif mode == modes.VISUAL:
-                self.view.run_command('move', {'by': 'stops',
-                                      'word_end': True,
-                                      'empty_line': True,
-                                      'separators': '',
-                                      'forward': True,
-                                      'extend': True})
-            elif mode == modes.VISUAL_BLOCK:
-                return
+                pt = units.word_ends(view, s.b, count=count, big=True)
+                return sublime.Region(pt - 1)
 
-        for i in range(count):
-            move()
+            elif mode == modes.INTERNAL_NORMAL:
+                pt = units.word_ends(view, s.b, count=count, big=True)
+                return sublime.Region(pt - 1)
+
+            elif mode in (modes.VISUAL, modes.VISUAL_BLOCK):
+                pt = units.word_ends(view, s.b, count=count, big=True)
+                if s.a > s.b:
+                    if pt > s.a:
+                        return sublime.Region(s.a - 1, pt)
+                    return sublime.Region(s.a, pt - 1)
+                return sublime.Region(s.a, pt)
+            return s
+
+        regions_transformer(self.view, do_move)
 
 
 class _vi_ctrl_f(ViMotionCommand):
