@@ -940,8 +940,10 @@ class _vi_yy(ViTextCommandBase):
 
     _can_yank = True
     _synthetize_new_line_at_eof = True
+    _yanks_linewise = True
 
     def run(self, edit, mode=None, count=1, register=None):
+        print("FOO", self._yanks_linewise)
         def select(view, s):
             if count > 1:
                 row, col = self.view.rowcol(s.b)
@@ -2095,40 +2097,6 @@ class _vi_ctrl_y(sublime_plugin.TextCommand):
             return
         extend = True if mode == modes.VISUAL else False
         self.view.run_command('scroll_lines', {'amount': 1, 'extend': extend})
-
-
-class _vi_big_y(ViTextCommandBase):
-
-    _can_yank = True
-    _synthetize_new_line_at_eof = True
-
-    def run(self, edit, count=1, mode=None, register=None):
-        def select(view, s):
-            if mode == modes.INTERNAL_NORMAL:
-                pt = view.text_point(view.rowcol(s.b)[0] + (count - 1), 0)
-                return sublime.Region(view.full_line(pt).b, view.line(s.b).a)
-
-            elif mode == modes.VISUAL:
-                # TODO: Restore xpos after yanking.
-                if s.a < s.b:
-                    return sublime.Region(view.full_line(s.b - 1).b,
-                                          view.line(s.a).a)
-                return sublime.Region(view.line(s.b).a,
-                                      view.full_line(s.a - 1).b)
-
-            raise ValueError('unsupported mode')
-
-        try:
-            regions_transformer(self.view, select)
-        except ValueError:
-            utils.blink()
-            self.enter_normal_mode(mode)
-            return
-
-        self.outline_target()
-        self.state.registers.yank(self, register)
-
-        self.enter_normal_mode(mode)
 
 
 class _vi_ctrl_r_equal(sublime_plugin.TextCommand):

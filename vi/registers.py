@@ -193,14 +193,18 @@ class Registers(object):
         fragments = [self.view.substr(r) for r in list(self.view.sel())]
 
         # Add new line at EOF, but don't add too many new lines.
+        print("GGG", vi_cmd_data._synthetize_new_line_at_eof, vi_cmd_data._yanks_linewise)
         if vi_cmd_data._synthetize_new_line_at_eof and not vi_cmd_data._yanks_linewise:
+            print("PPP", "HELLO")
             if (not fragments[-1].endswith('\n') and
                 # XXX: It appears regions can end beyond the buffer's EOF (?).
                 self.view.sel()[-1].b >= self.view.size()):
                     fragments[-1] += '\n'
 
         if fragments and vi_cmd_data._yanks_linewise:
+            print("AAA", "HELLO")
             for i, f in enumerate(fragments):
+                print("XXX", "HELLO")
                 # When should we add a newline character?
                 #  * always except when we have a non-\n-only string followed by a newline char.
                 if (not f.endswith('\n')) or (f == '\n') or f.endswith('\n\n'):

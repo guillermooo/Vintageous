@@ -706,25 +706,6 @@ class ViIncrement(ViOperatorDef):
         return cmd
 
 
-@keys.assign(seq=seqs.YY, modes=_MODES_ACTION)
-class ViCopyLine(ViOperatorDef):
-    """
-    Vim: `yy`
-    """
-
-    def __init__(self, *args, **kwargs):
-        ViOperatorDef.__init__(self, *args, **kwargs)
-        self.updates_xpos = True
-        self.scroll_into_view = True
-        self.repeatable = True
-
-    def translate(self, state):
-        cmd = {}
-        cmd['action'] = '_vi_big_y'
-        cmd['action_args'] = {'mode': state.mode, 'count': state.count}
-        return cmd
-
-
 @keys.assign(seq=seqs.G_BIG_J, modes=_MODES_ACTION)
 class ViJoinLinesNoSeparator(ViOperatorDef):
     """
