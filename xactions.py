@@ -1579,17 +1579,11 @@ class _vi_big_p(ViTextCommandBase):
 
     _can_yank = True
     _synthetize_new_line_at_eof = True
-    _yanks_linewise = True
 
     def run(self, edit, register=None, count=1, mode=None):
         state = self.state
 
         if state.mode == modes.VISUAL:
-            # force register population. We have to do it here
-            # vi_cmd_data = {
-            #     "synthetize_new_line_at_eof": True,
-            #     "yanks_linewise": False,
-            # }
             prev_text = state.registers.get_selected_text(self)
 
         if register:
@@ -1602,91 +1596,56 @@ class _vi_big_p(ViTextCommandBase):
             # Populate registers with the text we're about to paste.
             state.registers['"'] = prev_text
 
-        sels = list(self.view.sel())
-        if len(sels) == len(fragments):
-            sel_frag = zip(sels, fragments)
-        else:
-            sel_frag = zip(sels, [fragments[0],] * len(sels))
+        # TODO: Enable pasting to multiple selections.
+        sel = list(self.view.sel())[0]
+        merged_fragments, linewise = self.merge_fragments(fragments)
 
-        pasting_linewise = True
-        offset = 0
-        paste_locations = []
-        for s, text in sel_frag:
-            row = self.view.rowcol(s.begin())[0]
-            row = max(0, row - 1)
-            if text.endswith('\n'):
-                if utils.is_at_eol(self.view, s) or utils.is_at_bol(self.view, s):
-                    l = self.paste_all(edit, s, self.view.line(s.b).a, text, count)
-                    paste_locations.append(l)
-                else:
-                    l = self.paste_all(edit, s, self.view.line(s.b - 1).a, text, count)
-                    paste_locations.append(l)
+        if mode == modes.INTERNAL_NORMAL:
+            if not linewise:
+                self.view.insert(edit, sel.a, merged_fragments)
+                self.view.sel().clear()
+                pt = sel.a + len(merged_fragments) - 1
+                self.view.sel().add(sublime.Region(pt))
             else:
-                pasting_linewise = False
-                l = self.paste_all(edit, s, s.b + offset, text, count)
-                paste_locations.append(l)
-                offset += len(text) * count
+                pt = self.view.line(sel.a).a
+                self.view.insert(edit, pt, merged_fragments)
+                self.view.sel().clear()
+                pt = pt + len(merged_fragments)
+                row = utils.row_at(self.view, pt)
+                pt = self.view.text_point(row - 1, 0)
+                self.view.sel().add(sublime.Region(pt))
 
-        if pasting_linewise:
-            self.reset_carets_linewise()
-        else:
-            self.reset_carets_charwise(paste_locations, len(text))
-
-    def paste_all(self, edit, sel, at, text, count):
-        # for x in range(count):
-        #     self.view.insert(edit, at, text)
-        state = self.state
-        if state.mode not in (modes.VISUAL, modes.VISUAL_LINE):
-            for x in range(count):
-                self.view.insert(edit, at, text)
-            return at + (len(text) * (count - 1))
-
-        else:
-            if text.endswith('\n'):
-                text = text * count
-                if not text.startswith('\n'):
-                    text = '\n' + text
+        elif mode == modes.VISUAL:
+            if not linewise:
+                self.view.replace(edit, sel, merged_fragments)
             else:
-                text = text * count
-            self.view.replace(edit, sel, text)
-            return sel.begin()
-
-    def reset_carets_charwise(self, paste_locations, paste_len):
-        # FIXME: Won't work for multiple jagged pastes...
-        b_pts = [s.b for s in list(self.view.sel())]
-        if len(b_pts) > 1:
-            self.view.sel().clear()
-            self.view.sel().add_all([sublime.Region(ploc + paste_len - 1,
-                                                    ploc + paste_len - 1)
-                                            for ploc in paste_locations])
+                pt = sel.a
+                if merged_fragments[0] != '\n':
+                    merged_fragments = '\n' + merged_fragments
+                self.view.replace(edit, sel, merged_fragments)
+                self.view.sel().clear()
+                row = utils.row_at(self.view, pt + len(merged_fragments))
+                pt = self.view.text_point(row - 1, 0)
+                self.view.sel().add(sublime.Region(pt))
         else:
-            self.view.sel().clear()
-            self.view.sel().add(sublime.Region(paste_locations[0] + paste_len - 1,
-                                               paste_locations[0] + paste_len - 1))
+            return
 
-    def reset_carets_linewise(self):
-        # FIXME: Won't work well for visual selections...
-        # FIXME: This might not work for cmdline paste command (the target row isn't necessarily
-        #        the next one.
-        def deselect_visual_line(view, s):
-            return sublime.Region(s.a)
-        state = self.state
-        if state.mode == modes.VISUAL_LINE:
-            regions_transformer(self.view, deselect_visual_line)
-        else:
-            # After pasting linewise, we should move the caret one line down.
-            b_pts = [s.b for s in list(self.view.sel())]
-            new_rows = [self.view.rowcol(b)[0] + 1 for b in b_pts]
-            row_starts = [self.view.text_point(r, 0) for r in new_rows]
-            self.view.sel().clear()
-            self.view.sel().add_all([sublime.Region(pt, pt) for pt in row_starts])
+        self.enter_normal_mode(mode=mode)
+
+    def merge_fragments(self, fragments):
+        print("000", fragments)
+        joined = ''.join(fragments)
+        if '\n' in fragments[0]:
+            if joined[-1] != '\n':
+                return (joined + '\n'), True
+            return joined, True
+        return joined, False
 
 
 class _vi_p(ViTextCommandBase):
 
     _can_yank = True
     _synthetize_new_line_at_eof = True
-    _yanks_linewise = True
 
     def run(self, edit, register=None, count=1, mode=None):
         state = self.state
