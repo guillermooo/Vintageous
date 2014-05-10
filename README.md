@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/guillermooo/Vintageous.svg?branch=master)](https://travis-ci.org/guillermooo/Vintageous)
+
 Vintageous
 ==========
 
