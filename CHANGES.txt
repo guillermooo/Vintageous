@@ -1,3 +1,13 @@
+3.5.8 - 10-05-2014
+
+	- Improve bracket text object.
+	- Improve 'P' operator.
+	- 'yy' operator should synthetize a new line at eof if necessary.
+	- Improve 'e' and 'E' motions.
+	- Improve <count>i operator.
+	- Improve 'x' and 'X' operators when given counts.
+	- Enable 'w' in visual block mode.
+
 3.5.7 - 08-05-2014
 
 	- Improve tag text object.
