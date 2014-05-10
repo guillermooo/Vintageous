@@ -52,6 +52,7 @@ class Test_ex_shell_out_filter_through_shell(ViewTest):
         else:
             return 'wc -w'
 
+    @unittest.skipIf(os.name == 'nt', 'Windows')
     def testSimpleFilterThroughShell(self):
         word_count_command = self.__class__.getWordCountCommand()
         # TODO implement test for Windows.
@@ -75,6 +76,7 @@ class Test_ex_shell_out_filter_through_shell(ViewTest):
         self.assertEqual(cursor.begin(), cursor.end())
         self.assertEqual(self.view.text_point(0, 0), cursor.begin())
 
+    @unittest.skipIf(os.name == 'nt', 'Windows')
     def testMultipleFilterThroughShell(self):
         word_count_command = self.__class__.getWordCountCommand()
         # TODO implement test for Windows.
