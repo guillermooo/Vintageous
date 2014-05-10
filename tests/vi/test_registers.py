@@ -395,18 +395,17 @@ class Test_yank(ViewTest):
     def testYanksToRegisters(self):
         class vi_cmd_data:
             _can_yank = True
-            register = 'a'
             _populates_small_delete_register = False
 
         with mock.patch.object(self.regs, 'get_selected_text') as gst:
             gst.return_value = ['foo']
-            self.regs.yank(vi_cmd_data)
+            self.regs.yank(vi_cmd_data, register='a')
             self.assertEqual(registers._REGISTER_DATA, {'"': ['foo'], 'a': ['foo']})
 
     def testCanPopulateSmallDeleteRegister(self):
         class vi_cmd_data:
-            _can_yank = False
-            _populates_small_delete_register = False
+            _can_yank = True
+            _populates_small_delete_register = True
 
         with mock.patch.object(builtins, 'all') as a, \
              mock.patch.object(self.regs, 'get_selected_text') as gst:

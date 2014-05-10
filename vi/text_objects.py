@@ -331,6 +331,9 @@ def find_next_lone_bracket(view, start, items, unbalanced=0):
             return
         new_start = next_closing_bracket.end()
 
+    if view.substr(start) == items[0][-1]:
+        start += 1
+
     nested = 0
     while True:
         next_opening_bracket = find_in_range(view, items[0],
@@ -360,6 +363,9 @@ def find_prev_lone_bracket(view, start, tags, unbalanced=0):
                                                   end=new_start,
                                                   flags=sublime.IGNORECASE)
         if prev_opening_bracket is None:
+            # Tag names may be escaped, so slice them.
+            if i == 0 and view.substr(start) == tags[0][-1]:
+                return sublime.Region(start, start + 1)
             # Unbalanced tags; nothing we can do.
             return
         new_start = prev_opening_bracket.begin()

@@ -86,7 +86,7 @@ class RunVintageousTests(sublime_plugin.WindowCommand):
 
     def run(self, **kwargs):
         with self.chdir(kwargs.get('working_dir')):
-            p = os.path.join(os.getcwd(), 'tests/commands')
+            p = os.path.join(os.getcwd(), 'tests/')
             suite = unittest.TestLoader().discover(p)
 
             file_regex = r'^\s*File\s*"([^.].*?)",\s*line\s*(\d+),.*$'

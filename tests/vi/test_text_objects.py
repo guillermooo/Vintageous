@@ -39,12 +39,6 @@ class Test_find_prev_lone_bracket_SingleLine_Flat(ViewTest):
         region = find_prev_lone_bracket(self.view, 2, ('\\{', '\\}'))
         self.assertEqual(region, None)
 
-    def testReturnsNoneIfCaretAfterAllBracketPairs(self):
-        set_text(self.view,'ab{cd}efg')
-
-        region = find_prev_lone_bracket(self.view, 7, ('\\{', '\\}'))
-        self.assertEqual(region, None)
-
     def testFindsUnbalancedBracket(self):
         set_text(self.view,'a{bc')
 
@@ -110,12 +104,6 @@ class Test_find_prev_lone_bracket_MultipleLines_Flat(ViewTest):
         set_text(self.view,'abc{a\nb}c')
 
         region = find_prev_lone_bracket(self.view, 2, ('\\{', '\\}'))
-        self.assertIsNone(region)
-
-    def testReturnsNoneIfCaretAfterAllBracketPairs(self):
-        set_text(self.view,'ab{c\nd}efg')
-
-        region = find_prev_lone_bracket(self.view, 7, ('\\{', '\\}'))
         self.assertIsNone(region)
 
     def testFindsUnbalancedBracket(self):
