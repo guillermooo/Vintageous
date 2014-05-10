@@ -369,7 +369,7 @@ class _vi_j(ViMotionCommand):
                 if view.line(target_pt).empty():
                     return sublime.Region(target_pt, target_pt)
 
-                target_pt = min(target_pt + xpos, view.full_line(target_pt).b)
+                target_pt = min(target_pt + xpos, view.line(target_pt).b - 1)
                 return sublime.Region(target_pt, target_pt)
 
             if mode == modes.INTERNAL_NORMAL:
@@ -419,7 +419,6 @@ class _vi_j(ViMotionCommand):
                         end = view.full_line(target_pt).b
                         end = end - 1 if not crosses_a else end
                         return sublime.Region(s.a, end)
-
 
             if mode == modes.VISUAL_LINE:
                 if s.a < s.b:
