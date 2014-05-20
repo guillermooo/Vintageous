@@ -1,5 +1,6 @@
 import re
 import logging
+from collections import Counter
 
 import sublime
 import sublime_plugin
@@ -604,7 +605,12 @@ class State(object):
     def update_xpos(self):
         if self.motion and self.motion.updates_xpos:
             try:
-                xpos = self.view.rowcol(self.view.sel()[0].b)[1]
+                end = self.view.sel()[0].b
+                r = sublime.Region(self.view.line(end).a, end)
+                counter = Counter(self.view.substr(r))
+                size = self.view.settings().get('tab_size')
+                xpos = (self.view.rowcol(end)[1] +
+                        ((counter['\t'] * size) - counter['\t']))
             except Exception as e:
                 print(e)
                 raise ValueError('could not set xpos')
