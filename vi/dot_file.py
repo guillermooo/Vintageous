@@ -28,7 +28,14 @@ class DotFile(object):
 
     def parse(self, line):
         self.logger.info('[DotFile] parsing line: {0}'.format(line))
-        if line.startswith(':map '):
+        if line.startswith((':map ')):
             line = line[len(':map '):]
             return ('ex_map', {'cmd': line.rstrip()})
 
+        if line.startswith((':omap ')):
+            line = line[len(':omap '):]
+            return ('ex_omap', {'cmd': line.rstrip()})
+
+        if line.startswith((':vmap ')):
+            line = line[len(':vmap '):]
+            return ('ex_vmap', {'cmd': line.rstrip()})
