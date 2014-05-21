@@ -943,7 +943,6 @@ class _vi_yy(ViTextCommandBase):
     _yanks_linewise = True
 
     def run(self, edit, mode=None, count=1, register=None):
-        print("FOO", self._yanks_linewise)
         def select(view, s):
             if count > 1:
                 row, col = self.view.rowcol(s.b)
@@ -1633,7 +1632,6 @@ class _vi_big_p(ViTextCommandBase):
         self.enter_normal_mode(mode=mode)
 
     def merge_fragments(self, fragments):
-        print("000", fragments)
         joined = ''.join(fragments)
         if '\n' in fragments[0]:
             if joined[-1] != '\n':
