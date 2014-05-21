@@ -491,6 +491,8 @@ class _vi_k(ViMotionCommand):
         return pt
 
     def calculate_xpos(self, start, xpos):
+        if self.view.line(start).empty():
+            return start, 0
         size = self.view.settings().get('tab_size')
         eol = self.view.line(start).b - 1
         pt = 0
@@ -530,52 +532,15 @@ class _vi_k(ViMotionCommand):
                 current_row = view.rowcol(exact_position)[0]
                 target_row = max(current_row - count, 0)
                 target_pt = view.text_point(target_row, 0)
-                xpos = self.calculate_xpos(target_pt, xpos)[1] + 1
-                is_long_enough = view.full_line(target_pt).size() > xpos
+                _, xpos = self.calculate_xpos(target_pt, xpos)
 
-                # We're crossing over to the other side of .a; we need to modify .a.
-                crosses_a = False
-                if (s.a < s.b) and (view.rowcol(s.a)[0] > target_row):
-                    crosses_a = True
-
-                if view.line(s.begin()) == view.line(s.end() - 1):
-                    if s.a < s.b:
-                        if is_long_enough:
-                            return sublime.Region(s.a + 1, view.text_point(target_row, xpos))
-                        else:
-                            return sublime.Region(s.a + 1, view.line(target_pt).b)
-
-                # Returning to the same line...
-                if not crosses_a and abs(view.rowcol(s.begin())[0] - view.rowcol(s.end() - 1)[0]) == 1:
-                    if s.a < s.b:
-                        if is_long_enough:
-                            if view.rowcol(s.a)[1] <= view.rowcol(s.b - 1)[1]:
-                                return sublime.Region(s.a, view.text_point(target_row, xpos) + 1)
-                            else:
-                                r = sublime.Region(s.a + 1, view.text_point(target_row, xpos))
-                                return r
-
-                if is_long_enough:
-                    if s.a < s.b:
-                        # FIXME: The following if-else could use some brains.
-                        offset = 0
-                        if xpos == 0 and not crosses_a:
-                            offset = 1
-                        elif crosses_a:
-                            pass
-                        else:
-                            offset = 1
-                        start = s.a if not crosses_a else s.a + 1
-                        return sublime.Region(start, view.text_point(target_row, xpos + offset))
-                    elif s.a > s.b:
-                        return sublime.Region(s.a, view.text_point(target_row, xpos))
-                else:
-                    if s.a < s.b:
-                        end = view.full_line(target_pt).b
-                        end = end if not crosses_a else end - 1
-                        return sublime.Region(s.a, end)
-                    elif s.a > s.b:
-                        return sublime.Region(s.a, view.line(target_pt).b)
+                if s.b >= s.a:
+                    if (self.view.line(s.a).contains(s.b) and
+                        not self.view.line(s.a).contains(target_pt)):
+                            return sublime.Region(s.a + 1, target_pt + xpos)
+                    else:
+                            return sublime.Region(s.a, target_pt + xpos + 1)
+                return sublime.Region(s.a, target_pt + xpos)
 
             if mode == modes.VISUAL_LINE:
                 if s.a < s.b:

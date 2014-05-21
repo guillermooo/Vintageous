@@ -91,3 +91,65 @@ class Test_vi_h(ViewTest):
                 self.assertEqual(self.R(*data.expected.regions), actual, msg)
             else:
                 self.assertEqual(data.expected, actual, msg)
+
+
+test = namedtuple('simple_test', 'content regions kwargs expected msg')
+
+MORE_TESTS = (
+    test(content='''aaa
+bbb
+''',
+    regions=((1, 1), (1, 1)), kwargs={'mode': modes.NORMAL, 'count': 1, 'xpos': 1}, expected=((0, 1), (0, 1)), msg='from same length'),
+
+    test(content='''
+
+''',
+    regions=((1, 0), (1, 0)), kwargs={'mode': modes.NORMAL, 'count': 1, 'xpos': 0}, expected=((0, 0), (0, 0)), msg='from empty to empty'),
+
+    test(content='''
+aaa
+''',
+    regions=((1, 2), (1, 2)), kwargs={'mode': modes.NORMAL, 'count': 1, 'xpos': 2}, expected=((0, 0), (0,0)), msg='from longer to empty'),
+
+    test(content='''aaa
+
+''',
+    regions=((1, 0), (1, 0)), kwargs={'mode': modes.NORMAL, 'count': 1, 'xpos': 0}, expected=((0, 0), (0, 0)), msg='from empty to longer'),
+
+    test(content='''aaa bbb
+aaa
+''',
+    regions=((1, 2), (1, 2)), kwargs={'mode': modes.NORMAL, 'count': 1, 'xpos': 2}, expected=((0, 2), (0, 2)), msg='from shorter to longer'),
+
+    test(content='''aaa
+aaa bbb
+''',
+    regions=((1, 6), (1, 6)), kwargs={'mode': modes.NORMAL, 'count': 1, 'xpos': 6}, expected=((0, 2), (0, 2)), msg='from longer to shorter'),
+
+    test(content='''\t\taaa
+aaa bbb ccc
+''',
+    regions=((1, 8), (1, 8)), kwargs={'mode': modes.NORMAL, 'count': 1, 'xpos': 8}, expected=((0, 2), (0, 2)), msg='xpos with tabs'),
+
+    test(content='''aaa
+aaa bbb ccc
+''',
+    regions=((1, 8), (1, 8)), kwargs={'mode': modes.NORMAL, 'count': 1, 'xpos': 1000}, expected=((0, 2), (0, 2)), msg='xpos stops at eol'),
+)
+
+
+class Test_vi_k_new(ViewTest):
+    def testAll(self):
+        for (i, data) in enumerate(MORE_TESTS):
+            # TODO: Perhaps we should ensure that other state is reset too?
+            self.view.sel().clear()
+
+            self.write(data.content)
+            for region in data.regions:
+                self.add_sel(self.R(*region))
+
+            self.view.run_command('_vi_k', data.kwargs)
+
+            msg = "failed at test index {0}: {1}".format(i, data.msg)
+            actual = self.view.sel()[0]
+            self.assertEqual(self.R(*data.expected), actual, msg)
