@@ -605,7 +605,11 @@ class State(object):
     def update_xpos(self):
         if self.motion and self.motion.updates_xpos:
             try:
-                end = self.view.sel()[0].b
+                sel = self.view.sel()[0]
+                end = sel.b
+                if not sel.empty():
+                    if sel.a < sel.b:
+                        end -= 1
                 r = sublime.Region(self.view.line(end).a, end)
                 counter = Counter(self.view.substr(r))
                 size = self.view.settings().get('tab_size')

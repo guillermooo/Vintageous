@@ -4,6 +4,7 @@ import sublime
 import sublime_plugin
 
 from itertools import chain
+from collections import Counter
 
 
 from Vintageous import state as state_module
@@ -357,8 +358,26 @@ class _vi_j(ViMotionCommand):
             pass
         return pt
 
+    def calculate_xpos(self, start, xpos):
+        size = self.view.settings().get('tab_size')
+        if self.view.line(start).empty():
+            return start, 0
+        else:
+            eol = self.view.line(start).b - 1
+        pt = 0
+        chars = 0
+        while (pt < xpos):
+            if self.view.substr(start + chars) == '\t':
+                pt += size
+            else:
+                pt += 1
+            chars += 1
+        pt = min(eol, start + chars)
+        return pt, chars
+
     def run(self, count=1, mode=None, xpos=0, no_translation=False):
         def f(view, s):
+            nonlocal xpos
             if mode == modes.NORMAL:
                 current_row = view.rowcol(s.b)[0]
                 target_row = min(current_row + count, view.rowcol(view.size())[0])
@@ -369,8 +388,8 @@ class _vi_j(ViMotionCommand):
                 if view.line(target_pt).empty():
                     return sublime.Region(target_pt, target_pt)
 
-                target_pt = min(target_pt + xpos, view.line(target_pt).b - 1)
-                return sublime.Region(target_pt, target_pt)
+                pt = self.calculate_xpos(target_pt, xpos)[0]
+                return sublime.Region(pt)
 
             if mode == modes.INTERNAL_NORMAL:
                 current_row = view.rowcol(s.b)[0]
@@ -383,42 +402,15 @@ class _vi_j(ViMotionCommand):
                 current_row = view.rowcol(exact_position)[0]
                 target_row = min(current_row + count, view.rowcol(view.size())[0])
                 target_pt = view.text_point(target_row, 0)
-                is_long_enough = view.full_line(target_pt).size() > xpos
+                _, xpos = self.calculate_xpos(target_pt, xpos)
 
-                # We're crossing over to the other side of .a; we need to modify .a.
-                crosses_a = False
-                if (s.a > s.b) and (view.rowcol(s.a)[0] < target_row):
-                    crosses_a = True
+                if s.a < s.b:
+                    return sublime.Region(s.a, target_pt + xpos + 1)
 
-                if view.line(s.begin()) == view.line(s.end() - 1):
-                    if s.a > s.b:
-                        if is_long_enough:
-                            return sublime.Region(s.a - 1, view.text_point(target_row, xpos) + 1)
-                        else:
-                            return sublime.Region(s.a - 1, view.full_line(target_pt).b)
+                if (target_pt + xpos) >= s.a:
+                    return sublime.Region(s.a - 1, target_pt + xpos + 1)
+                return sublime.Region(s.a, target_pt + xpos)
 
-                # Returning to the same line...
-                if not crosses_a and abs(view.rowcol(s.begin())[0] - view.rowcol(s.end())[0]) == 1:
-                    if s.a > s.b:
-                        if is_long_enough:
-                            if view.rowcol(s.a - 1)[1] <= view.rowcol(s.b)[1]:
-                                return sublime.Region(s.a - 1, view.text_point(target_row, xpos) + 1)
-
-                if is_long_enough:
-                    if s.a < s.b:
-                        return sublime.Region(s.a, view.text_point(target_row, xpos) + 1)
-                    elif s.a > s.b:
-                        start = s.a if not crosses_a else s.a - 1
-                        end = view.text_point(target_row, xpos)
-                        end = end if (end < s.a) else end + 1
-                        return sublime.Region(start, end)
-                else:
-                    if s.a < s.b:
-                        return sublime.Region(s.a, view.full_line(target_pt).b)
-                    elif s.a > s.b:
-                        end = view.full_line(target_pt).b
-                        end = end - 1 if not crosses_a else end
-                        return sublime.Region(s.a, end)
 
             if mode == modes.VISUAL_LINE:
                 if s.a < s.b:
@@ -498,8 +490,23 @@ class _vi_k(ViMotionCommand):
             pass
         return pt
 
+    def calculate_xpos(self, start, xpos):
+        size = self.view.settings().get('tab_size')
+        eol = self.view.line(start).b - 1
+        pt = 0
+        chars = 0
+        while (pt < xpos):
+            if self.view.substr(start + chars) == '\t':
+                pt += size
+            else:
+                pt += 1
+            chars += 1
+        pt = min(eol, start + chars)
+        return (pt, chars)
+
     def run(self, count=1, mode=None, xpos=0, no_translation=False):
         def f(view, s):
+            nonlocal xpos
             if mode == modes.NORMAL:
                 current_row = view.rowcol(s.b)[0]
                 target_row = min(current_row - count, view.rowcol(view.size())[0])
@@ -509,8 +516,8 @@ class _vi_k(ViMotionCommand):
                 if view.line(target_pt).empty():
                     return sublime.Region(target_pt, target_pt)
 
-                target_pt = min(target_pt + xpos, view.line(target_pt).b - 1)
-                return sublime.Region(target_pt, target_pt)
+                pt, _ = self.calculate_xpos(target_pt, xpos)
+                return sublime.Region(pt)
 
             if mode == modes.INTERNAL_NORMAL:
                 current_row = view.rowcol(s.b)[0]
@@ -523,6 +530,7 @@ class _vi_k(ViMotionCommand):
                 current_row = view.rowcol(exact_position)[0]
                 target_row = max(current_row - count, 0)
                 target_pt = view.text_point(target_row, 0)
+                xpos = self.calculate_xpos(target_pt, xpos)[1] + 1
                 is_long_enough = view.full_line(target_pt).size() > xpos
 
                 # We're crossing over to the other side of .a; we need to modify .a.
