@@ -77,6 +77,7 @@ class ViInsertLineAfter(ViOperatorDef):
     def __init__(self, *args, **kwargs):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.scroll_into_view = True
+        self.updates_xpos = False
 
     def translate(self, state):
         cmd = {}

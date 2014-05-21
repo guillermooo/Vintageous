@@ -56,8 +56,8 @@ TESTS_MODES = (
               expected=region_data([(1, 0), (1, 1)]), actual_func=first_sel_wrapper, msg='move opposite end smaller different lines cross over xpos at 0'),
     test_data(cmd='_vi_k', initial_text='foo bar\nfoo bar\nfoo bar\n', regions=[[(1, 4), (2, 4)]], cmd_params={'mode': modes.VISUAL, 'xpos': 4, 'count': 2},
               expected=region_data([(1, 5), (0, 4)]), actual_func=first_sel_wrapper, msg='move opposite end smaller different lines cross over non 0 xpos'),
-    test_data(cmd='_vi_k', initial_text='foo\nbar\nbaz\n', regions=[[(0, 1), (1, 1)]], cmd_params={'mode': modes.VISUAL, 'xpos': 1, 'count': 1},
-              expected=region_data([(0, 2), (0, 1)]), actual_func=first_sel_wrapper, msg='move back to same line same xpos'),
+    test_data(cmd='_vi_k', initial_text='foo\nbar\nbaz\n', regions=[[(0, 1), (1, 1)]], cmd_params={'mode': modes.VISUAL, 'xpos': 0, 'count': 1},
+              expected=region_data([(0, 2), (0, 0)]), actual_func=first_sel_wrapper, msg='move back to same line same xpos'),
 
     test_data(cmd='_vi_k', initial_text='foo\nbar\nbaz\n', regions=[[(0, 2), (1, 0)]], cmd_params={'mode': modes.VISUAL, 'xpos': 0, 'count': 1},
               expected=region_data([(0, 3), (0, 0)]), actual_func=first_sel_wrapper, msg='move back to same line opposite end has greater xpos'),
@@ -135,6 +135,18 @@ aaa bbb ccc
 aaa bbb ccc
 ''',
     regions=((1, 8), (1, 8)), kwargs={'mode': modes.NORMAL, 'count': 1, 'xpos': 1000}, expected=((0, 2), (0, 2)), msg='xpos stops at eol'),
+
+    # VISUAL
+    test(content='''aaa
+
+ccc
+''',
+    regions=(((1, 0), (1, 1)),), kwargs={'mode': modes.VISUAL, 'count': 1, 'xpos': 0}, expected=((1, 1), (0, 0)), msg='from empty to non-empty (visual)'),
+
+    test(content='''aaa bbb ccc ddd
+aaa bbb ccc ddd
+''',
+    regions=(((0, 6), (1, 2)),), kwargs={'mode': modes.VISUAL, 'count': 1, 'xpos': 2}, expected=((0, 7), (0, 2)), msg='from empty to non-empty (visual)'),
 )
 
 

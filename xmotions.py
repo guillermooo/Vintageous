@@ -404,11 +404,12 @@ class _vi_j(ViMotionCommand):
                 target_pt = view.text_point(target_row, 0)
                 _, xpos = self.calculate_xpos(target_pt, xpos)
 
+                end = min(self.view.line(target_pt).b, target_pt + xpos)
                 if s.a < s.b:
-                    return sublime.Region(s.a, target_pt + xpos + 1)
+                    return sublime.Region(s.a, end + 1)
 
                 if (target_pt + xpos) >= s.a:
-                    return sublime.Region(s.a - 1, target_pt + xpos + 1)
+                    return sublime.Region(s.a - 1, end + 1)
                 return sublime.Region(s.a, target_pt + xpos)
 
 
@@ -534,13 +535,17 @@ class _vi_k(ViMotionCommand):
                 target_pt = view.text_point(target_row, 0)
                 _, xpos = self.calculate_xpos(target_pt, xpos)
 
+                end = min(self.view.line(target_pt).b, target_pt + xpos)
                 if s.b >= s.a:
-                    if (self.view.line(s.a).contains(s.b) and
+                    if (self.view.line(s.a).contains(s.b - 1) and
                         not self.view.line(s.a).contains(target_pt)):
-                            return sublime.Region(s.a + 1, target_pt + xpos)
+                            return sublime.Region(s.a + 1, end)
                     else:
-                            return sublime.Region(s.a, target_pt + xpos + 1)
-                return sublime.Region(s.a, target_pt + xpos)
+                        if (target_pt + xpos) < s.a:
+                            return sublime.Region(s.a + 1, end)
+                        else:
+                            return sublime.Region(s.a, end + 1)
+                return sublime.Region(s.a, end)
 
             if mode == modes.VISUAL_LINE:
                 if s.a < s.b:

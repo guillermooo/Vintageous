@@ -51,7 +51,7 @@ TESTS_MODES = (
     test_data(cmd='_vi_j', initial_text='abc\nabc\nabc', regions=[[6, 1]], cmd_params={'mode': modes.VISUAL, 'count': 100, 'xpos': 1},
               expected=region_data([(0, 5), (2, 2)]), actual_func=first_sel_wrapper, msg='xxxx'),
     test_data(cmd='_vi_j', initial_text='abc\nabc\nabc', regions=[[6, 1]], cmd_params={'mode': modes.VISUAL, 'count': 1, 'xpos': 1},
-              expected=region_data([(1, 1), (0, 6)]), actual_func=first_sel_wrapper, msg='move from empty line'),
+              expected=region_data([(1, 2), (1, 1)]), actual_func=first_sel_wrapper, msg='move from different line to home position'),
     test_data(cmd='_vi_j', initial_text='abc\nabc\nabc', regions=[[6, 5]], cmd_params={'mode': modes.VISUAL, 'count': 1, 'xpos': 1},
               expected=region_data([(0, 5), (2, 2)]), actual_func=first_sel_wrapper, msg='move from empty line'),
     test_data(cmd='_vi_j', initial_text=('abc\n' * 60), regions=[[1, 2]], cmd_params={'mode': modes.VISUAL, 'count': 50, 'xpos': 1},
@@ -59,7 +59,7 @@ TESTS_MODES = (
     test_data(cmd='_vi_j', initial_text='foo\nfoo bar\nfoo bar', regions=[[1, 2]], cmd_params={'mode': modes.VISUAL, 'count': 1, 'xpos': 1},
               expected=region_data([(0, 1), (1, 2)]), actual_func=first_sel_wrapper, msg='move many lines'),
     test_data(cmd='_vi_j', initial_text='foo bar\nfoo\nbar', regions=[[5, 6]], cmd_params={'mode': modes.VISUAL, 'count': 1, 'xpos': 5},
-              expected=region_data([(0, 5), (1, 4)]), actual_func=first_sel_wrapper, msg='move many lines'),
+              expected=region_data([(0, 5), (1, 4)]), actual_func=first_sel_wrapper, msg='move from longer to shorter'),
     test_data(cmd='_vi_j', initial_text='\nfoo\nbar', regions=[[0, 1]], cmd_params={'mode': modes.VISUAL, 'count': 1, 'xpos': 0},
               expected=region_data([(0, 0), (1, 1)]), actual_func=first_sel_wrapper, msg='move many lines'),
     test_data(cmd='_vi_j', initial_text='\n\nbar', regions=[[0, 1]], cmd_params={'mode': modes.VISUAL, 'count': 1, 'xpos': 0},
@@ -137,6 +137,12 @@ aaa
 aaa
 ''',
     regions=((8,),), kwargs={'mode': modes.NORMAL, 'count': 1, 'xpos': 1000}, expected=((1, 2), (1, 2)), msg='xpos stops at eol'),
+
+    # VISUAL MODE
+    test(content='''
+aaa
+''',
+    regions=((0, 1),), kwargs={'mode': modes.VISUAL, 'count': 1, 'xpos': 0}, expected=((0, 0), (1, 1)), msg='from empty to non-empty (visual)'),
 )
 
 
