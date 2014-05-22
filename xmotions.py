@@ -36,8 +36,9 @@ from Vintageous.vi.text_objects import find_containing_tag
 
 
 class _vi_find_in_line(ViMotionCommand):
-    """Contrary to *f*, *t* does not look past the caret's position, so if ``character`` is under
-       the caret, nothing happens.
+    """
+    Contrary to *f*, *t* does not look past the caret's position, so if
+    @character is under the caret, nothing happens.
     """
     def run(self, char=None, mode=None, count=1, change_direction=False,
             inclusive=True, skipping=False):
@@ -50,7 +51,7 @@ class _vi_find_in_line(ViMotionCommand):
 
             if (mode in (modes.NORMAL, modes.INTERNAL_NORMAL) and
                 not inclusive
-                and skipping):
+               and skipping):
                     # When repeating through ';', we must make sure we skip one
                     # if we are at a match position.
                     if view.substr(match.b + 1) == char:

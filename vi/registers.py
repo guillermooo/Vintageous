@@ -1,5 +1,4 @@
 import sublime
-import os
 
 import itertools
 
@@ -17,8 +16,8 @@ REG_SYS_CLIPBOARD_ALL = (REG_SYS_CLIPBOARD_1, REG_SYS_CLIPBOARD_2)
 REG_VALID_NAMES = tuple("{0}".format(c) for c in "abcdefghijklmnopqrstuvwxyz")
 REG_VALID_NUMBERS = tuple("{0}".format(c) for c in "0123456789")
 REG_SPECIAL = (REG_UNNAMED, REG_SMALL_DELETE, REG_BLACK_HOLE,
-           REG_LAST_INSERTED_TEXT, REG_FILE_NAME, REG_ALT_FILE_NAME,
-           REG_SYS_CLIPBOARD_1, REG_SYS_CLIPBOARD_2)
+               REG_LAST_INSERTED_TEXT, REG_FILE_NAME, REG_ALT_FILE_NAME,
+               REG_SYS_CLIPBOARD_1, REG_SYS_CLIPBOARD_2)
 REG_ALL = REG_SPECIAL + REG_VALID_NUMBERS + REG_VALID_NAMES
 
 # todo(guillermo): There are more.
@@ -59,7 +58,6 @@ class Registers(object):
         state.registers['A'] # => "foobar" (synonyms)
     """
 
-
     def __get__(self, instance, owner):
         self.view = instance.view
         self.settings = instance.settings
@@ -78,9 +76,9 @@ class Registers(object):
         # We actually need to check whether the option is set to a bool; could
         # be any JSON type.
         if (name in REG_SYS_CLIPBOARD_ALL or
-            self.settings.view['vintageous_use_sys_clipboard'] == True):
-                # Make sure Sublime Text does the right thing in the presence of multiple
-                # selections.
+           self.settings.view['vintageous_use_sys_clipboard'] is True):
+                # Make sure Sublime Text does the right thing in the presence
+                # of multiple selections.
                 if len(value) > 1:
                     self.view.run_command('copy')
                 else:
@@ -90,10 +88,10 @@ class Registers(object):
         """
         Sets an a-z or 0-9 register.
 
-        In order to honor multiple selections in Sublime Text, we need to store register data as
-        lists, one per selection. The paste command will then make the final decision about what
-        to insert into the buffer when faced with unbalanced selection number / available
-        register data.
+        In order to honor multiple selections in Sublime Text, we need to
+        store register data as lists, one per selection. The paste command
+        will then make the final decision about what to insert into the buffer
+        when faced with unbalanced selection number / availabl e register data.
         """
         # We accept integers as register names.
         name = str(name)
@@ -102,7 +100,8 @@ class Registers(object):
         if name == REG_BLACK_HOLE:
             return
 
-        assert isinstance(values, list), "Register values must be inside a list."
+        assert isinstance(values, list), \
+            "Register values must be inside a list."
         # Coerce all values into strings.
         values = [str(v) for v in values]
 
@@ -118,7 +117,7 @@ class Registers(object):
 
         _REGISTER_DATA[name] = values
 
-        if not name in (REG_EXPRESSION,):
+        if name not in (REG_EXPRESSION,):
             self._set_default_register(values)
             self._maybe_set_sys_clipboard(name, values)
 
@@ -127,10 +126,12 @@ class Registers(object):
         Appends to an a-z register. `name` must be a capital in A-Z.
         """
         assert len(name) == 1, "Register names must be 1 char long."
-        assert name in "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "Can only append to A-Z registers."
+        assert name in "ABCDEFGHIJKLMNOPQRSTUVWXYZ", \
+            "Can only append to A-Z registers."
 
         existing_values = _REGISTER_DATA.get(name.lower(), '')
-        new_values = itertools.zip_longest(existing_values, suffixes, fillvalue='')
+        new_values = itertools.zip_longest(existing_values,
+                                           suffixes, fillvalue='')
         new_values = [(prefix + suffix) for (prefix, suffix) in new_values]
         _REGISTER_DATA[name.lower()] = new_values
         self._set_default_register(new_values)
@@ -151,15 +152,18 @@ class Registers(object):
                 return ''
         elif name in REG_SYS_CLIPBOARD_ALL:
             return [sublime.get_clipboard()]
-        elif name not in (REG_UNNAMED, REG_SMALL_DELETE) and name in REG_SPECIAL:
+        elif ((name not in (REG_UNNAMED, REG_SMALL_DELETE)) and
+                (name in REG_SPECIAL)):
             return
         # Special case lumped among these --user always wants the sys
         # clipboard.
-        elif name == REG_UNNAMED and self.settings.view['vintageous_use_sys_clipboard'] == True:
+        elif ((name == REG_UNNAMED) and
+              (self.settings.view['vintageous_use_sys_clipboard'] is True)):
             return [sublime.get_clipboard()]
 
-        # If the expression register holds a value and we're requesting the unnamed register,
-        # return the expression register and clear it aftwerwards.
+        # If the expression register holds a value and we're requesting the
+        # unnamed register, return the expression register and clear it
+        # aftwerwards.
         elif name == REG_UNNAMED and _REGISTER_DATA.get(REG_EXPRESSION, ''):
             value = _REGISTER_DATA[REG_EXPRESSION]
             _REGISTER_DATA[REG_EXPRESSION] = ''
@@ -170,7 +174,6 @@ class Registers(object):
             # In Vim, "A and "a seem to be synonyms, so accept either.
             return _REGISTER_DATA[name.lower()]
         except KeyError:
-            # sublime.status_message("Vintage.Next: E353 Nothing in register %s", name)
             pass
 
     def yank(self, vi_cmd_data, register=None):
@@ -183,7 +186,8 @@ class Registers(object):
 
         # # XXX: Small register delete. Improve this implementation.
         if vi_cmd_data._populates_small_delete_register:
-            is_same_line = lambda r: self.view.line(r.begin()) == self.view.line(r.end() - 1)
+            is_same_line = (lambda r: self.view.line(r.begin()) ==
+                            self.view.line(r.end() - 1))
             if all(is_same_line(x) for x in list(self.view.sel())):
                 self[REG_SMALL_DELETE] = self.get_selected_text(vi_cmd_data)
 
@@ -193,16 +197,18 @@ class Registers(object):
         fragments = [self.view.substr(r) for r in list(self.view.sel())]
 
         # Add new line at EOF, but don't add too many new lines.
-        if vi_cmd_data._synthetize_new_line_at_eof and not vi_cmd_data._yanks_linewise:
+        if (vi_cmd_data._synthetize_new_line_at_eof and
+           not vi_cmd_data._yanks_linewise):
             if (not fragments[-1].endswith('\n') and
                 # XXX: It appears regions can end beyond the buffer's EOF (?).
-                self.view.sel()[-1].b >= self.view.size()):
+               self.view.sel()[-1].b >= self.view.size()):
                     fragments[-1] += '\n'
 
         if fragments and vi_cmd_data._yanks_linewise:
             for i, f in enumerate(fragments):
                 # When should we add a newline character?
-                #  * always except when we have a non-\n-only string followed by a newline char.
+                #  * always except when we have a non-\n-only string followed
+                # by a newline char.
                 if (not f.endswith('\n')) or (f == '\n') or f.endswith('\n\n'):
                     fragments[i] = f + '\n'
         return fragments
