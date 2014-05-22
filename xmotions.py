@@ -279,7 +279,7 @@ class _vi_l(ViMotionCommand):
 
         regions_transformer(self.view, f)
         state = self.state
-        state.xpos = self.view.rowcol(self.view.sel()[0].b)[1]
+        # state.xpos = self.view.rowcol(self.view.sel()[0].b)[1]
 
 
 class _vi_h(ViMotionCommand):
@@ -331,7 +331,7 @@ class _vi_h(ViMotionCommand):
 
         regions_transformer(self.view, f)
         state = self.state
-        state.xpos = self.view.rowcol(self.view.sel()[0].b)[1]
+        # state.xpos = self.view.rowcol(self.view.sel()[0].b)[1]
 
 
 class _vi_j(ViMotionCommand):

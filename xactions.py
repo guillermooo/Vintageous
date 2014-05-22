@@ -266,7 +266,7 @@ class _enter_normal_mode(ViTextCommandBase):
                                 })
             self.view.sel().clear()
             self.view.sel().add_all(new_sels)
-        state.xpos = self.view.rowcol(self.view.sel()[0].b)[1]
+        # state.xpos = self.view.rowcol(self.view.sel()[0].b)[1]
         sublime.status_message('')
 
 
@@ -832,6 +832,7 @@ class _vi_dot(ViWindowCommandBase):
 
         self.window.run_command('_enter_normal_mode', {'mode': mode})
         state.repeat_data = repeat_data
+        state.update_xpos()
 
 
 class _vi_dd_action(ViTextCommandBase):

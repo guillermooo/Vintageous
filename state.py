@@ -531,6 +531,14 @@ class State(object):
         if self.motion:
             return self.motion and self.motion.accept_input
 
+    @property
+    def must_update_xpos(self):
+        if self.motion and self.motion.updates_xpos:
+            return True
+
+        if self.action and self.action.updates_xpos:
+            return True
+
     def pop_parser(self):
         # parsers = self.input_parsers
         # current = parsers.pop()
@@ -603,7 +611,7 @@ class State(object):
         self.reset_register_data()
 
     def update_xpos(self):
-        if self.motion and self.motion.updates_xpos:
+        if self.must_update_xpos:
             try:
                 sel = self.view.sel()[0]
                 end = sel.b
