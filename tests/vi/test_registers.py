@@ -7,7 +7,7 @@ from unittest import mock
 from Vintageous.vi import registers
 from Vintageous.vi.registers import Registers
 from Vintageous.vi.settings import SettingsManager
-from Vintageous.state import VintageState
+from Vintageous.state import State
 from Vintageous.tests import ViewTest
 
 
@@ -79,7 +79,7 @@ class TestCaseRegisters(ViewTest):
         self.view.settings().erase('vintageous_use_sys_clipboard')
         # self.regs = Registers(view=self.view,
                               # settings=SettingsManager(view=self.view))
-        self.regs = VintageState(self.view).registers
+        self.regs = State(self.view).registers
 
     def testCanInitializeClass(self):
         self.assertEqual(self.regs.view, self.view)
@@ -256,7 +256,7 @@ class Test_get_selected_text(ViewTest):
         registers._REGISTER_DATA = {}
         self.view.settings().erase('vintage')
         self.view.settings().erase('vintageous_use_sys_clipboard')
-        self.regs = VintageState(self.view).registers
+        self.regs = State(self.view).registers
         self.regs.view = mock.Mock()
 
     def testExtractsSubstrings(self):
@@ -368,7 +368,7 @@ class Test_yank(ViewTest):
         registers._REGISTER_DATA = {}
         self.view.settings().erase('vintage')
         self.view.settings().erase('vintageous_use_sys_clipboard')
-        self.regs = VintageState(self.view).registers
+        self.regs = State(self.view).registers
         self.regs.view = mock.Mock()
 
     def testDontYankIfWeDontHaveTo(self):

@@ -234,6 +234,30 @@ class IrreversibleTextCommand(sublime_plugin.TextCommand):
         pass
 
 
+class IrreversibleMouseTextCommand(sublime_plugin.TextCommand):
+    """ Base class.
+
+        The undo stack will ignore commands derived from this class. This is
+        useful to prevent global state management commands from shadowing
+        commands performing edits to the buffer, which are the important ones
+        to keep in the undo history.
+
+        This command does not discard the 'event' parameter and so can receive
+        mouse data.
+    """
+    def __init__(self, view):
+        sublime_plugin.TextCommand.__init__(self, view)
+
+    def run_(self, edit_token, kwargs):
+        if kwargs:
+            self.run(**kwargs)
+        else:
+            self.run()
+
+    def run(self, **kwargs):
+        pass
+
+
 def next_non_white_space_char(view, pt, white_space='\t '):
     while (view.substr(pt) in white_space) and (pt <= view.size()):
         pt += 1

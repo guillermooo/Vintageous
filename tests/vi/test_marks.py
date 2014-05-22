@@ -4,7 +4,7 @@ import sublime
 
 from Vintageous.tests import ViewTest
 from Vintageous.vi import marks
-from Vintageous.state import VintageState
+from Vintageous.state import State
 from Vintageous.tests import make_region
 from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
@@ -35,7 +35,7 @@ class MarksTests(ViewTest):
         marks._MARKS = {}
         self.view.sel().clear()
         self.view.sel().add(sublime.Region(0, 0))
-        self.marks = VintageState(self.view).marks
+        self.marks = State(self.view).marks
 
     def testCanSetMark(self):
         self.marks.add('a', self.view)

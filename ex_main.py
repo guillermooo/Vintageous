@@ -14,13 +14,13 @@ from Vintageous.ex.completions import wants_setting_completions
 from Vintageous.vi.settings import iter_settings
 from Vintageous.vi.sublime import show_ipanel
 from Vintageous.vi.utils import modes
-from Vintageous.state import VintageState
+from Vintageous.state import State
 from Vintageous.vi.utils import mark_as_widget
 
 
 def plugin_loaded():
     v = sublime.active_window().active_view()
-    state = VintageState(v)
+    state = State(v)
     d = os.path.dirname(v.file_name()) if v.file_name() else os.getcwd()
     state.settings.vi['_cmdline_cd'] = d
 
@@ -60,7 +60,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
 
         FsCompletion.invalidate()
 
-        state = VintageState(self.window.active_view())
+        state = State(self.window.active_view())
         if state.mode in (modes.VISUAL, modes.VISUAL_LINE):
             initial_text = ":'<,'>" + initial_text[1:]
 
@@ -201,7 +201,7 @@ class FsCompletion(sublime_plugin.TextCommand):
         if self.view.score_selector(0, 'text.excmdline') == 0:
             return
 
-        state = VintageState(self.view)
+        state = State(self.view)
         FsCompletion.frozen_dir = (FsCompletion.frozen_dir or
                                    (state.settings.vi['_cmdline_cd'] + '/'))
 

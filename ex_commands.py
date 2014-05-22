@@ -5,7 +5,6 @@ import os
 import stat
 import re
 import subprocess
-import sys
 
 from Vintageous.ex import ex_error
 from Vintageous.ex import ex_range
@@ -13,9 +12,7 @@ from Vintageous.ex import parsers
 from Vintageous.ex import shell
 from Vintageous.ex.plat.windows import get_oem_cp
 from Vintageous.ex.plat.windows import get_startup_info
-from Vintageous.ex_main import FsCompletion
 from Vintageous.state import State
-from Vintageous.state import VintageState
 from Vintageous.vi import abbrev
 from Vintageous.vi import utils
 from Vintageous.vi.constants import MODE_NORMAL
@@ -38,9 +35,9 @@ CURRENT_LINE_RANGE = {'left_ref': '.', 'left_offset': 0,
 def changing_cd(f, *args, **kwargs):
     def inner(*args, **kwargs):
         try:
-            state = VintageState(args[0].view)
+            state = State(args[0].view)
         except AttributeError:
-            state = VintageState(args[0].window.active_view())
+            state = State(args[0].window.active_view())
 
         old = os.getcwd()
         try:
@@ -122,7 +119,7 @@ class ExTextCommandBase(sublime_plugin.TextCommand):
         self.view.settings().set('ex_data', {'next_sel': data})
 
     def set_mode(self):
-        state = VintageState(self.view)
+        state = State(self.view)
         state.enter_normal_mode()
         self.view.run_command('vi_enter_normal_mode')
 
@@ -154,7 +151,7 @@ class ExGoto(sublime_plugin.TextCommand):
         # FIXME: This should be handled by the parser.
         # FIXME: In Vim, 0 seems to equal 1 in ranges.
         b = b if line_range['text_range'] != '0' else 1
-        state = VintageState(self.view)
+        state = State(self.view)
         # FIXME: In Visual mode, goto line does some weird stuff.
         if state.mode == MODE_NORMAL:
             # TODO: push all this code down to ViGoToLine?
@@ -439,7 +436,7 @@ class ExUnabbreviate(sublime_plugin.TextCommand):
 class ExPrintWorkingDir(IrreversibleTextCommand):
     @changing_cd
     def run(self):
-        state = VintageState(self.view)
+        state = State(self.view)
         sublime.status_message(os.getcwd())
 
 
@@ -543,7 +540,7 @@ class ExWriteFile(sublime_plugin.WindowCommand):
 
         # This may unluckily prevent the user from seeing ST's feedback about saving the current
         # file.
-        state = VintageState(self.window.active_view())
+        state = State(self.window.active_view())
         if state.mode != MODE_NORMAL:
             state.enter_normal_mode()
             self.window.run_command('vi_enter_normal_mode')
@@ -771,7 +768,7 @@ class ExDelete(ExTextCommandBase):
             if not text.endswith('\n'):
                 text = text + '\n'
 
-            state = VintageState(self.view)
+            state = State(self.view)
             state.registers[register] = [text]
 
     def run_ex_command(self, edit, line_range=None, register='', count=''):
@@ -982,7 +979,7 @@ class ExEdit(IrreversibleTextCommand):
 
             if not os.path.isabs(file_name):
                 file_name = os.path.join(
-                                VintageState(self.view).settings.vi['_cmdline_cd'],
+                                State(self.view).settings.vi['_cmdline_cd'],
                                 file_name)
 
             if not os.path.exists(file_name):
@@ -1046,7 +1043,7 @@ class ExListRegisters(sublime_plugin.TextCommand):
             lines_display = '... [+{0}]'.format(line_count - 1)
             return lines_display if line_count > 1 else ''
 
-        state = VintageState(self.view)
+        state = State(self.view)
         pairs = [(k, v) for (k, v) in state.registers.to_dict().items() if v]
         pairs = [(k, repr(v[0]), len(v)) for (k, v) in pairs]
         pairs = ['"{0}  {1}  {2}'.format(k, v, show_lines(lines)) for (k, v, lines) in pairs]
@@ -1058,7 +1055,7 @@ class ExListRegisters(sublime_plugin.TextCommand):
         if idx == -1:
             return
 
-        state = VintageState(self.view)
+        state = State(self.view)
         value = list(state.registers.to_dict().values())[idx]
         state.registers['"'] = value
 
@@ -1086,7 +1083,7 @@ class ExYank(sublime_plugin.TextCommand):
         regs = get_region_by_range(self.view, line_range)
         text = '\n'.join([self.view.substr(line) for line in regs]) + '\n'
 
-        state = VintageState(self.view)
+        state = State(self.view)
         state.registers[register] = [text]
         if register == '"':
             state.registers['0'] = [text]
@@ -1166,7 +1163,7 @@ class ExCdCommand(IrreversibleTextCommand):
             ex_error.display_error(ex_error.ERR_UNSAVED_CHANGES)
             return
 
-        state = VintageState(self.view)
+        state = State(self.view)
 
         if not path:
             state.settings.vi['_cmdline_cd'] = os.path.expanduser("~")
@@ -1208,7 +1205,7 @@ class ExCddCommand(IrreversibleTextCommand):
             ex_error.display_error(ex_error.ERR_UNSAVED_CHANGES)
             return
         path = os.path.dirname(self.view.file_name())
-        state = VintageState(self.view)
+        state = State(self.view)
         try:
             state.settings.vi['_cmdline_cd'] = path
             self.view.run_command('ex_print_working_dir')

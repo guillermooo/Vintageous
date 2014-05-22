@@ -5,7 +5,7 @@ from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
 
-from Vintageous.state import VintageState
+from Vintageous.state import State
 
 from Vintageous.tests import get_sel
 from Vintageous.tests import first_sel
@@ -171,7 +171,7 @@ class Test_ex_delete_ModeTransition(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        state = VintageState(self.view)
+        state = State(self.view)
         state.enter_normal_mode()
 
         self.view.run_command('vi_enter_normal_mode')
@@ -181,7 +181,7 @@ class Test_ex_delete_ModeTransition(ViewTest):
         self.range['text_range'] = '2'
         self.view.run_command('ex_delete', {'line_range': self.range})
 
-        state = VintageState(self.view)
+        state = State(self.view)
         new_mode = state.mode
         self.assertEqual(prev_mode, new_mode)
 
@@ -190,7 +190,7 @@ class Test_ex_delete_ModeTransition(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 1)))
 
-        state = VintageState(self.view)
+        state = State(self.view)
         state.enter_visual_mode()
         prev_mode = state.mode
 
@@ -199,7 +199,7 @@ class Test_ex_delete_ModeTransition(ViewTest):
         self.range['text_range'] = "'<,'>"
         self.view.run_command('ex_delete', {'line_range': self.range})
 
-        state = VintageState(self.view)
+        state = State(self.view)
         new_mode = state.mode
         self.assertNotEqual(prev_mode, new_mode)
         self.assertEqual(new_mode, MODE_NORMAL)

@@ -2073,7 +2073,7 @@ class _vi_ctrl_r_equal(sublime_plugin.TextCommand):
                 on_cancel()
 
         def on_cancel():
-            state = VintageState(self.view)
+            state = State(self.view)
             state.reset()
 
         self.view.window().show_input_panel('', '', on_done, None, on_cancel)
