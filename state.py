@@ -1,12 +1,8 @@
-import re
-import logging
 from collections import Counter
 
 import sublime
-import sublime_plugin
 
 from Vintageous import local_logger
-from Vintageous.vi import inputs
 from Vintageous.vi import utils
 from Vintageous.vi.utils import input_types
 from Vintageous.vi.contexts import KeyContext
@@ -15,8 +11,6 @@ from Vintageous.vi.marks import Marks
 from Vintageous.vi.registers import Registers
 from Vintageous.vi.settings import SettingsManager
 from Vintageous.vi.utils import directions
-from Vintageous.vi.utils import get_logger
-from Vintageous.vi.utils import input_types
 from Vintageous.vi.utils import is_view
 from Vintageous.vi.utils import is_ignored
 from Vintageous.vi.utils import is_ignored_but_command_mode
@@ -25,15 +19,6 @@ from Vintageous.vi import cmd_defs
 from Vintageous.vi import cmd_base
 # !! Avoid error due to sublime_plugin.py:45 expectations.
 from Vintageous.plugins import plugins as user_plugins
-
-
-# ============================================================================
-# examples that need to work
-#
-#   ysta" => ys + t + [a as input for t] + [" as input for ys]
-#   d/foobar<cr>gUw
-#   ft:s/this/that/g<cr>gg
-# ============================================================================
 
 
 _logger = local_logger(__name__)
@@ -51,7 +36,9 @@ def _init_vintageous(view, new_session=False):
 
     if not is_view(view):
         # Abort if we got a widget, panel...
-        _logger().info('[_init_vintageous] ignoring view: {0}'.format(view.name() or view.file_name() or '<???>'))
+        _logger().info(
+            '[_init_vintageous] ignoring view: {0}'.format(
+                view.name() or view.file_name() or '<???>'))
         try:
             # XXX: All this seems to be necessary here.
             if not is_ignored_but_command_mode(view):
@@ -60,9 +47,11 @@ def _init_vintageous(view, new_session=False):
             view.settings().erase('vintage')
             if is_ignored(view):
                 # Someone has intentionally disabled Vintageous, so let the user know.
-                sublime.status_message('Vintageous: Vim emulation disabled for the current view')
+                sublime.status_message(
+                    'Vintageous: Vim emulation disabled for the current view')
         except AttributeError:
-            _logger().info('[_init_vintageous] probably received the console view')
+            _logger().info(
+                '[_init_vintageous] probably received the console view')
         except Exception:
             _logger().error('[_init_vintageous] error initializing view')
         finally:
@@ -83,7 +72,8 @@ def _init_vintageous(view, new_session=False):
     # init code. I believe this is due to Sublime Text (intentionally) not
     # serializing the inverted caret state and the command_mode setting when
     # first loading a file.
-    # If the mode is unknown, it might be a new file. Let normal mode setup continue.
+    # If the mode is unknown, it might be a new file. Let normal mode setup
+    # continue.
     if not reset and (state.mode not in (modes.NORMAL, modes.UNKNOWN)):
         return
 
@@ -103,11 +93,11 @@ def _init_vintageous(view, new_session=False):
 
     elif (view.has_non_empty_selection_region() and
           state.mode != modes.VISUAL):
-          # Runs, for example, when we've performed a search via ST3 search
-          # panel and we've pressed 'Find All'. In this case, we want to
-          # ensure a consistent state for multiple selections.
-          # TODO: We could end up with multiple selections in other ways
-          #       that bypass _init_vintageous.
+            # Runs, for example, when we've performed a search via ST3 search
+            # panel and we've pressed 'Find All'. In this case, we want to
+            # ensure a consistent state for multiple selections.
+            # TODO: We could end up with multiple selections in other ways
+            #       that bypass _init_vintageous.
             state.mode = modes.VISUAL
 
     else:
@@ -144,7 +134,9 @@ def plugin_unloaded():
         view.settings().set('command_mode', False)
         view.settings().set('inverse_caret_state', False)
     except AttributeError:
-        _logger().warn('could not access sublime.active_window().active_view().settings while unloading')
+        _logger().warn(
+            'could not access sublime.active_window().active_view().settings '
+            ' while unloading')
         pass
 
 
@@ -170,9 +162,10 @@ class State(object):
         # TODO: Make this a descriptor. Why isn't it?
         self.settings = SettingsManager(self.view)
 
-        _logger().info('[State] is .view an ST:Vintageous widget: {0}:{1}'.format(
-                                        bool(self.settings.view['is_widget']),
-                                        bool(self.settings.view['is_vintageous_widget'])))
+        _logger().info(
+            '[State] is .view an ST:Vintageous widget: {0}:{1}'.format(
+                bool(self.settings.view['is_widget']),
+                bool(self.settings.view['is_vintageous_widget'])))
 
     @property
     def glue_until_normal_mode(self):
@@ -248,7 +241,8 @@ class State(object):
         Returns the name of the last character search command, namely one of:
         vi_f, vi_t, vi_big_f, vi_big_t.
         """
-        return self.settings.window['_vintageous_last_char_search_command'] or 'vi_f'
+        ok = self.settings.window['_vintageous_last_char_search_command']
+        return ok or 'vi_f'
 
     @last_char_search_command.setter
     def last_char_search_command(self, value):
@@ -683,7 +677,7 @@ class State(object):
           A command definition as found in `keys.py`.
         """
         assert isinstance(command, cmd_base.ViCommandDefBase), \
-                          'ViCommandDefBase expected, got {0}'.format(type(command))
+            'ViCommandDefBase expected, got {0}'.format(type(command))
 
         if isinstance(command, cmd_base.ViMotionDef):
             if self.runnable():
@@ -748,8 +742,8 @@ class State(object):
         if old_mode == modes.VISUAL:
             if (data[0] > 0):
                 end = self.view.text_point(
-                                self.view.rowcol(first_sel.b)[0] + data[0],
-                                data[1])
+                    self.view.rowcol(first_sel.b)[0] + data[0],
+                    data[1])
             else:
                 end = first_sel.b + data[1]
             self.view.sel().add(sublime.Region(first_sel.b, end))
@@ -758,7 +752,8 @@ class State(object):
         elif old_mode == modes.VISUAL_LINE:
             row_count, _, old_mode = data
             begin = self.view.line(first_sel.b).a
-            end = self.view.text_point(utils.row_at(self.view, begin) + row_count - 1, 0)
+            end = self.view.text_point(utils.row_at(self.view, begin) +
+                                       (row_count - 1), 0)
             end = self.view.full_line(end).b
             self.view.sel().add(sublime.Region(begin, end))
             self.mode = modes.VISUAL_LINE
@@ -797,7 +792,8 @@ class State(object):
             if self.action and self.motion:
                 action_cmd = self.action.translate(self)
                 motion_cmd = self.motion.translate(self)
-                self.logger.info('[State] full command, switching to internal normal mode')
+                self.logger.info(
+                    '[State] full command, switching to internal normal mode')
                 self.mode = modes.INTERNAL_NORMAL
 
                 # TODO: Make a requirement that motions and actions take a
@@ -810,26 +806,30 @@ class State(object):
 
                 args = action_cmd['action_args']
                 args['count'] = 1
-                # let the action run the motion within its edit object so that we don't need to
-                # worry about grouping edits to the buffer.
+                # let the action run the motion within its edit object so that
+                # we don't need to worry about grouping edits to the buffer.
                 args['motion'] = motion_cmd
-                self.logger.info('[Stage] motion in motion+action: {0}'.format(motion_cmd))
+                self.logger.info(
+                    '[Stage] motion in motion+action: {0}'.format(motion_cmd))
 
                 if self.glue_until_normal_mode and not self.gluing_sequence:
                     # We need to tell Sublime Text now that it should group
                     # all the next edits until we enter normal mode again.
-                    sublime.active_window().run_command('mark_undo_groups_for_gluing')
+                    sublime.active_window().run_command(
+                        'mark_undo_groups_for_gluing')
 
                 sublime.active_window().run_command(action_cmd['action'], args)
                 if not self.non_interactive:
                     if self.action.repeatable:
-                        self.repeat_data = ('vi', str(self.sequence), self.mode, None)
+                        self.repeat_data = ('vi', str(self.sequence),
+                                            self.mode, None)
                 self.reset_command_data()
                 return
 
             if self.motion:
                 motion_cmd = self.motion.translate(self)
-                self.logger.info('[State] lone motion cmd: {0}'.format(motion_cmd))
+                self.logger.info(
+                    '[State] lone motion cmd: {0}'.format(motion_cmd))
 
                 # We know that all motions are subclasses of ViTextCommandBase,
                 # so it's safe to call them from the current view.
@@ -844,11 +844,13 @@ class State(object):
                 action_cmd = self.action.translate(self)
                 self.logger.info('[Stage] lone action cmd '.format(action_cmd))
                 if self.mode == modes.NORMAL:
-                    self.logger.info('[State] switching to internal normal mode')
+                    self.logger.info(
+                        '[State] switching to internal normal mode')
                     self.mode = modes.INTERNAL_NORMAL
 
                     if 'mode' in action_cmd['action_args']:
-                        action_cmd['action_args']['mode'] = modes.INTERNAL_NORMAL
+                        action_cmd['action_args']['mode'] = \
+                            modes.INTERNAL_NORMAL
                 elif self.mode in (modes.VISUAL, modes.VISUAL_LINE):
                     self.view.add_regions('visual_sel', list(self.view.sel()))
 
@@ -859,22 +861,24 @@ class State(object):
                 # iXXX<Esc>llaYYY<Esc>, where we want to group the whole
                 # sequence instead.
                 if self.glue_until_normal_mode and not self.gluing_sequence:
-                    sublime.active_window().run_command('mark_undo_groups_for_gluing')
+                    sublime.active_window().run_command(
+                        'mark_undo_groups_for_gluing')
 
                 seq = self.sequence
                 visual_repeat_data = self.get_visual_repeat_data()
                 action = self.action
 
                 sublime.active_window().run_command(action_cmd['action'],
-                                                action_cmd['action_args'])
+                                                    action_cmd['action_args'])
 
                 if not (self.gluing_sequence and self.glue_until_normal_mode):
                     if action.repeatable:
-                        self.repeat_data = ('vi', seq, self.mode, visual_repeat_data)
+                        self.repeat_data = ('vi', seq, self.mode,
+                                            visual_repeat_data)
 
-
-            self.logger.info('running command: action: {0} motion: {1}'.format(self.action,
-                                                                          self.motion))
+            self.logger.info(
+                'running command: action: {0} motion: {1}'.format(self.action,
+                                                                  self.motion))
 
             if self.mode == modes.INTERNAL_NORMAL:
                 self.enter_normal_mode()
