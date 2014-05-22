@@ -601,27 +601,29 @@ class State(object):
 
         self.reset_sequence()
         self.reset_partial_sequence()
-        # self.reset_user_input()
         self.reset_register_data()
 
-    def update_xpos(self):
-        if self.must_update_xpos:
+    def update_xpos(self, force=False):
+        if self.must_update_xpos or force:
             try:
                 sel = self.view.sel()[0]
-                end = sel.b
+                pos = sel.b
+                # TODO: we should check the current mode instead.
                 if not sel.empty():
                     if sel.a < sel.b:
-                        end -= 1
-                r = sublime.Region(self.view.line(end).a, end)
+                        pos -= 1
+                r = sublime.Region(self.view.line(pos).a, pos)
                 counter = Counter(self.view.substr(r))
-                size = self.view.settings().get('tab_size')
-                xpos = (self.view.rowcol(end)[1] +
-                        ((counter['\t'] * size) - counter['\t']))
+                tab_size = self.view.settings().get('tab_size')
+                xpos = (self.view.rowcol(pos)[1] +
+                        ((counter['\t'] * tab_size) - counter['\t']))
             except Exception as e:
                 print(e)
-                raise ValueError('could not set xpos')
-
-            self.xpos = xpos
+                print('Vintageous: Error when setting xpos. Defaulting to 0.')
+                self.xpos = 0
+                return
+            else:
+                self.xpos = xpos
 
     def reset(self):
         # TODO: Remove this when we've ported all commands. This is here for

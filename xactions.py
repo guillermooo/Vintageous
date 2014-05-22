@@ -9,7 +9,6 @@ from Vintageous import local_logger
 from Vintageous.state import _init_vintageous
 from Vintageous.state import State
 from Vintageous.vi import inputs
-# from Vintageous.vi import motions
 from Vintageous.vi import utils
 from Vintageous.vi.constants import regions_transformer_reversed
 from Vintageous.vi.core import ViTextCommandBase
@@ -266,7 +265,8 @@ class _enter_normal_mode(ViTextCommandBase):
                                 })
             self.view.sel().clear()
             self.view.sel().add_all(new_sels)
-        # state.xpos = self.view.rowcol(self.view.sel()[0].b)[1]
+
+        state.update_xpos(force=True)
         sublime.status_message('')
 
 
