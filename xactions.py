@@ -1119,7 +1119,8 @@ class _vi_quote(ViTextCommandBase):
             elif mode == modes.NORMAL:
                 return address
             elif mode == modes.INTERNAL_NORMAL:
-                return sublime.Region(view.line(s.a).a, view.full_line(address.b).b)
+                return sublime.Region(view.full_line(s.b).b,
+                                      view.line(address.b).a)
 
             return s
 
