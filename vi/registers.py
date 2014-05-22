@@ -36,27 +36,27 @@ class Registers(object):
 
     This class is meant to be used a descriptor.
 
-        class VintageState(object):
+        class State(object):
             registers = Registers()
             ...
 
-        vstate = VintageState()
-        vstate.registers["%"] # now vstate.registers has access to the
+        state = State()
+        state.registers["%"] # now state.registers has access to the
                               # current view.
 
     And this is how you access registers:
 
     Setting registers...
 
-        vstate.registers['a'] = "foo" # => a == "foo"
-        vstate.registers['A'] = "bar" # => a == "foobar"
-        vstate.registers['1'] = "baz" # => 1 == "baz"
-        vstate.registers[1] = "fizz"  # => 1 == "fizz"
+        state.registers['a'] = "foo" # => a == "foo"
+        state.registers['A'] = "bar" # => a == "foobar"
+        state.registers['1'] = "baz" # => 1 == "baz"
+        state.registers[1] = "fizz"  # => 1 == "fizz"
 
     Retrieving registers...
 
-        vstate.registers['a'] # => "foobar"
-        vstate.registers['A'] # => "foobar" (synonyms)
+        state.registers['a'] # => "foobar"
+        state.registers['A'] # => "foobar" (synonyms)
     """
 
 

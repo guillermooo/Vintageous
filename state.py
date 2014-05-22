@@ -883,7 +883,3 @@ class State(object):
             if self.mode == modes.INTERNAL_NORMAL:
                 self.enter_normal_mode()
             self.reset_command_data()
-
-
-# TODO: Remove this when we've ported all commands.
-VintageState = State
