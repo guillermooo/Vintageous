@@ -3357,3 +3357,21 @@ class ViInsertLineWithCommonPrefix(ViOperatorDef):
                               }
         return cmd
 
+
+@keys.assign(seq=seqs.GM, modes=_MODES_MOTION)
+class ViMoveHalfScreenHorizontally(ViMotionDef):
+    """
+    Vim: `gm`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViMotionDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def translate(self, state):
+        cmd = {}
+
+        cmd['motion'] = '_vi_gm'
+        cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
+        return cmd

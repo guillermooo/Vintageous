@@ -1898,10 +1898,29 @@ class _vi_go_to_symbol(ViMotionCommand):
 
         if globally:
             # Global symbol; simply open the file; not a motion.
-            # TODO: Perhaps must be a motion if the target file happens to be the current one?
-            self.view.window().open_file(location[0] + ':' + ':'.join([str(x) for x in location[2]]), sublime.ENCODED_POSITION)
+            # TODO: Perhaps must be a motion if the target file happens to be
+            #       the current one?
+            self.view.window().open_file(
+                location[0] + ':' + ':'.join([str(x) for x in location[2]]),
+                sublime.ENCODED_POSITION)
             return
 
         # Local symbol; select.
         location = self.view.text_point(*location)
         regions_transformer(self.view, f)
+
+
+class _vi_gm(ViMotionCommand):
+    """
+    Vim: `gm`
+    """
+    def run(self, mode=None, count=1):
+        if mode != modes.NORMAL:
+            utils.blink()
+            return
+
+        def advance(view, s):
+            line = view.line(s.b)
+            return sublime.Region(min(s.b + (line.size() // 2), line.b - 1))
+
+        regions_transformer(self.view, advance)

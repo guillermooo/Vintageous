@@ -1,10 +1,6 @@
-import logging
 import re
 
 from Vintageous import local_logger
-from Vintageous.vi import inputs
-from Vintageous.vi import utils
-from Vintageous.vi.utils import input_types
 from Vintageous.vi.utils import modes
 from Vintageous.vi import cmd_base
 from Vintageous.plugins import plugins
@@ -174,6 +170,7 @@ class seqs:
     GQ =                           'gq'
     GT =                           'gt'
     G_BIG_T =                      'gT'
+    GM =                           'gm'
     GU =                           'gu'
     GUGU =                         'gugu'
     GUU =                          'guu'

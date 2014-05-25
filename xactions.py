@@ -1505,6 +1505,7 @@ class _vi_greater_than(ViTextCommandBase):
             first = self.view.sel()[0]
             self.view.sel().clear()
             self.view.sel().add(first)
+            self.enter_normal_mode(mode)
             return
 
         if motion:
