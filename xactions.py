@@ -1658,11 +1658,6 @@ class _vi_p(ViTextCommandBase):
             return
 
         if state.mode == modes.VISUAL:
-            # force register population. We have to do it here
-            # vi_cmd_data = {
-            #     "synthetize_new_line_at_eof": True,
-            #     "yanks_linewise": False,
-            # }
             prev_text = state.registers.get_selected_text(self)
             state.registers['"'] = prev_text
 
@@ -1711,42 +1706,33 @@ class _vi_p(ViTextCommandBase):
                 offset += len(fragment) * count
 
         if pasting_linewise:
-            self.reset_carets_linewise()
+            self.reset_carets_linewise(paste_locations)
         else:
             self.reset_carets_charwise(paste_locations, len(fragment))
 
         self.enter_normal_mode(mode)
 
-    def reset_carets_charwise(self, paste_locations, paste_len):
+    def reset_carets_charwise(self, pts, paste_len):
         # FIXME: Won't work for multiple jagged pastes...
         b_pts = [s.b for s in list(self.view.sel())]
         if len(b_pts) > 1:
             self.view.sel().clear()
             self.view.sel().add_all([sublime.Region(ploc + paste_len - 1,
                                                     ploc + paste_len - 1)
-                                            for ploc in paste_locations])
+                                    for ploc in pts])
         else:
             self.view.sel().clear()
-            self.view.sel().add(sublime.Region(paste_locations[0] + paste_len - 1,
-                                               paste_locations[0] + paste_len - 1))
+            self.view.sel().add(sublime.Region(pts[0] + paste_len - 1,
+                                               pts[0] + paste_len - 1))
 
-    def reset_carets_linewise(self):
-        # FIXME: Won't work well for visual selections...
-        # FIXME: This might not work for cmdline paste command (the target row isn't necessarily
-        #        the next one.
-        def deselect_visual_line(view, s):
-            return sublime.Region(s.a)
+    def reset_carets_linewise(self, pts):
+        self.view.sel().clear()
 
-        state = self.state
-        if state.mode == modes.VISUAL_LINE:
-            regions_transformer(self.view, deselect_visual_line)
-        else:
-            # After pasting linewise, we should move the caret one line down.
-            b_pts = [s.b for s in list(self.view.sel())]
-            new_rows = [self.view.rowcol(b)[0] + 1 for b in b_pts]
-            row_starts = [self.view.text_point(r, 0) for r in new_rows]
-            self.view.sel().clear()
-            self.view.sel().add_all([sublime.Region(pt, pt) for pt in row_starts])
+        if self.state.mode == modes.VISUAL_LINE:
+            self.view.sel().add_all([sublime.Region(loc) for loc in pts])
+            return
+
+        self.view.sel().add_all([sublime.Region(loc + 1) for loc in pts])
 
     def prepare_fragment(self, text):
         if text.endswith('\n') and text != '\n':
@@ -1777,8 +1763,7 @@ class _vi_p(ViTextCommandBase):
                     text = text[1:]
 
             self.view.replace(edit, sel, text)
-            # Return position at which we have just pasted.
-            return sel.a
+            return sel.begin()
 
 
 class _vi_gt(ViWindowCommandBase):
