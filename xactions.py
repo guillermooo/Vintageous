@@ -4,6 +4,7 @@ import sublime_plugin
 
 import re
 import logging
+from functools import partial
 
 from Vintageous import local_logger
 from Vintageous.state import _init_vintageous
@@ -1487,6 +1488,25 @@ class _vi_greater_than(ViTextCommandBase):
         def f(view, s):
             return sublime.Region(s.begin())
 
+        def indent_from_begin(view, s, level=1):
+            block = '\t' if not translate else ' ' * size
+            self.view.insert(edit, s.begin(), block * level)
+            return sublime.Region(s.begin() + 1)
+
+        if mode == modes.VISUAL_BLOCK:
+            translate = self.view.settings().get('translate_tabs_to_spaces')
+            size = self.view.settings().get('tab_size')
+            indent = partial(indent_from_begin, level=count)
+
+            regions_transformer_reversed(self.view, indent)
+            regions_transformer(self.view, f)
+
+            # Restore only the first sel.
+            first = self.view.sel()[0]
+            self.view.sel().clear()
+            self.view.sel().add(first)
+            return
+
         if motion:
             self.view.run_command(motion['motion'], motion['motion_args'])
         elif mode not in (modes.VISUAL, modes.VISUAL_LINE):
@@ -1503,6 +1523,8 @@ class _vi_less_than(ViTextCommandBase):
     def run(self, edit, mode=None, count=1, motion=None):
         def f(view, s):
             return sublime.Region(s.begin())
+
+        # Note: Vim does not unindent in visual block mode.
 
         if motion:
             self.view.run_command(motion['motion'], motion['motion_args'])
