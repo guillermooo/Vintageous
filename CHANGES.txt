@@ -1,3 +1,13 @@
+3.5.10 - 25-05-2014
+
+	- Add approximate implementation of 'gm' motion.
+	- Fix '>'. Indent by blocks, not lines.
+	- Make `p` paste and indent by default.
+	- Improve caret placement after 'p' operation.
+	- Pasting operations can now be repeated with '.'.
+	- Fix: Update xpos when returning to normal mode from insert mode.
+	- Improve ' marks in internal normal mode.
+
 3.5.9 - 22-05-2014
 
 	- Improve <cr> motion.

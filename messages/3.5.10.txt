@@ -1,0 +1,51 @@
+==============================================================================
+Vintageous 3.5.10
+==============================================================================
+
+This version includes assorted fixes and tweaks to commands so they are more
+similar to Vim's counterparts.
+
+Cheers,
+Guillermo
+
+
+*** Follow important announcements on Twitter: @VintageousS3 ***
+
+
+CHANGES
+-------
+
+	- Add approximate implementation of 'gm' motion.
+	- Fix '>'. Indent by blocks, not lines.
+	- Make `p` paste and indent by default.
+	- Improve caret placement after 'p' operation.
+	- Pasting operations can now be repeated with '.'.
+	- Fix: Update xpos when returning to normal mode from insert mode.
+	- Improve ' marks in internal normal mode.
+
+
+FOUND BUGS?
+-----------
+
+Please report them here:
+
+    https://github.com/guillermooo/Vintageous/issues
+
+
+SUPPORT VINTAGEOUS
+------------------
+
+Is Vintageous worth your time? Developing Vintageous is hard work. If you use
+it often to get actual work done, please consider donating and make it worth
+my time too.
+
+    PayPal: http://www.pledgie.com/campaigns/19122
+    Gittip: https://www.gittip.com/guillermooo/
+
+I'm the creator and main author of Vintageous, but some generous people have
+contributed their time and effort as well. See the more active ones here; you
+may want to show them some gratitude too:
+
+https://github.com/guillermooo/Vintageous/graphs/contributors
+
+Thanks for reading and for using Vintageous!
