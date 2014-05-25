@@ -262,6 +262,7 @@ TESTS_KNOWN_SEQUENCES = (
     seq_test(actual=seqs.GQ,                   expected='gq'),
     seq_test(actual=seqs.GT,                   expected='gt'),
     seq_test(actual=seqs.G_BIG_T,              expected= 'gT'),
+    seq_test(actual=seqs.GM,                   expected= 'gm'),
     seq_test(actual=seqs.GU,                   expected= 'gu'),
     seq_test(actual=seqs.GUGU,                 expected= 'gugu'),
     seq_test(actual=seqs.GUU,                  expected= 'guu'),
@@ -312,14 +313,15 @@ TESTS_KNOWN_SEQUENCES = (
     seq_test(actual=seqs.ZERO,                   expected='0'),
 )
 
+
 class Test_KeySequenceNames(ViewTest):
     def testAll(self):
         for (i, data) in enumerate(TESTS_KNOWN_SEQUENCES):
-            self.assertEqual(data.actual, data.expected, "failed at index {0}".format(i))
+            self.assertEqual(data.actual, data.expected,
+                             "failed at index {0}".format(i))
 
     def testAllKeySequenceNamesAreTested(self):
         tested_seqs = [k.actual for k in TESTS_KNOWN_SEQUENCES]
         self.assertEqual(sorted(tested_seqs),
                          sorted([v for (k, v) in seqs.__dict__.items()
-                                              if k.isupper()])
-                         )
+                                if k.isupper()]))

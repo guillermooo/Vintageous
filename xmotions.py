@@ -1921,6 +1921,7 @@ class _vi_gm(ViMotionCommand):
 
         def advance(view, s):
             line = view.line(s.b)
-            return sublime.Region(min(s.b + (line.size() // 2), line.b - 1))
+            delta = (line.b - s.b) // 2
+            return sublime.Region(min(s.b + delta, line.b - 1))
 
         regions_transformer(self.view, advance)
