@@ -153,7 +153,6 @@ class ViYankByChars(ViOperatorDef):
         self.updates_xpos = True
         self.scroll_into_view = True
         self.motion_required = True
-        self.repeatable = True
 
     def translate(self, state):
         cmd = {}
@@ -529,7 +528,6 @@ class ViYankLine(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.updates_xpos = True
         self.scroll_into_view = True
-        self.repeatable = True
 
     def translate(self, state):
         cmd = {}
@@ -857,6 +855,7 @@ class ViPasteBefore(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.updates_xpos = True
         self.scroll_into_view = True
+        self.repeatable = True
 
     def translate(self, state):
         cmd = {}
