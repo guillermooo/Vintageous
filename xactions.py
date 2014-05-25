@@ -24,6 +24,7 @@ from Vintageous.vi.utils import IrreversibleTextCommand
 from Vintageous.vi.utils import is_view
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import regions_transformer
+from Vintageous.vi.utils import restoring_sel
 from Vintageous.vi import cmd_base
 from Vintageous.vi import cmd_defs
 from Vintageous.vi import search
@@ -1748,7 +1749,14 @@ class _vi_p(ViTextCommandBase):
             at = at if at <= self.view.size() else self.view.size()
             for x in range(count):
                 self.view.insert(edit, at, text)
-                # Return position at which we have just pasted.
+
+            if '\n' in text:
+                with restoring_sel(self.view):
+                    delta = len(text) * count
+                    r = sublime.Region(at + 1, at + delta)
+                    self.view.sel().add(r)
+                    self.view.run_command('reindent', {'force_indent': False})
+
             return at
         else:
             if text.startswith('\n'):
@@ -1763,6 +1771,14 @@ class _vi_p(ViTextCommandBase):
                     text = text[1:]
 
             self.view.replace(edit, sel, text)
+
+            if '\n' in text:
+                with restoring_sel(self.view):
+                    delta = sel.begin() + len(text)
+                    r = sublime.Region(sel.begin() + 1, delta - 1)
+                    self.view.sel().add(r)
+                    self.view.run_command('reindent', {'force_indent': False})
+
             return sel.begin()
 
 

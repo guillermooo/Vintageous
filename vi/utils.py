@@ -306,6 +306,15 @@ def translate_char(char):
         return char
 
 
+@contextmanager
+def restoring_sel(view):
+    regs = list(view.sel())
+    view.sel().clear()
+    yield
+    view.sel().clear()
+    view.sel().add_all(regs)
+
+
 class directions:
     NONE = 0
     UP = 1
