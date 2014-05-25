@@ -833,6 +833,7 @@ class ViPasteAfter(ViOperatorDef):
         ViOperatorDef.__init__(self, *args, **kwargs)
         self.updates_xpos = True
         self.scroll_into_view = True
+        self.repeatable = True
 
     def translate(self, state):
         cmd = {}

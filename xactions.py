@@ -1106,6 +1106,8 @@ class _vi_m(ViTextCommandBase):
 
 
 class _vi_quote(ViTextCommandBase):
+    """
+    """
     def run(self, edit, mode=None, character=None, count=1):
         def f(view, s):
             if mode == modes.VISUAL:
@@ -1116,8 +1118,10 @@ class _vi_quote(ViTextCommandBase):
                         return sublime.Region(s.a, address.b)
                 else:
                     return sublime.Region(s.a + 1, address.b)
+
             elif mode == modes.NORMAL:
                 return address
+
             elif mode == modes.INTERNAL_NORMAL:
                 return sublime.Region(view.full_line(s.b).b,
                                       view.line(address.b).a)
@@ -1125,7 +1129,6 @@ class _vi_quote(ViTextCommandBase):
             return s
 
         state = self.state
-
         address = state.marks.get_as_encoded_address(character)
 
         if address is None:
@@ -1139,7 +1142,6 @@ class _vi_quote(ViTextCommandBase):
                 self.view.run_command(address.split(' ')[1][:-1])
             return
 
-        # This is a motion in a composite command.
         regions_transformer(self.view, f)
 
 
