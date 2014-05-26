@@ -108,30 +108,43 @@ class _vi_gq(ViTextCommandBase):
         super().__init__(*args, **kwargs)
 
     def run(self, edit, mode=None, count=1, motion=None):
-        def f(view, s):
-            return sublime.Region(s.begin(), s.end())
-            # reverse the resulting region so that _enter_normal_mode foo bar foo
-            # collapses the selection as we want it.
+        def reverse(view, s):
+            return sublime.Region(s.end(), s.begin())
 
-        if mode != modes.INTERNAL_NORMAL:
-            raise ValueError('bad mode: ' + mode)
+        def shrink(view, s):
+            if view.substr(s.b - 1) == '\n':
+                return sublime.Region(s.a, s.b - 1)
+            return s
 
-        if motion is None:
-            raise ValueError('motion data required')
-
-        self.save_sel()
-
-        self.view.run_command(motion['motion'], motion['motion_args'])
-
-        if self.has_sel_changed():
-            self.save_sel()
+        if mode in (modes.VISUAL, modes.VISUAL_LINE):
+            # TODO: ST seems to always reformat whole paragraphs with
+            #       'wrap_lines'.
+            regions_transformer(self.view, shrink)
+            regions_transformer(self.view, reverse)
             self.view.run_command('wrap_lines')
-            self.view.sel().clear()
-            self.view.sel().add_all(self.old_sel)
-        else:
-            utils.blink()
+            self.enter_normal_mode(mode)
+            return
 
-        self.enter_normal_mode(mode)
+        elif mode == modes.INTERNAL_NORMAL:
+            if motion is None:
+                raise ValueError('motion data required')
+
+            self.save_sel()
+
+            self.view.run_command(motion['motion'], motion['motion_args'])
+
+            if self.has_sel_changed():
+                self.save_sel()
+                self.view.run_command('wrap_lines')
+                self.view.sel().clear()
+                self.view.sel().add_all(self.old_sel)
+            else:
+                utils.blink()
+
+            self.enter_normal_mode(mode)
+
+        else:
+            raise ValueError('bad mode: ' + mode)
 
 
 class _vi_u(IrreversibleTextCommand):
