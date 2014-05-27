@@ -103,7 +103,7 @@ def _init_vintageous(view, new_session=False):
     else:
         # This may be run when we're coming from cmdline mode.
         pseudo_visual = view.has_non_empty_selection_region()
-        mode = modes.VISUAL if pseudo_visual else modes.INSERT
+        mode = modes.VISUAL if pseudo_visual else state.mode
         # TODO: Maybe the above should be handled by State?
         state.enter_normal_mode()
         view.window().run_command('_enter_normal_mode', {'mode': mode,
