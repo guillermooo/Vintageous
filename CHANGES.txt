@@ -1,3 +1,12 @@
+3.5.11 - 27-05-2014
+
+	- Prevent caret from walking bacward when switching tabs.
+	- Improve 'cw' and 'cW' (exceptions).
+	- Add option to control visual bell ('visualbell').
+	- Abort 'V' at EOF in normal mode to prevent caret getting stuck.
+	- '<' and '>' in visual modes now accept counts.
+	- Enable 'gq' in visual modes (initial work).
+
 3.5.10 - 25-05-2014
 
 	- Add approximate implementation of 'gm' motion.
