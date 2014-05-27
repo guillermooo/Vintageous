@@ -195,6 +195,10 @@ def gluing_undo_groups(view, state):
 
 
 def blink(times=4, delay=55):
+    prefs = sublime.load_settings('Preferences.sublime-settings')
+    if prefs.get('vintageous_visualbell') is False:
+        return
+
     v = sublime.active_window().active_view()
     settings = v.settings()
     # Ensure we leave the setting as we found it.

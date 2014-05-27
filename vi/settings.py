@@ -3,7 +3,7 @@ import sublime
 import collections
 import json
 
-vi_user_setting = collections.namedtuple('vi_editor_setting', 'scope values default parser action noable')
+vi_user_setting = collections.namedtuple('vi_editor_setting', 'scope values default parser action negatable')
 
 WINDOW_SETTINGS = [
     'last_buffer_search',
@@ -32,6 +32,7 @@ def set_generic_view_setting(view, name, value, opt, globally=False):
         if not globally or (opt.scope not in (SCOPE_VI_VIEW, SCOPE_VI_WINDOW)):
             view.settings().set(name, opt.parser(value))
         else:
+            name = 'vintageous_' + name
             prefs = sublime.load_settings('Preferences.sublime-settings')
             prefs.set(name, opt.parser(value))
             sublime.save_settings('Preferences.sublime-settings')
@@ -70,21 +71,22 @@ def opt_rulers_parser(value):
 
 
 VI_OPTIONS = {
-    'hlsearch':    vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True,  parser=opt_bool_parser,   action=set_generic_view_setting, noable=True),
-    'magic':       vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True,  parser=opt_bool_parser,   action=set_generic_view_setting, noable=True),
-    'ignorecase':  vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=False, parser=opt_bool_parser,   action=set_generic_view_setting, noable=True),
-    'incsearch':   vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True,  parser=opt_bool_parser,   action=set_generic_view_setting, noable=True),
-    'autoindent':  vi_user_setting(scope=SCOPE_VI_VIEW, values=(True, False, '0', '1'), default=True,  parser=None,              action=set_generic_view_setting, noable=False),
-    'showminimap': vi_user_setting(scope=SCOPE_WINDOW,  values=(True, False, '0', '1'), default=True,  parser=None,              action=set_minimap,              noable=True),
-    'showsidebar': vi_user_setting(scope=SCOPE_WINDOW,  values=(True, False, '0', '1'), default=True,  parser=None,              action=set_sidebar,              noable=True),
-    'rulers':      vi_user_setting(scope=SCOPE_VIEW,    values=None,                    default=[],    parser=opt_rulers_parser, action=set_generic_view_setting, noable=False),
+    'autoindent':  vi_user_setting(scope=SCOPE_VI_VIEW,   values=(True, False, '0', '1'), default=True,  parser=None,              action=set_generic_view_setting, negatable=False),
+    'hlsearch':    vi_user_setting(scope=SCOPE_VI_VIEW,   values=(True, False, '0', '1'), default=True,  parser=opt_bool_parser,   action=set_generic_view_setting, negatable=True),
+    'ignorecase':  vi_user_setting(scope=SCOPE_VI_VIEW,   values=(True, False, '0', '1'), default=False, parser=opt_bool_parser,   action=set_generic_view_setting, negatable=True),
+    'incsearch':   vi_user_setting(scope=SCOPE_VI_VIEW,   values=(True, False, '0', '1'), default=True,  parser=opt_bool_parser,   action=set_generic_view_setting, negatable=True),
+    'magic':       vi_user_setting(scope=SCOPE_VI_VIEW,   values=(True, False, '0', '1'), default=True,  parser=opt_bool_parser,   action=set_generic_view_setting, negatable=True),
+    'visualbell':  vi_user_setting(scope=SCOPE_VI_WINDOW, values=(True, False, '0', '1'), default=True,  parser=opt_bool_parser,   action=set_generic_view_setting, negatable=True),
+    'rulers':      vi_user_setting(scope=SCOPE_VIEW,      values=None,                    default=[],    parser=opt_rulers_parser, action=set_generic_view_setting, negatable=False),
+    'showminimap': vi_user_setting(scope=SCOPE_WINDOW,    values=(True, False, '0', '1'), default=True,  parser=None,              action=set_minimap,              negatable=True),
+    'showsidebar': vi_user_setting(scope=SCOPE_WINDOW,    values=(True, False, '0', '1'), default=True,  parser=None,              action=set_sidebar,              negatable=True),
 }
 
 
 # For completions.
 def iter_settings(prefix=''):
     if prefix.startswith('no'):
-        for item in (x for (x, y) in VI_OPTIONS.items() if y.noable):
+        for item in (x for (x, y) in VI_OPTIONS.items() if y.negatable):
             if ('no' + item).startswith(prefix):
                 yield 'no' + item
     else:
@@ -96,7 +98,7 @@ def iter_settings(prefix=''):
 def set_local(view, name, value):
     try:
         opt = VI_OPTIONS[name]
-        if not value and opt.noable:
+        if not value and opt.negatable:
             opt.action(view, name, '1', opt)
             return
         opt.action(view, name, value, opt)
@@ -104,7 +106,7 @@ def set_local(view, name, value):
         if name.startswith('no'):
             try:
                 opt = VI_OPTIONS[name[2:]]
-                if opt.noable:
+                if opt.negatable:
                     opt.action(view, name[2:], '0', opt)
                 return
             except KeyError:
@@ -115,7 +117,7 @@ def set_local(view, name, value):
 def set_global(view, name, value):
     try:
         opt = VI_OPTIONS[name]
-        if not value and opt.noable:
+        if not value and opt.negatable:
             opt.action(view, name, '1', opt, globally=True)
             return
         opt.action(view, name, value, opt, globally=True)
@@ -123,7 +125,7 @@ def set_global(view, name, value):
         if name.startswith('no'):
             try:
                 opt = VI_OPTIONS[name[2:]]
-                if opt.noable:
+                if opt.negatable:
                     opt.action(view, name[2:], '0', opt, globally=True)
                 return
             except KeyError:
