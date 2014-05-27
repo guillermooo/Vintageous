@@ -1527,7 +1527,8 @@ class _vi_greater_than(ViTextCommandBase):
             utils.blink()
             return
 
-        self.view.run_command('indent')
+        for i in range(count):
+            self.view.run_command('indent')
 
         regions_transformer(self.view, f)
         self.enter_normal_mode(mode)
@@ -1546,7 +1547,8 @@ class _vi_less_than(ViTextCommandBase):
             utils.blink()
             return
 
-        self.view.run_command('unindent')
+        for i in range(count):
+            self.view.run_command('unindent')
 
         regions_transformer(self.view, f)
         self.enter_normal_mode(mode)
