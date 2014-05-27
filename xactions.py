@@ -3,19 +3,16 @@ import sublime
 import sublime_plugin
 
 import re
-import logging
 from functools import partial
 
 from Vintageous import local_logger
 from Vintageous.state import _init_vintageous
 from Vintageous.state import State
-from Vintageous.vi import inputs
 from Vintageous.vi import utils
 from Vintageous.vi.constants import regions_transformer_reversed
 from Vintageous.vi.core import ViTextCommandBase
 from Vintageous.vi.core import ViWindowCommandBase
 from Vintageous.vi.keys import KeySequenceTokenizer
-from Vintageous.vi.keys import EOF
 from Vintageous.vi.keys import to_bare_command_name
 from Vintageous.vi.keys import key_names
 from Vintageous.vi.mappings import Mappings
