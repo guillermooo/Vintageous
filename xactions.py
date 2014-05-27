@@ -386,8 +386,9 @@ class _enter_visual_mode(ViTextCommandBase):
 
 class _enter_visual_mode_impl(sublime_plugin.TextCommand):
     """
-    Transforms the view's selections. We don't do this inside the EnterVisualMode
-    window command because ST seems to neglect to repaint the selections. (bug?)
+    Transforms the view's selections. We don't do this inside the
+    EnterVisualMode window command because ST seems to neglect to repaint the
+    selections. (bug?)
     """
     def run(self, edit, mode=None):
         def f(view, s):
@@ -409,9 +410,19 @@ class _enter_visual_line_mode(ViTextCommandBase):
         if state.mode == modes.VISUAL_LINE:
             self.view.run_command('_enter_normal_mode', {'mode': mode})
             return
+
+        # FIXME: 'V' from normal mode sets mode to internal normal.
+        if mode in (modes.NORMAL, modes.INTERNAL_NORMAL):
+            # Abort if we are at EOF -- no newline char to hold on to.
+            if any(s.b == self.view.size() for s in self.view.sel()):
+                utils.blink()
+                return
+
         self.view.run_command('_enter_visual_line_mode_impl', {'mode': mode})
         state.enter_visual_line_mode()
         state.display_status()
+
+
 class _enter_visual_line_mode_impl(sublime_plugin.TextCommand):
     """
     Transforms the view's selections.
@@ -426,7 +437,7 @@ class _enter_visual_line_mode_impl(sublime_plugin.TextCommand):
                     else:
                         return sublime.Region(view.line(s.a).a, s.b)
                 else:
-                    if view.substr(s.a - 1 ) != '\n':
+                    if view.substr(s.a - 1) != '\n':
                         return sublime.Region(view.full_line(s.a - 1).b,
                                               view.line(s.b).a)
                     else:
