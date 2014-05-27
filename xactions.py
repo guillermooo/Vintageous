@@ -188,19 +188,29 @@ class _vi_a(sublime_plugin.TextCommand):
 
 class _vi_c(ViTextCommandBase):
     def run(self, edit, count=1, mode=None, motion=None, register=None):
+        def compact(view, s):
+            if view.substr(s).strip():
+                pt = utils.previous_non_white_space_char(view, s.b - 1,
+                                                         white_space=' \t')
+                return sublime.Region(s.a, pt + 1)
+            return s
+
         if mode is None:
             raise ValueError('mode required')
 
-        if mode == modes.INTERNAL_NORMAL and motion is None:
+        if (mode == modes.INTERNAL_NORMAL) and (motion is None):
             raise ValueError('motion required')
-
-        if mode == modes.INTERNAL_NORMAL and motion['motion'] == '_vi_w':
-            motion['motion'] = '_vi_e'
 
         self.save_sel()
 
         if motion:
             self.view.run_command(motion['motion'], motion['motion_args'])
+
+            # In these cases, Vim treats the motion differently and ignores
+            # trailing white space.
+            if ((mode == modes.INTERNAL_NORMAL) and
+               (motion['motion'] in ('_vi_w', '_vi_big_w'))):
+                    regions_transformer(self.view, compact)
 
             if not self.has_sel_changed():
                 self.enter_insert_mode(mode)
