@@ -298,7 +298,9 @@ class _enter_normal_mode(ViTextCommandBase):
 class _enter_normal_mode_impl(sublime_plugin.TextCommand):
     def run(self, edit, mode=None):
         def f(view, s):
-            _logger().info('[_enter_normal_mode_impl] entering normal mode from {0}'.format(mode))
+            _logger().info(
+                '[_enter_normal_mode_impl] entering normal mode from {0}'
+                .format(mode))
             if mode == modes.INSERT:
                 if view.line(s.b).a != s.b:
                     return sublime.Region(s.b - 1)
@@ -310,12 +312,13 @@ class _enter_normal_mode_impl(sublime_plugin.TextCommand):
 
             if mode == modes.VISUAL:
                 # save selections for gv
-                # But only if there are non-empty sels. We might be in visual mode and not have
-                # non-empty sels because we've just existed from an action.
+                # But only if there are non-empty sels. We might be in visual
+                # mode and not have non-empty sels because we've just existed
+                # from an action.
                 if self.view.has_non_empty_selection_region():
                     self.view.add_regions('visual_sel', list(self.view.sel()))
                 if s.a < s.b:
-                    r =  sublime.Region(s.b - 1)
+                    r = sublime.Region(s.b - 1)
                     if view.substr(r.b) == '\n':
                         r.b -= 1
                     return sublime.Region(r.b)
@@ -323,8 +326,9 @@ class _enter_normal_mode_impl(sublime_plugin.TextCommand):
 
             if mode in (modes.VISUAL_LINE, modes.VISUAL_BLOCK):
                 # save selections for gv
-                # But only if there are non-empty sels. We might be in visual mode and not have
-                # non-empty sels because we've just existed from an action.
+                # But only if there are non-empty sels. We might be in visual
+                # mode and not have non-empty sels because we've just existed
+                # from an action.
                 if self.view.has_non_empty_selection_region():
                     self.view.add_regions('visual_sel', list(self.view.sel()))
 
@@ -343,7 +347,8 @@ class _enter_normal_mode_impl(sublime_plugin.TextCommand):
 
         if mode == modes.UNKNOWN:
             return
-        if len(self.view.sel()) > 1 and mode == modes.NORMAL:
+
+        if (len(self.view.sel()) > 1) and (mode == modes.NORMAL):
             sel = self.view.sel()[0]
             self.view.sel().clear()
             self.view.sel().add(sel)
