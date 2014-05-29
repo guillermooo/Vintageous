@@ -828,6 +828,7 @@ class _vi_dot(ViWindowCommandBase):
     def run(self, mode=None, count=None, repeat_data=None):
         state = self.state
         state.reset_command_data()
+
         if state.mode == modes.INTERNAL_NORMAL:
             state.mode = modes.NORMAL
 
@@ -840,7 +841,9 @@ class _vi_dot(ViWindowCommandBase):
             count = None
 
         type_, seq_or_cmd, old_mode, visual_data = repeat_data
-        _logger().info('[_vi_dot] type: {0} seq or cmd: {1} old mode: {2}'.format(type_, seq_or_cmd, old_mode))
+        _logger().info(
+            '[_vi_dot] type: {0} seq or cmd: {1} old mode: {2}'
+            .format(type_, seq_or_cmd, old_mode))
 
         if visual_data and (mode != modes.VISUAL):
             state.restore_visual_data(visual_data)

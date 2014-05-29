@@ -249,7 +249,7 @@ class ViChangeByChars(ViOperatorDef):
         return cmd
 
 
-@keys.assign(seq=seqs.U, modes=_MODES_ACTION)
+@keys.assign(seq=seqs.U, modes=[modes.NORMAL])
 class ViUndo(ViOperatorDef):
     """
     Vim: `u`
@@ -262,16 +262,31 @@ class ViUndo(ViOperatorDef):
 
     def translate(self, state):
         cmd = {}
-
-        if state.mode in (modes.VISUAL,
-                          modes.VISUAL_LINE,
-                          modes.VISUAL_BLOCK):
-            cmd['action'] = '_vi_visual_u'
-            cmd['action_args'] = {'count': state.count, 'mode': state.mode}
-            return cmd
-
         cmd['action'] = '_vi_u'
         cmd['action_args'] = {'count': state.count}
+        return cmd
+
+
+@keys.assign(seq=seqs.U, modes=[modes.VISUAL,
+                                modes.VISUAL_LINE,
+                                modes.VISUAL_BLOCK])
+class ViChangeToLowerCaseByCharsVisual(ViOperatorDef):
+    # TODO: Maybe this is duplicated.
+    """
+    Vim: `u`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+        self.repeatable = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = '_vi_visual_u'
+        cmd['action_args'] = {'count': state.count, 'mode': state.mode}
+
         return cmd
 
 
@@ -1315,7 +1330,7 @@ class ViScrollByLinesUp(ViOperatorDef):
         return cmd
 
 
-@keys.assign(seq=seqs.BIG_U, modes=_MODES_ACTION)
+@keys.assign(seq=seqs.BIG_U, modes=[modes.NORMAL])
 class ViUndoLineChanges(ViOperatorDef):
     """
     TODO: Implement this.
@@ -1333,11 +1348,33 @@ class ViUndoLineChanges(ViOperatorDef):
         if state.mode in (modes.VISUAL,
                           modes.VISUAL_LINE,
                           modes.VISUAL_BLOCK):
-            cmd['action'] = '_vi_visual_big_u'
+            cmd['action'] = '_xxx_disabled'
             cmd['action_args'] = {'count': state.count, 'mode': state.mode}
             return cmd
 
         return {}
+
+
+@keys.assign(seq=seqs.BIG_U, modes=[modes.VISUAL, modes.VISUAL_LINE,
+                                    modes.VISUAL_BLOCK])
+class ViChangeToUpperCaseByCharsVisual(ViOperatorDef):
+    # TODO: Maybe this is duplicated.
+    """
+    Vim: `U`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+        self.repeatable = True
+
+    def translate(self, state):
+        cmd = {}
+
+        cmd['action'] = '_vi_visual_big_u'
+        cmd['action_args'] = {'count': state.count, 'mode': state.mode}
+        return cmd
 
 
 @keys.assign(seq=seqs.CTRL_E, modes=_MODES_ACTION)

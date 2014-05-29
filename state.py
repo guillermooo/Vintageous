@@ -742,7 +742,7 @@ class State(object):
                  utils.row_at(self.view, first.begin()))
 
         if lines > 0:
-            chars = utils.col_at(first.end())
+            chars = utils.col_at(self.view, first.end())
         else:
             chars = first.size()
 
