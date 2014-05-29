@@ -15,6 +15,7 @@ from Vintageous.vi.utils import is_view
 from Vintageous.vi.utils import is_ignored
 from Vintageous.vi.utils import is_ignored_but_command_mode
 from Vintageous.vi.utils import modes
+from Vintageous.vi.utils import first_sel
 from Vintageous.vi import cmd_defs
 from Vintageous.vi import cmd_base
 # !! Avoid error due to sublime_plugin.py:45 expectations.
@@ -730,45 +731,45 @@ class State(object):
                 return True
 
     def get_visual_repeat_data(self):
-        """
-        Returns the data needed to repeat a visual mode command in normal mode.
+        """Returns the data needed to restore visual selections before
+        repeating a visual mode command in normal mode.
         """
         if self.mode not in (modes.VISUAL, modes.VISUAL_LINE):
             return
 
-        first_sel = self.view.sel()[0]
-        lines = (utils.row_at(self.view, first_sel.end()) -
-                 utils.row_at(self.view, first_sel.begin()))
+        first = first_sel(self.view)
+        lines = (utils.row_at(self.view, first.end()) -
+                 utils.row_at(self.view, first.begin()))
+
         if lines > 0:
-            chars = self.view.rowcol(first_sel.end())[1]
+            chars = utils.col_at(first.end())
         else:
-            chars = first_sel.size()
+            chars = first.size()
 
         return (lines, chars, self.mode)
 
     def restore_visual_data(self, data):
-        row_count, chars, old_mode = data
-        first_sel = self.view.sel()[0]
+        rows, chars, old_mode = data
+        first = first_sel(self.view)
+
         if old_mode == modes.VISUAL:
-            if (data[0] > 0):
-                end = self.view.text_point(
-                    self.view.rowcol(first_sel.b)[0] + data[0],
-                    data[1])
+            if rows > 0:
+                end = self.view.text_point(utils.row_at(self.view, first.b) +
+                                           rows, chars)
             else:
-                end = first_sel.b + data[1]
-            self.view.sel().add(sublime.Region(first_sel.b, end))
+                end = first.b + chars
+
+            self.view.sel().add(sublime.Region(first.b, end))
             self.mode = modes.VISUAL
 
         elif old_mode == modes.VISUAL_LINE:
-            row_count, _, old_mode = data
-            begin = self.view.line(first_sel.b).a
+            rows, _, old_mode = data
+            begin = self.view.line(first.b).a
             end = self.view.text_point(utils.row_at(self.view, begin) +
-                                       (row_count - 1), 0)
+                                       (rows - 1), 0)
             end = self.view.full_line(end).b
             self.view.sel().add(sublime.Region(begin, end))
             self.mode = modes.VISUAL_LINE
-        else:
-            pass
 
     def runnable(self):
         """
