@@ -1,3 +1,12 @@
+3.5.12 - 29-05-2014
+
+	- Implement '[' and ']' motions.
+	- Fix Ctrl-C, Ctrl-[ in visual modes.
+	- Implement Ctrl-W in insert mode (deletes previous word).
+	- 'p' does not autoindent by default.
+	- Bracket text object skips escaped brackets.
+	- Add 'gc' and 'gC' operators to toggle comments (non-standard).
+
 3.5.11 - 27-05-2014
 
 	- Prevent caret from walking bacward when switching tabs.

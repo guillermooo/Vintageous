@@ -1,0 +1,43 @@
+==============================================================================
+Vintageous 3.5.12
+==============================================================================
+
+*** Follow important announcements on Twitter: @VintageousS3 ***
+
+
+CHANGES
+-------
+
+	- Implement '[' and ']' motions.
+	- Fix Ctrl-C, Ctrl-[ in visual modes.
+	- Implement Ctrl-W in insert mode (deletes previous word).
+	- 'p' does not autoindent by default.
+	- Bracket text object skips escaped brackets.
+	- Add 'gc' and 'gC' operators to toggle comments (non-standard).
+
+
+FOUND BUGS?
+-----------
+
+Please report them here:
+
+    https://github.com/guillermooo/Vintageous/issues
+
+
+SUPPORT VINTAGEOUS
+------------------
+
+Is Vintageous worth your time? Developing Vintageous is hard work. If you use
+it often to get actual work done, please consider donating and make it worth
+my time too.
+
+    PayPal: http://www.pledgie.com/campaigns/19122
+    Gittip: https://www.gittip.com/guillermooo/
+
+I'm the creator and main author of Vintageous, but some generous people have
+contributed their time and effort as well. See the more active ones here; you
+may want to show them some gratitude too:
+
+https://github.com/guillermooo/Vintageous/graphs/contributors
+
+Thanks for reading and for using Vintageous!
