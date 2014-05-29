@@ -1,183 +1,69 @@
-import unittest
+from collections import namedtuple
 
 from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
-from Vintageous.tests import get_sel
-from Vintageous.tests import first_sel
 from Vintageous.tests import ViewTest
 
 from Vintageous.vi.text_objects import find_prev_lone_bracket
 from Vintageous.vi.text_objects import find_next_lone_bracket
-from Vintageous.vi.search import reverse_search_by_pt
+
+from sublime import Region as R
 
 
-class Test_find_prev_lone_bracket_SingleLine_Flat(ViewTest):
-    def testReturnsNoneIfNoPreviousLoneBracket(self):
-        set_text(self.view, 'abc')
+test = namedtuple('simple_test', 'content start brackets expected msg')
 
-        region = find_prev_lone_bracket(self.view, 1, ('\\{', '\\}'))
-        self.assertIsNone(region)
+TESTS = (
+    test(content='aaa',      start=1, brackets=('\\{', '\\}'), expected=None, msg='should return none'),
+    test(content='a{a}a',    start=1, brackets=('\\{', '\\}'), expected=R(1, 2), msg='should find bracket at caret position'),
+    test(content='{aa}a',    start=1, brackets=('\\{', '\\}'), expected=R(0, 1), msg='should find bracket at BOF'),
+    test(content='bbb{aa}a', start=2, brackets=('\\{', '\\}'), expected=None, msg='should not find brackets after caret'),
+    test(content='a{bc',     start=3, brackets=('\\{', '\\}'), expected=R(1, 2), msg='should find unbalanced bracket before caret'),
 
-    # TODO: Fix this.
-    # Vim finds the current opening bracket if the caret is at its index.
-    def testCanFindPreviousLoneBracketAtSelfPosition(self):
-        set_text(self.view,'a{b}c')
-        add_sel(self.view, self.R(1, 1))
+    test(content='foo {bar {foo} bar}', start=16, brackets=('\\{', '\\}'), expected=R(4, 5), msg='should find outer bracket from RHS'),
+    test(content='foo {bar {foo} bar}', start=7, brackets=('\\{', '\\}'), expected=R(4, 5), msg='should find outer bracket from LHS'),
+    test(content='foo {bar {foo} bar}', start=13, brackets=('\\{', '\\}'), expected=R(9, 10), msg='should find inner bracket'),
 
-        region = find_prev_lone_bracket(self.view, 1, ('\\{', '\\}'))
-        self.assertEqual(region, self.R(1, 2))
+    test(content='foo {bar {foo} bar', start=16, brackets=('\\{', '\\}'), expected=R(4, 5), msg='should find outer if unbalanced outer'),
+    test(content='foo {bar {foo} bar', start=12, brackets=('\\{', '\\}'), expected=R(9, 10), msg='should find inner if unbalanced outer'),
 
-    def testCanFindPreviousLoneBracketAtBof(self):
-        set_text(self.view,'{ab}c')
-
-        region = find_prev_lone_bracket(self.view, 2, ('\\{', '\\}'))
-        self.assertEqual(region, self.R(0, 1))
-
-    def testReturnsNoneIfNoPreviousLoneBracketButLineHasBrackets(self):
-        set_text(self.view,'abc{ab}c')
-
-        region = find_prev_lone_bracket(self.view, 2, ('\\{', '\\}'))
-        self.assertEqual(region, None)
-
-    def testFindsUnbalancedBracket(self):
-        set_text(self.view,'a{bc')
-
-        region = find_prev_lone_bracket(self.view, 3, ('\\{', '\\}'))
-        self.assertEqual(region, self.R(1, 2))
+    test(content='a\\{bc', start=2, brackets=('\\{', '\\}'), expected=None, msg='should not find escaped bracket at caret position'),
+    test(content='a\\{bc', start=3, brackets=('\\{', '\\}'), expected=None, msg='should not find escaped bracket'),
+    )
 
 
-class Test_find_prev_lone_bracket_SingleLine_Nested(ViewTest):
-    def testFindsOuterFromRhs(self):
-        set_text(self.view, 'foo {bar {foo} bar}')
-
-        region = find_prev_lone_bracket(self.view, 16, ('\\{', '\\}'))
-        self.assertEqual(region, self.R(4, 5))
-
-    def testFindsOuterFromLhs(self):
-        set_text(self.view, 'foo {bar {foo} bar}')
-
-        region = find_prev_lone_bracket(self.view, 7, ('\\{', '\\}'))
-        self.assertEqual(region, self.R(4, 5))
-
-    def testFindsInner(self):
-        set_text(self.view, 'foo {bar {foo} bar}')
-
-        region = find_prev_lone_bracket(self.view, 13, ('\\{', '\\}'))
-        self.assertEqual(region, self.R(9, 10))
-
-    def testFindsOuterIfUnbalancedOuter(self):
-        set_text(self.view, 'foo {bar {foo} bar')
-
-        region = find_prev_lone_bracket(self.view, 16, ('\\{', '\\}'))
-        self.assertEqual(region, self.R(4, 5))
-
-    def testFindsInnerIfUnbalancedOuter(self):
-        set_text(self.view, 'foo {bar {foo} bar')
-
-        region = find_prev_lone_bracket(self.view, 12, ('\\{', '\\}'))
-        self.assertEqual(region, self.R(9, 10))
+TESTS_NEXT_BRACKET = (
+    test(content='a\\}bc', start=2, brackets=('\\{', '\\}'), expected=None, msg='should not find escaped bracket at caret position'),
+    test(content='a\\}bc', start=0, brackets=('\\{', '\\}'), expected=None, msg='should not find escaped bracket'),
+)
 
 
-class Test_find_prev_lone_bracket_MultipleLines_Flat(ViewTest):
-    def testReturnsNoneIfNoPreviousLoneBracket(self):
-        set_text(self.view, 'foo\nbar')
+class Test_previous_bracket(ViewTest):
+    def clear_selected_regions(self):
+        self.view.sel().clear()
 
-        region = find_prev_lone_bracket(self.view, 5, ('\\{', '\\}'))
-        self.assertIsNone(region)
+    def testAll(self):
+        for (i, data) in enumerate(TESTS):
+            self.clear_selected_regions()
+            self.write(data.content)
 
-    # TODO: Fix this.
-    # Vim finds the current opening bracket if the caret is at its index.
-    def testCanFindPreviousLoneBracketAtSelfPosition(self):
-        set_text(self.view,'a{\nb}c')
-        add_sel(self.view, self.R(1, 1))
+            actual = find_prev_lone_bracket(self.view, data.start,
+                                            data.brackets)
 
-        region = find_prev_lone_bracket(self.view, 1, ('\\{', '\\}'))
-        self.assertEqual(region, self.R(1, 2))
-
-    def testCanFindPreviousLoneBracketAtBof(self):
-        set_text(self.view,'{a\nb}c')
-
-        region = find_prev_lone_bracket(self.view, 2, ('\\{', '\\}'))
-        self.assertEqual(region, self.R(0, 1))
-
-    def testReturnsNoneIfNoPreviousLoneBracketButLineHasBrackets(self):
-        set_text(self.view,'abc{a\nb}c')
-
-        region = find_prev_lone_bracket(self.view, 2, ('\\{', '\\}'))
-        self.assertIsNone(region)
-
-    def testFindsUnbalancedBracket(self):
-        set_text(self.view,'a{\nbc')
-
-        region = find_prev_lone_bracket(self.view, 4, ('\\{', '\\}'))
-        self.assertEqual(region, self.R(1, 2))
+            msg = "failed at test index {0}: {1}".format(i, data.msg)
+            self.assertEqual(data.expected, actual, msg)
 
 
-class Test_find_prev_lone_bracket_MultipleLines_Nested(ViewTest):
-    def testFindsOuterFromRhs(self):
-        set_text(self.view, 'foo {bar\n{foo\nbar}\nfoo}')
+class Test_next_bracket(ViewTest):
+    def clear_selected_regions(self):
+        self.view.sel().clear()
 
-        region = find_prev_lone_bracket(self.view, 20, ('\\{', '\\}'))
-        self.assertEqual(region, self.R(4, 5))
+    def testAll(self):
+        for (i, data) in enumerate(TESTS_NEXT_BRACKET):
+            self.clear_selected_regions()
+            self.write(data.content)
 
-    def testFindsOuterFromLhs(self):
-        set_text(self.view, 'foo {bar\n{foo\nbar}\nfoo}')
+            actual = find_next_lone_bracket(self.view, data.start,
+                                            data.brackets)
 
-        region = find_prev_lone_bracket(self.view, 7, ('\\{', '\\}'))
-        self.assertEqual(region, self.R(4, 5))
-
-    def testFindsInner(self):
-        set_text(self.view, 'foo {bar\n{foo\nbar}\nfoo}')
-
-        region = find_prev_lone_bracket(self.view, 13, ('\\{', '\\}'))
-        self.assertEqual(region, self.R(9, 10))
-
-    def testFindsOuterIfUnbalancedOuter(self):
-        set_text(self.view, 'foo {bar\n{foo\nbar}\nfoo')
-
-        region = find_prev_lone_bracket(self.view, 20, ('\\{', '\\}'))
-        self.assertEqual(region, self.R(4, 5))
-
-    def testFindsInnerIfUnbalancedOuter(self):
-        set_text(self.view, 'foo {bar\n{foo\nbar}\nfoo')
-
-        region = find_prev_lone_bracket(self.view, 16, ('\\{', '\\}'))
-        self.assertEqual(region, self.R(9, 10))
-
-
-class Test_find_find_next_lone_bracket_MultipleLines_Nested(ViewTest):
-    # def testFindsOuterFromRhs(self):
-    #     set_text(self.view, 'foo {bar\n{foo\nbar}\nfoo}')
-
-    #     region = find_next_lone_bracket(self.view, 20, ('\\{', '\\}'))
-    #     self.assertEqual(region, self.R(4, 5))
-
-    # def testFindsOuterFromLhs(self):
-    #     set_text(self.view, 'foo {bar\n{foo\nbar}\nfoo}')
-
-    #     region = find_next_lone_bracket(self.view, 8, ('\\{', '\\}'))
-    #     self.assertEqual(region, self.R(4, 5))
-
-    def testFindsOuterFromLhs_DeeplyNested(self):
-        set_text(self.view, 'foo {bar\n{foo\nbar {foo} bar}\nfoo}')
-
-        region = find_next_lone_bracket(self.view, 7, ('\\{', '\\}'))
-        self.assertEqual(region, self.R(32, 33))
-
-    # def testFindsInner(self):
-    #     set_text(self.view, 'foo {bar\n{foo\nbar}\nfoo}')
-
-    #     region = find_next_lone_bracket(self.view, 13, ('\\{', '\\}'))
-    #     self.assertEqual(region, self.R(9, 10))
-
-    # def testFindsOuterIfUnbalancedOuter(self):
-    #     set_text(self.view, 'foo {bar\n{foo\nbar}\nfoo')
-
-    #     region = find_next_lone_bracket(self.view, 20, ('\\{', '\\}'))
-    #     self.assertEqual(region, self.R(4, 5))
-
-    # def testFindsInnerIfUnbalancedOuter(self):
-    #     set_text(self.view, 'foo {bar\n{foo\nbar}\nfoo')
-
-    #     region = find_next_lone_bracket(self.view, 16, ('\\{', '\\}'))
-    #     self.assertEqual(region, self.R(9, 10))
+            msg = "failed at test index {0}: {1}".format(i, data.msg)
+            self.assertEqual(data.expected, actual, msg)

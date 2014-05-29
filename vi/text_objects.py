@@ -326,9 +326,19 @@ def find_next_lone_bracket(view, start, items, unbalanced=0):
                                                   start=new_start,
                                                   end=view.size(),
                                                   flags=sublime.IGNORECASE)
+
         if next_closing_bracket is None:
             # Unbalanced items; nothing we can do.
             return
+
+        while view.substr(next_closing_bracket.begin() - 1) == '\\':
+            next_closing_bracket = find_in_range(view, items[1],
+                                                 start=next_closing_bracket.end(),
+                                                 end=view.size(),
+                                                 flags=sublime.IGNORECASE)
+            if next_closing_bracket is None:
+                return
+
         new_start = next_closing_bracket.end()
 
     if view.substr(start) == items[0][-1]:
@@ -362,12 +372,25 @@ def find_prev_lone_bracket(view, start, tags, unbalanced=0):
                                                   start=0,
                                                   end=new_start,
                                                   flags=sublime.IGNORECASE)
+
         if prev_opening_bracket is None:
+            # Check whether the caret is exactly at a bracket.
             # Tag names may be escaped, so slice them.
-            if i == 0 and view.substr(start) == tags[0][-1]:
-                return sublime.Region(start, start + 1)
+            if (i == 0 and view.substr(start) == tags[0][-1] and
+               view.substr(start - 1) != '\\'):
+                    return sublime.Region(start, start + 1)
             # Unbalanced tags; nothing we can do.
             return
+
+        while view.substr(prev_opening_bracket.begin() - 1) == '\\':
+            prev_opening_bracket = reverse_search_by_pt(
+                                          view, tags[0],
+                                          start=0,
+                                          end=prev_opening_bracket.begin(),
+                                          flags=sublime.IGNORECASE)
+            if prev_opening_bracket is None:
+                return
+
         new_start = prev_opening_bracket.begin()
 
     nested = 0
