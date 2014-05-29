@@ -1809,21 +1809,15 @@ class _vi_p(ViTextCommandBase):
     # TODO: Improve this signature.
     def paste_all(self, edit, sel, at, text, count):
         state = self.state
+
         if state.mode not in (modes.VISUAL, modes.VISUAL_LINE):
             # TODO: generate string first, then insert?
             # Make sure we can paste at EOF.
             at = at if at <= self.view.size() else self.view.size()
             for x in range(count):
                 self.view.insert(edit, at, text)
-
-            if '\n' in text:
-                with restoring_sel(self.view):
-                    delta = len(text) * count
-                    r = sublime.Region(at + 1, at + delta)
-                    self.view.sel().add(r)
-                    self.view.run_command('reindent', {'force_indent': False})
-
             return at
+
         else:
             if text.startswith('\n'):
                 text = text * count
@@ -1837,14 +1831,6 @@ class _vi_p(ViTextCommandBase):
                     text = text[1:]
 
             self.view.replace(edit, sel, text)
-
-            if '\n' in text:
-                with restoring_sel(self.view):
-                    delta = sel.begin() + len(text)
-                    r = sublime.Region(sel.begin() + 1, delta - 1)
-                    self.view.sel().add(r)
-                    self.view.run_command('reindent', {'force_indent': False})
-
             return sel.begin()
 
 
