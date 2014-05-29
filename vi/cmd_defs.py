@@ -25,7 +25,6 @@ _MODES_ACTION = (modes.NORMAL, modes.VISUAL, modes.VISUAL_LINE,
                  modes.VISUAL_BLOCK)
 
 
-
 @keys.assign(seq=seqs.D, modes=_MODES_ACTION)
 class ViDeleteByChars(ViOperatorDef):
     """
@@ -1716,6 +1715,8 @@ class ViEnterInserMode(ViOperatorDef):
 
 
 @keys.assign(seq=seqs.ESC, modes=_MODES_ACTION)
+@keys.assign(seq=seqs.CTRL_C, modes=_MODES_ACTION)
+@keys.assign(seq=seqs.CTRL_LEFT_SQUARE_BRACKET, modes=_MODES_ACTION)
 class ViEnterNormalMode(ViOperatorDef):
     """
     Vim: `<esc>`
@@ -2568,21 +2569,72 @@ class ViMoveBySentenceDown(ViMotionDef):
 
 
 @keys.assign(seq=seqs.LEFT_SQUARE_BRACKET, modes=_MODES_MOTION)
-class ViMoveBySquareBracketUp(ViMotionDef):
+class ViGotoOpeningBracket(ViMotionDef):
     """
     Vim: `[`
     """
-    # TODO: Revise this.
+
     def __init__(self, *args, **kwargs):
         ViMotionDef.__init__(self, *args, **kwargs)
-        self.updates_xpos = True
         self.scroll_into_view = True
+        self.updates_xpos = True
+        self.input_parser = parser_def(command=inputs.vi_left_square_bracket,
+                                       interactive_command=None,
+                                       input_param=None,
+                                       on_done=None,
+                                       type=input_types.INMEDIATE)
+
+    @property
+    def accept_input(self):
+        return self.inp == ''
+
+    def accept(self, key):
+        translated = utils.translate_char(key)
+        assert len(translated) == 1, '`[` only accepts a single char'
+        self._inp = translated
+        return True
 
     def translate(self, state):
         cmd = {}
-        cmd['is_jump'] = True
         cmd['motion'] = '_vi_left_square_bracket'
-        cmd['motion_args'] = {'mode': state.mode,
+        cmd['motion_args'] = {'char': self.inp,
+                              'mode': state.mode,
+                              'count': state.count,
+                              }
+        return cmd
+
+
+@keys.assign(seq=seqs.RIGHT_SQUARE_BRACKET, modes=_MODES_MOTION)
+class ViGotoClosingBracket(ViMotionDef):
+    """
+    Vim: `]`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViMotionDef.__init__(self, *args, **kwargs)
+        self.scroll_into_view = True
+        self.updates_xpos = True
+        self.input_parser = parser_def(command=inputs.vi_left_square_bracket,
+                                       interactive_command=None,
+                                       input_param=None,
+                                       on_done=None,
+                                       type=input_types.INMEDIATE)
+
+    @property
+    def accept_input(self):
+        return self.inp == ''
+
+    def accept(self, key):
+        translated = utils.translate_char(key)
+        assert len(translated) == 1, '`]` only accepts a single char'
+        self._inp = translated
+        return True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['motion'] = '_vi_right_square_bracket'
+        cmd['motion_args'] = {'char': self.inp,
+                              'mode': state.mode,
                               'count': state.count,
                               }
         return cmd

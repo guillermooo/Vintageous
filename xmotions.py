@@ -33,6 +33,8 @@ from Vintageous.vi.text_objects import word_reverse
 from Vintageous.vi.text_objects import word_end_reverse
 from Vintageous.vi.text_objects import get_closest_tag
 from Vintageous.vi.text_objects import find_containing_tag
+from Vintageous.vi.text_objects import find_prev_lone_bracket
+from Vintageous.vi.text_objects import find_next_lone_bracket
 
 
 class _vi_find_in_line(ViMotionCommand):
@@ -1935,3 +1937,65 @@ class _vi_gm(ViMotionCommand):
             return sublime.Region(min(s.b + delta, line.b - 1))
 
         regions_transformer(self.view, advance)
+
+
+class _vi_left_square_bracket(ViMotionCommand):
+    """
+    Vim: `[`
+    """
+    BRACKETS = {
+        '{': ('\\{', '\\}'),
+        '}': ('\\{', '\\}'),
+        '(': ('\\(', '\\)'),
+        ')': ('\\(', '\\)'),
+    }
+
+    def run(self, mode=None, count=1, char=None):
+        def move(view, s):
+            reg = find_prev_lone_bracket(self.view, s.b, brackets)
+            if reg is not None:
+                return sublime.Region(reg.a)
+            return s
+
+        if mode != modes.NORMAL:
+            self.enter_normal_mode(mode=mode)
+            utils.blink()
+            return
+
+        brackets = self.BRACKETS.get(char)
+        if brackets is None:
+            utils.blink()
+            return
+
+        regions_transformer(self.view, move)
+
+
+class _vi_right_square_bracket(ViMotionCommand):
+    """
+    Vim: `]`
+    """
+    BRACKETS = {
+        '{': ('\\{', '\\}'),
+        '}': ('\\{', '\\}'),
+        '(': ('\\(', '\\)'),
+        ')': ('\\(', '\\)'),
+    }
+
+    def run(self, mode=None, count=1, char=None):
+        def move(view, s):
+            reg = find_next_lone_bracket(self.view, s.b, brackets)
+            if reg is not None:
+                return sublime.Region(reg.a)
+            return s
+
+        if mode != modes.NORMAL:
+            utils.blink()
+            self.enter_normal_mode(mode=mode)
+            return
+
+        brackets = self.BRACKETS.get(char)
+        if brackets is None:
+            utils.blink()
+            return
+
+        regions_transformer(self.view, move)

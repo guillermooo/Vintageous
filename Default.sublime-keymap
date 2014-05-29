@@ -138,6 +138,8 @@
 	{"keys": ["ctrl+ç"], "command": "press_key", "args": {"key": "<C-ç>"}, "context": [{"key": "vi_command_mode_aware"}, 	{"key": "vi_use_ctrl_keys"}]},
 	{"keys": ["ctrl+ñ"], "command": "press_key", "args": {"key": "<C-ñ>"}, "context": [{"key": "vi_command_mode_aware"}, 	{"key": "vi_use_ctrl_keys"}]},
 
+	{"keys": ["ctrl+["], "command": "press_key", "args": {"key": "<C-[>"}, "context": [{"key": "vi_command_mode_aware"}, 	{"key": "vi_use_ctrl_keys"}]},
+
 	{"keys": ["ctrl+x"], "command": "press_key", "args": {"key": "<C-x>"}, "context": [{"key": "vi_insert_mode_aware"}, 	{"key": "vi_use_ctrl_keys"}]},
 	{"keys": ["ctrl+l"], "command": "press_key", "args": {"key": "<C-l>"}, "context": [{"key": "vi_insert_mode_aware"}, 	{"key": "vi_use_ctrl_keys"}]},
 	// {"keys": ["alt+a"], "command": "press_key", "args": {"key": "alt+a"}, "context": [{"key": "vi_command_mode_aware"}, {"key": "vi_use_ctrl_keys"}]},

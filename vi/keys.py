@@ -58,6 +58,8 @@ class seqs:
     BIG_E =                        'E'
     BIG_F =                        'F'
     BIG_G =                        'G'
+    CTRL_C =                       '<C-c>'
+    CTRL_LEFT_SQUARE_BRACKET =     '<C-[>'
     CTRL_W =                       '<C-w>'
     CTRL_W_Q =                     '<C-w>q'
 

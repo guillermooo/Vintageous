@@ -130,6 +130,7 @@ def vi_quote(state):
                    type=input_types.INMEDIATE)
     return p
 
+
 def vi_r(state):
     p = parser_def(command=one_char,
                    interactive_command=None,
@@ -137,8 +138,19 @@ def vi_r(state):
                    on_done='_vi_r_on_parser_done',
                    type=input_types.INMEDIATE)
     return p
+
+
 def vi_backtick(state):
     p = parser_def(command=one_char,
+                   interactive_command=None,
+                   input_param=None,
+                   on_done=None,
+                   type=input_types.INMEDIATE)
+    return p
+
+
+def vi_left_square_bracket(state):
+    p = parser_def(command=lambda x: x in '(){}',
                    interactive_command=None,
                    input_param=None,
                    on_done=None,
