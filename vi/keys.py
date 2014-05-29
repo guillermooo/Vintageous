@@ -35,6 +35,8 @@ class seqs:
     AW =                           'aw'
     B =                            'b'
     BACKSPACE =                    '<bs>'
+    G_BIG_C =                      'gC'
+    GC =                           'gc'
     GE =                           'ge'
     G_BIG_E =                      'gE'
     UP =                           '<up>'

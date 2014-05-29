@@ -1640,8 +1640,8 @@ class _vi_big_x(ViTextCommandBase):
 
         self.enter_normal_mode(mode)
 
-class _vi_big_p(ViTextCommandBase):
 
+class _vi_big_p(ViTextCommandBase):
     _can_yank = True
     _synthetize_new_line_at_eof = True
 
@@ -1654,7 +1654,8 @@ class _vi_big_p(ViTextCommandBase):
         if register:
             fragments = state.registers[register]
         else:
-            # TODO: There should be a simpler way of getting the unnamed register's content.
+            # TODO: There should be a simpler way of getting the unnamed
+            # register's content.
             fragments = state.registers['"']
 
         if state.mode == modes.VISUAL:
@@ -1663,33 +1664,32 @@ class _vi_big_p(ViTextCommandBase):
 
         # TODO: Enable pasting to multiple selections.
         sel = list(self.view.sel())[0]
-        merged_fragments, linewise = self.merge_fragments(fragments)
+        text_block, linewise = self.merge(fragments)
 
         if mode == modes.INTERNAL_NORMAL:
             if not linewise:
-                self.view.insert(edit, sel.a, merged_fragments)
+                self.view.insert(edit, sel.a, text_block)
                 self.view.sel().clear()
-                pt = sel.a + len(merged_fragments) - 1
+                pt = sel.a + len(text_block) - 1
                 self.view.sel().add(sublime.Region(pt))
             else:
                 pt = self.view.line(sel.a).a
-                self.view.insert(edit, pt, merged_fragments)
+                self.view.insert(edit, pt, text_block)
                 self.view.sel().clear()
-                pt = pt + len(merged_fragments)
                 row = utils.row_at(self.view, pt)
-                pt = self.view.text_point(row - 1, 0)
+                pt = self.view.text_point(row, 0)
                 self.view.sel().add(sublime.Region(pt))
 
         elif mode == modes.VISUAL:
             if not linewise:
-                self.view.replace(edit, sel, merged_fragments)
+                self.view.replace(edit, sel, text_block)
             else:
                 pt = sel.a
-                if merged_fragments[0] != '\n':
-                    merged_fragments = '\n' + merged_fragments
-                self.view.replace(edit, sel, merged_fragments)
+                if text_block[0] != '\n':
+                    text_block = '\n' + text_block
+                self.view.replace(edit, sel, text_block)
                 self.view.sel().clear()
-                row = utils.row_at(self.view, pt + len(merged_fragments))
+                row = utils.row_at(self.view, pt + len(text_block))
                 pt = self.view.text_point(row - 1, 0)
                 self.view.sel().add(sublime.Region(pt))
         else:
@@ -1697,13 +1697,18 @@ class _vi_big_p(ViTextCommandBase):
 
         self.enter_normal_mode(mode=mode)
 
-    def merge_fragments(self, fragments):
-        joined = ''.join(fragments)
+    def merge(self, fragments):
+        """Merges a list of strings.
+
+        Returns a block of text and a bool indicating whether it's a linewise
+        block.
+        """
+        block = ''.join(fragments)
         if '\n' in fragments[0]:
-            if joined[-1] != '\n':
-                return (joined + '\n'), True
-            return joined, True
-        return joined, False
+            if block[-1] != '\n':
+                return (block + '\n'), True
+            return block, True
+        return block, False
 
 
 class _vi_p(ViTextCommandBase):
@@ -2415,3 +2420,37 @@ class __replace_line(sublime_plugin.TextCommand):
         pt = utils.next_non_white_space_char(self.view, b, white_space=' \t')
         self.view.replace(edit, sublime.Region(pt, self.view.line(pt).b),
                           with_what)
+
+
+class _vi_gc(ViTextCommandBase):
+    def run(self, edit, mode=None, count=1, motion=None):
+        def f(view, s):
+            return sublime.Region(s.begin())
+
+        if motion:
+            self.view.run_command(motion['motion'], motion['motion_args'])
+        elif mode not in (modes.VISUAL, modes.VISUAL_LINE):
+            utils.blink()
+            return
+
+        self.view.run_command('toggle_comment', {'block': False})
+
+        regions_transformer(self.view, f)
+        self.enter_normal_mode(mode)
+
+
+class _vi_g_big_c(ViTextCommandBase):
+    def run(self, edit, mode=None, count=1, motion=None):
+        def f(view, s):
+            return sublime.Region(s.begin())
+
+        if motion:
+            self.view.run_command(motion['motion'], motion['motion_args'])
+        elif mode not in (modes.VISUAL, modes.VISUAL_LINE):
+            utils.blink()
+            return
+
+        self.view.run_command('toggle_comment', {'block': True})
+
+        regions_transformer(self.view, f)
+        self.enter_normal_mode(mode)

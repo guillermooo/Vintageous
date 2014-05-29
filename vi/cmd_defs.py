@@ -3375,3 +3375,51 @@ class ViMoveHalfScreenHorizontally(ViMotionDef):
         cmd['motion'] = '_vi_gm'
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
+
+
+@keys.assign(seq=seqs.GC, modes=_MODES_ACTION)
+class ViToggleCommentByLines(ViOperatorDef):
+    """
+    Vim: `gc`
+
+    Non-standard.
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+        self.motion_required = True
+        self.repeatable = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = '_vi_gc'
+        cmd['action_args'] = {'mode': state.mode,
+                              'count': state.count,
+                              }
+        return cmd
+
+
+@keys.assign(seq=seqs.G_BIG_C, modes=_MODES_ACTION)
+class ViToggleBlockCommentByLines(ViOperatorDef):
+    """
+    Vim: `gC`
+
+    Non-standard.
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+        self.motion_required = True
+        self.repeatable = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = '_vi_g_big_c'
+        cmd['action_args'] = {'mode': state.mode,
+                              'count': state.count,
+                              }
+        return cmd
