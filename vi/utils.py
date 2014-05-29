@@ -319,6 +319,22 @@ def restoring_sel(view):
     view.sel().add_all(regs)
 
 
+def last_sel(view):
+    return get_sel(view, -1)
+
+
+def second_sel(view):
+    return get_sel(view, 1)
+
+
+def first_sel(view):
+    return get_sel(view, 0)
+
+
+def get_sel(view, i=0):
+    return view.sel()[i]
+
+
 class directions:
     NONE = 0
     UP = 1
