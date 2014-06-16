@@ -970,11 +970,10 @@ class _vi_percent(ViMotionCommand):
     def run(self, percent=None, mode=None):
         if percent == None:
             def move_to_bracket(view, s):
-                def find_bracket_location(pt):
-
-                    pt = s.b
-                    if s.size() > 0 and s.b > s.a:
-                        pt = s.b - 1
+                def find_bracket_location(region):
+                    pt = region.b
+                    if (region.size() > 0) and (region.b > region.a):
+                        pt = region.b - 1
 
                     tag = self.find_tag(pt)
                     if tag:
@@ -990,30 +989,34 @@ class _vi_percent(ViMotionCommand):
                         return self.find_balanced_opening_bracket(bracket_pt, brackets)
 
                 if mode == modes.VISUAL:
-                    b = (s.b - 1) if (s.a < s.b) else s.b
-                    found = find_bracket_location(b)
-                    if found:
-                        end = (found + 1) if (found > s.b) else found
-                        end = (end + 1) if end == s.a else end
-                        begin = (s.a + 1) if (s.a < s.b) else s.a
+                    found = find_bracket_location(s)
+                    if found is not None:
+                        # Offset by 1 if s.a was upperbound but begin is not
+                        begin = (s.a - 1) if (s.b < s.a and (s.a - 1) < found) else s.a
+                        # Offset by 1 if begin is now upperbound but s.a was not
+                        begin = (s.a + 1) if (found < s.a and s.a < s.b) else begin
+
+                        # Testing against adjusted begin
+                        end = (found + 1) if (begin <= found) else found
+
                         return sublime.Region(begin, end)
 
                 if mode == modes.VISUAL_LINE:
                     # TODO: Improve handling of s.a < s.b and s.a > s.b cases.
-                    a = find_bracket_location(s.begin())
+                    a = find_bracket_location(s)
                     if a is not None:
                         a = self.view.full_line(a).b
                         return sublime.Region(s.begin(), a)
 
                 elif mode == modes.NORMAL:
-                    a = find_bracket_location(s.b)
+                    a = find_bracket_location(s)
                     if a is not None:
                         return sublime.Region(a, a)
 
                 # TODO: According to Vim we must swallow brackets in this case.
                 elif mode == modes.INTERNAL_NORMAL:
-                    found = find_bracket_location(s.b)
-                    if found:
+                    found = find_bracket_location(s)
+                    if found is not None:
                         if found < s.a:
                             return sublime.Region(s.a + 1, found)
                         else:
