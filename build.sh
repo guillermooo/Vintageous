@@ -8,6 +8,6 @@ case `uname` in
     ;;
 esac
 
-killall sublime_text
+killall sublime_text "Sublime Text" 2> /dev/null
 sleep 0.2
 subl
