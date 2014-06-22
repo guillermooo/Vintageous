@@ -1771,21 +1771,36 @@ class _vi_big_n(ViMotionCommand):
 class _vi_big_e(ViMotionCommand):
     def run(self, mode=None, count=1):
         def do_move(view, s):
+            b = s.b
+            if s.a < s.b:
+                b = s.b - 1
+
+            pt = units.word_ends(view, b, count=count, big=True)
+
             if mode == modes.NORMAL:
-                pt = units.word_ends(view, s.b, count=count, big=True)
                 return sublime.Region(pt - 1)
 
             elif mode == modes.INTERNAL_NORMAL:
-                pt = units.word_ends(view, s.b, count=count, big=True)
-                return sublime.Region(pt - 1)
+                return sublime.Region(s.a, pt)
 
-            elif mode in (modes.VISUAL, modes.VISUAL_BLOCK):
-                pt = units.word_ends(view, s.b, count=count, big=True)
+            elif mode == modes.VISUAL:
+                start = s.a
+                if s.b < s.a:
+                    start = s.a - 1
+                end = pt - 1
+                if start <= end:
+                    return sublime.Region(start, end + 1)
+                else:
+                    return sublime.Region(start + 1, end)
+
+            # Untested
+            elif mode == modes.VISUAL_BLOCK:
                 if s.a > s.b:
                     if pt > s.a:
                         return sublime.Region(s.a - 1, pt)
                     return sublime.Region(s.a, pt - 1)
                 return sublime.Region(s.a, pt)
+
             return s
 
         regions_transformer(self.view, do_move)
