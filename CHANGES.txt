@@ -1,3 +1,12 @@
+3.5.13 - 22-06-2014
+
+	- Fix tag text object when starting from before nested tag in outer tag.
+	- Fixes to operators t, f, T, F.
+	- Fix big E to work correctly with 'c' and 'd' and visual mode.
+	- Fix kill command in build.sh to work on OSX.
+	- Fix percent % brackets matching in visual mode
+	- Fix letter-case-related commands.
+
 3.5.12 - 29-05-2014
 
 	- Implement '[' and ']' motions.
