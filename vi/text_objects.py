@@ -24,7 +24,7 @@ RXC_ANY_TAG = re.compile(r'</?([0-9A-Za-z]+).*?>')
 # used in tag names. TODO: This won't be enough in Dart Polymer projects,
 # for example.
 RX_ANY_START_TAG = r'<([0-9A-Za-z]+)(.*?)>'
-RX_ANY_END_TAG = r'</.*?>'
+RX_ANY_END_TAG = r'</([0-9A-Za-z-]+).*?>'
 
 
 ANCHOR_NEXT_WORD_BOUNDARY = CLASS_WORD_START | CLASS_PUNCTUATION_START | \
@@ -485,7 +485,7 @@ def previous_begin_tag(view, pattern, start=0, end=0):
 
 
 def get_region_end(r):
-    return {'end': r.end()}
+    return {'start': r.end()}
 
 
 def get_region_begin(r):
