@@ -42,31 +42,23 @@ class _vi_find_in_line(ViMotionCommand):
     Contrary to *f*, *t* does not look past the caret's position, so if
     @character is under the caret, nothing happens.
     """
-    def run(self, char=None, mode=None, count=1, change_direction=False,
-            inclusive=True, skipping=False):
+    def run(self, char=None, mode=None, count=1, inclusive=True):
         def f(view, s):
-            eol = view.line(s.b).end()
-            if not s.empty():
-                eol = view.line(s.b - 1).end()
+            if mode == modes.VISUAL_LINE:
+                raise ValueError(
+                    'this operator is not valid in mode {}'.format(mode))
 
-            match = s
+            b = s.b
+            # If we are in any visual mode, get the actual insertion point.
+            if s.size() > 0:
+                b = utils.get_caret_pos_at_b(s)
 
-            if (mode in (modes.NORMAL, modes.INTERNAL_NORMAL) and
-                not inclusive
-               and skipping):
-                    # When repeating through ';', we must make sure we skip one
-                    # if we are at a match position.
-                    if view.substr(match.b + 1) == char:
-                        match = sublime.Region(match.b + 1)
+            eol = view.line(b).end()
 
+            match = sublime.Region(b + 1)
             for i in range(count):
                 # Define search range as 'rest of the line to the right'.
-                if state.mode != modes.VISUAL:
-                    search_range = sublime.Region(min(match.b + 1, eol), eol)
-
-                else:
-                    search_range = sublime.Region(min(match.b, eol), eol)
-
+                search_range = sublime.Region(match.end(), eol)
                 match = find_in_range(view, char,
                                             search_range.a,
                                             search_range.b,
@@ -75,20 +67,19 @@ class _vi_find_in_line(ViMotionCommand):
                 # Count too high or simply no match; break.
                 if match is None:
                     return s
-                    break
 
-            if (mode == modes.VISUAL) or (mode == modes.INTERNAL_NORMAL):
-                if match.a == s.b:
-                    return s
-                if not inclusive:
-                    return sublime.Region(s.a, match.b - 1)
-                else:
-                    return sublime.Region(s.a, match.b)
-
+            target_pos = match.a
             if not inclusive:
-                return sublime.Region(match.a - 1)
+                target_pos = target_pos - 1
+
+            if mode == modes.NORMAL:
+                return sublime.Region(target_pos)
+            elif mode == modes.INTERNAL_NORMAL:
+                return sublime.Region(s.a, target_pos + 1)
+            # For visual modes...
             else:
-                return sublime.Region(match.a)
+                new_a = utils.get_caret_pos_at_a(s)
+                return utils.new_inclusive_region(new_a, target_pos)
 
         if not all([char, mode]):
             print('char', char, 'mode', mode)
@@ -105,44 +96,40 @@ class _vi_reverse_find_in_line(ViMotionCommand):
     """Contrary to *F*, *T* does not look past the caret's position, so if ``character`` is right
        before the caret, nothing happens.
     """
-    def run(self, char=None, mode=None, count=1, change_direction=False,
-            inclusive=True, skipping=False):
+    def run(self, char=None, mode=None, count=1, inclusive=True):
         def f(view, s):
-            if mode not in (modes.VISUAL, modes.VISUAL_LINE, modes.VISUAL_BLOCK):
-                a, b = view.line(s.b).a, s.b
+            if mode == modes.VISUAL_LINE:
+                raise ValueError(
+                    'this operator is not valid in mode {}'.format(mode))
 
-            else:
-                a, b = view.line(s.b - 1).a, s.b
+            b = s.b
+            if s.size() > 0:
+                b = utils.get_caret_pos_at_b(s)
 
-            final_offset = -1
+            line_start = view.line(b).a
 
             try:
-                # search backwards
+                match = b
                 for i in range(count):
-                    line_text = view.substr(sublime.Region(a, b))
+                    # line_text does not include character at match
+                    line_text = view.substr(sublime.Region(line_start, match))
                     found_at = line_text.rindex(char)
-
-                    final_offset = found_at
-
-                    b = view.line(s.a).a + final_offset
+                    match = line_start + found_at
             except ValueError:
-                pass
+                return s
 
-            if final_offset > -1:
-                pt = view.line(s.b).a + final_offset
+            target_pos = match
+            if not inclusive:
+                target_pos = target_pos + 1
 
-                if mode == modes.VISUAL or mode == modes.INTERNAL_NORMAL:
-                    if not inclusive:
-                        return sublime.Region(s.a, pt + 1)
-                    else:
-                        return sublime.Region(s.a, pt)
-
-                if not inclusive:
-                    return sublime.Region(pt + 1)
-                else:
-                    return sublime.Region(pt)
-
-            return s
+            if mode == modes.NORMAL:
+                return sublime.Region(target_pos)
+            elif mode == modes.INTERNAL_NORMAL:
+                return sublime.Region(b, target_pos)
+            # For visual modes...
+            else:
+                new_a = utils.get_caret_pos_at_a(s)
+                return utils.new_inclusive_region(new_a, target_pos)
 
         if not all([char, mode]):
             raise ValueError('bad parameters')

@@ -177,6 +177,49 @@ def regions_transformer(view, f):
     view.sel().add_all(new)
 
 
+def get_caret_pos_at_b(region):
+    """Returns the actual insertion point closest to @region.b for a visual
+    region.
+
+    For non-visual regions, the insertion point is always any of the region's
+    ends, so using this function is pointless.
+    """
+    if region.size() == 0:
+        raise TypeError('not a visual region')
+
+    if region.a < region.b:
+        return region.b - 1
+    elif region.b < region.a:
+        return region.b
+
+
+def get_caret_pos_at_a(region):
+    """Returns the actual insertion point closest to @region.a for a visual
+    region.
+
+    For non-visual regions, the insertion point is always any of the region's
+    ends, so using this function is pointless.
+    """
+    if region.size() == 0:
+        raise TypeError('not a visual region')
+
+    if region.a < region.b:
+        return region.a
+    elif region.b < region.a:
+        return region.a - 1
+
+
+def new_inclusive_region(a, b):
+    """
+    Creates a region that includes the caracter at @a or @b depending on the
+    new region's orientation.
+    """
+    if a <= b:
+        return sublime.Region(a, b + 1)
+    else:
+        return sublime.Region(a + 1, b)
+
+
 def row_at(view, pt):
     return view.rowcol(pt)[0]
 
