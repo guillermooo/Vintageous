@@ -53,6 +53,17 @@ class ViewTest(unittest.TestCase):
         if self.view:
             self.view.close()
 
+    def assert_equal_regions(self, expected_region, actual_region, msg=''):
+        """Tests that @expected_region and @actual_region cover the exact same
+        region. Does not take region orientation into account.
+        """
+        if (expected_region.size() == 1) and (actual_region.size() == 1):
+            expected_region = make_region(self.view, expected_region.begin(),
+                                          expected_region.end())
+            actual_region = make_region(self.view, actual_region.begin(),
+                                        actual_region.end())
+        self.assertEqual(expected_region, actual_region, msg)
+
 
 def make_region(view, a, b=None):
     try:
