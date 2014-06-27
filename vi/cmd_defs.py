@@ -1732,6 +1732,24 @@ class StShowCommandPalette(ViOperatorDef):
         return cmd
 
 
+@keys.assign(seq=seqs.SHIFT_F11, modes=_MODES_ACTION)
+class StEnterDistractionFreeMode(ViOperatorDef):
+    """
+    Vintageous: `<S-f11>`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = 'toggle_distraction_free'
+        cmd['action_args'] = {}
+        return cmd
+
+
 @keys.assign(seq=seqs.I, modes=_MODES_ACTION + (modes.SELECT,))
 class ViEnterInserMode(ViOperatorDef):
     """

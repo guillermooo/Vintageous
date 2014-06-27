@@ -210,6 +210,7 @@ class seqs:
     S =                            's'
     SEMICOLON =                    ';'
     SHIFT_CTRL_F12 =               '<C-S-f12>'
+    SHIFT_F11 =               '<S-f11>'
     SLASH =                        '/'
     STAR =                         '*'
     T =                            't'

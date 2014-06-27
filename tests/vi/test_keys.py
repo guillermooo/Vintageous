@@ -302,6 +302,7 @@ TESTS_KNOWN_SEQUENCES = (
     seq_test(actual=seqs.S,                      expected= 's'),
     seq_test(actual=seqs.SEMICOLON,              expected= ';'),
     seq_test(actual=seqs.SHIFT_CTRL_F12,         expected= '<C-S-f12>'),
+    seq_test(actual=seqs.SHIFT_F11,              expected='<S-f11>'),
     seq_test(actual=seqs.SLASH,                  expected= '/'),
     seq_test(actual=seqs.STAR,                   expected= '*'),
     seq_test(actual=seqs.T,                      expected= 't'),
