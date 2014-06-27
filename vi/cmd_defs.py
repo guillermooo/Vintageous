@@ -3509,6 +3509,25 @@ class ViToggleCommentByLines(ViOperatorDef):
         return cmd
 
 
+@keys.assign(seq=seqs.GCC, modes=_MODES_ACTION)
+class ViCommentLine(ViOperatorDef):
+    """
+    Vintageous: `gcc`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+        self.repeatable = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = '_vi_gcc_action'
+        cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+        return cmd
+
+
 @keys.assign(seq=seqs.G_BIG_C, modes=_MODES_ACTION)
 class ViToggleBlockCommentByLines(ViOperatorDef):
     """

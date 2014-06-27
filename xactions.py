@@ -2449,3 +2449,53 @@ class _vi_g_big_c(ViTextCommandBase):
 
         regions_transformer(self.view, f)
         self.enter_normal_mode(mode)
+
+
+class _vi_gcc_action(ViTextCommandBase):
+
+    _can_yank = True
+    _synthetize_new_line_at_eof = True
+    _yanks_linewise = False
+    _populates_small_delete_register = False
+
+    def run(self, edit, mode=None, count=1):
+        def f(view, s):
+            # We've made a selection with _vi_cc_motion just before this.
+            if mode == modes.INTERNAL_NORMAL:
+                view.run_command('toggle_comment')
+                if utils.row_at(self.view, s.a) != utils.row_at(self.view, self.view.size()):
+                    pt = utils.next_non_white_space_char(view, s.a, white_space=' \t')
+                else:
+                    pt = utils.next_non_white_space_char(view,
+                                                         self.view.line(s.a).a,
+                                                         white_space=' \t')
+
+                return sublime.Region(pt, pt)
+            return s
+
+        self.view.run_command('_vi_gcc_motion', {'mode': mode, 'count': count})
+
+        state = self.state
+        state.registers.yank(self)
+
+        row = [self.view.rowcol(s.begin())[0] for s in self.view.sel()][0]
+        regions_transformer_reversed(self.view, f)
+        self.view.sel().clear()
+        self.view.sel().add(sublime.Region(self.view.text_point(row, 0)))
+
+
+class _vi_gcc_motion(sublime_plugin.TextCommand):
+    def run(self, edit, mode=None, count=1):
+        def f(view, s):
+            if mode == modes.INTERNAL_NORMAL:
+                end = view.text_point(utils.row_at(self.view, s.b) + (count - 1), 0)
+                begin = view.line(s.b).a
+                if ((utils.row_at(self.view, end) == utils.row_at(self.view, view.size())) and
+                    (view.substr(begin - 1) == '\n')):
+                        begin -= 1
+
+                return sublime.Region(begin, view.full_line(end).b)
+
+            return s
+
+        regions_transformer(self.view, f)
