@@ -184,6 +184,10 @@ class _vi_a(sublime_plugin.TextCommand):
 
 
 class _vi_c(ViTextCommandBase):
+
+    _can_yank = True
+    _populates_small_delete_register = True
+
     def run(self, edit, count=1, mode=None, motion=None, register=None):
         def compact(view, s):
             if view.substr(s).strip():
@@ -212,6 +216,8 @@ class _vi_c(ViTextCommandBase):
             if not self.has_sel_changed():
                 self.enter_insert_mode(mode)
                 return
+
+        self.state.registers.yank(self, register)
 
         self.view.run_command('right_delete')
 
