@@ -592,10 +592,8 @@ class PressKeys(ViWindowCommandBase):
                                     'check_user_mappings': check_user_mappings
                                     })
                         else:
-                            # TODO: remove active_view; window will route the
-                            #       cmd.
-                            self.window.active_view().run_command('insert', {
-                                                           'characters': key})
+                            self.window.run_command('insert', {
+                               'characters': utils.translate_char(key)})
                     if not state.must_collect_input:
                         return
                 finally:
