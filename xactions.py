@@ -171,16 +171,22 @@ class _vi_a(sublime_plugin.TextCommand):
                 return sublime.Region(s.b + 1)
             return s
 
+        state = State(self.view)
+        # Abort if the *actual* mode is insert mode. This prevents
+        # _vi_a from adding spaces between text fragments when used with a
+        # count, as in 5aFOO. In that case, we only need to run 'a' the first
+        # time, not for every iteration.
+        if state.mode == modes.INSERT:
+            return
+
         if mode is None:
             raise ValueError('mode required')
-
         # TODO: We should probably not define the keys for these modes
         # in the first place.
         elif mode != modes.INTERNAL_NORMAL:
             return
 
         regions_transformer(self.view, f)
-        state = State(self.view)
         self.view.window().run_command('_enter_insert_mode', {'mode': mode,
             'count': state.normal_insert_count})
 
@@ -278,6 +284,7 @@ class _enter_normal_mode(ViTextCommandBase):
             state.glue_until_normal_mode = False
 
         if mode == modes.INSERT and int(state.normal_insert_count) > 1:
+            state.enter_insert_mode()
             # TODO: Calculate size the view has grown by and place the caret
             # after the newly inserted text.
             sels = list(self.view.sel())
