@@ -1,3 +1,11 @@
+3.5.14 - 28-06-2014
+
+	- Improve * and # operators.
+	- Enable counts for 'a' operator.
+	- Add non-standard 'gcc' operator to comment current line.
+	- Add non-standard command to enter distraction free mode (<S-f11>).
+	- Restore abitlity of 'c' operator to yank to registers.
+
 3.5.13 - 22-06-2014
 
 	- Fix tag text object when starting from before nested tag in outer tag.
