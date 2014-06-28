@@ -1222,6 +1222,11 @@ class _vi_star(ViMotionCommand, ExactWordBufferSearchBase):
                     return sublime.Region(s.a, match.begin())
                 elif state.mode == modes.NORMAL:
                     return sublime.Region(match.begin(), match.begin())
+
+            elif mode == modes.NORMAL:
+                pt = utils.previous_white_space_char(view, s.b)
+                return sublime.Region(pt + 1)
+
             return s
 
         state = self.state
@@ -1263,6 +1268,11 @@ class _vi_octothorp(ViMotionCommand, ExactWordBufferSearchBase):
                     return sublime.Region(s.b, match.begin())
                 elif state.mode == modes.NORMAL:
                     return sublime.Region(match.begin(), match.begin())
+
+            elif mode == modes.NORMAL:
+                pt = utils.previous_white_space_char(view, s.b)
+                return sublime.Region(pt + 1)
+
             return s
 
         state = self.state
