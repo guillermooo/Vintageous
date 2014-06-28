@@ -259,6 +259,7 @@ TESTS_KNOWN_SEQUENCES = (
     seq_test(actual=seqs.G_TILDE_TILDE,        expected='g~~'),
     seq_test(actual=seqs.G_UNDERSCORE,         expected='g_'),
     seq_test(actual=seqs.GC,                   expected='gc'),
+    seq_test(actual=seqs.GCC,                  expected='gcc'),
     seq_test(actual=seqs.GD,                   expected='gd'),
     seq_test(actual=seqs.GG,                   expected='gg'),
     seq_test(actual=seqs.GJ,                   expected='gj'),
