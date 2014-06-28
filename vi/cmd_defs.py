@@ -1801,10 +1801,11 @@ class ViInsertAfterChar(ViOperatorDef):
     def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_a'
-        cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+        cmd['action_args'] = {'mode': state.mode, 'count': 1}
 
         if state.mode != modes.SELECT:
             state.glue_until_normal_mode = True
+            state.normal_insert_count = state.count
 
         return cmd
 

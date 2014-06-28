@@ -180,7 +180,9 @@ class _vi_a(sublime_plugin.TextCommand):
             return
 
         regions_transformer(self.view, f)
-        self.view.window().run_command('_enter_insert_mode')
+        state = State(self.view)
+        self.view.window().run_command('_enter_insert_mode', {'mode': mode,
+            'count': state.normal_insert_count})
 
 
 class _vi_c(ViTextCommandBase):
