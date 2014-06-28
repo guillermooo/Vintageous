@@ -1732,6 +1732,24 @@ class StShowCommandPalette(ViOperatorDef):
         return cmd
 
 
+@keys.assign(seq=seqs.SHIFT_F11, modes=_MODES_ACTION)
+class StEnterDistractionFreeMode(ViOperatorDef):
+    """
+    Vintageous: `<S-f11>`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = 'toggle_distraction_free'
+        cmd['action_args'] = {}
+        return cmd
+
+
 @keys.assign(seq=seqs.I, modes=_MODES_ACTION + (modes.SELECT,))
 class ViEnterInserMode(ViOperatorDef):
     """
@@ -1783,10 +1801,11 @@ class ViInsertAfterChar(ViOperatorDef):
     def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_a'
-        cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+        cmd['action_args'] = {'mode': state.mode, 'count': 1}
 
         if state.mode != modes.SELECT:
             state.glue_until_normal_mode = True
+            state.normal_insert_count = state.count
 
         return cmd
 
@@ -3488,6 +3507,25 @@ class ViToggleCommentByLines(ViOperatorDef):
         cmd['action_args'] = {'mode': state.mode,
                               'count': state.count,
                               }
+        return cmd
+
+
+@keys.assign(seq=seqs.GCC, modes=_MODES_ACTION)
+class ViCommentLine(ViOperatorDef):
+    """
+    Vintageous: `gcc`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+        self.repeatable = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = '_vi_gcc_action'
+        cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
 

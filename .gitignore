@@ -15,5 +15,5 @@ dist/
 *.TMP
 *.swp
 *.swo
-_.swn
-_.swm
+*.swm
+*.swn
