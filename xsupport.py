@@ -1,4 +1,5 @@
 import threading
+import os
 
 import sublime
 import sublime_plugin
@@ -168,3 +169,18 @@ class VintageousToggleCtrlKeys(sublime_plugin.WindowCommand):
 class ReloadVintageousSettings(sublime_plugin.TextCommand):
     def run(self, edit):
         DotFile.from_user().run()
+
+
+class VintageousOpenConfigFile(sublime_plugin.WindowCommand):
+    """Opens or creates $packages/User/.vintageousrc.
+    """
+
+    def run(self):
+        path = os.path.realpath(os.path.join(sublime.packages_path(),
+                                'User/.vintageousrc'))
+        if os.path.exists(path):
+            self.window.open_file(path)
+        else:
+            with open(path, 'w'):
+                pass
+            self.window.open_file(path)

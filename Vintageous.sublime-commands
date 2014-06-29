@@ -1,5 +1,6 @@
 [
     { "caption": "Vintageous: Reset", "command": "reset_vintageous" },
     { "caption": "Vintageous: Toggle Vim Ctrl Keys", "command": "vintageous_toggle_ctrl_keys" },
-    { "caption": "Vintageous: Exit from command mode", "command": "force_exit_from_command_mode" }
+    { "caption": "Vintageous: Exit from command mode", "command": "force_exit_from_command_mode" },
+    { "caption": "Vintageous: Open .vintageousrc", "command": "vintageous_open_config_file" }
 ]
