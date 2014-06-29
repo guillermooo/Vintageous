@@ -1,5 +1,8 @@
-import threading
+"""Assorted commands.
+"""
+
 import os
+import threading
 
 import sublime
 import sublime_plugin
@@ -7,35 +10,39 @@ import sublime_plugin
 from Vintageous import local_logger
 from Vintageous.state import _init_vintageous
 from Vintageous.state import State
-from Vintageous.vi import utils
+from Vintageous.vi import cmd_defs
 from Vintageous.vi.dot_file import DotFile
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import regions_transformer
-from Vintageous.vi import cmd_defs
 
 
 _logger = local_logger(__name__)
 
 
 class _vi_slash_on_parser_done(sublime_plugin.WindowCommand):
+
     def run(self, key=None):
         state = State(self.window.active_view())
         state.motion = cmd_defs.ViSearchForwardImpl()
-        state.last_buffer_search = state.motion._inp or state.last_buffer_search
+        state.last_buffer_search = (state.motion._inp or
+            state.last_buffer_search)
 
 
 class _vi_question_mark_on_parser_done(sublime_plugin.WindowCommand):
+
     def run(self, key=None):
         state = State(self.window.active_view())
         state.motion = cmd_defs.ViSearchBackwardImpl()
-        state.last_buffer_search = state.motion._inp or state.last_buffer_search
+        state.last_buffer_search = (state.motion._inp or
+            state.last_buffer_search)
 
 
 # TODO: Test me.
 class VintageStateTracker(sublime_plugin.EventListener):
+
     def on_post_save(self, view):
-        # Ensure the carets are within valid bounds. For instance, this is a concern when
-        # `trim_trailing_white_space_on_save` is set to true.
+        # Ensure the carets are within valid bounds. For instance, this is a
+        # concern when `trim_trailing_white_space_on_save` is set to true.
         state = State(view)
         view.run_command('_vi_adjust_carets', {'mode': state.mode})
 
@@ -45,6 +52,7 @@ class VintageStateTracker(sublime_plugin.EventListener):
 
 
 class ViMouseTracker(sublime_plugin.EventListener):
+
     def on_text_command(self, view, command, args):
         if command == 'drag_select':
             state = State(view)
@@ -58,19 +66,20 @@ class ViMouseTracker(sublime_plugin.EventListener):
                 # mode anyway.
                 return ('sequence', {'commands': [
                     ['drag_select', args], ['_enter_visual_mode', {
-                    'mode': state.mode }]
+                        'mode': state.mode}]
                 ]})
 
             # Otherwise, enter normal mode to ensure the xpos is updated.
             else:
                 return ('sequence', {'commands': [
                     ['drag_select', args], ['_enter_normal_mode', {
-                    'mode': state.mode }]
+                        'mode': state.mode}]
                 ]})
 
 
 # TODO: Test me.
 class ViFocusRestorerEvent(sublime_plugin.EventListener):
+
     def __init__(self):
         self.timer = None
 
@@ -87,14 +96,16 @@ class ViFocusRestorerEvent(sublime_plugin.EventListener):
             pass
 
     def on_new(self, view):
-        # Without this, on OS X Vintageous might not initialize correctly if the user leaves
-        # the application in a windowless state and then creates a new buffer.
+        # Without this, on OS X Vintageous might not initialize correctly if
+        # the user leaves the application in a windowless state and then
+        # creates a new buffer.
         if sublime.platform() == 'osx':
             _init_vintageous(view)
 
     def on_load(self, view):
-        # Without this, on OS X Vintageous might not initialize correctly if the user leaves
-        # the application in a windowless state and then creates a new buffer.
+        # Without this, on OS X Vintageous might not initialize correctly if
+        # the user leaves the application in a windowless state and then
+        # creates a new buffer.
         if sublime.platform() == 'osx':
             try:
                 _init_vintageous(view)
@@ -109,12 +120,12 @@ class ViFocusRestorerEvent(sublime_plugin.EventListener):
 
 
 class _vi_adjust_carets(sublime_plugin.TextCommand):
+
     def run(self, edit, mode=None):
         def f(view, s):
             if mode in (modes.NORMAL, modes.INTERNAL_NORMAL):
                 if  ((view.substr(s.b) == '\n' or s.b == view.size())
                      and not view.line(s.b).empty()):
-                        # print('adjusting carets')
                         return sublime.Region(s.b - 1)
             return s
 
@@ -122,6 +133,7 @@ class _vi_adjust_carets(sublime_plugin.TextCommand):
 
 
 class Sequence(sublime_plugin.TextCommand):
+
     """Required so that mark_undo_groups_for_gluing and friends work.
     """
     def run(self, edit, commands):
@@ -130,6 +142,7 @@ class Sequence(sublime_plugin.TextCommand):
 
 
 class ResetVintageous(sublime_plugin.WindowCommand):
+
     def run(self):
         v = self.window.active_view()
         v.settings().erase('vintage')
@@ -157,6 +170,7 @@ class ForceExitFromCommandMode(sublime_plugin.WindowCommand):
 
 
 class VintageousToggleCtrlKeys(sublime_plugin.WindowCommand):
+
     def run(self):
         prefs = sublime.load_settings('Preferences.sublime-settings')
         value = prefs.get('vintageous_use_ctrl_keys', False)
@@ -164,10 +178,12 @@ class VintageousToggleCtrlKeys(sublime_plugin.WindowCommand):
         sublime.save_settings('Preferences.sublime-settings')
         status = 'enabled' if (not value) else 'disabled'
         print("Package.Vintageous: Use of Ctrl- keys {0}.".format(status))
-        sublime.status_message("Vintageous: Use of Ctrl- keys {0}".format(status))
+        sublime.status_message("Vintageous: Use of Ctrl- keys {0}"
+                               .format(status))
 
 
 class ReloadVintageousSettings(sublime_plugin.TextCommand):
+
     def run(self, edit):
         DotFile.from_user().run()
 
@@ -184,4 +200,5 @@ class VintageousOpenConfigFile(sublime_plugin.WindowCommand):
         else:
             with open(path, 'w'):
                 pass
+
             self.window.open_file(path)
