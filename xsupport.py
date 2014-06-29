@@ -108,6 +108,7 @@ class ResetVintageous(sublime_plugin.WindowCommand):
         v = self.window.active_view()
         v.settings().erase('vintage')
         _init_vintageous(v)
+        DotFile.from_user().run()
         print("Package.Vintageous: State reset.")
         sublime.status_message("Vintageous: State reset")
 
