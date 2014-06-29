@@ -59,11 +59,6 @@ class ViMouseTracker(sublime_plugin.EventListener):
 
             # If the user has held the shift key, enter visual mode.
             if args.get('extend'):
-                # TODO(guillermooo): .post_text_command() does not intercept
-                # this command, so we have no easy way of switching modes and
-                # updating xpos. Mode switching isn't as important, since
-                # non-zero-length selections will be interpreted as visual
-                # mode anyway.
                 return ('sequence', {'commands': [
                     ['drag_select', args], ['_enter_visual_mode', {
                         'mode': state.mode}]
