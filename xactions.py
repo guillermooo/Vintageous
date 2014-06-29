@@ -396,17 +396,27 @@ class _enter_insert_mode(ViTextCommandBase):
 
 
 class _enter_visual_mode(ViTextCommandBase):
-    def run(self, edit, mode=None):
 
+    def run(self, edit, mode=None):
         state = self.state
+
+        # TODO(guillermooo): If all selections are non-zero-length, we may be
+        # looking at a pseudo-visual selection, like the ones that are
+        # created pressing Alt+Enter when using ST's built-in search dialog.
+        # What shall we really do in that case?
         if state.mode == modes.VISUAL:
             self.view.run_command('_enter_normal_mode', {'mode': mode})
             return
+
         self.view.run_command('_enter_visual_mode_impl', {'mode': mode})
 
         if any(s.empty() for s in self.view.sel()):
             return
 
+        # Sometimes we'll call this command without the global state knowing
+        # its metadata. For example, when shift-clicking with the mouse to
+        # create visual selections. Always update xpos to cover this case.
+        state.update_xpos(force=True)
         state.enter_visual_mode()
         state.display_status()
 
@@ -425,7 +435,12 @@ class _enter_visual_mode_impl(sublime_plugin.TextCommand):
                 if s.empty() and (s.b == self.view.size()):
                     utils.blink()
                     return s
-                return sublime.Region(s.b, s.b + 1)
+
+                # Extending from s.a to s.b because we may be looking at
+                # selections with len>0. For example, if it's been created
+                # using the mouse. Normally, though, the selection will be
+                # empty when we reach here.
+                return sublime.Region(s.a, s.b + 1)
 
         regions_transformer(self.view, f)
 

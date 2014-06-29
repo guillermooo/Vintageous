@@ -43,6 +43,31 @@ class VintageStateTracker(sublime_plugin.EventListener):
         return vintage_state.context.check(key, operator, operand, match_all)
 
 
+class ViMouseTracker(sublime_plugin.EventListener):
+    def on_text_command(self, view, command, args):
+        if command == 'drag_select':
+            state = State(view)
+
+            # If the user has held the shift key, enter visual mode.
+            if args.get('extend'):
+                # TODO(guillermooo): .post_text_command() does not intercept
+                # this command, so we have no easy way of switching modes and
+                # updating xpos. Mode switching isn't as important, since
+                # non-zero-length selections will be interpreted as visual
+                # mode anyway.
+                return ('sequence', {'commands': [
+                    ['drag_select', args], ['_enter_visual_mode', {
+                    'mode': state.mode }]
+                ]})
+
+            # Otherwise, enter normal mode to ensure the xpos is updated.
+            else:
+                return ('sequence', {'commands': [
+                    ['drag_select', args], ['_enter_normal_mode', {
+                    'mode': state.mode }]
+                ]})
+
+
 # TODO: Test me.
 class ViFocusRestorerEvent(sublime_plugin.EventListener):
     def __init__(self):
