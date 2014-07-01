@@ -57,15 +57,15 @@ class ViMouseTracker(sublime_plugin.EventListener):
         if command == 'drag_select':
             state = State(view)
 
-            # If the user has held the shift key, enter visual mode.
-            if args.get('extend'):
+            # Double click or Shift+click -- enter visual mode.
+            if (args.get('by') == 'words') or args.get('extend'):
                 return ('sequence', {'commands': [
                     ['drag_select', args], ['_enter_visual_mode', {
                         'mode': state.mode}]
                 ]})
 
             # Otherwise, enter normal mode to ensure the xpos is updated.
-            else:
+            elif not args.get('extend'):
                 return ('sequence', {'commands': [
                     ['drag_select', args], ['_enter_normal_mode', {
                         'mode': state.mode}]
