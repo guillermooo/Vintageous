@@ -404,6 +404,8 @@ class _enter_visual_mode(ViTextCommandBase):
         # looking at a pseudo-visual selection, like the ones that are
         # created pressing Alt+Enter when using ST's built-in search dialog.
         # What shall we really do in that case?
+        # XXX: In response to the above, we would probably already be in
+        # visual mode, but we should double-check that.
         if state.mode == modes.VISUAL:
             self.view.run_command('_enter_normal_mode', {'mode': mode})
             return
@@ -440,7 +442,11 @@ class _enter_visual_mode_impl(sublime_plugin.TextCommand):
                 # selections with len>0. For example, if it's been created
                 # using the mouse. Normally, though, the selection will be
                 # empty when we reach here.
-                return sublime.Region(s.a, s.b + 1)
+                end = s.b
+                # Only extend .b by 1 if we're looking at empty sels.
+                if not view.has_non_empty_selection_region():
+                    end += 1
+                return sublime.Region(s.a, end)
 
         regions_transformer(self.view, f)
 
