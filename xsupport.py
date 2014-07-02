@@ -57,19 +57,27 @@ class ViMouseTracker(sublime_plugin.EventListener):
         if command == 'drag_select':
             state = State(view)
 
-            # Double click or Shift+click -- enter visual mode.
-            if (args.get('by') == 'words') or args.get('extend'):
-                return ('sequence', {'commands': [
-                    ['drag_select', args], ['_enter_visual_mode', {
-                        'mode': state.mode}]
-                ]})
+            if state.mode in (modes.VISUAL, modes.VISUAL_LINE,
+                              modes.VISUAL_BLOCK):
+                if (args.get('extend') or (args.get('by') == 'words') or
+                    args.get('additive')):
+                        return
 
-            # Otherwise, enter normal mode to ensure the xpos is updated.
-            elif not args.get('extend'):
-                return ('sequence', {'commands': [
-                    ['drag_select', args], ['_enter_normal_mode', {
-                        'mode': state.mode}]
-                ]})
+                elif not args.get('extend'):
+                    return ('sequence', {'commands': [
+                        ['drag_select', args], ['_enter_normal_mode', {
+                            'mode': state.mode}]
+                    ]})
+
+            elif state.mode == modes.NORMAL:
+                # TODO(guillermooo): Dragging the mouse does not seem to
+                # fire a different event than simply clicking. This makes it
+                # hard to update the xpos.
+                if args.get('extend') or (args.get('by') == 'words'):
+                    return ('sequence', {'commands': [
+                        ['drag_select', args], ['_enter_visual_mode', {
+                            'mode': state.mode}]
+                    ]})
 
 
 # TODO: Test me.
