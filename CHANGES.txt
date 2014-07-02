@@ -1,3 +1,7 @@
+3.6.2 - 02-07-2014
+
+	- Tweak handling of mouse-driven selections.
+
 3.6.1 - 01-07-2014
 
 	- Double-clicking selects word.
