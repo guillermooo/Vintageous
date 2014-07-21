@@ -235,7 +235,7 @@ def get_text_object_region(view, s, text_object, inclusive=False, count=1):
             return sublime.Region(begin_tag.b, end_tag.a)
 
     if type_ == PARAGRAPH:
-        return find_paragraph_text_object(view, s, inclusive)
+        return find_paragraph_text_object(view, s, inclusive=inclusive, count=count)
 
     if type_ == BRACKET:
         opening = find_prev_lone_bracket(view, s.b, delims)
@@ -411,16 +411,56 @@ def find_prev_lone_bracket(view, start, tags, unbalanced=0):
     else:
         return prev_opening_bracket
 
-
-def find_paragraph_text_object(view, s, inclusive=True):
-    # TODO: Implement counts.
-    begin = view.find_by_class(s.a, forward=False, classes=CLASS_EMPTY_LINE)
-    end = view.find_by_class(s.b, forward=True, classes=CLASS_EMPTY_LINE)
-    if not inclusive:
-        if begin > 0:
-            begin += 1
+def find_paragraph_text_object(view, s, inclusive=True, count=1):
+    # In Vim, `vip` will select an inner paragraph -- all the lines having the
+    # same whitespace status of the current location. And a `vap` will select
+    # both the current inner paragraph (either whitespace or not) and the next
+    # inner paragraph (the opposite).
+    begin = None
+    end   = s.a
+    for _ in range(count):
+        b1, e1  = find_inner_paragraph(view, end)
+        b2, end = find_inner_paragraph(view, e1) if inclusive else (b1, e1)
+        if begin is None:
+            begin = b1
     return sublime.Region(begin, end)
 
+def find_inner_paragraph(view, initial_loc):
+    '''
+    Takes a location, as an integer. Returns a (begin, end) tuple of ints for
+    the Vim inner paragraph corresponding to that location. An inner paragraph
+    consists of a set of contiguous lines all having the same whitespace status
+    (a line either consists entirely of whitespace characters or it does not).
+    '''
+    # Determine whether the initial point lies in an all-whitespace line.
+    is_whitespace = lambda region: len(view.substr(region).strip()) == 0
+    iws = is_whitespace(view.line(initial_loc))
+
+    # Search backward finding all lines with similar whitespace status.
+    # This will give use the value for begin.
+    p = initial_loc
+    while True:
+        line = view.line(p)
+        if is_whitespace(line) != iws:
+            break
+        elif line.begin() == 0:
+            p = 0
+            break
+        p = line.begin() - 1
+    begin = p + 1 if p > 0 else p
+
+    # To get the value for end, we do the same thing, this time searching forward.
+    p = initial_loc
+    while True:
+        line = view.line(p)
+        if is_whitespace(line) != iws:
+            break
+        p = line.end() + 1
+        if p >= view.size():
+            break
+    end = p
+
+    return (begin, end)
 
 # TODO: Move this to units.py.
 def word_reverse(view, pt, count=1, big=False):
