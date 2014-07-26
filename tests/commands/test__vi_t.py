@@ -62,17 +62,25 @@ VISUAL_MULTI_LINE_CASES = (
     test_data('0123\n5678', (7, 5), '8', modes.VISUAL, (6, 8), 'Select L2->LF+1, find on L2'),
 )
 
+SKIP_CASES = (
+    test_data('xxxx', (1, 1), 'x', modes.NORMAL, (2, 2), 'Skip past previous match'),
+    test_data('xxxx', (2, 2), 'x', modes.NORMAL, (2, 2), 'Does not skip past final match'),
+)
+
 class Test_vi_t(ViewTest):
-    def runTests(self, data):
+    def runTests(self, data, skipping=False):
         for (i, data) in enumerate(data):
             self.write(data.text)
             self.clear_sel()
             self.add_sel(self.R(*data.startRegion))
             self.view.run_command('_vi_find_in_line',
-                {'mode': data.mode, 'count': 1, 'char': data.findChar, 'inclusive': False})
+                {'mode': data.mode, 'count': 1, 'char': data.findChar, 'inclusive': False, 'skipping': skipping})
             self.assert_equal_regions(self.R(*data.expectedRegion), self.first_sel(),
                 "Failed on index {} {} : Text:\"{}\" Region:{} Find:'{}'"
                     .format(i, data.msg, data.text, data.startRegion, data.findChar))
+
+    def runTestsWithSkip(self, data):
+        self.runTests(data, skipping=True)
 
     def testNormalCases(self):
         self.runTests(NORMAL_CASES)
@@ -91,3 +99,6 @@ class Test_vi_t(ViewTest):
 
     def testVisualMultipleLinesCases(self):
         self.runTests(VISUAL_MULTI_LINE_CASES)
+
+    def testSkipCases(self):
+        self.runTestsWithSkip(SKIP_CASES)

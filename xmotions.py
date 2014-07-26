@@ -42,7 +42,7 @@ class _vi_find_in_line(ViMotionCommand):
     Contrary to *f*, *t* does not look past the caret's position, so if
     @character is under the caret, nothing happens.
     """
-    def run(self, char=None, mode=None, count=1, inclusive=True):
+    def run(self, char=None, mode=None, count=1, inclusive=True, skipping=False):
         def f(view, s):
             if mode == modes.VISUAL_LINE:
                 raise ValueError(
@@ -52,6 +52,11 @@ class _vi_find_in_line(ViMotionCommand):
             # If we are in any visual mode, get the actual insertion point.
             if s.size() > 0:
                 b = utils.get_caret_pos_at_b(s)
+
+            # Vim skips a character while performing the search
+            # if the command is ';' or ',' after a 't' or 'T'
+            if skipping:
+                b = b + 1
 
             eol = view.line(b).end()
 
@@ -96,7 +101,7 @@ class _vi_reverse_find_in_line(ViMotionCommand):
     """Contrary to *F*, *T* does not look past the caret's position, so if ``character`` is right
        before the caret, nothing happens.
     """
-    def run(self, char=None, mode=None, count=1, inclusive=True):
+    def run(self, char=None, mode=None, count=1, inclusive=True, skipping=False):
         def f(view, s):
             if mode == modes.VISUAL_LINE:
                 raise ValueError(
@@ -105,6 +110,11 @@ class _vi_reverse_find_in_line(ViMotionCommand):
             b = s.b
             if s.size() > 0:
                 b = utils.get_caret_pos_at_b(s)
+
+            # Vim skips a character while performing the search
+            # if the command is ';' or ',' after a 't' or 'T'
+            if skipping:
+                b = b - 1
 
             line_start = view.line(b).a
 
