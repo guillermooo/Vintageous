@@ -2884,9 +2884,9 @@ class ViMoveToBol(ViMotionDef):
 
 
 @keys.assign(seq=seqs.UNDERSCORE, modes=_MODES_MOTION)
-class ViMoveToBol(ViMotionDef):
+class ViMoveToSoftBol(ViMotionDef):
     """
-    Vim: `^`
+    Vim: `_`
     """
 
     def __init__(self, *args, **kwargs):
