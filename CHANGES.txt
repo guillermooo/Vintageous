@@ -1,3 +1,11 @@
+3.6.3 - 27-07-2014
+
+	- Fix paragraph text object.
+	- Fix '^' motion command.
+	- Disable Ctrl-[ due to problems with some keyboard layouts.
+	- Fix command definition collision between hat '^' and underscore '_'.
+	- Fix semicolon and comma after t or T not moving caret after first match.
+
 3.6.2 - 02-07-2014
 
 	- Tweak handling of mouse-driven selections.
