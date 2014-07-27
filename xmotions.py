@@ -839,10 +839,6 @@ class _vi_e(ViMotionCommand):
                     return sublime.Region(s.a - 1, pt)
                 elif (s.a > s.b):
                     return sublime.Region(s.a, pt)
-                # Don't think this is needed. Currently, it causes `e` commands
-                # to fail to select complete word if the word is at the file end.
-                # elif (view.size() == pt):
-                #     pt -= 1
                 return sublime.Region(s.a, pt)
 
             elif mode == modes.INTERNAL_NORMAL:
