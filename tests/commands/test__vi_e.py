@@ -40,3 +40,12 @@ class Test_vi_e_InNormalMode(ViewTest):
         self.view.run_command('_vi_e', {'mode': modes.NORMAL, 'count': 1})
 
         self.assertEqual(self.R((2, 5), (2, 5)), first_sel(self.view))
+
+class Test_vi_e_InVisualMode(ViewTest):
+    def testMoveToEndOfWord_OnLastLine2(self):
+        self.write('abc abc abc')
+        self.clear_sel()
+        self.add_sel(self.R(0, 2))
+        self.view.run_command('_vi_e', {'mode': modes.VISUAL, 'count': 3})
+        self.assertEqual(self.R((0, 0), (0, 11)), first_sel(self.view))
+
