@@ -426,12 +426,10 @@ def find_paragraph_text_object(view, s, inclusive=True, count=1):
     return sublime.Region(begin, end)
 
 def find_inner_paragraph(view, initial_loc):
-    '''
-    Takes a location, as an integer. Returns a (begin, end) tuple of ints for
+    '''Takes a location, as an integer. Returns a (begin, end) tuple of ints for
     the Vim inner paragraph corresponding to that location. An inner paragraph
     consists of a set of contiguous lines all having the same whitespace status
-    (a line either consists entirely of whitespace characters or it does not).
-    '''
+    (a line either consists entirely of whitespace characters or it does not).'''
     # Determine whether the initial point lies in an all-whitespace line.
     is_whitespace = lambda region: len(view.substr(region).strip()) == 0
     iws = is_whitespace(view.line(initial_loc))

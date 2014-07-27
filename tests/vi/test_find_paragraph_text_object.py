@@ -1,107 +1,78 @@
-import unittest
+from collections import namedtuple
 
-from Vintageous.vi.constants import MODE_NORMAL
-from Vintageous.vi.constants import _MODE_INTERNAL_NORMAL
-
-from Vintageous.tests import ViewTest
-from Vintageous.tests import set_text
-from Vintageous.tests import add_sel
-
+from Vintageous.tests import ViewTest, region2rowcols
 from Vintageous.vi.text_objects import find_paragraph_text_object
 
+####
 # Define a TEXT to experiment with.
-# Note that some of the whitespace lines have trailing spaces.
+# Note: some whitespace lines have trailing spaces.
+####
 
-INNER_PARAGRAPHS = [
-'''
-1  ip0 line1
-2  ip0 line2
-3  ip0 line3
-''',
-'''
+TEXT = '''
+0  ip0.1
+1  ip0.2
+2  ip0.3
 
    
-''',
-'''
-6  ip2 line1
-7  ip2 line2
-8  ip2 line3
-''',
-'''
+5  ip2.1
+6  ip2.2
+7  ip2.3
 
-''',
-'''
-10 ip4 line1
-11 ip4 line2
-12 ip4 line3
-''',
-'''
+9  ip4.1
+10 ip4.2
+11 ip4.3
 
-           
+    
 
-''',
-'''
-16 ip6 line1
-17 ip6 line2
-18 ip6 line3
-''',
-]
+15 ip6.1
+16 ip6.2
+17 ip6.3
+'''.lstrip()
 
-for i, p in enumerate(INNER_PARAGRAPHS):
-    INNER_PARAGRAPHS[i] = p[1:]
+####
+# Test cases.
+####
 
-TEXT = ''.join(INNER_PARAGRAPHS)
+test_data = namedtuple('test_data', 'start_region motion expected_region msg')
 
-class Test_find_paragraph_text_object_InInternalNormalMode_Inclusive(ViewTest):
+ALL_CASES = (
+    #          start_region      motion   expected_region  msg
+    test_data( [(6,2), (6,2)],   '1ip',   [(5,0), (8,0)],  'basic' ),
+    test_data( [(6,2), (6,2)],   '1ap',   [(5,0), (9,0)],  'basic' ),
 
-    def testReturnsFullParagraph_CountOne(self):
-        set_text(self.view, TEXT)
-        r = self.R((6, 2), (6, 2))
-        add_sel(self.view, r)
-        expected = ''.join(INNER_PARAGRAPHS[2:4])
-        reg = find_paragraph_text_object(self.view, r)
-        self.assertEqual(expected, self.view.substr(reg))
+    test_data( [(6,2), (6,2)],   '3ip',   [(5,0), (12,0)], 'counts' ),
+    test_data( [(6,2), (6,2)],   '2ap',   [(5,0), (15,0)], 'counts' ),
 
-    # def testReturnsWordAndPrecedingWhiteSpace_CountOne(self):
-    #     set_text(self.view, '(foo bar) baz\n')
-    #     r = self.R(5, 5)
-    #     add_sel(self.view, r)
+    test_data( [(0,0), (0,0)],   '1ip',   [(0,0), (3,0)],  'start of view' ),
+    test_data( [(0,0), (0,0)],   '2ap',   [(0,0), (9,0)],  'start of view' ),
 
-    #     reg = a_word(self.view, r.b)
-    #     self.assertEqual(' bar', self.view.substr(reg))
+    test_data( [(9,0), (9,0)],   '3ip',   [(9,0), (18,0)], 'end of view' ),
+    test_data( [(8,0), (8,0)],   '2ap',   [(8,0), (18,0)], 'end of view' ),
+)
 
-    # def testReturnsWordAndAllPrecedingWhiteSpace_CountOne(self):
-    #     set_text(self.view, '(foo   bar) baz\n')
-    #     r = self.R(8, 8)
-    #     add_sel(self.view, r)
+class Test_find_paragraph_text_object(ViewTest):
 
-    #     reg = a_word(self.view, r.b)
-    #     self.assertEqual('   bar', self.view.substr(reg))
+    MSG_FMT = 'find_paragraph_text_object(msg={!r}, motion={}, exp_rc={}, got_rc={})'
 
+    def runTests(self, data):
+        for (i, td) in enumerate(data):
+            # Get method params from the Vim motion.
+            count = int(td.motion[0:-2])
+            inclusive = td.motion[-2] == 'a'
 
-class Test_find_paragraph_text_object_InInternalNormalMode_Exclusive(ViewTest):
+            # Set up the view.
+            self.write(TEXT)
+            self.clear_sel()
+            s = self.R(*td.start_region)
+            self.add_sel(s)
 
-    def testReturnsFullParagraph_CountOne(self):
-        set_text(self.view, TEXT)
-        r = self.R((6, 2), (6, 2))
-        add_sel(self.view, r)
-        expected = ''.join(INNER_PARAGRAPHS[2:3])
-        reg = find_paragraph_text_object(self.view, r, inclusive=False)
-        self.assertEqual(expected, self.view.substr(reg))
+            # Expected vs actual region returned by find_paragraph_text_object().
+            exp = self.R(*td.expected_region)
+            got = find_paragraph_text_object(self.view, s, inclusive=inclusive, count=count)
+            rcs = [ region2rowcols(self.view, r) for r in (exp, got) ]
+            msg = self.MSG_FMT.format(td.msg, td.motion, *rcs)
+            self.assert_equal_regions(exp, got, msg)
 
-    # def testReturnsWordAndPrecedingWhiteSpace_CountOne(self):
-    #     set_text(self.view, '(foo bar) baz\n')
-    #     r = self.R(5, 5)
-    #     add_sel(self.view, r)
-
-    #     reg = a_word(self.view, r.b)
-    #     self.assertEqual(' bar', self.view.substr(reg))
-
-    # def testReturnsWordAndAllPrecedingWhiteSpace_CountOne(self):
-    #     set_text(self.view, '(foo   bar) baz\n')
-    #     r = self.R(8, 8)
-    #     add_sel(self.view, r)
-
-    #     reg = a_word(self.view, r.b)
-    #     self.assertEqual('   bar', self.view.substr(reg))
+    def testAllCases(self):
+        self.runTests(ALL_CASES)
 

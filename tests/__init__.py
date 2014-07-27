@@ -84,6 +84,12 @@ def make_region(view, a, b=None):
         return sublime.Region(a)
 
 
+def region2rowcols(view, reg):
+    '''Takes a view and a region. Returns a pair of row-col tuples
+    corresponding to the region's start and end points.'''
+    points = (reg.begin(), reg.end())
+    return list(map(view.rowcol, points))
+
 def set_text(view, text):
     view.run_command('__vi_tests_write_buffer', {'text': text})
 
