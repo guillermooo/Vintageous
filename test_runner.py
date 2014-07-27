@@ -86,8 +86,11 @@ class RunVintageousTests(sublime_plugin.WindowCommand):
 
     def run(self, **kwargs):
         with self.chdir(kwargs.get('working_dir')):
+            # If kwargs['loader_pattern'] is supplied, only a subset of the
+            # tests will be discovered.
             p = os.path.join(os.getcwd(), 'tests')
-            suite = unittest.TestLoader().discover(p)
+            patt = kwargs.get('loader_pattern', 'test*.py',)
+            suite = unittest.TestLoader().discover(p, pattern=patt)
 
             file_regex = r'^\s*File\s*"([^.].*?)",\s*line\s*(\d+),.*$'
             display = OutputPanel('vintageous.tests', file_regex=file_regex)
