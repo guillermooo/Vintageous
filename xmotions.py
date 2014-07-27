@@ -42,7 +42,7 @@ class _vi_find_in_line(ViMotionCommand):
     Contrary to *f*, *t* does not look past the caret's position, so if
     @character is under the caret, nothing happens.
     """
-    def run(self, char=None, mode=None, count=1, inclusive=True):
+    def run(self, char=None, mode=None, count=1, inclusive=True, skipping=False):
         def f(view, s):
             if mode == modes.VISUAL_LINE:
                 raise ValueError(
@@ -52,6 +52,11 @@ class _vi_find_in_line(ViMotionCommand):
             # If we are in any visual mode, get the actual insertion point.
             if s.size() > 0:
                 b = utils.get_caret_pos_at_b(s)
+
+            # Vim skips a character while performing the search
+            # if the command is ';' or ',' after a 't' or 'T'
+            if skipping:
+                b = b + 1
 
             eol = view.line(b).end()
 
@@ -96,7 +101,7 @@ class _vi_reverse_find_in_line(ViMotionCommand):
     """Contrary to *F*, *T* does not look past the caret's position, so if ``character`` is right
        before the caret, nothing happens.
     """
-    def run(self, char=None, mode=None, count=1, inclusive=True):
+    def run(self, char=None, mode=None, count=1, inclusive=True, skipping=False):
         def f(view, s):
             if mode == modes.VISUAL_LINE:
                 raise ValueError(
@@ -105,6 +110,11 @@ class _vi_reverse_find_in_line(ViMotionCommand):
             b = s.b
             if s.size() > 0:
                 b = utils.get_caret_pos_at_b(s)
+
+            # Vim skips a character while performing the search
+            # if the command is ';' or ',' after a 't' or 'T'
+            if skipping:
+                b = b - 1
 
             line_start = view.line(b).a
 
@@ -1373,24 +1383,23 @@ class _vi_underscore(ViMotionCommand):
 class _vi_hat(ViMotionCommand):
     def run(self, count=None, mode=None):
         def f(view, s):
+            a = s.a
+            b = s.b
+            if s.size() > 0:
+                a = utils.get_caret_pos_at_a(s)
+                b = utils.get_caret_pos_at_b(s)
+
+            bol = self.view.line(b).a
+            bol = utils.next_non_white_space_char(self.view, bol, white_space='\t ')
+
             if mode == modes.NORMAL:
-                bol = self.view.line(s.b).a
-                bol = utils.next_non_white_space_char(self.view, bol, white_space='\t ')
                 return sublime.Region(bol)
             elif mode == modes.INTERNAL_NORMAL:
-                begin = self.view.line(s.b).a
-                begin = utils.next_non_white_space_char(self.view, begin, white_space='\t ')
-                return sublime.Region(begin, s.b)
+                # The character at the "end" of the region is skipped in both
+                # forward and reverse cases, so unlike other regions, no need to add 1 to it
+                return sublime.Region(a, bol)
             elif mode == modes.VISUAL:
-                if self.view.rowcol(s.b)[1] == 0:
-                    return s
-                bol = self.view.line(s.b - 1).a
-                bol = utils.next_non_white_space_char(self.view, bol, white_space='\t ')
-                if (s.a < s.b) and (bol < s.a):
-                    return sublime.Region(s.a + 1, bol)
-                elif (s.a < s.b):
-                    return sublime.Region(s.a, bol + 1)
-                return sublime.Region(s.a, bol)
+                return utils.new_inclusive_region(a, bol)
             else:
                 return s
 

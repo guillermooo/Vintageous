@@ -2504,13 +2504,15 @@ class ViRepeatCharSearchForward(ViMotionDef):
         cmd = {}
         forward = state.last_char_search_command in ('vi_t', 'vi_f')
         inclusive = state.last_char_search_command in ('vi_f', 'vi_big_f')
+        skipping = state.last_char_search_command in ('vi_t', 'vi_big_t')
 
         cmd['motion'] = ('_vi_find_in_line' if forward
                                             else '_vi_reverse_find_in_line')
 
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count,
                               'char': state.last_character_search,
-                              'inclusive': inclusive}
+                              'inclusive': inclusive,
+                              'skipping': skipping}
 
         return cmd
 
@@ -2732,12 +2734,14 @@ class ViRepeatCharSearchBackward(ViMotionDef):
         cmd = {}
         forward = state.last_char_search_command in ('vi_t', 'vi_f')
         inclusive = state.last_char_search_command in ('vi_f', 'vi_big_f')
+        skipping = state.last_char_search_command in ('vi_t', 'vi_big_t')
 
         cmd['motion'] = ('_vi_find_in_line' if not forward
                                             else '_vi_reverse_find_in_line')
         cmd['motion_args'] = {'mode': state.mode, 'count': state.count,
                               'char': state.last_character_search,
-                              'inclusive': inclusive}
+                              'inclusive': inclusive,
+                              'skipping': skipping}
 
         return cmd
 
@@ -2884,9 +2888,9 @@ class ViMoveToBol(ViMotionDef):
 
 
 @keys.assign(seq=seqs.UNDERSCORE, modes=_MODES_MOTION)
-class ViMoveToBol(ViMotionDef):
+class ViMoveToSoftBol(ViMotionDef):
     """
-    Vim: `^`
+    Vim: `_`
     """
 
     def __init__(self, *args, **kwargs):
