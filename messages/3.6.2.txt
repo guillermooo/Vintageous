@@ -1,5 +1,5 @@
 ==============================================================================
-Vintageous 3.6.3
+Vintageous 3.6.2
 ==============================================================================
 
 *** Follow important announcements on Twitter: @VintageousS3 ***
@@ -8,11 +8,7 @@ Vintageous 3.6.3
 CHANGES
 -------
 
-	- Fix paragraph text object. (Thanks @hindman.)
-	- Fix '^' motion command. (Thanks @diwo.)
-	- Disable Ctrl-[ due to problems with some keyboard layouts.
-	- Fix command definition collision between hat '^' and underscore '_'. (Thanks @diwo.)
-	- Fix semicolon and comma after t or T not moving caret after first match. (Thanks @diwo.)
+	- Tweak handling of mouse-driven selections.
 
 
 FOUND BUGS?
