@@ -90,6 +90,7 @@ def region2rowcols(view, reg):
     points = (reg.begin(), reg.end())
     return list(map(view.rowcol, points))
 
+
 def set_text(view, text):
     view.run_command('__vi_tests_write_buffer', {'text': text})
 

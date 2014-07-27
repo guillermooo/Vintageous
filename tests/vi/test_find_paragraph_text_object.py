@@ -3,17 +3,15 @@ from collections import namedtuple
 from Vintageous.tests import ViewTest, region2rowcols
 from Vintageous.vi.text_objects import find_paragraph_text_object
 
-####
-# Define a TEXT to experiment with.
-# Note: some whitespace lines have trailing spaces.
-####
 
+# Note: trailing spaces are encoded in unicode to prevent automatic traling
+# white space removal.
 TEXT = '''
 0  ip0.1
 1  ip0.2
 2  ip0.3
 
-   
+\u0020\u0020\u0020
 5  ip2.1
 6  ip2.2
 7  ip2.3
@@ -22,18 +20,16 @@ TEXT = '''
 10 ip4.2
 11 ip4.3
 
-    
+\u0020\u0020\u0020\u0020
 
 15 ip6.1
 16 ip6.2
 17 ip6.3
 '''.lstrip()
 
-####
-# Test cases.
-####
 
 test_data = namedtuple('test_data', 'start_region motion expected_region msg')
+
 
 ALL_CASES = (
     #          start_region      motion   expected_region  msg
@@ -49,6 +45,7 @@ ALL_CASES = (
     test_data( [(9,0), (9,0)],   '3ip',   [(9,0), (18,0)], 'end of view' ),
     test_data( [(8,0), (8,0)],   '2ap',   [(8,0), (18,0)], 'end of view' ),
 )
+
 
 class Test_find_paragraph_text_object(ViewTest):
 
