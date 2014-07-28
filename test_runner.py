@@ -73,7 +73,23 @@ class OutputPanel(object):
 
 
 class RunVintageousTests(sublime_plugin.WindowCommand):
+    '''Runs tests and displays the result.
 
+    - Do not use ST while tests are running.
+
+    @working_dir
+      Required. Should be the parent of the top-level directory for `tests`.
+
+    @loader_pattern
+      Optional. Only run tests matching this glob.
+
+    @active_file_only
+      Optional. Only run tests in the active file in ST. Shadows
+      @loader_pattern.
+
+    To use this runner conveniently, open the command palette and select one
+    of the `Build: Vintageous - Test *` commands.
+    '''
     @contextlib.contextmanager
     def chdir(self, path=None):
         old_path = os.getcwd()
@@ -86,10 +102,13 @@ class RunVintageousTests(sublime_plugin.WindowCommand):
 
     def run(self, **kwargs):
         with self.chdir(kwargs.get('working_dir')):
-            # If kwargs['loader_pattern'] is supplied, only a subset of the
-            # tests will be discovered.
             p = os.path.join(os.getcwd(), 'tests')
             patt = kwargs.get('loader_pattern', 'test*.py',)
+            # TODO(guillermooo): I can't get $file to expand in the build
+            # system. It should be possible to make the following code simpler
+            # with it.
+            if kwargs.get('active_file_only') is True:
+                patt = os.path.basename(self.window.active_view().file_name())
             suite = unittest.TestLoader().discover(p, pattern=patt)
 
             file_regex = r'^\s*File\s*"([^.].*?)",\s*line\s*(\d+),.*$'
