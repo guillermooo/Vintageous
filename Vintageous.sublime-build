@@ -8,12 +8,12 @@
 
 	"variants": [
 		{
-			"name": "Vintageous - Test All",
+			"name": "Vintageous - Test (All)",
 			"target": "run_vintageous_tests",
 		},
 
 		{
-			"name": "Vintageous - Test This File Only",
+			"name": "Vintageous - Test (This File Only)",
 			"target": "run_vintageous_tests",
 			"active_file_only": true
 		}
