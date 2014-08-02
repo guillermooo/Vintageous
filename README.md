@@ -1,4 +1,7 @@
-[![Build Status](https://travis-ci.org/guillermooo/Vintageous.svg?branch=master)](https://travis-ci.org/guillermooo/Vintageous)
+**Plaform** | **Status**
+------------|------------
+Linux | [![Build Status](https://travis-ci.org/guillermooo/Vintageous.svg?branch=master)](https://travis-ci.org/guillermooo/Vintageous)
+Windows | [![Build status](https://ci.appveyor.com/api/projects/status/pvea8jg8bdoq2rmn/branch/master)](https://ci.appveyor.com/project/guillermooo/vintageous/branch/master)
 
 Vintageous
 ==========
