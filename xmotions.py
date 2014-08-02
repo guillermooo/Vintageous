@@ -1351,27 +1351,32 @@ class _vi_big_b(ViMotionCommand):
 class _vi_underscore(ViMotionCommand):
     def run(self, count=None, mode=None):
         def f(view, s):
+            a = s.a
+            b = s.b
+            if s.size() > 0:
+                a = utils.get_caret_pos_at_a(s)
+                b = utils.get_caret_pos_at_b(s)
+
+            current_row = self.view.rowcol(b)[0]
+            target_row = current_row + (count - 1)
+            last_row = self.view.rowcol(self.view.size() - 1)[0]
+
+            if target_row > last_row:
+                target_row = last_row
+
+            bol = self.view.text_point(target_row, 0)
+            bol = utils.next_non_white_space_char(self.view, bol, white_space='\t ')
+
             if mode == modes.NORMAL:
-                current_row, _ = self.view.rowcol(s.b)
-                bol = self.view.text_point(current_row + (count - 1), 0)
-                bol = utils.next_non_white_space_char(self.view, bol, white_space='\t ')
                 return sublime.Region(bol)
             elif mode == modes.INTERNAL_NORMAL:
-                current_row, _ = self.view.rowcol(s.b)
-                begin = self.view.text_point(current_row, 0)
-                end = self.view.text_point(current_row + (count - 1), 0)
-                end = self.view.full_line(end).b
+                # TODO: differentiate between 'd' and 'c'
+                begin = self.view.line(b).a
+                target_row_bol = self.view.text_point(target_row, 0)
+                end = self.view.line(target_row_bol).b
                 return sublime.Region(begin, end)
             elif mode == modes.VISUAL:
-                if self.view.rowcol(s.b)[1] == 0:
-                    return s
-                bol = self.view.line(s.b - 1).a
-                bol = utils.next_non_white_space_char(self.view, bol, white_space='\t ')
-                if (s.a < s.b) and (bol < s.a):
-                    return sublime.Region(s.a + 1, bol)
-                elif (s.a < s.b):
-                    return sublime.Region(s.a, bol + 1)
-                return sublime.Region(s.a, bol)
+                return utils.new_inclusive_region(a, bol)
             else:
                 return s
 
