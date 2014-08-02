@@ -1,0 +1,14 @@
+install:
+  # TODO: Use Desired state configuration or a block script.
+  - ps: write-output "installing sublime text 3"
+  - ps: start-filedownload "http://c758482.r82.cf2.rackcdn.com/Sublime%20Text%20Build%203059%20x64.zip"
+  - ps: write-output "installing Sublime%20Text%20Build%203059%20x64.zip"
+  - ps: 7z.exe x "Sublime%20Text%20Build%203059%20x64.zip" -o"C:\st" > $null
+  - ps: mkdir "C:\st\Data\Packages" -force > $null
+  - ps: git clone -q --branch=master https://github.com/gullermooo/Vintageous.git "C:\st\Data\Packages\Vintageous"
+  - ps: git clone -q --branch=master https://github.com/randy3k/UnitTesting.git "C:\st\Data\Packages\UnitTesting"
+
+build: false
+
+test_script:
+  - ps: C:\st\Data\Packages\UnitTesting\sbin\run.ps1 "Vintageous"
