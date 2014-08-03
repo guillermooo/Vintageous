@@ -22,7 +22,9 @@
 			["./ex/*.py", []],
 			["./ex/parsers/*.py", []],
 			["./plugins/*.py", []],
-			["./ex/plat/*.py", []]
+			["./ex/plat/*.py", []],
+
+			["./Development/*.*", []]
 
 
 		],
@@ -35,6 +37,7 @@
 					 "*.JSON-tmLanguage",
 					 "*.ps1",
 					 "*.hg*",
+					 "dev_*.py",
 					 "*manifest.json",
 					 "Default.sublime-commands",
 					 "test_runner.py"]
