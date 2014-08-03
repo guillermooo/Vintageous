@@ -1,0 +1,4 @@
+[
+	{ "keys": ["f5"],		"command": "run_tests_for_active_view", "context": [{ "key": "vi_command_mode_aware"}]},
+	{ "keys": ["ctrl+f5"],	"command": "run_all_tests",				"context": [{ "key": "vi_command_mode_aware"}]}
+]

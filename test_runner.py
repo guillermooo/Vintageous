@@ -94,7 +94,7 @@ class RunVintageousTests(sublime_plugin.WindowCommand):
     def chdir(self, path=None):
         old_path = os.getcwd()
         if path is not None:
-            assert os.path.exists(path), "'path' is invalid"
+            assert os.path.exists(path), "'path' is invalid {}".format(path)
             os.chdir(path)
         yield
         if path is not None:
