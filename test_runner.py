@@ -5,6 +5,8 @@ import os
 import unittest
 import contextlib
 
+from threading import Thread
+
 
 class __vi_tests_write_buffer(sublime_plugin.TextCommand):
     """Replaces the buffer's content with the specified `text`.
@@ -119,5 +121,8 @@ class RunVintageousTests(sublime_plugin.WindowCommand):
             def run_and_display():
                 runner.run(suite)
                 display.show()
+                # If we don't do this, custom mappings won't be available
+                # after running the test suite.
+                self.window.run_command('reset_vintageous')
 
-            sublime.set_timeout_async(run_and_display, 0)
+            Thread(target=run_and_display).start()
