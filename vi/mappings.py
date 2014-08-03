@@ -54,6 +54,8 @@ class Mappings(object):
         try:
             self.state.logger.info("[Mappings] checking partials {0} for {1}".format(partials, seq))
             name = list(x for x in partials if x == seq)[0]
+            # FIXME: Possibly related to #613. We're not returning the view's
+            # current mode.
             return (name, _mappings[mode][name])
         except IndexError:
             return (None, None)
