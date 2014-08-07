@@ -16,9 +16,8 @@ def find_project_path(path):
 class RunTestsForActiveViewCommand(sublime_plugin.WindowCommand):
     '''Runs tests:
 
-    - From the active file if its name starts with 'test_'.
-    - From a file with the name 'test_<active_file_basename>'.
-    - From the active file if all of the above failed.
+    - From a file with the name 'test_<active_file_basename>' if it exists.
+    - Else, from the active file.
     '''
     def run(self):
         v = self.window.active_view()
