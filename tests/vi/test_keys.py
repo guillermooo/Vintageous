@@ -14,6 +14,7 @@ from Vintageous.tests import ViewTest
 from Vintageous.vi.keys import to_bare_command_name
 from Vintageous.vi.keys import KeySequenceTokenizer
 from Vintageous.vi.keys import seqs
+from Vintageous.vi import variables
 
 
 _tests_tokenizer = (
@@ -42,6 +43,11 @@ _tests_tokenizer = (
 
 
 class Test_KeySequenceTokenizer_tokenize_one(ViewTest):
+    def setUp(self):
+        super().setUp()
+        self.old_vars = variables._VARIABLES
+        variables._VARIABLES = {}
+
     def parse(self, input_):
         tokenizer = KeySequenceTokenizer(input_)
         return tokenizer.tokenize_one()
@@ -50,6 +56,10 @@ class Test_KeySequenceTokenizer_tokenize_one(ViewTest):
         for (i, t) in enumerate(_tests_tokenizer):
             input_, expected, msg = t
             self.assertEqual(self.parse(input_), expected, "{0} - {1}".format(i, msg))
+
+    def tearDown(self):
+        super().tearDown()
+        variables._VARIABLES = self.old_vars
 
 
 _tests_iter_tokenize = (

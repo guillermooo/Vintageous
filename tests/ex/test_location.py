@@ -106,4 +106,5 @@ class TestSearchHelpers(unittest.TestCase):
         select_line(g_test_view, 1)
 
     def tearDown(self):
+        super().tearDown()
         select_line(g_test_view, 1)
