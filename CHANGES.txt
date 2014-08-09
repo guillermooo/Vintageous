@@ -1,3 +1,9 @@
+3.6.4 - 09-08-2014
+
+	- Implement basic <Leader> key support.
+	- Improve implementation of underscore '_'. (Thanks Dickson Wong)
+	- Fix vi_e in visual mode. (Thanks Monty Hindman)
+
 3.6.3 - 27-07-2014
 
 	- Fix paragraph text object.
