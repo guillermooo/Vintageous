@@ -55,7 +55,7 @@ def get_commit_messages(vcs=None, since_tag=None):
     assert since_tag, 'bad arguments'
     try:
         out = check_output(
-                    'git log "{0}^{{}}..HEAD" --format=%s (Thanks %an.)'.format(since_tag),
+                    'git log "{0}^{{}}..HEAD" --format="%s (Thanks %an)"'.format(since_tag),
                     shell=True)
     except Exception as e:
         print('git command failed')
