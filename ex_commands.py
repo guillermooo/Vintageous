@@ -324,6 +324,8 @@ class ExMap(sublime_plugin.TextCommand):
     """
     def run(self, edit, mode=None, count=None, cmd=''):
         try:
+            # TODO(guillermooo): Instead of parsing this here, add parsers
+            # to ex command defs and reuse them here.
             keys, command = cmd.lstrip().split(' ', 1)
         except ValueError:
             sublime.status_message('Vintageous: Bad mapping format')
@@ -1287,3 +1289,9 @@ class ExSet(IrreversibleTextCommand):
             sublime.status_message("Vintageuos: No such option.")
         except ValueError:
             sublime.status_message("Vintageous: Invalid value for option.")
+
+
+class ExLet(IrreversibleTextCommand):
+    def run(self, name=None, operator='=', value=None):
+        state = State(self.view)
+        state.variables.set(name, value)

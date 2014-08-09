@@ -16,6 +16,7 @@ from Vintageous.vi.utils import is_ignored
 from Vintageous.vi.utils import is_ignored_but_command_mode
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import first_sel
+from Vintageous.vi.variables import Variables
 from Vintageous.vi import cmd_defs
 from Vintageous.vi import cmd_base
 # !! Avoid error due to sublime_plugin.py:45 expectations.
@@ -154,6 +155,7 @@ class State(object):
     registers = Registers()
     marks = Marks()
     context = KeyContext()
+    variables = Variables()
 
     def __init__(self, view):
         self.view = view

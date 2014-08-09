@@ -5,6 +5,7 @@ from Vintageous.vi.keys import to_bare_command_name
 from Vintageous.vi.keys import KeySequenceTokenizer
 from Vintageous.vi.utils import modes
 from Vintageous.vi.cmd_base import cmd_types
+from Vintageous.vi import variables
 
 
 _mappings = {
@@ -146,8 +147,8 @@ class Mappings(object):
             self.state.logger.info('[Mappings] got {0}'.format(command))
             return command
 
-
     def add(self, mode, new, target):
+        new = variables.expand_keys(new)
         _mappings[mode][new] = {'name': target, 'type': cmd_types.USER}
 
     def remove(self, mode, new):

@@ -4,6 +4,7 @@ from Vintageous import local_logger
 from Vintageous.vi.utils import modes
 from Vintageous.vi import cmd_base
 from Vintageous.plugins import plugins
+from Vintageous.vi import variables
 
 
 _logger = local_logger(__name__)
@@ -315,6 +316,7 @@ class key_names:
     F13         = '<f13>'
     F14         = '<f14>'
     F15         = '<f15>'
+    Leader      = '<leader>'
 
     as_list = [
         BACKSPACE,
@@ -347,6 +349,8 @@ class key_names:
         F13,
         F14,
         F15,
+
+        Leader,
     ]
 
     max_len = len('<space>')
@@ -446,7 +450,7 @@ class KeySequenceTokenizer(object):
         c = self.consume()
 
         if c == '<':
-            return self.long_key_name()
+            return self._expand_vars(self.long_key_name())
         else:
             return c
 
@@ -456,6 +460,9 @@ class KeySequenceTokenizer(object):
             if token == EOF:
                 break
             yield token
+
+    def _expand_vars(self, c):
+        return variables.get(c) if variables.is_key_name(c) else c
 
 
 def to_bare_command_name(seq):

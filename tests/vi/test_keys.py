@@ -37,6 +37,7 @@ _tests_tokenizer = (
     ('0',            '0',            'zero key'),
     ('<c-m-.>',      '<C-M-.>',      'ctrl-alt-period key'),
     ('<tab>',        '<tab>',        'tab key'),
+    ('<Leader>',     '\\',     'leader key'),
 )
 
 
