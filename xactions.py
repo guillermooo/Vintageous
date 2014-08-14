@@ -323,12 +323,6 @@ class _enter_normal_mode_impl(sublime_plugin.TextCommand):
                 return sublime.Region(s.b)
 
             if mode == modes.VISUAL:
-                # save selections for gv
-                # But only if there are non-empty sels. We might be in visual
-                # mode and not have non-empty sels because we've just existed
-                # from an action.
-                if self.view.has_non_empty_selection_region():
-                    self.view.add_regions('visual_sel', list(self.view.sel()))
                 if s.a < s.b:
                     r = sublime.Region(s.b - 1)
                     if view.substr(r.b) == '\n':
