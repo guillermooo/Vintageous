@@ -1,3 +1,8 @@
+3.6.7 - 06-09-2014
+
+	- Fix Goto Anything crash on OSX: do not init on_load and on_new.
+	- Partial fix for #623 - gv should preserve selection direction.
+
 3.6.6 - 09-08-2014
 
 	- Implement basic <Leader> key support.
