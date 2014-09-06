@@ -98,25 +98,6 @@ class ViFocusRestorerEvent(sublime_plugin.EventListener):
             # Switching back from another application. Ignore.
             pass
 
-    def on_new(self, view):
-        # Without this, on OS X Vintageous might not initialize correctly if
-        # the user leaves the application in a windowless state and then
-        # creates a new buffer.
-        if sublime.platform() == 'osx':
-            _init_vintageous(view)
-
-    def on_load(self, view):
-        # Without this, on OS X Vintageous might not initialize correctly if
-        # the user leaves the application in a windowless state and then
-        # creates a new buffer.
-        if sublime.platform() == 'osx':
-            try:
-                _init_vintageous(view)
-            except AttributeError:
-                _logger().error(
-                    '[VintageStateTracker] .settings() missing during .on_load() for {0}'
-                        .format(view.file_name()))
-
     def on_deactivated(self, view):
         self.timer = threading.Timer(0.25, self.action)
         self.timer.start()
