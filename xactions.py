@@ -1213,6 +1213,9 @@ class _vi_quote(ViTextCommandBase):
 
         regions_transformer(self.view, f)
 
+        if not self.view.visible_region().intersects(address):
+            self.view.show_at_center(address)
+
 
 class _vi_backtick(ViTextCommandBase):
     def run(self, edit, count=1, mode=None, character=None):
