@@ -20,10 +20,6 @@ test_data = namedtuple('test_data', 'cmd initial_text regions cmd_params expecte
 region_data = namedtuple('region_data', 'regions')
 
 TESTS_INTERNAL_NORMAL = (
-    # MOTION
-    test_data(cmd='_vi_cc_motion', initial_text='foo bar\nfoo bar\nfoo bar\n', regions=[[(1, 2), (1, 2)]], cmd_params={'mode': modes.INTERNAL_NORMAL},
-              expected=region_data([(1, 0), (1, 7)]), actual_func=first_sel_wrapper, msg='selects whole line'),
-
     # OPERATOR
     test_data(cmd='_vi_cc_action', initial_text='foo bar\nfoo bar\nfoo bar\n',      regions=[[(1, 0), (1, 0)]], cmd_params={'mode': modes.INTERNAL_NORMAL},
               expected='foo bar\n\nfoo bar\n', actual_func=get_text,  msg=''),
@@ -36,7 +32,7 @@ TESTS_INTERNAL_NORMAL = (
 TESTS = TESTS_INTERNAL_NORMAL
 
 
-class Test_vi_cc_motion(ViewTest):
+class Test_vi_cc_action(ViewTest):
     def testAll(self):
         for (i, data) in enumerate(TESTS):
             # TODO: Perhaps we should ensure that other state is reset too?
