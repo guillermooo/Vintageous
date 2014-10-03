@@ -706,11 +706,8 @@ class PressKey(ViWindowCommandBase):
             return
 
         state.sequence += key
-        if not state.recording_macro:
-            state.display_status()
-            # sublime.status_message(state.sequence)
-        else:
-            sublime.status_message('[Vintageous] Recording')
+        state.display_status()
+
         if state.capture_register:
             state.register = key
             state.partial_sequence = ''
@@ -2165,38 +2162,12 @@ class _vi_ctrl_r_equal(sublime_plugin.TextCommand):
 
 class _vi_q(IrreversibleTextCommand):
     def run(self, name=None, mode=None, count=1):
-        # TODO: We ignore the name.
-        state = State(self.view)
-
-        if state.recording_macro:
-            self.view.run_command('toggle_record_macro')
-            cmds = []
-            for c in sublime.get_macro():
-                cmds.append([c['command'], c['args']])
-            state.last_macro = cmds
-            state.recording_macro = False
-            sublime.status_message('')
-            return
-        self.view.run_command('toggle_record_macro')
-        state.recording_macro = True
-        sublime.status_message('[Vintageous] Recording macro...')
+        print("Vintageous: Macros not implemented.")
 
 
 class _vi_at(IrreversibleTextCommand):
     def run(self, name=None, mode=None, count=1):
-        # TODO: We ignore the name.
-        state = State(self.view)
-
-        if not (state.gluing_sequence or state.recording_macro):
-            self.view.run_command('mark_undo_groups_for_gluing')
-
-        cmds = state.last_macro
-        for i in range(count):
-
-            self.view.run_command('sequence', {'commands': cmds})
-
-        if not (state.gluing_sequence or state.recording_macro):
-            self.view.run_command('glue_marked_undo_groups')
+        print("Vintageous: Macros not implemented.")
 
 
 class _enter_visual_block_mode(ViTextCommandBase):

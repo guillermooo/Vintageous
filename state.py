@@ -408,30 +408,6 @@ class State(object):
         self.settings.vi['repeat_data'] = value
 
     @property
-    def last_macro(self):
-        """
-        Stores the last recorded macro.
-        """
-        return self.settings.window['_vintageous_last_macro'] or None
-
-    @last_macro.setter
-    def last_macro(self, value):
-        """
-        Stores the last recorded macro.
-        """
-        # FIXME: Check that we're storing a valid macro?
-        self.settings.window['_vintageous_last_macro'] = value
-
-    @property
-    def recording_macro(self):
-        return self.settings.window['_vintageous_recording_macro'] or False
-
-    @recording_macro.setter
-    def recording_macro(self, value):
-        # FIXME: Check that we're storing a bool?
-        self.settings.window['_vintageous_recording_macro'] = value
-
-    @property
     def count(self):
         """
         Calculates the actual count for the current command.
