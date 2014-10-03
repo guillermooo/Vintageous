@@ -1,3 +1,9 @@
+3.6.8 - 03-10-2014
+
+	- Improve status bar info.
+	- Improve cc with empty lines.
+	- Improve m motion in internal mode.
+
 3.6.7 - 06-09-2014
 
 	- Fix Goto Anything crash on OSX: do not init on_load and on_new.
