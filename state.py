@@ -571,7 +571,7 @@ class State(object):
         msg = "{0} {1}"
         mode_name = modes.to_friendly_name(self.mode)
         mode_name = '-- {0} --'.format(mode_name) if mode_name else ''
-        sublime.status_message(msg.format(mode_name, self.sequence))
+        self.view.set_status('vim', msg.format(mode_name, self.sequence))
 
     def reset_partial_sequence(self):
         self.partial_sequence = ''
@@ -605,6 +605,7 @@ class State(object):
         self.reset_sequence()
         self.reset_partial_sequence()
         self.reset_register_data()
+        self.view.erase_status('vim')
 
     def update_xpos(self, force=False):
         if self.must_update_xpos or force:
