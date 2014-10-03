@@ -913,7 +913,6 @@ class _vi_dd_action(ViTextCommandBase):
 
     def run(self, edit, mode=None, count=1):
         def f(view, s):
-            # We've made a selection with _vi_cc_motion just before this.
             if mode == modes.INTERNAL_NORMAL:
                 view.erase(edit, s)
                 if utils.row_at(self.view, s.a) != utils.row_at(self.view, self.view.size()):
@@ -954,23 +953,6 @@ class _vi_dd_motion(sublime_plugin.TextCommand):
         regions_transformer(self.view, f)
 
 
-class _vi_cc_motion(ViTextCommandBase):
-    def run(self, edit, mode=None, count=1):
-        def f(view, s):
-            if mode == modes.INTERNAL_NORMAL:
-                if view.line(s.b).empty():
-                    return s
-
-                end = view.text_point(utils.row_at(self.view, s.b) + (count - 1), 0)
-                begin = view.line(s.b).a
-                begin = utils.next_non_white_space_char(view, begin, white_space=' \t')
-                return sublime.Region(begin, view.line(end).b)
-
-            return s
-
-        regions_transformer(self.view, f)
-
-
 class _vi_cc_action(ViTextCommandBase):
 
     _can_yank = True
@@ -978,16 +960,28 @@ class _vi_cc_action(ViTextCommandBase):
     _yanks_linewise = False
     _populates_small_delete_register = False
 
+    def motion(self, view, s, count, mode):
+        if mode == modes.INTERNAL_NORMAL:
+            if view.line(s.b).empty():
+                return s
+
+            end = view.text_point(utils.row_at(view, s.b) + (count - 1), 0)
+            begin = view.line(s.b).a
+            begin = utils.next_non_white_space_char(view, begin, white_space=' \t')
+            return sublime.Region(begin, view.line(end).b)
+
+        return s
+
     def run(self, edit, mode=None, count=1, register='"'):
-        self.save_sel()
-        self.view.run_command('_vi_cc_motion', {'mode': mode, 'count': count})
+        def f(view, s):
+            new_s = self.motion(view, s, count, mode)
+            if not new_s.empty():
+                state.registers.yank(self)
+                self.view.erase(edit, new_s)
+            return sublime.Region(new_s.a)
 
         state = self.state
-
-        if self.has_sel_changed():
-            state.registers.yank(self)
-            self.view.run_command('right_delete')
-
+        regions_transformer(self.view, f)
         self.enter_insert_mode(mode)
         self.set_xpos(state)
 
@@ -2485,7 +2479,6 @@ class _vi_gcc_action(ViTextCommandBase):
 
     def run(self, edit, mode=None, count=1):
         def f(view, s):
-            # We've made a selection with _vi_cc_motion just before this.
             if mode == modes.INTERNAL_NORMAL:
                 view.run_command('toggle_comment')
                 if utils.row_at(self.view, s.a) != utils.row_at(self.view, self.view.size()):
