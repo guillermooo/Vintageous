@@ -2194,11 +2194,14 @@ class _vi_at(IrreversibleTextCommand):
                 print('Vintageous: error: %s' % e)
                 return
 
+        state = State(self.view)
         for cmd, args in cmds:
             # TODO(guillermooo): Is this robust enough?
             if 'xpos' in args:
+                state.update_xpos(force=True)
                 args['xpos'] = State(self.view).xpos
             elif args.get('motion') and 'xpos' in args.get('motion'):
+                state.update_xpos(force=True)
                 motion = args.get('motion')
                 motion['motion_args']['xpos'] = State(self.view).xpos
                 args['motion'] = motion
