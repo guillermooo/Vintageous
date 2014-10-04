@@ -3362,8 +3362,12 @@ class ViSearchForward(ViMotionDef):
 
     def translate(self, state):
         cmd = {}
-        cmd['motion'] = '_vi_slash'
-        cmd['motion_args'] = {}
+        if self.accept_input:
+            cmd['motion'] = '_vi_slash'
+            cmd['motion_args'] = {}
+        else:
+            # We'll end up here, for example, when repeating via '.'.
+            return ViSearchForwardImpl(term=self._inp[:-4]).translate(state)
 
         return cmd
 
@@ -3421,10 +3425,14 @@ class ViSearchBackward(ViMotionDef):
         return True
 
     def translate(self, state):
-        cmd = {}
-        cmd['motion'] = '_vi_question_mark'
-        cmd['motion_args'] = {}
-        return cmd
+        if self.accept_input:
+            cmd = {}
+            cmd['motion'] = '_vi_question_mark'
+            cmd['motion_args'] = {}
+            return cmd
+        else:
+            # We'll end up here, for example, when repeating via '.'.
+            return ViSearchBackwardImpl(term=self._inp[:-4]).translate(state)
 
 
 class ViSearchBackwardImpl(ViMotionDef):
