@@ -19,6 +19,7 @@ from Vintageous.vi.utils import first_sel
 from Vintageous.vi.variables import Variables
 from Vintageous.vi import cmd_defs
 from Vintageous.vi import cmd_base
+from Vintageous.vi.macros import MacroRegisters
 # !! Avoid error due to sublime_plugin.py:45 expectations.
 from Vintageous.plugins import plugins as user_plugins
 
@@ -157,6 +158,7 @@ class State(object):
     context = KeyContext()
     variables = Variables()
     macro_steps = []
+    macro_registers = MacroRegisters()
 
     def __init__(self, view):
         self.view = view
@@ -192,7 +194,7 @@ class State(object):
     @property
     def gluing_sequence(self):
         """
-        Indicates whether `PressKeys` is running a command and is grouping all
+        Indicates whether `ProcessNotation` is running a command and is grouping all
         of the edits in one single undo step.
 
         This property is *VOLATILE*; it shouldn't be persisted between
@@ -209,7 +211,7 @@ class State(object):
     def non_interactive(self):
         # FIXME: This property seems to do the same as gluing_sequence.
         """
-        Indicates whether `PressKeys` is running a command and no interactive
+        Indicates whether `ProcessNotation` is running a command and no interactive
         prompts should be used (for example, by the '/' motion.)
 
         This property is *VOLATILE*; it shouldn't be persisted between
@@ -399,7 +401,7 @@ class State(object):
         Stores (type, cmd_name_or_key_seq, , mode) so '.' can use them.
 
         `type` may be 'vi' or 'native'. `vi`-commands are executed VIA_PANEL
-        `PressKeys`, while `native`-commands are executed via .run_command().
+        `ProcessNotation`, while `native`-commands are executed via .run_command().
         """
         return self.settings.vi['repeat_data'] or None
 
@@ -556,6 +558,11 @@ class State(object):
         self.mode = modes.VISUAL_BLOCK
 
     def reset_sequence(self):
+        # TODO(guillermooo): When is_recording, we could store the .sequence
+        # and replay that, but we can't easily translate key presses in insert
+        # mode to a Vintageous-friendly notation. A hybrid approach may work:
+        # use a plain string for any command-mode-based mode, and native ST
+        # commands for insert mode. That should make editing macros easier.
         self.sequence = ''
 
     def display_status(self):
@@ -884,7 +891,7 @@ class State(object):
 
                 # Some commands, like 'i' or 'a', open a series of edits that
                 # need to be grouped together unless we are gluing a larger
-                # sequence through PressKeys. For example, aFOOBAR<Esc> should
+                # sequence through ProcessNotation. For example, aFOOBAR<Esc> should
                 # be grouped atomically, but not inside a sequence like
                 # iXXX<Esc>llaYYY<Esc>, where we want to group the whole
                 # sequence instead.
