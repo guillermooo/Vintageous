@@ -279,7 +279,12 @@ class _enter_normal_mode(ViTextCommandBase):
                 # We're exiting from insert mode or replace mode. Capture
                 # the last native command as repeat data.
                 state.repeat_data = ('native', self.view.command_history(0)[:2], mode, None)
+                state.add_macro_step(*self.view.command_history(0)[:2])
+                state.add_macro_step('_enter_normal_mode', {'mode': mode,
+                                     'from_init': from_init})
             else:
+                state.add_macro_step('_enter_normal_mode', {'mode': mode,
+                                     'from_init': from_init})
                 self.view.window().run_command('unmark_undo_groups_for_gluing')
             state.glue_until_normal_mode = False
 
@@ -2162,12 +2167,30 @@ class _vi_ctrl_r_equal(sublime_plugin.TextCommand):
 
 class _vi_q(IrreversibleTextCommand):
     def run(self, name=None, mode=None, count=1):
-        print("Vintageous: Macros not implemented.")
+        state = State(self.view)
+
+        if state.is_recording:
+            state.stop_recording()
+            return
+
+        # TODO(guillermooo): What happens when we change views?
+        state.start_recording()
 
 
 class _vi_at(IrreversibleTextCommand):
     def run(self, name=None, mode=None, count=1):
-        print("Vintageous: Macros not implemented.")
+        # TODO(guillermooo): Do we need to glue all these edits?
+        for cmd, args in State.macro_steps:
+
+            # TODO(guillermooo): Is this robust enough?
+            if 'xpos' in args:
+                args['xpos'] = State(self.view).xpos
+            elif args.get('motion') and 'xpos' in args.get('motion'):
+                motion = args.get('motion')
+                motion['motion_args']['xpos'] = State(self.view).xpos
+                args['motion'] = motion
+
+            self.view.run_command(cmd, args)
 
 
 class _enter_visual_block_mode(ViTextCommandBase):

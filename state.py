@@ -156,6 +156,7 @@ class State(object):
     marks = Marks()
     context = KeyContext()
     variables = Variables()
+    macro_steps = []
 
     def __init__(self, view):
         self.view = view
@@ -496,6 +497,11 @@ class State(object):
             return (self.action.accept_input and
                     self.action.input_parser.type == input_types.AFTER_MOTION)
 
+        # Special case: `q` should stop the macro recorder.
+        if (isinstance(self.action, cmd_defs.ViToggleMacroRecorder) and
+            self.is_recording):
+                return False
+
         if (self.action and
             self.action.accept_input and
             self.action.input_parser.type == input_types.INMEDIATE):
@@ -511,6 +517,15 @@ class State(object):
 
         if self.action and self.action.updates_xpos:
             return True
+
+    @property
+    def is_recording(self):
+        return self.settings.vi['recording'] or False
+
+    @is_recording.setter
+    def is_recording(self, value):
+        assert value in (True, False)
+        self.settings.vi['recording'] = value
 
     def pop_parser(self):
         # parsers = self.input_parsers
@@ -753,6 +768,22 @@ class State(object):
             self.view.sel().add(sublime.Region(begin, end))
             self.mode = modes.VISUAL_LINE
 
+    def start_recording(self):
+        self.is_recording = True
+        State.macro_steps = []
+        self.view.set_status('vim-recorder', 'Recording...')
+
+    def stop_recording(self):
+        self.is_recording = False
+        self.view.erase_status('vim-recorder')
+
+    def add_macro_step(self, cmd_name, args):
+        if self.is_recording:
+            if cmd_name == '_vi_q':
+                # don't store the ending macro step
+                return
+            State.macro_steps.append((cmd_name, args))
+
     def runnable(self):
         """
         Returns `True` if we can run the state data as it is.
@@ -811,6 +842,8 @@ class State(object):
                     sublime.active_window().run_command(
                         'mark_undo_groups_for_gluing')
 
+                self.add_macro_step(action_cmd['action'], args)
+
                 sublime.active_window().run_command(action_cmd['action'], args)
                 if not self.non_interactive:
                     if self.action.repeatable:
@@ -824,6 +857,8 @@ class State(object):
                 self.logger.info(
                     '[State] lone motion cmd: {0}'.format(motion_cmd))
 
+                self.add_macro_step(motion_cmd['motion'],
+                                         motion_cmd['motion_args'])
                 # We know that all motions are subclasses of ViTextCommandBase,
                 # so it's safe to call them from the current view.
                 # TODO: State should know about each command's type hierarchy.
@@ -860,6 +895,9 @@ class State(object):
                 seq = self.sequence
                 visual_repeat_data = self.get_visual_repeat_data()
                 action = self.action
+
+                self.add_macro_step(action_cmd['action'],
+                                    action_cmd['action_args'])
 
                 sublime.active_window().run_command(action_cmd['action'],
                                                     action_cmd['action_args'])
