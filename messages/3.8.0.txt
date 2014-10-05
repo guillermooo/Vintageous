@@ -1,0 +1,60 @@
+==============================================================================
+Vintageous 3.8.0
+==============================================================================
+
+*** Follow important announcements on Twitter: @VintageousS3 ***
+
+Hi,
+
+This version includes the ability to record and replay macros. Macros are
+implemented entirely in Vintageous and don't share any functionality with
+ST native macros (ST macro-related commands won't work with Vintageous).
+
+Macros don't mimic Vim's completely. In particular, they can't be edited and
+are stored separately from the yank registers. Other than that, they work
+in a similar fashion:
+
+	- q<name>: Start macro recorder; store in `name` register.
+	- q: Stop macro recorder.
+	- @<name>: Replay `name` macro.
+	- @@: Replay macro used last.
+
+Macros should work with all motions and operators. Please report any issues
+you encounter.
+
+Cheers,
+Guillermo
+
+
+CHANGES
+-------
+
+	- Implement macros.
+	- Improve status bar feedback.
+	- Improve / and ? motions when repeating via '.'.
+
+
+FOUND BUGS?
+-----------
+
+Please report them here:
+
+    https://github.com/guillermooo/Vintageous/issues
+
+
+SUPPORT VINTAGEOUS
+------------------
+
+Is Vintageous worth your time? Developing Vintageous is hard work. If you use
+it often, please consider donating and make it worth my time too.
+
+    PayPal: http://www.pledgie.com/campaigns/19122
+    Gittip: https://www.gittip.com/guillermooo/
+
+I'm the creator and main author of Vintageous, but some generous people have
+contributed their time and effort as well. See the more active ones here; you
+may want to show them some gratitude too:
+
+https://github.com/guillermooo/Vintageous/graphs/contributors
+
+Thanks for reading and for using Vintageous!

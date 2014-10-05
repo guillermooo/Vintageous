@@ -1,3 +1,10 @@
+3.8.0 - 05-10-2014
+
+	- Implement macros.
+	- Make Vintageous aware of more key bindings.
+	- Improve / and ? motions when repeating via '.'.
+	- Improve status bar feedback.
+
 3.6.8 - 03-10-2014
 
 	- Improve status bar info.
