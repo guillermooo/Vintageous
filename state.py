@@ -19,6 +19,7 @@ from Vintageous.vi.utils import first_sel
 from Vintageous.vi.variables import Variables
 from Vintageous.vi import cmd_defs
 from Vintageous.vi import cmd_base
+from Vintageous.vi.macros import MacroRegisters
 # !! Avoid error due to sublime_plugin.py:45 expectations.
 from Vintageous.plugins import plugins as user_plugins
 
@@ -156,6 +157,8 @@ class State(object):
     marks = Marks()
     context = KeyContext()
     variables = Variables()
+    macro_steps = []
+    macro_registers = MacroRegisters()
 
     def __init__(self, view):
         self.view = view
@@ -191,7 +194,7 @@ class State(object):
     @property
     def gluing_sequence(self):
         """
-        Indicates whether `PressKeys` is running a command and is grouping all
+        Indicates whether `ProcessNotation` is running a command and is grouping all
         of the edits in one single undo step.
 
         This property is *VOLATILE*; it shouldn't be persisted between
@@ -208,7 +211,7 @@ class State(object):
     def non_interactive(self):
         # FIXME: This property seems to do the same as gluing_sequence.
         """
-        Indicates whether `PressKeys` is running a command and no interactive
+        Indicates whether `ProcessNotation` is running a command and no interactive
         prompts should be used (for example, by the '/' motion.)
 
         This property is *VOLATILE*; it shouldn't be persisted between
@@ -398,7 +401,7 @@ class State(object):
         Stores (type, cmd_name_or_key_seq, , mode) so '.' can use them.
 
         `type` may be 'vi' or 'native'. `vi`-commands are executed VIA_PANEL
-        `PressKeys`, while `native`-commands are executed via .run_command().
+        `ProcessNotation`, while `native`-commands are executed via .run_command().
         """
         return self.settings.vi['repeat_data'] or None
 
@@ -406,30 +409,6 @@ class State(object):
     def repeat_data(self, value):
         self.logger.info("setting repeat data {0}".format(value))
         self.settings.vi['repeat_data'] = value
-
-    @property
-    def last_macro(self):
-        """
-        Stores the last recorded macro.
-        """
-        return self.settings.window['_vintageous_last_macro'] or None
-
-    @last_macro.setter
-    def last_macro(self, value):
-        """
-        Stores the last recorded macro.
-        """
-        # FIXME: Check that we're storing a valid macro?
-        self.settings.window['_vintageous_last_macro'] = value
-
-    @property
-    def recording_macro(self):
-        return self.settings.window['_vintageous_recording_macro'] or False
-
-    @recording_macro.setter
-    def recording_macro(self, value):
-        # FIXME: Check that we're storing a bool?
-        self.settings.window['_vintageous_recording_macro'] = value
 
     @property
     def count(self):
@@ -520,6 +499,11 @@ class State(object):
             return (self.action.accept_input and
                     self.action.input_parser.type == input_types.AFTER_MOTION)
 
+        # Special case: `q` should stop the macro recorder.
+        if (isinstance(self.action, cmd_defs.ViToggleMacroRecorder) and
+            self.is_recording):
+                return False
+
         if (self.action and
             self.action.accept_input and
             self.action.input_parser.type == input_types.INMEDIATE):
@@ -535,6 +519,15 @@ class State(object):
 
         if self.action and self.action.updates_xpos:
             return True
+
+    @property
+    def is_recording(self):
+        return self.settings.vi['recording'] or False
+
+    @is_recording.setter
+    def is_recording(self, value):
+        assert value in (True, False)
+        self.settings.vi['recording'] = value
 
     def pop_parser(self):
         # parsers = self.input_parsers
@@ -565,6 +558,11 @@ class State(object):
         self.mode = modes.VISUAL_BLOCK
 
     def reset_sequence(self):
+        # TODO(guillermooo): When is_recording, we could store the .sequence
+        # and replay that, but we can't easily translate key presses in insert
+        # mode to a Vintageous-friendly notation. A hybrid approach may work:
+        # use a plain string for any command-mode-based mode, and native ST
+        # commands for insert mode. That should make editing macros easier.
         self.sequence = ''
 
     def display_status(self):
@@ -777,6 +775,22 @@ class State(object):
             self.view.sel().add(sublime.Region(begin, end))
             self.mode = modes.VISUAL_LINE
 
+    def start_recording(self):
+        self.is_recording = True
+        State.macro_steps = []
+        self.view.set_status('vim-recorder', 'Recording...')
+
+    def stop_recording(self):
+        self.is_recording = False
+        self.view.erase_status('vim-recorder')
+
+    def add_macro_step(self, cmd_name, args):
+        if self.is_recording:
+            if cmd_name == '_vi_q':
+                # don't store the ending macro step
+                return
+            State.macro_steps.append((cmd_name, args))
+
     def runnable(self):
         """
         Returns `True` if we can run the state data as it is.
@@ -835,6 +849,8 @@ class State(object):
                     sublime.active_window().run_command(
                         'mark_undo_groups_for_gluing')
 
+                self.add_macro_step(action_cmd['action'], args)
+
                 sublime.active_window().run_command(action_cmd['action'], args)
                 if not self.non_interactive:
                     if self.action.repeatable:
@@ -848,6 +864,8 @@ class State(object):
                 self.logger.info(
                     '[State] lone motion cmd: {0}'.format(motion_cmd))
 
+                self.add_macro_step(motion_cmd['motion'],
+                                         motion_cmd['motion_args'])
                 # We know that all motions are subclasses of ViTextCommandBase,
                 # so it's safe to call them from the current view.
                 # TODO: State should know about each command's type hierarchy.
@@ -873,7 +891,7 @@ class State(object):
 
                 # Some commands, like 'i' or 'a', open a series of edits that
                 # need to be grouped together unless we are gluing a larger
-                # sequence through PressKeys. For example, aFOOBAR<Esc> should
+                # sequence through ProcessNotation. For example, aFOOBAR<Esc> should
                 # be grouped atomically, but not inside a sequence like
                 # iXXX<Esc>llaYYY<Esc>, where we want to group the whole
                 # sequence instead.
@@ -884,6 +902,9 @@ class State(object):
                 seq = self.sequence
                 visual_repeat_data = self.get_visual_repeat_data()
                 action = self.action
+
+                self.add_macro_step(action_cmd['action'],
+                                    action_cmd['action_args'])
 
                 sublime.active_window().run_command(action_cmd['action'],
                                                     action_cmd['action_args'])

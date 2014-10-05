@@ -279,7 +279,12 @@ class _enter_normal_mode(ViTextCommandBase):
                 # We're exiting from insert mode or replace mode. Capture
                 # the last native command as repeat data.
                 state.repeat_data = ('native', self.view.command_history(0)[:2], mode, None)
+                state.add_macro_step(*self.view.command_history(0)[:2])
+                state.add_macro_step('_enter_normal_mode', {'mode': mode,
+                                     'from_init': from_init})
             else:
+                state.add_macro_step('_enter_normal_mode', {'mode': mode,
+                                     'from_init': from_init})
                 self.view.window().run_command('unmark_undo_groups_for_gluing')
             state.glue_until_normal_mode = False
 
@@ -519,7 +524,7 @@ class ToggleMode(ViWindowCommandBase):
         sublime.status_message('command mode status: %s' % (not value))
 
 
-class PressKeys(ViWindowCommandBase):
+class ProcessNotation(ViWindowCommandBase):
     """
     Runs sequences of keys representing Vim commands.
 
@@ -534,7 +539,7 @@ class PressKeys(ViWindowCommandBase):
     """
     def run(self, keys, repeat_count=None, check_user_mappings=True):
         state = self.state
-        _logger().info("[PressKeys] seq received: {0} mode: {1}"
+        _logger().info("[ProcessNotation] seq received: {0} mode: {1}"
                                                     .format(keys, state.mode))
         initial_mode = state.mode
         # Disable interactive prompts. For example, to supress interactive
@@ -557,7 +562,7 @@ class PressKeys(ViWindowCommandBase):
             if state.action:
                 # The last key press has caused an action to be primed. That
                 # means there are no more leading motions. Break out of here.
-                _logger().info('[PressKeys] first action found in {0}'
+                _logger().info('[ProcessNotation] first action found in {0}'
                                                       .format(state.sequence))
                 state.reset_command_data()
                 if state.mode == modes.OPERATOR_PENDING:
@@ -586,10 +591,10 @@ class PressKeys(ViWindowCommandBase):
                 (not state.must_collect_input)):
                     return
 
-            _logger().info('[PressKeys] original seq/leading motions: {0}/{1}'
+            _logger().info('[ProcessNotation] original seq/leading motions: {0}/{1}'
                                                .format(keys, leading_motions))
             keys = keys[len(leading_motions):]
-            _logger().info('[PressKeys] seq stripped to {0}'.format(keys))
+            _logger().info('[ProcessNotation] seq stripped to {0}'.format(keys))
 
         if not (state.motion and not state.action):
             with gluing_undo_groups(self.window.active_view(), state):
@@ -623,7 +628,7 @@ class PressKeys(ViWindowCommandBase):
         # We'll reach this point if we have a command that requests input
         # whose input parser isn't satistied. For example, `/foo`. Note that
         # `/foo<CR>`, on the contrary, would have satisfied the parser.
-        _logger().info('[PressKeys] unsatisfied parser: {0} {1}'
+        _logger().info('[ProcessNotation] unsatisfied parser: {0} {1}'
                                           .format(state.action, state.motion))
         if (state.action and state.motion):
             # We have a parser an a motion that can collect data. Collect data
@@ -654,7 +659,7 @@ class PressKeys(ViWindowCommandBase):
                 command = self.state.action or self.state.motion
 
             parser_def = command.input_parser
-            _logger().info('[PressKeys] last attemp to collect input: {0}'
+            _logger().info('[ProcessNotation] last attemp to collect input: {0}'
                                                   .format(parser_def.command))
             if parser_def.interactive_command:
                 self.window.run_command(parser_def.interactive_command,
@@ -682,7 +687,7 @@ class PressKey(ViWindowCommandBase):
         state. Most of the time, the default value of `True` should be
         used. Set to `False` when you want to manually control
         the global state's evaluation. For example, this is what the
-        PressKeys command does.
+        PressKey command does.
     """
 
     def run(self, key, repeat_count=None, do_eval=True, check_user_mappings=True):
@@ -706,11 +711,8 @@ class PressKey(ViWindowCommandBase):
             return
 
         state.sequence += key
-        if not state.recording_macro:
-            state.display_status()
-            # sublime.status_message(state.sequence)
-        else:
-            sublime.status_message('[Vintageous] Recording')
+        state.display_status()
+
         if state.capture_register:
             state.register = key
             state.partial_sequence = ''
@@ -771,8 +773,8 @@ class PressKey(ViWindowCommandBase):
                 state.motion_count = mcount
                 state.action_count = acount
                 state.mode = modes.NORMAL
-                _logger().info('[PressKey] running user mapping {0} via press_keys starting in mode {1}'.format(new_keys, state.mode))
-                self.window.run_command('press_keys', {'keys': new_keys, 'check_user_mappings': False})
+                _logger().info('[PressKey] running user mapping {0} via process_notation starting in mode {1}'.format(new_keys, state.mode))
+                self.window.run_command('process_notation', {'keys': new_keys, 'check_user_mappings': False})
             return
 
         if isinstance(command, cmd_defs.ViOpenNameSpace):
@@ -885,7 +887,7 @@ class _vi_dot(ViWindowCommandBase):
             return
 
         if type_ == 'vi':
-            self.window.run_command('press_keys', {'keys': seq_or_cmd,
+            self.window.run_command('process_notation', {'keys': seq_or_cmd,
                                                    'repeat_count': count})
         elif type_ == 'native':
             sels = list(self.window.active_view().sel())
@@ -2164,39 +2166,46 @@ class _vi_ctrl_r_equal(sublime_plugin.TextCommand):
 
 
 class _vi_q(IrreversibleTextCommand):
+    _register_name = None
+
     def run(self, name=None, mode=None, count=1):
-        # TODO: We ignore the name.
         state = State(self.view)
 
-        if state.recording_macro:
-            self.view.run_command('toggle_record_macro')
-            cmds = []
-            for c in sublime.get_macro():
-                cmds.append([c['command'], c['args']])
-            state.last_macro = cmds
-            state.recording_macro = False
-            sublime.status_message('')
+        if state.is_recording:
+            State.macro_registers[_vi_q._register_name] = list(State.macro_steps)
+            state.stop_recording()
+            _vi_q._register_name = None
             return
-        self.view.run_command('toggle_record_macro')
-        state.recording_macro = True
-        sublime.status_message('[Vintageous] Recording macro...')
+
+        # TODO(guillermooo): What happens when we change views?
+        state.start_recording()
+        _vi_q._register_name = name
 
 
 class _vi_at(IrreversibleTextCommand):
     def run(self, name=None, mode=None, count=1):
-        # TODO: We ignore the name.
+        # TODO(guillermooo): Do we need to glue all these edits?
+        cmds = State.macro_steps
+        if name != '@':
+            try:
+                cmds = State.macro_registers[name]
+                State.macro_steps = cmds
+            except ValueError as e:
+                print('Vintageous: error: %s' % e)
+                return
+
         state = State(self.view)
-
-        if not (state.gluing_sequence or state.recording_macro):
-            self.view.run_command('mark_undo_groups_for_gluing')
-
-        cmds = state.last_macro
-        for i in range(count):
-
-            self.view.run_command('sequence', {'commands': cmds})
-
-        if not (state.gluing_sequence or state.recording_macro):
-            self.view.run_command('glue_marked_undo_groups')
+        for cmd, args in cmds:
+            # TODO(guillermooo): Is this robust enough?
+            if 'xpos' in args:
+                state.update_xpos(force=True)
+                args['xpos'] = State(self.view).xpos
+            elif args.get('motion') and 'xpos' in args.get('motion'):
+                state.update_xpos(force=True)
+                motion = args.get('motion')
+                motion['motion_args']['xpos'] = State(self.view).xpos
+                args['motion'] = motion
+            self.view.run_command(cmd, args)
 
 
 class _enter_visual_block_mode(ViTextCommandBase):
