@@ -3013,6 +3013,9 @@ class ViReverseFindWord(ViMotionDef):
 @keys.assign(seq=seqs.CTRL_W, modes=_MODES_MOTION)
 @keys.assign(seq=seqs.G, modes=_MODES_MOTION)
 @keys.assign(seq=seqs.Z, modes=_MODES_MOTION)
+# Non-standard
+@keys.assign(seq=seqs.CTRL_DOT, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.CTRL_SHIFT_DOT, modes=_MODES_MOTION)
 # TODO: This is called a 'submode' in the vim docs.
 @keys.assign(seq=seqs.CTRL_X, modes=[modes.INSERT])
 # FIXME: This should not be a motion.
