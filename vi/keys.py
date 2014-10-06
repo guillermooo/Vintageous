@@ -60,6 +60,18 @@ class seqs:
     BIG_E =                        'E'
     BIG_F =                        'F'
     BIG_G =                        'G'
+
+    CTRL_0 =                       '<C-0>'
+    CTRL_1 =                       '<C-1>'
+    CTRL_2 =                       '<C-2>'
+    CTRL_3 =                       '<C-3>'
+    CTRL_4 =                       '<C-4>'
+    CTRL_5 =                       '<C-5>'
+    CTRL_6 =                       '<C-6>'
+    CTRL_7 =                       '<C-7>'
+    CTRL_8 =                       '<C-8>'
+    CTRL_9 =                       '<C-9>'
+
     CTRL_C =                       '<C-c>'
     CTRL_ENTER =                   '<C-cr>'
     CTRL_SHIFT_ENTER =             '<C-S-cr>'

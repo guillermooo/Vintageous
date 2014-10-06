@@ -1750,6 +1750,186 @@ class StEnterDistractionFreeMode(ViOperatorDef):
         return cmd
 
 
+@keys.assign(seq=seqs.CTRL_1, modes=_MODES_ACTION)
+class StFocusGroup0(ViOperatorDef):
+    """
+    Vintageous: `<C-1>`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = 'focus_group'
+        cmd['action_args'] = {'group': 0}
+        return cmd
+
+
+@keys.assign(seq=seqs.CTRL_2, modes=_MODES_ACTION)
+class StFocusGroup1(ViOperatorDef):
+    """
+    Vintageous: `<C-2>`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = 'focus_group'
+        cmd['action_args'] = {'group': 1}
+        return cmd
+
+
+@keys.assign(seq=seqs.CTRL_3, modes=_MODES_ACTION)
+class StFocusGroup2(ViOperatorDef):
+    """
+    Vintageous: `<C-3>`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = 'focus_group'
+        cmd['action_args'] = {'group': 2}
+        return cmd
+
+
+@keys.assign(seq=seqs.CTRL_4, modes=_MODES_ACTION)
+class StFocusGroup3(ViOperatorDef):
+    """
+    Vintageous: `<C-4>`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = 'focus_group'
+        cmd['action_args'] = {'group': 3}
+        return cmd
+
+
+@keys.assign(seq=seqs.CTRL_5, modes=_MODES_ACTION)
+class StFocusGroup4(ViOperatorDef):
+    """
+    Vintageous: `<C-5>`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = 'focus_group'
+        cmd['action_args'] = {'group': 4}
+        return cmd
+
+
+@keys.assign(seq=seqs.CTRL_6, modes=_MODES_ACTION)
+class StFocusGroup5(ViOperatorDef):
+    """
+    Vintageous: `<C-6>`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = 'focus_group'
+        cmd['action_args'] = {'group': 5}
+        return cmd
+
+
+@keys.assign(seq=seqs.CTRL_7, modes=_MODES_ACTION)
+class StFocusGroup6(ViOperatorDef):
+    """
+    Vintageous: `<C-7>`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = 'focus_group'
+        cmd['action_args'] = {'group': 6}
+        return cmd
+
+
+@keys.assign(seq=seqs.CTRL_8, modes=_MODES_ACTION)
+class StFocusGroup7(ViOperatorDef):
+    """
+    Vintageous: `<C-8>`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = 'focus_group'
+        cmd['action_args'] = {'group': 7}
+        return cmd
+
+
+@keys.assign(seq=seqs.CTRL_9, modes=_MODES_ACTION)
+class StFocusGroup8(ViOperatorDef):
+    """
+    Vintageous: `<C-9>`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = 'focus_group'
+        cmd['action_args'] = {'group': 8}
+        return cmd
+
+
+@keys.assign(seq=seqs.CTRL_0, modes=_MODES_ACTION)
+class StFocusSideBar(ViOperatorDef):
+    """
+    Vintageous: `<C-0>`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = 'focus_side_bar'
+        cmd['action_args'] = {}
+        return cmd
+
+
 @keys.assign(seq=seqs.I, modes=_MODES_ACTION + (modes.SELECT,))
 class ViEnterInserMode(ViOperatorDef):
     """
