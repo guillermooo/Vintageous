@@ -7,9 +7,13 @@ class MacroRegisters(dict):
     def __setitem__(self, key, value):
         if key in ('%', '#'):
             raise ValueError('invalid register key: %s' % key)
-        super().__setitem__(key, value)
+        # TODO(guillermooo): further restrict valid register names.
+        # TODO(guillermooo): implement a vs A register.
+        super().__setitem__(key.lower(), value)
 
     def __getitem__(self, key):
         if key in ('%', '#'):
             raise ValueError('unsupported key: %s' % key)
-        return super().__getitem__(key)
+        # TODO(guillermooo): further restrict valid register names.
+        # TODO(guillermooo): implement a vs A register.
+        return super().__getitem__(key.lower())
