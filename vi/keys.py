@@ -78,9 +78,9 @@ class seqs:
     CTRL_DOT =                     '<C-.>'
     CTRL_SHIFT_DOT =               '<C-S-.>'
     CTRL_LEFT_SQUARE_BRACKET =     '<C-[>'
+
     CTRL_W =                       '<C-w>'
     CTRL_W_Q =                     '<C-w>q'
-
     CTRL_W_V =                     '<C-w>v'
     CTRL_W_L =                     '<C-w>l'
     CTRL_W_BIG_L =                 '<C-w>L'
