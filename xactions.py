@@ -1,4 +1,5 @@
 # TODO: weird name to avoid init issues with state.py::State.
+
 import sublime
 import sublime_plugin
 
@@ -8,24 +9,25 @@ from functools import partial
 from Vintageous import local_logger
 from Vintageous.state import _init_vintageous
 from Vintageous.state import State
+from Vintageous.vi import cmd_base
+from Vintageous.vi import cmd_defs
+from Vintageous.vi import mappings
+from Vintageous.vi import search
 from Vintageous.vi import utils
 from Vintageous.vi.constants import regions_transformer_reversed
 from Vintageous.vi.core import ViTextCommandBase
 from Vintageous.vi.core import ViWindowCommandBase
+from Vintageous.vi.keys import key_names
 from Vintageous.vi.keys import KeySequenceTokenizer
 from Vintageous.vi.keys import to_bare_command_name
-from Vintageous.vi.keys import key_names
 from Vintageous.vi.mappings import Mappings
-from Vintageous.vi import mappings
 from Vintageous.vi.utils import gluing_undo_groups
 from Vintageous.vi.utils import IrreversibleTextCommand
 from Vintageous.vi.utils import is_view
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import regions_transformer
 from Vintageous.vi.utils import restoring_sel
-from Vintageous.vi import cmd_base
-from Vintageous.vi import cmd_defs
-from Vintageous.vi import search
+
 
 _logger = local_logger(__name__)
 
@@ -37,8 +39,8 @@ class _vi_g_big_u(ViTextCommandBase):
     def run(self, edit, mode=None, count=1, motion=None):
         def f(view, s):
             view.replace(edit, s, view.substr(s).upper())
-            # reverse the resulting region so that _enter_normal_mode collapses the
-            # selection as we want it.
+            # Reverse the resulting region so that _enter_normal_mode
+            # collapses the selection as we want it.
             return sublime.Region(s.b, s.a)
 
         if mode not in (modes.INTERNAL_NORMAL,
