@@ -34,7 +34,7 @@ class Test_State(StateTestCase):
         self.state.mode = modes.VISUAL_BLOCK
         self.assertEqual(self.state.in_any_visual_mode(), True)
 
-    @unittest.skipIf(os.name == 'nt', 'fails in CI server only')
+    @unittest.skipIf(os.environ['APPVEYOR'], 'fails in CI server only')
     def testCanInitialize(self):
         s = state.State(self.view)
         # Make sure the actual usage of Vintageous doesn't change the pristine
@@ -69,7 +69,7 @@ class Test_State(StateTestCase):
 
 class Test_State_Mode_Switching(StateTestCase):
     # TODO(guillermooo): Disable this only on CI server via env vars?
-    @unittest.skipIf(os.name == 'nt', 'fails in CI server only')
+    @unittest.skipIf(os.environ['APPVEYOR'], 'fails in CI server only')
     def test_enter_normal_mode(self):
         self.assertEqual(self.state.mode, modes.NORMAL)
         self.state.mode = modes.UNKNOWN
@@ -77,13 +77,13 @@ class Test_State_Mode_Switching(StateTestCase):
         self.state.enter_normal_mode()
         self.assertEqual(self.state.mode, modes.NORMAL)
 
-    @unittest.skipIf(os.name == 'nt', 'fails in CI server only')
+    @unittest.skipIf(os.environ['APPVEYOR'], 'fails in CI server only')
     def test_enter_visual_mode(self):
         self.assertEqual(self.state.mode, modes.NORMAL)
         self.state.enter_visual_mode()
         self.assertEqual(self.state.mode, modes.VISUAL)
 
-    @unittest.skipIf(os.name == 'nt', 'fails in CI server only')
+    @unittest.skipIf(os.environ['APPVEYOR'], 'fails in CI server only')
     def test_enter_insert_mode(self):
         self.assertEqual(self.state.mode, modes.NORMAL)
         self.state.enter_insert_mode()
