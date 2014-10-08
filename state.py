@@ -196,7 +196,7 @@ class State(object):
         self.settings.vi['_vintageous_glue_until_normal_mode'] = value
 
     @property
-    def gluing_sequence(self):
+    def processing_notation(self):
         """
         Indicates whether `ProcessNotation` is running a command and is
         grouping all edits in one single undo step. That is, we are running
@@ -206,13 +206,13 @@ class State(object):
         sessions.
         """
         # TODO(guillermooo): Rename self.settings.vi to self.settings.local
-        return self.settings.vi['_vintageous_gluing_sequence'] or False
+        return self.settings.vi['_vintageous_processing_notation'] or False
 
-    @gluing_sequence.setter
-    def gluing_sequence(self, value):
-        self.settings.vi['_vintageous_gluing_sequence'] = value
+    @processing_notation.setter
+    def processing_notation(self, value):
+        self.settings.vi['_vintageous_processing_notation'] = value
 
-    # FIXME: This property seems to do the same as gluing_sequence.
+    # FIXME: This property seems to do the same as processing_notation.
     @property
     def non_interactive(self):
         """
@@ -612,7 +612,7 @@ class State(object):
         """
         self.glue_until_normal_mode = False
         self.view.run_command('unmark_undo_groups_for_gluing')
-        self.gluing_sequence = False
+        self.processing_notation = False
         self.non_interactive = False
         self.reset_during_init = True
 
@@ -814,105 +814,105 @@ class State(object):
         """
         Run data as a command if possible.
         """
-        if self.runnable():
-            if self.action and self.motion:
-                action_cmd = self.action.translate(self)
-                motion_cmd = self.motion.translate(self)
+        if not self.runnable():
+            return
+
+        if self.action and self.motion:
+            action_cmd = self.action.translate(self)
+            motion_cmd = self.motion.translate(self)
+            self.logger.info(
+                '[State] full command, switching to internal normal mode')
+            self.mode = modes.INTERNAL_NORMAL
+
+            # TODO: Make a requirement that motions and actions take a
+            # 'mode' param.
+            if 'mode' in action_cmd['action_args']:
+                action_cmd['action_args']['mode'] = modes.INTERNAL_NORMAL
+
+            if 'mode' in motion_cmd['motion_args']:
+                motion_cmd['motion_args']['mode'] = modes.INTERNAL_NORMAL
+
+            args = action_cmd['action_args']
+            args['count'] = 1
+            # let the action run the motion within its edit object so that
+            # we don't need to worry about grouping edits to the buffer.
+            args['motion'] = motion_cmd
+            self.logger.info(
+                '[Stage] motion in motion+action: {0}'.format(motion_cmd))
+
+            if self.glue_until_normal_mode and not self.processing_notation:
+                # We need to tell Sublime Text now that it should group
+                # all the next edits until we enter normal mode again.
+                sublime.active_window().run_command(
+                    'mark_undo_groups_for_gluing')
+
+            self.add_macro_step(action_cmd['action'], args)
+
+            sublime.active_window().run_command(action_cmd['action'], args)
+            if not self.non_interactive:
+                if self.action.repeatable:
+                    self.repeat_data = ('vi', str(self.sequence),
+                                        self.mode, None)
+            self.reset_command_data()
+            return
+
+        if self.motion:
+            motion_cmd = self.motion.translate(self)
+            self.logger.info(
+                '[State] lone motion cmd: {0}'.format(motion_cmd))
+
+            self.add_macro_step(motion_cmd['motion'],
+                                motion_cmd['motion_args'])
+
+            # We know that all motions are subclasses of ViTextCommandBase,
+            # so it's safe to call them from the current view.
+            self.view.run_command(motion_cmd['motion'],
+                                  motion_cmd['motion_args'])
+
+        if self.action:
+            action_cmd = self.action.translate(self)
+            self.logger.info('[Stage] lone action cmd '.format(action_cmd))
+            if self.mode == modes.NORMAL:
                 self.logger.info(
-                    '[State] full command, switching to internal normal mode')
+                    '[State] switching to internal normal mode')
                 self.mode = modes.INTERNAL_NORMAL
 
-                # TODO: Make a requirement that motions and actions take a
-                # 'mode' param.
                 if 'mode' in action_cmd['action_args']:
-                    action_cmd['action_args']['mode'] = modes.INTERNAL_NORMAL
+                    action_cmd['action_args']['mode'] = \
+                        modes.INTERNAL_NORMAL
+            elif self.mode in (modes.VISUAL, modes.VISUAL_LINE):
+                self.view.add_regions('visual_sel', list(self.view.sel()))
 
-                if 'mode' in motion_cmd['motion_args']:
-                    motion_cmd['motion_args']['mode'] = modes.INTERNAL_NORMAL
+            # Some commands, like 'i' or 'a', open a series of edits that
+            # need to be grouped together unless we are gluing a larger
+            # sequence through ProcessNotation. For example, aFOOBAR<Esc> should
+            # be grouped atomically, but not inside a sequence like
+            # iXXX<Esc>llaYYY<Esc>, where we want to group the whole
+            # sequence instead.
+            if self.glue_until_normal_mode and not self.processing_notation:
+                sublime.active_window().run_command(
+                    'mark_undo_groups_for_gluing')
 
-                args = action_cmd['action_args']
-                args['count'] = 1
-                # let the action run the motion within its edit object so that
-                # we don't need to worry about grouping edits to the buffer.
-                args['motion'] = motion_cmd
-                self.logger.info(
-                    '[Stage] motion in motion+action: {0}'.format(motion_cmd))
+            seq = self.sequence
+            visual_repeat_data = self.get_visual_repeat_data()
+            action = self.action
 
-                if self.glue_until_normal_mode and not self.gluing_sequence:
-                    # We need to tell Sublime Text now that it should group
-                    # all the next edits until we enter normal mode again.
-                    sublime.active_window().run_command(
-                        'mark_undo_groups_for_gluing')
+            self.add_macro_step(action_cmd['action'],
+                                action_cmd['action_args'])
 
-                self.add_macro_step(action_cmd['action'], args)
+            sublime.active_window().run_command(action_cmd['action'],
+                                                action_cmd['action_args'])
 
-                sublime.active_window().run_command(action_cmd['action'], args)
-                if not self.non_interactive:
-                    if self.action.repeatable:
-                        self.repeat_data = ('vi', str(self.sequence),
-                                            self.mode, None)
-                self.reset_command_data()
-                return
+            if not (self.processing_notation and self.glue_until_normal_mode):
+                if action.repeatable:
+                    self.repeat_data = ('vi', seq, self.mode,
+                                        visual_repeat_data)
 
-            if self.motion:
-                motion_cmd = self.motion.translate(self)
-                self.logger.info(
-                    '[State] lone motion cmd: {0}'.format(motion_cmd))
+        self.logger.info(
+            'running command: action: {0} motion: {1}'.format(self.action,
+                                                              self.motion))
 
-                self.add_macro_step(motion_cmd['motion'],
-                                         motion_cmd['motion_args'])
-                # We know that all motions are subclasses of ViTextCommandBase,
-                # so it's safe to call them from the current view.
-                # TODO: State should know about each command's type hierarchy.
-                #       Example:
-                #           runner = self.resolve_runner('_vi_dollar')
-                #           # runner ==> view.run_command
-                self.view.run_command(motion_cmd['motion'],
-                                      motion_cmd['motion_args'])
+        if self.mode == modes.INTERNAL_NORMAL:
+            self.enter_normal_mode()
 
-            if self.action:
-                action_cmd = self.action.translate(self)
-                self.logger.info('[Stage] lone action cmd '.format(action_cmd))
-                if self.mode == modes.NORMAL:
-                    self.logger.info(
-                        '[State] switching to internal normal mode')
-                    self.mode = modes.INTERNAL_NORMAL
-
-                    if 'mode' in action_cmd['action_args']:
-                        action_cmd['action_args']['mode'] = \
-                            modes.INTERNAL_NORMAL
-                elif self.mode in (modes.VISUAL, modes.VISUAL_LINE):
-                    self.view.add_regions('visual_sel', list(self.view.sel()))
-
-                # Some commands, like 'i' or 'a', open a series of edits that
-                # need to be grouped together unless we are gluing a larger
-                # sequence through ProcessNotation. For example, aFOOBAR<Esc> should
-                # be grouped atomically, but not inside a sequence like
-                # iXXX<Esc>llaYYY<Esc>, where we want to group the whole
-                # sequence instead.
-                if self.glue_until_normal_mode and not self.gluing_sequence:
-                    sublime.active_window().run_command(
-                        'mark_undo_groups_for_gluing')
-
-                seq = self.sequence
-                visual_repeat_data = self.get_visual_repeat_data()
-                action = self.action
-
-                self.add_macro_step(action_cmd['action'],
-                                    action_cmd['action_args'])
-
-                sublime.active_window().run_command(action_cmd['action'],
-                                                    action_cmd['action_args'])
-
-                if not (self.gluing_sequence and self.glue_until_normal_mode):
-                    if action.repeatable:
-                        self.repeat_data = ('vi', seq, self.mode,
-                                            visual_repeat_data)
-
-            self.logger.info(
-                'running command: action: {0} motion: {1}'.format(self.action,
-                                                                  self.motion))
-
-            if self.mode == modes.INTERNAL_NORMAL:
-                self.enter_normal_mode()
-            self.reset_command_data()
+        self.reset_command_data()
