@@ -18,12 +18,18 @@ class ViCommandDefBase(object):
     _serializable = ['_inp',]
 
     def __init__(self):
+        # the name of the st command wrapped by this class
+        self.command = '<unset>'
         self.input_parser = None
         self._inp = ''
 
     def __getitem__(self, key):
         # XXX: For compatibility. Should be removed eventually.
         return self.__dict__[key]
+
+    def __str__(self):
+        return '<{0} ({1})>'.format(self.__class__.__qualname__,
+                                    self.command)
 
     @property
     def accept_input(self):

@@ -715,7 +715,7 @@ class PressKey(ViWindowCommandBase):
         state.sequence += key
         state.display_status()
 
-        if state.capture_register:
+        if state.must_capture_register_name:
             state.register = key
             state.partial_sequence = ''
             return
@@ -756,7 +756,7 @@ class PressKey(ViWindowCommandBase):
 
         if isinstance(command, cmd_defs.ViOpenRegister):
             _logger().info('[PressKey] requesting register name')
-            state.capture_register = True
+            state.must_capture_register_name = True
             return
 
         # XXX: This doesn't seem to be correct. If we are in OPERATOR_PENDING mode, we should
