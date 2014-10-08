@@ -138,18 +138,21 @@ class Test_State_counts(StateTestCase):
         self.assertEqual(self.state.count, 10)
 
     def testFailsIfBadActionCount(self):
-        self.state.action_count = 'x'
-        self.assertRaises(ValueError, lambda: self.state.count)
+        def set_count():
+            self.state.action_count = 'x'
+        self.assertRaises(AssertionError, set_count)
 
     def testFailsIfBadMotionCount(self):
-        self.state.motion_count = 'x'
-        self.assertRaises(ValueError, lambda: self.state.count)
+        def set_count():
+            self.state.motion_count = 'x'
+        self.assertRaises(AssertionError, set_count)
 
     def testCountIsNeverLessThan1(self):
         self.state.motion_count = '0'
         self.assertEqual(self.state.count, 1)
-        self.state.motion_count = '-1'
-        self.assertRaises(ValueError, lambda: self.state.count)
+        def set_count():
+            self.state.motion_count = '-1'
+        self.assertRaises(AssertionError, set_count)
 
     def testCanRetrieveGoodMotionCount(self):
         self.state.motion_count = '10'

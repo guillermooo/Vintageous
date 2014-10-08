@@ -369,11 +369,10 @@ class State(object):
 
     @property
     def motion(self):
-        val = self.settings.vi['motion'] or None
-        if val:
-            # TODO: Encapsulate further.
-            cls = getattr(cmd_defs, val['name'])
-            return cls.from_json(val['data'])
+        motion = self.settings.vi['motion'] or None
+        if motion:
+            cls = getattr(cmd_defs, motion['name'])
+            return cls.from_json(motion['data'])
 
     @motion.setter
     def motion(self, value):
@@ -386,6 +385,7 @@ class State(object):
 
     @motion_count.setter
     def motion_count(self, value):
+        assert value == '' or value.isdigit(), 'bad call'
         self.settings.vi['motion_count'] = value
 
     @property
@@ -394,20 +394,23 @@ class State(object):
 
     @action_count.setter
     def action_count(self, value):
+        assert value == '' or value.isdigit(), 'bad call'
         self.settings.vi['action_count'] = value
 
     @property
     def repeat_data(self):
         """
-        Stores (type, cmd_name_or_key_seq, , mode) so '.' can use them.
+        Stores (type, cmd_name_or_key_seq, , mode) for '.' to use.
 
-        `type` may be 'vi' or 'native'. `vi`-commands are executed VIA_PANEL
+        `type` may be 'vi' or 'native'. `vi`-commands are executed via
         `ProcessNotation`, while `native`-commands are executed via .run_command().
         """
         return self.settings.vi['repeat_data'] or None
 
     @repeat_data.setter
     def repeat_data(self, value):
+        assert isinstance(value, tuple) or isinstance(value, list), 'bad call'
+        assert len(value) == 4, 'bad call'
         self.logger.info("setting repeat data {0}".format(value))
         self.settings.vi['repeat_data'] = value
 
@@ -417,11 +420,6 @@ class State(object):
         Calculates the actual count for the current command.
         """
         c = 1
-        if self.action_count and not self.action_count.isdigit():
-            raise ValueError('action count must be a digit')
-
-        if self.motion_count and not self.motion_count.isdigit():
-            raise ValueError('motion count must be a digit')
 
         if self.action_count:
             c = int(self.action_count) or 1
@@ -430,7 +428,7 @@ class State(object):
             c *= (int(self.motion_count) or 1)
 
         if c < 1:
-            raise ValueError('count must be greater than 0')
+            raise ValueError('count must be positive')
 
         return c
 
@@ -443,29 +441,24 @@ class State(object):
 
     @xpos.setter
     def xpos(self, value):
-        if not isinstance(value, int):
-            raise ValueError('xpos must be an int')
-
+        assert isinstance(value, int), '`value` must be an int'
         self.settings.vi['xpos'] = value
 
     @property
     def visual_block_direction(self):
         """
-        Stores the current visual block direction for the current selection.
+        Stores the visual block direction for the current selection.
         """
         return self.settings.vi['visual_block_direction'] or directions.DOWN
 
     @visual_block_direction.setter
     def visual_block_direction(self, value):
-        if not isinstance(value, int):
-            raise ValueError('visual_block_direction must be an int')
-
+        assert isinstance(value, int), '`value` must be an int'
         self.settings.vi['visual_block_direction'] = value
 
+    # FIXME(guillermooo): Remove this and use a global logger.
     @property
     def logger(self):
-        # FIXME: potentially very slow?
-        # return get_logger()
         global _logger
         return _logger()
 
@@ -474,15 +467,11 @@ class State(object):
         """
         Stores the current open register, as requested by the user.
         """
-        # TODO: Maybe unify with Registers?
-        # TODO: Validate register name?
         return self.settings.vi['register'] or '"'
 
     @register.setter
     def register(self, value):
-        if len(str(value)) > 1:
-            raise ValueError('register must be an character')
-
+        assert len(str(value)) == 1, '`value` must be a character'
         self.logger.info('opening register {0}'.format(value))
         self.settings.vi['register'] = value
         self.must_capture_register_name = False
@@ -500,7 +489,8 @@ class State(object):
             return (self.action.accept_input and
                     self.action.input_parser.type == input_types.AFTER_MOTION)
 
-        # Special case: `q` should stop the macro recorder.
+        # Special case: `q` should stop the macro recorder if it's running and
+        # not request further input from the user.
         if (isinstance(self.action, cmd_defs.ViToggleMacroRecorder) and
             self.is_recording):
                 return False
@@ -511,7 +501,7 @@ class State(object):
                 return True
 
         if self.motion:
-            return self.motion and self.motion.accept_input
+            return (self.motion and self.motion.accept_input)
 
     @property
     def must_update_xpos(self):
@@ -527,15 +517,8 @@ class State(object):
 
     @is_recording.setter
     def is_recording(self, value):
-        assert value in (True, False)
+        assert isinstance(value, bool), 'bad call'
         self.settings.vi['recording'] = value
-
-    def pop_parser(self):
-        # parsers = self.input_parsers
-        # current = parsers.pop()
-        # self.input_parsers = parsers
-        # return current
-        return None
 
     def enter_normal_mode(self):
         self.mode = modes.NORMAL
@@ -566,13 +549,6 @@ class State(object):
         # commands for insert mode. That should make editing macros easier.
         self.sequence = ''
 
-    def display_status(self):
-        msg = "{0} {1}"
-        mode_name = modes.to_friendly_name(self.mode)
-        mode_name = '-- {0} --'.format(mode_name) if mode_name else ''
-        self.view.set_status('vim-mode', mode_name)
-        self.view.set_status('vim', self.sequence)
-
     def reset_partial_sequence(self):
         self.partial_sequence = ''
 
@@ -580,21 +556,43 @@ class State(object):
         self.register = '"'
         self.must_capture_register_name = False
 
+    def reset_status(self):
+        self.view.erase_status('vim-seq')
+        if self.mode == modes.NORMAL:
+            self.view.erase_status('vim-mode')
+
+    def display_status(self):
+        msg = "{0} {1}"
+        mode_name = modes.to_friendly_name(self.mode)
+        if mode_name:
+            mode_name = '-- {0} --'.format(mode_name) if mode_name else ''
+            self.view.set_status('vim-mode', mode_name)
+        self.view.set_status('vim-seq', self.sequence)
+
     def must_scroll_into_view(self):
+        # TODO(guillermooo): Actions should be able to request this too?
         return (self.motion and self.motion.scroll_into_view)
 
     def scroll_into_view(self):
         v = sublime.active_window().active_view()
+        # TODO(guillermooo): Maybe some commands should show their
+        # surroundings too?
         # Make sure we show the first caret on the screen, but don't show
         # its surroundings.
         v.show(v.sel()[0], False)
 
+    def reset(self):
+        # TODO: Remove this when we've ported all commands. This is here for
+        # retrocompatibility.
+        self.reset_command_data()
+
     def reset_command_data(self):
         # Resets all temporary data needed to build a command or partial
-        # command to their default values.
+        # command.
         self.update_xpos()
         if self.must_scroll_into_view():
             self.scroll_into_view()
+
         self.action and self.action.reset()
         self.action = None
         self.motion and self.motion.reset()
@@ -605,36 +603,7 @@ class State(object):
         self.reset_sequence()
         self.reset_partial_sequence()
         self.reset_register_data()
-        self.view.erase_status('vim')
-        if self.mode == modes.NORMAL:
-            self.view.erase_status('vim-mode')
-
-    def update_xpos(self, force=False):
-        if self.must_update_xpos or force:
-            try:
-                sel = self.view.sel()[0]
-                pos = sel.b
-                # TODO: we should check the current mode instead.
-                if not sel.empty():
-                    if sel.a < sel.b:
-                        pos -= 1
-                r = sublime.Region(self.view.line(pos).a, pos)
-                counter = Counter(self.view.substr(r))
-                tab_size = self.view.settings().get('tab_size')
-                xpos = (self.view.rowcol(pos)[1] +
-                        ((counter['\t'] * tab_size) - counter['\t']))
-            except Exception as e:
-                print(e)
-                print('Vintageous: Error when setting xpos. Defaulting to 0.')
-                self.xpos = 0
-                return
-            else:
-                self.xpos = xpos
-
-    def reset(self):
-        # TODO: Remove this when we've ported all commands. This is here for
-        # retrocompatibility.
-        self.reset_command_data()
+        self.reset_status()
 
     def reset_volatile_data(self):
         """
@@ -646,6 +615,31 @@ class State(object):
         self.gluing_sequence = False
         self.non_interactive = False
         self.reset_during_init = True
+
+    def update_xpos(self, force=False):
+        if self.must_update_xpos or force:
+            try:
+                # TODO: we should check the current mode instead. ============
+                sel = self.view.sel()[0]
+                pos = sel.b
+                if not sel.empty():
+                    if sel.a < sel.b:
+                        pos -= 1
+                # ============================================================
+                r = sublime.Region(self.view.line(pos).a, pos)
+                counter = Counter(self.view.substr(r))
+                tab_size = self.view.settings().get('tab_size')
+                xpos = (self.view.rowcol(pos)[1] +
+                        ((counter['\t'] * tab_size) - counter['\t']))
+            except Exception as e:
+                print(e)
+                _logger.error(
+                    'Vintageous: Error when setting xpos. Defaulting to 0.')
+                _logger.error(e)
+                self.xpos = 0
+                return
+            else:
+                self.xpos = xpos
 
     def _set_parsers(self, command):
         """
@@ -675,7 +669,6 @@ class State(object):
 
         if self.motion and self.motion.accept_input:
             motion = self.motion
-            # TODO: Rmove this.
             val = motion.accept(key)
             self.motion = motion
             return val
@@ -699,8 +692,8 @@ class State(object):
             if self.runnable():
                 # We already have a motion, so this looks like an error.
                 raise ValueError('too many motions')
-
             self.motion = command
+
             if self.mode == modes.OPERATOR_PENDING:
                 self.mode = modes.NORMAL
 
@@ -711,8 +704,8 @@ class State(object):
             if self.runnable():
                 # We already have an action, so this looks like an error.
                 raise ValueError('too many actions')
-
             self.action = command
+
             if (self.action.motion_required and
                 not self.in_any_visual_mode()):
                     self.mode = modes.OPERATOR_PENDING
@@ -731,9 +724,10 @@ class State(object):
 
     def can_run_action(self):
         if (self.action and
-            (not self.action['motion_required'] or
-             self.in_any_visual_mode())):
-                return True
+                (not self.action['motion_required'] or
+                 self.in_any_visual_mode())
+                ):
+                    return True
 
     def get_visual_repeat_data(self):
         """Returns the data needed to restore visual selections before
