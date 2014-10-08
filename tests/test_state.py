@@ -34,7 +34,7 @@ class Test_State(StateTestCase):
         self.state.mode = modes.VISUAL_BLOCK
         self.assertEqual(self.state.in_any_visual_mode(), True)
 
-    unittest.skipIf(os.name == 'nt', 'fails in CI server only')
+    @unittest.skipIf(os.name == 'nt', 'fails in CI server only')
     def testCanInitialize(self):
         s = state.State(self.view)
         # Make sure the actual usage of Vintageous doesn't change the pristine
