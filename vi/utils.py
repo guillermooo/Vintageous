@@ -230,11 +230,11 @@ def col_at(view, pt):
 
 @contextmanager
 def gluing_undo_groups(view, state):
-    state.gluing_sequence = True
+    state.processing_notation = True
     view.run_command('mark_undo_groups_for_gluing')
     yield
     view.run_command('glue_marked_undo_groups')
-    state.gluing_sequence = False
+    state.processing_notation = False
 
 
 def blink(times=4, delay=55):

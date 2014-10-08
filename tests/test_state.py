@@ -47,7 +47,7 @@ class Test_State(StateTestCase):
         self.assertEqual(s.motion, None)
         self.assertEqual(s.action_count, '')
         self.assertEqual(s.glue_until_normal_mode, False)
-        self.assertEqual(s.gluing_sequence, False)
+        self.assertEqual(s.processing_notation, False)
         self.assertEqual(s.last_character_search, '')
         self.assertEqual(s.last_char_search_command, 'vi_f')
         self.assertEqual(s.non_interactive, False)
@@ -120,14 +120,14 @@ class Test_State_Resetting_State(StateTestCase):
 class Test_State_Resetting_Volatile_Data(StateTestCase):
     def test_reset_volatile_data(self):
         self.state.glue_until_normal_mode = True
-        self.state.gluing_sequence = True
+        self.state.processing_notation = True
         self.state.non_interactive = True
         self.state.reset_during_init = False
 
         self.state.reset_volatile_data()
 
         self.assertFalse(self.state.glue_until_normal_mode)
-        self.assertFalse(self.state.gluing_sequence)
+        self.assertFalse(self.state.processing_notation)
         self.assertFalse(self.state.non_interactive)
         self.assertTrue(self.state.reset_during_init)
 

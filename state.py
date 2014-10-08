@@ -196,7 +196,7 @@ class State(object):
         self.settings.vi['_vintageous_glue_until_normal_mode'] = value
 
     @property
-    def gluing_sequence(self):
+    def processing_notation(self):
         """
         Indicates whether `ProcessNotation` is running a command and is
         grouping all edits in one single undo step. That is, we are running
@@ -206,13 +206,13 @@ class State(object):
         sessions.
         """
         # TODO(guillermooo): Rename self.settings.vi to self.settings.local
-        return self.settings.vi['_vintageous_gluing_sequence'] or False
+        return self.settings.vi['_vintageous_processing_notation'] or False
 
-    @gluing_sequence.setter
-    def gluing_sequence(self, value):
-        self.settings.vi['_vintageous_gluing_sequence'] = value
+    @processing_notation.setter
+    def processing_notation(self, value):
+        self.settings.vi['_vintageous_processing_notation'] = value
 
-    # FIXME: This property seems to do the same as gluing_sequence.
+    # FIXME: This property seems to do the same as processing_notation.
     @property
     def non_interactive(self):
         """
@@ -612,7 +612,7 @@ class State(object):
         """
         self.glue_until_normal_mode = False
         self.view.run_command('unmark_undo_groups_for_gluing')
-        self.gluing_sequence = False
+        self.processing_notation = False
         self.non_interactive = False
         self.reset_during_init = True
 
@@ -840,7 +840,7 @@ class State(object):
             self.logger.info(
                 '[Stage] motion in motion+action: {0}'.format(motion_cmd))
 
-            if self.glue_until_normal_mode and not self.gluing_sequence:
+            if self.glue_until_normal_mode and not self.processing_notation:
                 # We need to tell Sublime Text now that it should group
                 # all the next edits until we enter normal mode again.
                 sublime.active_window().run_command(
@@ -889,7 +889,7 @@ class State(object):
             # be grouped atomically, but not inside a sequence like
             # iXXX<Esc>llaYYY<Esc>, where we want to group the whole
             # sequence instead.
-            if self.glue_until_normal_mode and not self.gluing_sequence:
+            if self.glue_until_normal_mode and not self.processing_notation:
                 sublime.active_window().run_command(
                     'mark_undo_groups_for_gluing')
 
@@ -903,7 +903,7 @@ class State(object):
             sublime.active_window().run_command(action_cmd['action'],
                                                 action_cmd['action_args'])
 
-            if not (self.gluing_sequence and self.glue_until_normal_mode):
+            if not (self.processing_notation and self.glue_until_normal_mode):
                 if action.repeatable:
                     self.repeat_data = ('vi', seq, self.mode,
                                         visual_repeat_data)

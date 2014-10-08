@@ -275,7 +275,7 @@ class _enter_normal_mode(ViTextCommandBase):
         # XXX: st bug? if we don't do this, selections won't be redrawn
         self.view.run_command('_enter_normal_mode_impl', {'mode': mode})
 
-        if state.glue_until_normal_mode and not state.gluing_sequence:
+        if state.glue_until_normal_mode and not state.processing_notation:
             if self.view.is_dirty():
                 self.view.window().run_command('glue_marked_undo_groups')
                 # We're exiting from insert mode or replace mode. Capture
