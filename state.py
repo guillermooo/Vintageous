@@ -1,25 +1,25 @@
-from collections import Counter
-
 import sublime
 
+from collections import Counter
+
 from Vintageous import local_logger
+from Vintageous.vi import cmd_base
+from Vintageous.vi import cmd_defs
 from Vintageous.vi import utils
-from Vintageous.vi.utils import input_types
 from Vintageous.vi.contexts import KeyContext
 from Vintageous.vi.dot_file import DotFile
+from Vintageous.vi.macros import MacroRegisters
 from Vintageous.vi.marks import Marks
 from Vintageous.vi.registers import Registers
 from Vintageous.vi.settings import SettingsManager
 from Vintageous.vi.utils import directions
-from Vintageous.vi.utils import is_view
+from Vintageous.vi.utils import first_sel
+from Vintageous.vi.utils import input_types
 from Vintageous.vi.utils import is_ignored
 from Vintageous.vi.utils import is_ignored_but_command_mode
+from Vintageous.vi.utils import is_view
 from Vintageous.vi.utils import modes
-from Vintageous.vi.utils import first_sel
 from Vintageous.vi.variables import Variables
-from Vintageous.vi import cmd_defs
-from Vintageous.vi import cmd_base
-from Vintageous.vi.macros import MacroRegisters
 # !! Avoid error due to sublime_plugin.py:45 expectations.
 from Vintageous.plugins import plugins as user_plugins
 
@@ -140,51 +140,55 @@ def plugin_unloaded():
         _logger().warn(
             'could not access sublime.active_window().active_view().settings '
             ' while unloading')
-        pass
 
 
 class State(object):
     """
-    Manages global state needed to build commands and control modes, etc.
+    Manages global Vim state. Accumulates command data, etc.
 
     Usage:
-      Before using it, always instantiate with the view commands are going to
-      target. `State` uses view.settings() and window.settings() for data
-      storage.
+      Always instantiate passing it the view that commands are going to
+      target.
+
+      Example:
+
+          state = State(view)
+
+    Notes:
+      `State` internally uses view.settings() and window.settings()
+      to persist data.
     """
 
     registers = Registers()
+    macro_registers = MacroRegisters()
     marks = Marks()
     context = KeyContext()
     variables = Variables()
     macro_steps = []
-    macro_registers = MacroRegisters()
 
     def __init__(self, view):
         self.view = view
-        # We have multiple types of settings: vi-specific (settings.vi) and
-        # regular ST view settings (settings.view) and window settings
-        # (settings.window).
-        # TODO: Make this a descriptor. Why isn't it?
+        # We use several types of settings:
+        #   - vi-specific (settings.vi),
+        #   - regular ST view settings (settings.view) and
+        #   - window settings (settings.window).
         self.settings = SettingsManager(self.view)
 
-        _logger().info(
-            '[State] is .view an ST:Vintageous widget: {0}:{1}'.format(
+        _logger().debug(
+            '[State] Is .view an ST/Vintageous widget? {0}/{1}'.format(
                 bool(self.settings.view['is_widget']),
-                bool(self.settings.view['is_vintageous_widget'])))
+                bool(self.settings.view['is_vintageous_widget']))
+            )
 
     @property
     def glue_until_normal_mode(self):
         """
         Indicates that editing commands should be grouped together in a single
-        undo step once the user requests `_enter_normal_mode`.
+        undo step after the user requested `_enter_normal_mode` next.
 
         This property is *VOLATILE*; it shouldn't be persisted between
         sessions.
         """
-        # FIXME: What happens when we have an incomplete command and we switch
-        #        views? We should clean up.
-        # TODO: Make this a window setting.
         return self.settings.vi['_vintageous_glue_until_normal_mode'] or False
 
     @glue_until_normal_mode.setter
@@ -194,37 +198,35 @@ class State(object):
     @property
     def gluing_sequence(self):
         """
-        Indicates whether `ProcessNotation` is running a command and is grouping all
-        of the edits in one single undo step.
+        Indicates whether `ProcessNotation` is running a command and is
+        grouping all edits in one single undo step. That is, we are running
+        a non-interactive sequence of commands.
 
         This property is *VOLATILE*; it shouldn't be persisted between
         sessions.
         """
-        # TODO: Store this as a window setting.
+        # TODO(guillermooo): Rename self.settings.vi to self.settings.local
         return self.settings.vi['_vintageous_gluing_sequence'] or False
 
     @gluing_sequence.setter
     def gluing_sequence(self, value):
         self.settings.vi['_vintageous_gluing_sequence'] = value
 
+    # FIXME: This property seems to do the same as gluing_sequence.
     @property
     def non_interactive(self):
-        # FIXME: This property seems to do the same as gluing_sequence.
         """
-        Indicates whether `ProcessNotation` is running a command and no interactive
-        prompts should be used (for example, by the '/' motion.)
+        Indicates whether `ProcessNotation` is running a command and no
+        interactive prompts should be used (for example, by the '/' motion.)
 
         This property is *VOLATILE*; it shouldn't be persisted between
         sessions.
         """
-        # TODO: Store this as a window setting.
         return self.settings.vi['_vintageous_non_interactive'] or False
 
     @non_interactive.setter
     def non_interactive(self, value):
-        if not isinstance(value, bool):
-            raise ValueError('expected bool')
-
+        assert isinstance(value, bool), 'bool expected'
         self.settings.vi['_vintageous_non_interactive'] = value
 
     @property
@@ -236,41 +238,41 @@ class State(object):
 
     @last_character_search.setter
     def last_character_search(self, value):
+        assert isinstance(value, str), 'bad call'
+        assert len(value) == 1, 'bad call'
         self.settings.window['_vintageous_last_character_search'] = value
 
     @property
     def last_char_search_command(self):
         """
-        ',' and ';' change directions depending on whether 'f' or 't' was
-        issued previously.
+        ',' and ';' change directions depending on which of 'f' or 't' was the
+        previous command.
 
-        Returns the name of the last character search command, namely one of:
-        vi_f, vi_t, vi_big_f, vi_big_t.
+        Returns the name of the last character search command, namely:
+        'vi_f', 'vi_t', 'vi_big_f' or 'vi_big_t'.
         """
-        ok = self.settings.window['_vintageous_last_char_search_command']
-        return ok or 'vi_f'
+        name = self.settings.window['_vintageous_last_char_search_command']
+        return name or 'vi_f'
 
     @last_char_search_command.setter
     def last_char_search_command(self, value):
-        # FIXME: It isn't working.
         self.settings.window['_vintageous_last_char_search_command'] = value
 
     @property
-    def capture_register(self):
+    def must_capture_register_name(self):
         """
         Returns `True` if `State` is expecting a register name next.
         """
-        return self.settings.vi['capture_register'] or False
+        return self.settings.vi['must_capture_register_name'] or False
 
-    @capture_register.setter
-    def capture_register(self, value):
-        self.settings.vi['capture_register'] = value
+    @must_capture_register_name.setter
+    def must_capture_register_name(self, value):
+        self.settings.vi['must_capture_register_name'] = value
 
     @property
     def last_buffer_search(self):
         """
-        Returns the last string used by buffer search commands such as '/' and
-        '?'.
+        Returns the last string used by buffer search commands '/' or '?'.
         """
         return self.settings.window['_vintageous_last_buffer_search'] or ''
 
@@ -294,20 +296,18 @@ class State(object):
 
     @reset_during_init.setter
     def reset_during_init(self, value):
-        if not isinstance(value, bool):
-            raise ValueError('expected a bool')
-
+        assert isinstance(value, bool), 'expected a bool'
         self.settings.window['_vintageous_reset_during_init'] = value
 
     # This property isn't reset automatically. _enter_normal_mode mode must
-    # take care of that so it can repeat the commands issues while in
+    # take care of that so it can repeat the commands issued while in
     # insert mode.
     @property
     def normal_insert_count(self):
         """
         Count issued to 'i' or 'a', etc. These commands enter insert mode.
-        If passed a count, they must repeat the commands issued while in
-        insert mode.
+        If passed a count, they must repeat the commands run while in insert
+        mode.
         """
         return self.settings.vi['normal_insert_count'] or '1'
 
@@ -315,11 +315,10 @@ class State(object):
     def normal_insert_count(self, value):
         self.settings.vi['normal_insert_count'] = value
 
-    # TODO: Make these simple properties that access settings descriptors?
     @property
     def sequence(self):
         """
-        Sequence of keys that build the command.
+        Sequence of keys provided by the user.
         """
         return self.settings.vi['sequence'] or ''
 
@@ -354,30 +353,31 @@ class State(object):
 
     @property
     def action(self):
-        val = self.settings.vi['action'] or None
-        if val:
-            cls = getattr(cmd_defs, val['name'], None)
+        action = self.settings.vi['action'] or None
+        if action:
+            cls = getattr(cmd_defs, action['name'], None)
             if cls is None:
-                cls = user_plugins.classes[val['name']]
-            return cls.from_json(val['data'])
+                cls = user_plugins.classes.get(action['name'], None)
+            if cls is None:
+                ValueError('unknown action: %s' % action)
+            return cls.from_json(action['data'])
 
     @action.setter
     def action(self, value):
-        v = value.serialize() if value else None
-        self.settings.vi['action'] = v
+        serialized = value.serialize() if value else None
+        self.settings.vi['action'] = serialized
 
     @property
     def motion(self):
-        val = self.settings.vi['motion'] or None
-        if val:
-            # TODO: Encapsulate further.
-            cls = getattr(cmd_defs, val['name'])
-            return cls.from_json(val['data'])
+        motion = self.settings.vi['motion'] or None
+        if motion:
+            cls = getattr(cmd_defs, motion['name'])
+            return cls.from_json(motion['data'])
 
     @motion.setter
     def motion(self, value):
-        v = value.serialize() if value else None
-        self.settings.vi['motion'] = v
+        serialized = value.serialize() if value else None
+        self.settings.vi['motion'] = serialized
 
     @property
     def motion_count(self):
@@ -385,6 +385,7 @@ class State(object):
 
     @motion_count.setter
     def motion_count(self, value):
+        assert value == '' or value.isdigit(), 'bad call'
         self.settings.vi['motion_count'] = value
 
     @property
@@ -393,20 +394,23 @@ class State(object):
 
     @action_count.setter
     def action_count(self, value):
+        assert value == '' or value.isdigit(), 'bad call'
         self.settings.vi['action_count'] = value
 
     @property
     def repeat_data(self):
         """
-        Stores (type, cmd_name_or_key_seq, , mode) so '.' can use them.
+        Stores (type, cmd_name_or_key_seq, , mode) for '.' to use.
 
-        `type` may be 'vi' or 'native'. `vi`-commands are executed VIA_PANEL
+        `type` may be 'vi' or 'native'. `vi`-commands are executed via
         `ProcessNotation`, while `native`-commands are executed via .run_command().
         """
         return self.settings.vi['repeat_data'] or None
 
     @repeat_data.setter
     def repeat_data(self, value):
+        assert isinstance(value, tuple) or isinstance(value, list), 'bad call'
+        assert len(value) == 4, 'bad call'
         self.logger.info("setting repeat data {0}".format(value))
         self.settings.vi['repeat_data'] = value
 
@@ -416,11 +420,6 @@ class State(object):
         Calculates the actual count for the current command.
         """
         c = 1
-        if self.action_count and not self.action_count.isdigit():
-            raise ValueError('action count must be a digit')
-
-        if self.motion_count and not self.motion_count.isdigit():
-            raise ValueError('motion count must be a digit')
 
         if self.action_count:
             c = int(self.action_count) or 1
@@ -429,7 +428,7 @@ class State(object):
             c *= (int(self.motion_count) or 1)
 
         if c < 1:
-            raise ValueError('count must be greater than 0')
+            raise ValueError('count must be positive')
 
         return c
 
@@ -442,29 +441,24 @@ class State(object):
 
     @xpos.setter
     def xpos(self, value):
-        if not isinstance(value, int):
-            raise ValueError('xpos must be an int')
-
+        assert isinstance(value, int), '`value` must be an int'
         self.settings.vi['xpos'] = value
 
     @property
     def visual_block_direction(self):
         """
-        Stores the current visual block direction for the current selection.
+        Stores the visual block direction for the current selection.
         """
         return self.settings.vi['visual_block_direction'] or directions.DOWN
 
     @visual_block_direction.setter
     def visual_block_direction(self, value):
-        if not isinstance(value, int):
-            raise ValueError('visual_block_direction must be an int')
-
+        assert isinstance(value, int), '`value` must be an int'
         self.settings.vi['visual_block_direction'] = value
 
+    # FIXME(guillermooo): Remove this and use a global logger.
     @property
     def logger(self):
-        # FIXME: potentially very slow?
-        # return get_logger()
         global _logger
         return _logger()
 
@@ -473,18 +467,14 @@ class State(object):
         """
         Stores the current open register, as requested by the user.
         """
-        # TODO: Maybe unify with Registers?
-        # TODO: Validate register name?
         return self.settings.vi['register'] or '"'
 
     @register.setter
     def register(self, value):
-        if len(str(value)) > 1:
-            raise ValueError('register must be an character')
-
+        assert len(str(value)) == 1, '`value` must be a character'
         self.logger.info('opening register {0}'.format(value))
         self.settings.vi['register'] = value
-        self.capture_register = False
+        self.must_capture_register_name = False
 
     @property
     def must_collect_input(self):
@@ -499,7 +489,8 @@ class State(object):
             return (self.action.accept_input and
                     self.action.input_parser.type == input_types.AFTER_MOTION)
 
-        # Special case: `q` should stop the macro recorder.
+        # Special case: `q` should stop the macro recorder if it's running and
+        # not request further input from the user.
         if (isinstance(self.action, cmd_defs.ViToggleMacroRecorder) and
             self.is_recording):
                 return False
@@ -510,7 +501,7 @@ class State(object):
                 return True
 
         if self.motion:
-            return self.motion and self.motion.accept_input
+            return (self.motion and self.motion.accept_input)
 
     @property
     def must_update_xpos(self):
@@ -526,15 +517,8 @@ class State(object):
 
     @is_recording.setter
     def is_recording(self, value):
-        assert value in (True, False)
+        assert isinstance(value, bool), 'bad call'
         self.settings.vi['recording'] = value
-
-    def pop_parser(self):
-        # parsers = self.input_parsers
-        # current = parsers.pop()
-        # self.input_parsers = parsers
-        # return current
-        return None
 
     def enter_normal_mode(self):
         self.mode = modes.NORMAL
@@ -565,35 +549,50 @@ class State(object):
         # commands for insert mode. That should make editing macros easier.
         self.sequence = ''
 
-    def display_status(self):
-        msg = "{0} {1}"
-        mode_name = modes.to_friendly_name(self.mode)
-        mode_name = '-- {0} --'.format(mode_name) if mode_name else ''
-        self.view.set_status('vim-mode', mode_name)
-        self.view.set_status('vim', self.sequence)
-
     def reset_partial_sequence(self):
         self.partial_sequence = ''
 
     def reset_register_data(self):
         self.register = '"'
-        self.capture_register = False
+        self.must_capture_register_name = False
+
+    def reset_status(self):
+        self.view.erase_status('vim-seq')
+        if self.mode == modes.NORMAL:
+            self.view.erase_status('vim-mode')
+
+    def display_status(self):
+        msg = "{0} {1}"
+        mode_name = modes.to_friendly_name(self.mode)
+        if mode_name:
+            mode_name = '-- {0} --'.format(mode_name) if mode_name else ''
+            self.view.set_status('vim-mode', mode_name)
+        self.view.set_status('vim-seq', self.sequence)
 
     def must_scroll_into_view(self):
+        # TODO(guillermooo): Actions should be able to request this too?
         return (self.motion and self.motion.scroll_into_view)
 
     def scroll_into_view(self):
         v = sublime.active_window().active_view()
+        # TODO(guillermooo): Maybe some commands should show their
+        # surroundings too?
         # Make sure we show the first caret on the screen, but don't show
         # its surroundings.
         v.show(v.sel()[0], False)
 
+    def reset(self):
+        # TODO: Remove this when we've ported all commands. This is here for
+        # retrocompatibility.
+        self.reset_command_data()
+
     def reset_command_data(self):
         # Resets all temporary data needed to build a command or partial
-        # command to their default values.
+        # command.
         self.update_xpos()
         if self.must_scroll_into_view():
             self.scroll_into_view()
+
         self.action and self.action.reset()
         self.action = None
         self.motion and self.motion.reset()
@@ -604,36 +603,7 @@ class State(object):
         self.reset_sequence()
         self.reset_partial_sequence()
         self.reset_register_data()
-        self.view.erase_status('vim')
-        if self.mode == modes.NORMAL:
-            self.view.erase_status('vim-mode')
-
-    def update_xpos(self, force=False):
-        if self.must_update_xpos or force:
-            try:
-                sel = self.view.sel()[0]
-                pos = sel.b
-                # TODO: we should check the current mode instead.
-                if not sel.empty():
-                    if sel.a < sel.b:
-                        pos -= 1
-                r = sublime.Region(self.view.line(pos).a, pos)
-                counter = Counter(self.view.substr(r))
-                tab_size = self.view.settings().get('tab_size')
-                xpos = (self.view.rowcol(pos)[1] +
-                        ((counter['\t'] * tab_size) - counter['\t']))
-            except Exception as e:
-                print(e)
-                print('Vintageous: Error when setting xpos. Defaulting to 0.')
-                self.xpos = 0
-                return
-            else:
-                self.xpos = xpos
-
-    def reset(self):
-        # TODO: Remove this when we've ported all commands. This is here for
-        # retrocompatibility.
-        self.reset_command_data()
+        self.reset_status()
 
     def reset_volatile_data(self):
         """
@@ -645,6 +615,31 @@ class State(object):
         self.gluing_sequence = False
         self.non_interactive = False
         self.reset_during_init = True
+
+    def update_xpos(self, force=False):
+        if self.must_update_xpos or force:
+            try:
+                # TODO: we should check the current mode instead. ============
+                sel = self.view.sel()[0]
+                pos = sel.b
+                if not sel.empty():
+                    if sel.a < sel.b:
+                        pos -= 1
+                # ============================================================
+                r = sublime.Region(self.view.line(pos).a, pos)
+                counter = Counter(self.view.substr(r))
+                tab_size = self.view.settings().get('tab_size')
+                xpos = (self.view.rowcol(pos)[1] +
+                        ((counter['\t'] * tab_size) - counter['\t']))
+            except Exception as e:
+                print(e)
+                _logger.error(
+                    'Vintageous: Error when setting xpos. Defaulting to 0.')
+                _logger.error(e)
+                self.xpos = 0
+                return
+            else:
+                self.xpos = xpos
 
     def _set_parsers(self, command):
         """
@@ -674,7 +669,6 @@ class State(object):
 
         if self.motion and self.motion.accept_input:
             motion = self.motion
-            # TODO: Rmove this.
             val = motion.accept(key)
             self.motion = motion
             return val
@@ -698,8 +692,8 @@ class State(object):
             if self.runnable():
                 # We already have a motion, so this looks like an error.
                 raise ValueError('too many motions')
-
             self.motion = command
+
             if self.mode == modes.OPERATOR_PENDING:
                 self.mode = modes.NORMAL
 
@@ -710,8 +704,8 @@ class State(object):
             if self.runnable():
                 # We already have an action, so this looks like an error.
                 raise ValueError('too many actions')
-
             self.action = command
+
             if (self.action.motion_required and
                 not self.in_any_visual_mode()):
                     self.mode = modes.OPERATOR_PENDING
@@ -730,9 +724,10 @@ class State(object):
 
     def can_run_action(self):
         if (self.action and
-            (not self.action['motion_required'] or
-             self.in_any_visual_mode())):
-                return True
+                (not self.action['motion_required'] or
+                 self.in_any_visual_mode())
+                ):
+                    return True
 
     def get_visual_repeat_data(self):
         """Returns the data needed to restore visual selections before

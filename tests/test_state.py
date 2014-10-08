@@ -51,7 +51,7 @@ class Test_State(StateTestCase):
         self.assertEqual(s.last_character_search, '')
         self.assertEqual(s.last_char_search_command, 'vi_f')
         self.assertEqual(s.non_interactive, False)
-        self.assertEqual(s.capture_register, False)
+        self.assertEqual(s.must_capture_register_name, False)
         self.assertEqual(s.last_buffer_search, '')
         self.assertEqual(s.reset_during_init, True)
 
@@ -102,7 +102,7 @@ class Test_State_Resetting_State(StateTestCase):
         self.state.action_count = '10'
         self.state.motion_count = '100'
         self.state.register = 'a'
-        self.state.capture_register = True
+        self.state.must_capture_register_name = True
 
         self.state.reset_command_data()
 
@@ -114,7 +114,7 @@ class Test_State_Resetting_State(StateTestCase):
         self.assertEqual(self.state.sequence, '')
         self.assertEqual(self.state.partial_sequence, '')
         self.assertEqual(self.state.register, '"')
-        self.assertEqual(self.state.capture_register, False)
+        self.assertEqual(self.state.must_capture_register_name, False)
 
 
 class Test_State_Resetting_Volatile_Data(StateTestCase):
@@ -138,18 +138,21 @@ class Test_State_counts(StateTestCase):
         self.assertEqual(self.state.count, 10)
 
     def testFailsIfBadActionCount(self):
-        self.state.action_count = 'x'
-        self.assertRaises(ValueError, lambda: self.state.count)
+        def set_count():
+            self.state.action_count = 'x'
+        self.assertRaises(AssertionError, set_count)
 
     def testFailsIfBadMotionCount(self):
-        self.state.motion_count = 'x'
-        self.assertRaises(ValueError, lambda: self.state.count)
+        def set_count():
+            self.state.motion_count = 'x'
+        self.assertRaises(AssertionError, set_count)
 
     def testCountIsNeverLessThan1(self):
         self.state.motion_count = '0'
         self.assertEqual(self.state.count, 1)
-        self.state.motion_count = '-1'
-        self.assertRaises(ValueError, lambda: self.state.count)
+        def set_count():
+            self.state.motion_count = '-1'
+        self.assertRaises(AssertionError, set_count)
 
     def testCanRetrieveGoodMotionCount(self):
         self.state.motion_count = '10'

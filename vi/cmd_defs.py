@@ -33,6 +33,7 @@ class ViDeleteByChars(ViOperatorDef):
 
     def __init__(self, *args, **kwargs):
         ViOperatorDef.__init__(self, *args, **kwargs)
+        self.command = '_vi_d'
         self.updates_xpos = True
         self.scroll_into_view = True
         self.motion_required = True
@@ -40,11 +41,12 @@ class ViDeleteByChars(ViOperatorDef):
 
     def translate(self, state):
         cmd = {}
-        cmd['action'] = '_vi_d'
-        cmd['action_args'] = {'mode': state.mode,
-                              'count': state.count,
-                              'register': state.register,
-                              }
+        cmd['action'] = self.command
+        cmd['action_args'] = {
+                'mode': state.mode,
+                'count': state.count,
+                'register': state.register,
+                }
         return cmd
 
 
@@ -56,13 +58,13 @@ class ViInsertLineBefore(ViOperatorDef):
 
     def __init__(self, *args, **kwargs):
         ViOperatorDef.__init__(self, *args, **kwargs)
+        self.command = '_vi_big_o'
         self.scroll_into_view = True
 
     def translate(self, state):
         state.glue_until_normal_mode = True
-
         cmd = {}
-        cmd['action'] = '_vi_big_o'
+        cmd['action'] = self.command
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
@@ -1786,12 +1788,13 @@ class StFocusSideBar(ViOperatorDef):
 
     def __init__(self, *args, **kwargs):
         ViOperatorDef.__init__(self, *args, **kwargs)
+        self.command = 'focus_side_bar'
         self.updates_xpos = True
         self.scroll_into_view = True
 
     def translate(self, state):
         cmd = {}
-        cmd['action'] = 'focus_side_bar'
+        cmd['action'] = self.command
         cmd['action_args'] = {}
         return cmd
 
@@ -1804,13 +1807,14 @@ class ViEnterInserMode(ViOperatorDef):
 
     def __init__(self, *args, **kwargs):
         ViOperatorDef.__init__(self, *args, **kwargs)
+        self.command = '_enter_insert_mode'
         self.scroll_into_view = True
 
     def translate(self, state):
         state.glue_until_normal_mode = True
 
         cmd = {}
-        cmd['action'] = '_enter_insert_mode'
+        cmd['action'] = self.command
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 
