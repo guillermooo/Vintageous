@@ -1,0 +1,42 @@
+==============================================================================
+Vintageous 3.8.2
+==============================================================================
+
+*** Follow important announcements on Twitter: @VintageousS3 ***
+
+This version includes fixes.
+
+Guillermo
+
+
+CHANGES
+-------
+
+	- Fix macros when command enters insert mode.
+	- X can now be repeated with '.'.
+
+
+FOUND BUGS?
+-----------
+
+Please report them here:
+
+    https://github.com/guillermooo/Vintageous/issues
+
+
+SUPPORT VINTAGEOUS
+------------------
+
+Is Vintageous worth your time? Developing Vintageous is hard work. If you use
+it often, please consider donating and make it worth my time too.
+
+    PayPal: http://www.pledgie.com/campaigns/19122
+    Gittip: https://www.gratipay.com/guillermooo/
+
+I'm the creator and main author of Vintageous, but some generous people have
+contributed their time and effort as well. See the more active ones here; you
+may want to show them some gratitude too:
+
+https://github.com/guillermooo/Vintageous/graphs/contributors
+
+Thanks for reading and for using Vintageous!
