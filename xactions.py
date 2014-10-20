@@ -281,6 +281,8 @@ class _enter_normal_mode(ViTextCommandBase):
                 # We're exiting from insert mode or replace mode. Capture
                 # the last native command as repeat data.
                 state.repeat_data = ('native', self.view.command_history(0)[:2], mode, None)
+                # Required here so that the macro gets recorded.
+                state.glue_until_normal_mode = False
                 state.add_macro_step(*self.view.command_history(0)[:2])
                 state.add_macro_step('_enter_normal_mode', {'mode': mode,
                                      'from_init': from_init})
@@ -288,7 +290,7 @@ class _enter_normal_mode(ViTextCommandBase):
                 state.add_macro_step('_enter_normal_mode', {'mode': mode,
                                      'from_init': from_init})
                 self.view.window().run_command('unmark_undo_groups_for_gluing')
-            state.glue_until_normal_mode = False
+                state.glue_until_normal_mode = False
 
         if mode == modes.INSERT and int(state.normal_insert_count) > 1:
             state.enter_insert_mode()
