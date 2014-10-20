@@ -784,7 +784,9 @@ class State(object):
             if cmd_name == '_vi_q':
                 # don't store the ending macro step
                 return
-            State.macro_steps.append((cmd_name, args))
+
+            if self.runnable and not self.glue_until_normal_mode:
+                State.macro_steps.append((cmd_name, args))
 
     def runnable(self):
         """
