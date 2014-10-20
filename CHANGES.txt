@@ -1,3 +1,11 @@
+3.8.2 - 20-10-2014
+
+	- Don't add macro if state needs to group commands.
+	- X must be repeatable.
+	- Disable tests only in CI server.
+	- Rename 'gluing_sequence' to 'processing_notation'.
+	- Refactor.
+
 3.8.1 - 07-10-2014
 
 	- Simplify code.
