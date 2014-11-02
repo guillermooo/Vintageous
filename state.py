@@ -259,6 +259,23 @@ class State(object):
         self.settings.window['_vintageous_last_char_search_command'] = value
 
     @property
+    def last_buffer_search_command(self):
+        """
+        'n' and 'N' change directions depending on which of '/' or '?' was the
+        previous command.
+
+        Returns the name of the last character search command, namely:
+        'vi_slash', 'vi_question_mark'.
+        """
+        name = self.settings.window['_vintageous_last_buffer_search_command']
+        return name or 'vi_slash'
+
+    @last_buffer_search_command.setter
+    def last_buffer_search_command(self, value):
+        print("aaaa", value)
+        self.settings.window['_vintageous_last_buffer_search_command'] = value
+
+    @property
     def must_capture_register_name(self):
         """
         Returns `True` if `State` is expecting a register name next.

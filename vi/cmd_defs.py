@@ -2989,10 +2989,13 @@ class ViRepeatSearchForward(ViMotionDef):
 
     def translate(self, state):
         cmd = {}
-        cmd['motion'] = '_vi_n'
-        cmd['motion_args'] = {'mode': state.mode,
-                              'count': state.count,
-                              'search_string': state.last_buffer_search}
+        cmd['motion'] = '_vi_repeat_buffer_search'
+        cmd['motion_args'] = {
+            'mode': state.mode,
+            'count': state.count,
+            'search_string': state.last_buffer_search,
+            'forward': state.last_buffer_search_command == 'vi_slash',
+            }
 
         return cmd
 
@@ -3010,11 +3013,13 @@ class ViRepeatSearchBackward(ViMotionDef):
 
     def translate(self, state):
         cmd = {}
-        cmd['motion'] = '_vi_big_n'
-        cmd['motion_args'] = {'mode': state.mode,
-                              'count': state.count,
-                              'search_string': state.last_buffer_search}
-
+        cmd['motion'] = '_vi_repeat_buffer_search'
+        cmd['motion_args'] = {
+            'mode': state.mode,
+            'count': state.count,
+            'search_string': state.last_buffer_search,
+            'forward': not (state.last_buffer_search_command == 'vi_slash'),
+            }
         return cmd
 
 

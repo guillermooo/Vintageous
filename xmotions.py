@@ -172,6 +172,7 @@ class _vi_slash(ViMotionCommand, BufferSearchBase):
         state = self.state
         state.sequence += s + '<CR>'
         self.view.erase_regions('vi_inc_search')
+        state.last_buffer_search_command = 'vi_slash'
         state.motion = cmd_defs.ViSearchForwardImpl(term=s)
 
         # If s is empty, we must repeat the last search.
@@ -1736,6 +1737,7 @@ class _vi_question_mark(ViMotionCommand, BufferSearchBase):
         state = self.state
         state.sequence += s + '<CR>'
         self.view.erase_regions('vi_inc_search')
+        state.last_buffer_search_command = 'vi_question_mark'
         state.motion = cmd_defs.ViSearchBackwardImpl(term=s)
 
         # If s is empty, we must repeat the last search.
@@ -1767,6 +1769,22 @@ class _vi_question_mark(ViMotionCommand, BufferSearchBase):
         if not self.view.visible_region().contains(self.view.sel()[0]):
             self.view.show(self.view.sel()[0])
 
+class _vi_repeat_buffer_search(ViMotionCommand):
+    # TODO: This is a jump.
+    def run(self, mode=None, count=1, search_string='', forward=True):
+        if forward:
+            self.view.run_command('_vi_slash_impl', {
+                'mode': mode,
+                'count': count,
+                'search_string': search_string
+                })
+            return
+
+        self.view.run_command('_vi_question_mark_impl', {
+            'mode': mode,
+            'count': count,
+            'search_string': search_string
+            })
 
 class _vi_n(ViMotionCommand):
     # TODO: This is a jump.
