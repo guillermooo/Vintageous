@@ -8,6 +8,9 @@ import re
 RX_CMD_LINE_CD = re.compile(r'^(?P<cmd>:\s*cd!?)\s+(?P<path>.*)$')
 RX_CMD_LINE_WRITE = re.compile(r'^(?P<cmd>:\s*w(?:rite)?!?)\s+(?P<path>.*)$')
 RX_CMD_LINE_EDIT = re.compile(r'^(?P<cmd>:\s*e(?:dit)?!?)\s+(?P<path>.*)$')
+RX_CMD_LINE_TABEDIT = re.compile(r'^(?P<cmd>:\s*t(?:abedit)?!?)\s+(?P<path>.*)$')
+# convenience, for the people who type tabe not tabedit
+RX_CMD_LINE_TABE = re.compile(r'^(?P<cmd>:\s*t(?:abe)?!?)\s+(?P<path>.*)$')
 RX_CMD_LINE_VSPLIT = re.compile(r'^(?P<cmd>:\s*vs(?:plit)?!?)\s+(?P<path>.*)$')
 
 
@@ -18,6 +21,8 @@ completion_types = [
     (RX_CMD_LINE_CD, True),
     (RX_CMD_LINE_WRITE, True),
     (RX_CMD_LINE_EDIT, False),
+    (RX_CMD_LINE_TABEDIT, False),
+    (RX_CMD_LINE_TABE, False),
     (RX_CMD_LINE_VSPLIT, False),
 ]
 
