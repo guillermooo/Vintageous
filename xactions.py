@@ -934,9 +934,15 @@ class _vi_dd(ViTextCommandBase):
                 white_space=' \t')
             return sublime.Region(pt)
 
+        def set_sel():
+            old = [s.a for s in list(self.view.sel())]
+            self.view.sel().clear()
+            new = [utils.next_non_white_space_char(self.view, pt) for pt in old]
+            self.view.sel().add_all([sublime.Region(pt) for pt in new])
+
         regions_transformer(self.view, do_motion)
-        self.state.registers.yank(self)
         self.view.run_command('right_delete')
+        set_sel()
         # TODO(guillermooo): deleting last line leaves the caret at \n
 
 
