@@ -411,7 +411,7 @@ class ViDeleteLine(ViOperatorDef):
 
     def translate(self, state):
         cmd = {}
-        cmd['action'] = '_vi_dd_action'
+        cmd['action'] = '_vi_dd'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 

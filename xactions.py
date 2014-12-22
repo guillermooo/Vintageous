@@ -27,6 +27,7 @@ from Vintageous.vi.utils import is_view
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import regions_transformer
 from Vintageous.vi.utils import restoring_sel
+from Vintageous.vi import units
 
 
 _logger = local_logger(__name__)
@@ -910,53 +911,32 @@ class _vi_dot(ViWindowCommandBase):
         state.update_xpos()
 
 
-class _vi_dd_action(ViTextCommandBase):
+class _vi_dd(ViTextCommandBase):
 
     _can_yank = True
-    _synthetize_new_line_at_eof = True
     _yanks_linewise = False
     _populates_small_delete_register = False
+    _synthetize_new_line_at_eof = True
 
     def run(self, edit, mode=None, count=1):
-        def f(view, s):
-            if mode == modes.INTERNAL_NORMAL:
-                view.erase(edit, s)
-                if utils.row_at(self.view, s.a) != utils.row_at(self.view, self.view.size()):
-                    pt = utils.next_non_white_space_char(view, s.a, white_space=' \t')
-                else:
-                    pt = utils.next_non_white_space_char(view,
-                                                         self.view.line(s.a).a,
-                                                         white_space=' \t')
+        def do_motion(view, s):
+            if mode != modes.INTERNAL_NORMAL:
+                return s
 
-                return sublime.Region(pt, pt)
-            return s
+            return units.lines(view, s, count)
 
-        self.view.run_command('_vi_dd_motion', {'mode': mode, 'count': count})
+        def do_action(view, s):
+            if mode != modes.INTERNAL_NORMAL:
+                return s
 
-        state = self.state
-        state.registers.yank(self)
+            view.erase(edit, s)
+            pt = utils.next_non_white_space_char(view, view.line(s.a).a,
+                white_space=' \t')
+            return sublime.Region(pt)
 
-        row = [self.view.rowcol(s.begin())[0] for s in self.view.sel()][0]
-        regions_transformer_reversed(self.view, f)
-        self.view.sel().clear()
-        self.view.sel().add(sublime.Region(self.view.text_point(row, 0)))
-
-
-class _vi_dd_motion(sublime_plugin.TextCommand):
-    def run(self, edit, mode=None, count=1):
-        def f(view, s):
-            if mode == modes.INTERNAL_NORMAL:
-                end = view.text_point(utils.row_at(self.view, s.b) + (count - 1), 0)
-                begin = view.line(s.b).a
-                if ((utils.row_at(self.view, end) == utils.row_at(self.view, view.size())) and
-                    (view.substr(begin - 1) == '\n')):
-                        begin -= 1
-
-                return sublime.Region(begin, view.full_line(end).b)
-
-            return s
-
-        regions_transformer(self.view, f)
+        regions_transformer(self.view, do_motion)
+        self.state.registers.yank(self)
+        regions_transformer_reversed(self.view, do_action)
 
 
 class _vi_cc_action(ViTextCommandBase):
