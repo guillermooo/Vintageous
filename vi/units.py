@@ -185,3 +185,9 @@ def lines(view, s, count=1):
             a -= 1
     return sublime.Region(a, view.full_line(b).b)
 
+
+def inner_lines(view, s, count=1):
+    end = view.text_point(utils.row_at(view, s.b) + (count - 1), 0)
+    begin = view.line(s.b).a
+    begin = utils.next_non_white_space_char(view, begin, white_space=' \t')
+    return sublime.Region(begin, view.line(end).b)

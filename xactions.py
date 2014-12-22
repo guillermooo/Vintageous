@@ -942,34 +942,25 @@ class _vi_dd(ViTextCommandBase):
 class _vi_cc_action(ViTextCommandBase):
 
     _can_yank = True
-    _synthetize_new_line_at_eof = True
     _yanks_linewise = False
     _populates_small_delete_register = False
+    _synthetize_new_line_at_eof = True
 
-    def motion(self, view, s, count, mode):
-        if mode == modes.INTERNAL_NORMAL:
+    def run(self, edit, mode=None, count=1, register='"'):
+        def motion(view, s):
+            if mode != modes.INTERNAL_NORMAL:
+                return s
+
             if view.line(s.b).empty():
                 return s
 
-            end = view.text_point(utils.row_at(view, s.b) + (count - 1), 0)
-            begin = view.line(s.b).a
-            begin = utils.next_non_white_space_char(view, begin, white_space=' \t')
-            return sublime.Region(begin, view.line(end).b)
+            return units.inner_lines(view, s, count)
 
-        return s
-
-    def run(self, edit, mode=None, count=1, register='"'):
-        def f(view, s):
-            new_s = self.motion(view, s, count, mode)
-            if not new_s.empty():
-                state.registers.yank(self)
-                self.view.erase(edit, new_s)
-            return sublime.Region(new_s.a)
-
-        state = self.state
-        regions_transformer(self.view, f)
+        regions_transformer(self.view, motion)
+        self.state.registers.yank(self)
+        self.view.run_command ('right_delete')
         self.enter_insert_mode(mode)
-        self.set_xpos(state)
+        self.set_xpos(self.state)
 
 
 class _vi_visual_o(sublime_plugin.TextCommand):
