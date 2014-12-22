@@ -392,7 +392,7 @@ class ViChangeLine(ViOperatorDef):
         state.glue_until_normal_mode = True
 
         cmd = {}
-        cmd['action'] = '_vi_cc_action'
+        cmd['action'] = '_vi_cc'
         cmd['action_args'] = {'mode': state.mode, 'count': state.count}
         return cmd
 

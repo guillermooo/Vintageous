@@ -946,7 +946,7 @@ class _vi_dd(ViTextCommandBase):
         # TODO(guillermooo): deleting last line leaves the caret at \n
 
 
-class _vi_cc_action(ViTextCommandBase):
+class _vi_cc(ViTextCommandBase):
 
     _can_yank = True
     _yanks_linewise = False
