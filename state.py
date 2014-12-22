@@ -587,8 +587,8 @@ class State(object):
         self.view.set_status('vim-seq', self.sequence)
 
     def must_scroll_into_view(self):
-        # TODO(guillermooo): Actions should be able to request this too?
-        return (self.motion and self.motion.scroll_into_view)
+        return ((self.motion and self.motion.scroll_into_view) or
+                (self.action and self.action.scroll_into_view))
 
     def scroll_into_view(self):
         v = sublime.active_window().active_view()
