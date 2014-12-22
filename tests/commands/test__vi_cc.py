@@ -21,10 +21,10 @@ region_data = namedtuple('region_data', 'regions')
 
 TESTS_INTERNAL_NORMAL = (
     # OPERATOR
-    test_data(cmd='_vi_cc_action', initial_text='foo bar\nfoo bar\nfoo bar\n',      regions=[[(1, 0), (1, 0)]], cmd_params={'mode': modes.INTERNAL_NORMAL},
+    test_data(cmd='_vi_cc', initial_text='foo bar\nfoo bar\nfoo bar\n',      regions=[[(1, 0), (1, 0)]], cmd_params={'mode': modes.INTERNAL_NORMAL},
               expected='foo bar\n\nfoo bar\n', actual_func=get_text,  msg=''),
 
-    test_data(cmd='_vi_cc_action', initial_text='\tfoo bar\n\tfoo bar\nfoo bar\n',  regions=[[(1, 0), (1, 0)]], cmd_params={'mode': modes.INTERNAL_NORMAL},
+    test_data(cmd='_vi_cc', initial_text='\tfoo bar\n\tfoo bar\nfoo bar\n',  regions=[[(1, 0), (1, 0)]], cmd_params={'mode': modes.INTERNAL_NORMAL},
               expected='\tfoo bar\n\t\nfoo bar\n', actual_func=get_text,  msg=''),
     )
 
@@ -32,7 +32,7 @@ TESTS_INTERNAL_NORMAL = (
 TESTS = TESTS_INTERNAL_NORMAL
 
 
-class Test_vi_cc_action(ViewTest):
+class Test_vi_cc(ViewTest):
     def testAll(self):
         for (i, data) in enumerate(TESTS):
             # TODO: Perhaps we should ensure that other state is reset too?

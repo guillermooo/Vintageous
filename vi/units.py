@@ -1,3 +1,5 @@
+import sublime
+
 from sublime import CLASS_WORD_START
 from sublime import CLASS_WORD_END
 from sublime import CLASS_PUNCTUATION_START
@@ -8,6 +10,7 @@ from sublime import CLASS_LINE_START
 
 
 from Vintageous.vi.utils import next_non_white_space_char
+from Vintageous.vi import utils
 
 import re
 
@@ -170,3 +173,46 @@ def word_ends(view, start, count=1, big=False):
 
     # FIXME: We should return the actual word end and not pt - 1 ??
     return pt
+
+
+def lines(view, s, count=1):
+    """
+    Returns a region spanning @count full lines.
+
+    Assumes we're operating in INTERNAL_NORMAL mode.
+
+    @view
+      Target view.
+    @s
+      Selection in @view taken as starting point.
+    @count
+      Number of lines to include in returned region.
+    """
+    # assumes INTERNAL_NORMAL mode.
+    a = view.line(s.b).a
+    b = view.text_point(utils.row_at(view, s.b) + (count - 1), 0)
+    # make sure we remove the last line if needed
+    if ((utils.row_at(view, b) == utils.last_row(view)) and
+        (view.substr(a - 1) == '\n')):
+            a -= 1
+    return sublime.Region(a, view.full_line(b).b)
+
+
+def inner_lines(view, s, count=1):
+    """
+    Returns a region spanning @count inner lines. Inner lines are lines
+    excluding leading/trailing whitespace at outer ends.
+
+    Assumes we're operating in INTERNAL_NORMAL mode.
+
+    @view
+      Target view.
+    @s
+      Selection in @view taken as starting point.
+    @count
+      Number of lines to include in returned region.
+    """
+    end = view.text_point(utils.row_at(view, s.b) + (count - 1), 0)
+    begin = view.line(s.b).a
+    begin = utils.next_non_white_space_char(view, begin, white_space=' \t')
+    return sublime.Region(begin, view.line(end).b)

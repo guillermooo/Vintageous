@@ -338,6 +338,14 @@ def is_at_bol(view, reg):
     return view.line(reg.b).a == reg.b
 
 
+def first_row(view):
+    return view.rowcol(0)[0]
+
+
+def last_row(view):
+    return view.rowcol(view.size())[0]
+
+
 def translate_char(char):
     # FIXME: What happens to keys like <home>, <up>, etc? We shouln't be
     #        able to use those in some contexts, like as arguments to f, t...
