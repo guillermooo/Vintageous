@@ -190,6 +190,7 @@ class _vi_a(sublime_plugin.TextCommand):
             return
 
         regions_transformer(self.view, f)
+        # TODO(guillermooo): derive this class from ViTextCommandBase ???
         self.view.window().run_command('_enter_insert_mode', {'mode': mode,
             'count': state.normal_insert_count})
 
@@ -2316,12 +2317,11 @@ class _vi_g_tilde_g_tilde(ViTextCommandBase):
 class _vi_g_big_u_big_u(ViTextCommandBase):
     def run(self, edit, mode=None, count=1):
         def select(view, s):
-            l = view.line(s.b)
-            return sublime.Region(l.end(), l.begin())
+            return units.lines(view, s, count)
 
         def to_upper(view, s):
             view.replace(edit, s, view.substr(s).upper())
-            return s
+            return sublime.Region(s.a)
 
         regions_transformer(self.view, select)
         regions_transformer(self.view, to_upper)
