@@ -1468,8 +1468,8 @@ class _vi_less_than_less_than(sublime_plugin.TextCommand):
                 return s
 
             a = utils.get_bol(view, s.a)
-            pt = view.text_point(row_at(view, a) + (count - 1), 0)
-            return R(a, get_eol(view, pt))
+            pt = view.text_point(utils.row_at(view, a) + (count - 1), 0)
+            return R(a, utils.get_eol(view, pt))
 
         def action(view, s):
             bol = utils.get_bol(view, s.begin())
@@ -1503,22 +1503,19 @@ class _vi_equal_equal(ViTextCommandBase):
 class _vi_greater_than_greater_than(ViTextCommandBase):
     def run(self, edit, mode=None, count=1):
         def f(view, s):
-            bol = view.line(s.begin()).a
+            bol = utils.get.bol(view, s.begin())
             pt = utils.next_non_white_space_char(view, bol, white_space='\t ')
             return R(pt)
 
-        def select():
-            s0 = self.view.sel()[0]
-            end_row = utils.row_at(self.view, s0.b) + (count - 1)
-            self.view.sel().clear()
-            self.view.sel().add(R(s0.begin(),
-                                self.view.text_point(end_row, 1)))
+        def select(view):
+            s0 = utils.first_sel(view)
+            end_row = utils.row_at(view, s0.b) + (count - 1)
+            utils.replace_sel(view, R(s0.begin(), view.text_point(end_row, 1)))
 
         if count > 1:
-            select()
+            select(self.view)
 
         self.view.run_command('indent')
-
         regions_transformer(self.view, f)
         self.enter_normal_mode(mode)
 
@@ -1542,9 +1539,7 @@ class _vi_greater_than(ViTextCommandBase):
             regions_transformer(self.view, f)
 
             # Restore only the first sel.
-            first = self.view.sel()[0]
-            self.view.sel().clear()
-            self.view.sel().add(first)
+            utils.replace_sel(self.view, utils.first_sel(self.view))
             self.enter_normal_mode(mode)
             return
 

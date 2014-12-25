@@ -398,6 +398,16 @@ def get_bol(view, pt):
     return view.line(pt).a
 
 
+def replace_sel(view, new_sel):
+    if not new_sel:
+        raise ValueError('no new_sel')
+    view.sel().clear()
+    if isinstance(new_sel, list):
+        view.sel().add_all(new_sel)
+        return
+    view.sel().add(new_sel)
+
+
 class directions:
     NONE = 0
     UP = 1
