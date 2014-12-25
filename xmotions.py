@@ -754,7 +754,6 @@ class _vi_dollar(ViMotionCommand):
 
         regions_transformer(self.view, f)
 
-
 class _vi_w(ViMotionCommand):
     def run(self, mode=None, count=1):
         def f(view, s):
