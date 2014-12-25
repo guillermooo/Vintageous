@@ -9,6 +9,9 @@ import re
 
 logging.basicConfig(level=logging.INFO)
 
+# alias
+R = sublime.Region
+
 
 def mark_as_widget(view):
     """
@@ -384,6 +387,25 @@ def first_sel(view):
 
 def get_sel(view, i=0):
     return view.sel()[i]
+
+
+def get_eol(view, pt, inclusive=False):
+    if not inclusive:
+        return view.line(pt).end()
+    return view.full_line(pt).end()
+
+def get_bol(view, pt):
+    return view.line(pt).a
+
+
+def replace_sel(view, new_sel):
+    if not new_sel:
+        raise ValueError('no new_sel')
+    view.sel().clear()
+    if isinstance(new_sel, list):
+        view.sel().add_all(new_sel)
+        return
+    view.sel().add(new_sel)
 
 
 class directions:
