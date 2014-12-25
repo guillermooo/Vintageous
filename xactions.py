@@ -149,6 +149,9 @@ class _vi_gq(ViTextCommandBase):
 
 
 class _vi_u(IrreversibleTextCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, count=1):
         for i in range(count):
             self.view.run_command('undo')
@@ -163,12 +166,18 @@ class _vi_u(IrreversibleTextCommand):
 
 
 class _vi_ctrl_r(IrreversibleTextCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, count=1, mode=None):
         for i in range(count):
             self.view.run_command('redo')
 
 
 class _vi_a(sublime_plugin.TextCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, count=1, mode=None):
         def f(view, s):
             if view.substr(s.b) != '\n' and s.b < view.size():
@@ -197,6 +206,8 @@ class _vi_a(sublime_plugin.TextCommand):
 
 
 class _vi_c(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     _can_yank = True
     _populates_small_delete_register = True
@@ -249,6 +260,9 @@ class _enter_normal_mode(ViTextCommandBase):
       is important to know in order to not hide output panels when the user
       is only navigating files or clicking around, not pressing Esc.
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, from_init=False):
         state = self.state
 
@@ -320,6 +334,9 @@ class _enter_normal_mode(ViTextCommandBase):
 
 
 class _enter_normal_mode_impl(sublime_plugin.TextCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None):
         def f(view, s):
             _logger().info(
@@ -378,6 +395,9 @@ class _enter_normal_mode_impl(sublime_plugin.TextCommand):
 
 
 class _enter_select_mode(ViWindowCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, mode=None, count=1):
         self.state.enter_select_mode()
 
@@ -392,6 +412,9 @@ class _enter_select_mode(ViWindowCommandBase):
 
 
 class _enter_insert_mode(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1):
         self.view.settings().set('inverse_caret_state', False)
         self.view.settings().set('command_mode', False)
@@ -402,6 +425,8 @@ class _enter_insert_mode(ViTextCommandBase):
 
 
 class _enter_visual_mode(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def run(self, edit, mode=None):
         state = self.state
@@ -435,6 +460,9 @@ class _enter_visual_mode_impl(sublime_plugin.TextCommand):
     EnterVisualMode window command because ST seems to neglect to repaint the
     selections. (bug?)
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None):
         def f(view, s):
             if mode == modes.VISUAL_LINE:
@@ -458,6 +486,9 @@ class _enter_visual_mode_impl(sublime_plugin.TextCommand):
 
 
 class _enter_visual_line_mode(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None):
 
         state = self.state
@@ -481,6 +512,9 @@ class _enter_visual_line_mode_impl(sublime_plugin.TextCommand):
     """
     Transforms the view's selections.
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None):
         def f(view, s):
             if mode == modes.VISUAL:
@@ -503,6 +537,9 @@ class _enter_visual_line_mode_impl(sublime_plugin.TextCommand):
 
 
 class _enter_replace_mode(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit):
         def f(view, s):
             return R(s.b)
@@ -519,6 +556,9 @@ class _enter_replace_mode(ViTextCommandBase):
 
 # TODO: Remove this command once we don't need it any longer.
 class ToggleMode(ViWindowCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self):
         value = self.window.active_view().settings().get('command_mode')
         self.window.active_view().settings().set('command_mode', not value)
@@ -544,6 +584,9 @@ class ProcessNotation(ViWindowCommandBase):
     @check_user_mappings
         Whether user mappings should be consulted to expand key sequences.
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, keys, repeat_count=None, check_user_mappings=True):
         state = self.state
         _logger().info("[ProcessNotation] seq received: {0} mode: {1}"
@@ -696,6 +739,9 @@ class PressKey(ViWindowCommandBase):
         the global state's evaluation. For example, this is what the
         PressKey command does.
     """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def run(self, key, repeat_count=None, do_eval=True, check_user_mappings=True):
         _logger().info("[PressKey] pressed: {0}".format(key))
@@ -862,6 +908,9 @@ class PressKey(ViWindowCommandBase):
 
 
 class _vi_dot(ViWindowCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, mode=None, count=None, repeat_data=None):
         state = self.state
         state.reset_command_data()
@@ -920,6 +969,9 @@ class _vi_dd(ViTextCommandBase):
     _populates_small_delete_register = False
     _synthetize_new_line_at_eof = True
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1):
         def do_motion(view, s):
             if mode != modes.INTERNAL_NORMAL:
@@ -955,6 +1007,9 @@ class _vi_cc(ViTextCommandBase):
     _populates_small_delete_register = False
     _synthetize_new_line_at_eof = True
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1, register='"'):
         def motion(view, s):
             if mode != modes.INTERNAL_NORMAL:
@@ -973,6 +1028,9 @@ class _vi_cc(ViTextCommandBase):
 
 
 class _vi_visual_o(sublime_plugin.TextCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1):
         def f(view, s):
             # FIXME: In Vim, o doesn't work in modes.VISUAL_LINE, but ST can't move the caret while
@@ -991,6 +1049,9 @@ class _vi_yy(ViTextCommandBase):
     _can_yank = True
     _synthetize_new_line_at_eof = True
     _yanks_linewise = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def run(self, edit, mode=None, count=1, register=None):
         def select(view, s):
@@ -1024,6 +1085,9 @@ class _vi_y(ViTextCommandBase):
     _can_yank = True
     _populates_small_delete_register = True
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1, motion=None, register=None):
         def f(view, s):
             return R(s.end(), s.begin())
@@ -1047,6 +1111,9 @@ class _vi_d(ViTextCommandBase):
 
     _can_yank = True
     _populates_small_delete_register = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def run(self, edit, mode=None, count=1, motion=None, register=None):
         def reverse(view, s):
@@ -1080,6 +1147,9 @@ class _vi_d(ViTextCommandBase):
 
 
 class _vi_big_a(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1):
         def f(view, s):
             if mode == modes.VISUAL_BLOCK:
@@ -1121,6 +1191,9 @@ class _vi_big_a(ViTextCommandBase):
 
 
 class _vi_big_i(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, count=1, mode=None):
         def f(view, s):
             if mode == modes.VISUAL_BLOCK:
@@ -1146,6 +1219,9 @@ class _vi_big_i(ViTextCommandBase):
 
 
 class _vi_m(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1, character=None):
         state = self.state
         state.marks.add(character, self.view)
@@ -1157,6 +1233,9 @@ class _vi_m(ViTextCommandBase):
 class _vi_quote(ViTextCommandBase):
     """
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, character=None, count=1):
         def f(view, s):
             if mode == modes.VISUAL:
@@ -1201,6 +1280,9 @@ class _vi_quote(ViTextCommandBase):
 
 
 class _vi_backtick(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, count=1, mode=None, character=None):
         def f(view, s):
             if mode == modes.VISUAL:
@@ -1236,6 +1318,9 @@ class _vi_backtick(ViTextCommandBase):
 class _vi_quote_quote(IrreversibleTextCommand):
     next_command = 'jump_back'
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self):
         current = _vi_quote_quote.next_command
         self.view.window().run_command(current)
@@ -1248,6 +1333,9 @@ class _vi_big_d(ViTextCommandBase):
 
     _can_yank = True
     _synthetize_new_line_at_eof = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def run(self, edit, mode=None, count=1, register=None):
         def f(view, s):
@@ -1274,6 +1362,9 @@ class _vi_big_c(ViTextCommandBase):
 
     _can_yank = True
     _synthetize_new_line_at_eof = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def run(self, edit, mode=None, count=1, register=None):
         def f(view, s):
@@ -1308,6 +1399,9 @@ class _vi_big_s_action(ViTextCommandBase):
 
     _can_yank = True
     _synthetize_new_line_at_eof = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def run(self, edit, mode=None, count=1, register=None):
         def sel_line(view, s):
@@ -1348,6 +1442,9 @@ class _vi_s(ViTextCommandBase):
     _can_yank = True
     _populates_small_delete_register = True
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1, register=None):
         def select(view, s):
             if mode == modes.INTERNAL_NORMAL:
@@ -1386,6 +1483,9 @@ class _vi_x(ViTextCommandBase):
     _can_yank = True
     _populates_small_delete_register = True
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def line_end(self, pt):
         return self.view.line(pt).end()
 
@@ -1415,6 +1515,9 @@ class _vi_r(ViTextCommandBase):
     _can_yank = True
     _synthetize_new_line_at_eof = True
     _populates_small_delete_register = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def make_replacement_text(self, char, r):
         frags = self.view.split_by_newlines(r)
@@ -1459,6 +1562,9 @@ class _vi_r(ViTextCommandBase):
 
 
 class _vi_less_than_less_than(sublime_plugin.TextCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=None):
         def motion(view, s):
             if mode != modes.INTERNAL_NORMAL:
@@ -1482,6 +1588,9 @@ class _vi_less_than_less_than(sublime_plugin.TextCommand):
 
 
 class _vi_equal_equal(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1):
         def f(view, s):
             return R(s.begin())
@@ -1501,6 +1610,9 @@ class _vi_equal_equal(ViTextCommandBase):
 
 
 class _vi_greater_than_greater_than(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1):
         def f(view, s):
             bol = utils.get.bol(view, s.begin())
@@ -1521,6 +1633,9 @@ class _vi_greater_than_greater_than(ViTextCommandBase):
 
 
 class _vi_greater_than(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1, motion=None):
         def f(view, s):
             return R(s.begin())
@@ -1557,6 +1672,9 @@ class _vi_greater_than(ViTextCommandBase):
 
 
 class _vi_less_than(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1, motion=None):
         def f(view, s):
             return R(s.begin())
@@ -1577,6 +1695,9 @@ class _vi_less_than(ViTextCommandBase):
 
 
 class _vi_equal(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1, motion=None):
         def f(view, s):
             return R(s.begin())
@@ -1594,6 +1715,9 @@ class _vi_equal(ViTextCommandBase):
 
 
 class _vi_big_o(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, count=1, mode=None):
         if mode == modes.INTERNAL_NORMAL:
             self.view.run_command('run_macro_file', {'file': 'res://Packages/Default/Add Line Before.sublime-macro'})
@@ -1602,6 +1726,9 @@ class _vi_big_o(ViTextCommandBase):
 
 
 class _vi_o(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, count=1, mode=None):
         if mode == modes.INTERNAL_NORMAL:
             self.view.run_command('run_macro_file', {'file': 'res://Packages/Default/Add Line.sublime-macro'})
@@ -1613,6 +1740,9 @@ class _vi_big_x(ViTextCommandBase):
 
     _can_yank = True
     _populates_small_delete_register = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def line_start(self, pt):
         return self.view.line(pt).begin()
@@ -1643,6 +1773,9 @@ class _vi_big_x(ViTextCommandBase):
 class _vi_big_p(ViTextCommandBase):
     _can_yank = True
     _synthetize_new_line_at_eof = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def run(self, edit, register=None, count=1, mode=None):
         state = self.state
@@ -1714,6 +1847,9 @@ class _vi_p(ViTextCommandBase):
 
     _can_yank = True
     _synthetize_new_line_at_eof = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def run(self, edit, register=None, count=1, mode=None):
         state = self.state
@@ -1834,18 +1970,27 @@ class _vi_p(ViTextCommandBase):
 
 
 class _vi_gt(ViWindowCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, count=1, mode=None):
         self.window.run_command('tab_control', {'command': 'next'})
         self.window.run_command('_enter_normal_mode', {'mode': mode})
 
 
 class _vi_g_big_t(ViWindowCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, count=1, mode=None):
         self.window.run_command('tab_control', {'command': 'prev'})
         self.window.run_command('_enter_normal_mode', {'mode': mode})
 
 
 class _vi_ctrl_w_q(IrreversibleTextCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, count=1, mode=None):
         if self.view.is_dirty():
             sublime.status_message('Unsaved changes.')
@@ -1855,6 +2000,9 @@ class _vi_ctrl_w_q(IrreversibleTextCommand):
 
 
 class _vi_ctrl_w_v(IrreversibleTextCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, count=1, mode=None):
         self.view.window().run_command('ex_vsplit')
 
@@ -1862,6 +2010,9 @@ class _vi_ctrl_w_v(IrreversibleTextCommand):
 class _vi_ctrl_w_l(IrreversibleTextCommand):
     # TODO: Should be a window command instead.
     # TODO: Should focus the group to the right only, not the 'next' group.
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, mode=None, count=None):
         w = self.view.window()
         current_group = w.active_group()
@@ -1870,6 +2021,9 @@ class _vi_ctrl_w_l(IrreversibleTextCommand):
 
 
 class _vi_ctrl_w_big_l(IrreversibleTextCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, mode=None, count=1):
         w = self.view.window()
         current_group = w.active_group()
@@ -1881,6 +2035,9 @@ class _vi_ctrl_w_big_l(IrreversibleTextCommand):
 class _vi_ctrl_w_h(IrreversibleTextCommand):
     # TODO: Should be a window command instead.
     # TODO: Should focus the group to the left only, not the 'previous' group.
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, mode=None, count=1):
         w = self.view.window()
         current_group = w.active_group()
@@ -1889,6 +2046,9 @@ class _vi_ctrl_w_h(IrreversibleTextCommand):
 
 
 class _vi_ctrl_w_big_h(IrreversibleTextCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, mode=None, count=1):
         w = self.view.window()
         current_group = w.active_group()
@@ -1948,6 +2108,9 @@ class _vi_modify_numbers(sublime_plugin.TextCommand):
     """
     DIGIT_PAT = re.compile('(\D+?)?(-)?(\d+)(\D+)?')
     NUM_PAT = re.compile('\d')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def get_editable_data(self, pt):
         sign = -1 if (self.view.substr(pt - 1) == '-') else 1
@@ -2014,6 +2177,9 @@ class _vi_select_big_j(IrreversibleTextCommand):
     Active in select mode. Clears multiple selections and returns to normal
     mode. Should be more convenient than having to reach for Esc.
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, mode=None, count=1):
         s = self.view.sel()[0]
         self.view.sel().clear()
@@ -2023,6 +2189,9 @@ class _vi_select_big_j(IrreversibleTextCommand):
 
 class _vi_big_j(sublime_plugin.TextCommand):
     WHITE_SPACE = ' \t'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def run(self, edit, mode=None, separator=' ', count=1):
         sels = self.view.sel()
@@ -2078,6 +2247,9 @@ class _vi_big_j(sublime_plugin.TextCommand):
 
 
 class _vi_gv(IrreversibleTextCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, mode=None, count=None):
         sels = self.view.get_regions('visual_sel')
         if not sels:
@@ -2089,6 +2261,9 @@ class _vi_gv(IrreversibleTextCommand):
 
 
 class _vi_ctrl_e(sublime_plugin.TextCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1):
         # TODO: Implement this motion properly; don't use built-in commands.
         # We're using an action because we don't care too much right now and we don't want the
@@ -2101,6 +2276,9 @@ class _vi_ctrl_e(sublime_plugin.TextCommand):
 
 
 class _vi_ctrl_y(sublime_plugin.TextCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1):
         # TODO: Implement this motion properly; don't use built-in commands.
         # We're using an action because we don't care too much right now and we don't want the
@@ -2113,6 +2291,9 @@ class _vi_ctrl_y(sublime_plugin.TextCommand):
 
 
 class _vi_ctrl_r_equal(sublime_plugin.TextCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, insert=False, next_mode=None):
         def on_done(s):
             state = State(self.view)
@@ -2137,6 +2318,9 @@ class _vi_ctrl_r_equal(sublime_plugin.TextCommand):
 class _vi_q(IrreversibleTextCommand):
     _register_name = None
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, name=None, mode=None, count=1):
         state = State(self.view)
 
@@ -2152,6 +2336,9 @@ class _vi_q(IrreversibleTextCommand):
 
 
 class _vi_at(IrreversibleTextCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, name=None, mode=None, count=1):
         # TODO(guillermooo): Do we need to glue all these edits?
         cmds = State.macro_steps
@@ -2178,6 +2365,9 @@ class _vi_at(IrreversibleTextCommand):
 
 
 class _enter_visual_block_mode(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None):
         def f(view, s):
             return R(s.b, s.b + 1)
@@ -2195,6 +2385,9 @@ class _enter_visual_block_mode(ViTextCommandBase):
 
 
 class _vi_select_j(ViWindowCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, count=1, mode=None):
         if mode != modes.SELECT:
             raise ValueError('wrong mode')
@@ -2207,6 +2400,9 @@ class _vi_tilde(ViTextCommandBase):
     """
     Implemented as if 'notildeopt' was `True`.
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, count=1, mode=None, motion=None):
         def select(view, s):
             if mode == modes.VISUAL:
@@ -2226,6 +2422,9 @@ class _vi_tilde(ViTextCommandBase):
 
 
 class _vi_g_tilde(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, count=1, mode=None, motion=None):
         def f(view, s):
             return R(s.end(), s.begin())
@@ -2252,6 +2451,9 @@ class _vi_visual_u(ViTextCommandBase):
     """
     'u' action in visual modes.
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1):
         for s in self.view.sel():
             self.view.replace(edit, s, self.view.substr(s).lower())
@@ -2268,6 +2470,9 @@ class _vi_visual_big_u(ViTextCommandBase):
     """
     'U' action in visual modes.
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1):
         for s in self.view.sel():
             self.view.replace(edit, s, self.view.substr(s).upper())
@@ -2281,6 +2486,9 @@ class _vi_visual_big_u(ViTextCommandBase):
 
 
 class _vi_g_tilde_g_tilde(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, count=1, mode=None):
         def select(view, s):
             l =  view.line(s.b)
@@ -2298,6 +2506,9 @@ class _vi_g_tilde_g_tilde(ViTextCommandBase):
 
 
 class _vi_g_big_u_big_u(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1):
         def select(view, s):
             return units.lines(view, s, count)
@@ -2312,6 +2523,9 @@ class _vi_g_big_u_big_u(ViTextCommandBase):
 
 
 class _vi_guu(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1):
         def select(view, s):
             l = view.line(s.b)
@@ -2333,6 +2547,9 @@ class _vi_g_big_h(ViWindowCommandBase):
     After a search has been performed via '/' or '?', selects all matches and
     enters select mode.
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, mode=None, count=1):
         view = self.window.active_view()
 
@@ -2354,6 +2571,10 @@ class _vi_ctrl_x_ctrl_l(ViTextCommandBase):
     http://vimdoc.sourceforge.net/htmldoc/insert.html#i_CTRL-X_CTRL-L
     """
     MAX_MATCHES = 20
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def find_matches(self, prefix, end):
         escaped = re.escape(prefix)
         matches = []
@@ -2406,6 +2627,9 @@ class _vi_ctrl_x_ctrl_l(ViTextCommandBase):
 
 
 class __replace_line(sublime_plugin.TextCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, with_what):
         b = self.view.line(self.view.sel()[0].b).a
         pt = utils.next_non_white_space_char(self.view, b, white_space=' \t')
@@ -2414,6 +2638,9 @@ class __replace_line(sublime_plugin.TextCommand):
 
 
 class _vi_gc(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1, motion=None):
         def f(view, s):
             return R(s.begin())
@@ -2431,6 +2658,9 @@ class _vi_gc(ViTextCommandBase):
 
 
 class _vi_g_big_c(ViTextCommandBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1, motion=None):
         def f(view, s):
             return R(s.begin())
@@ -2453,6 +2683,9 @@ class _vi_gcc_action(ViTextCommandBase):
     _synthetize_new_line_at_eof = True
     _yanks_linewise = False
     _populates_small_delete_register = False
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def run(self, edit, mode=None, count=1):
         def f(view, s):
@@ -2480,6 +2713,9 @@ class _vi_gcc_action(ViTextCommandBase):
 
 
 class _vi_gcc_motion(sublime_plugin.TextCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def run(self, edit, mode=None, count=1):
         def f(view, s):
             if mode == modes.INTERNAL_NORMAL:
