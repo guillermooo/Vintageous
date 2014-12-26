@@ -995,6 +995,7 @@ class _vi_dd(ViTextCommandBase):
             self.view.sel().add_all([R(pt) for pt in new])
 
         regions_transformer(self.view, do_motion)
+        self.state.registers.yank(self)
         self.view.run_command('right_delete')
         set_sel()
         # TODO(guillermooo): deleting last line leaves the caret at \n
