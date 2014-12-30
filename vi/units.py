@@ -237,14 +237,13 @@ def next_paragraph_start(view, pt, count=1, skip_empty=True):
         if eol and not view.line(pt).empty():
             return view.size() - 1
 
-        if skip_empty:
+        if skip_empty and (i != (count - 1)):
             pt, eol = _next_non_empty_row(view, pt)
             if eol:
                 if not view.line(pt).empty():
                     return pt - 1
                 return pt
-
-    return view.text_point(utils.row_at(view, pt) - 1, 0)
+    return pt
 
 
 def _next_empty_row(view, pt):

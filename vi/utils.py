@@ -231,6 +231,10 @@ def col_at(view, pt):
     return view.rowcol(pt)[1]
 
 
+def row_to_pt(view, row, col=0):
+    return view.text_point(row, col)
+
+
 @contextmanager
 def gluing_undo_groups(view, state):
     state.processing_notation = True
