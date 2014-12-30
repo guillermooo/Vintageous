@@ -28,6 +28,7 @@ from Vintageous.vi.utils import IrreversibleTextCommand
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import regions_transformer
 from Vintageous.vi.utils import mark_as_widget
+from Vintageous.vi.utils import R
 from Vintageous.vi import cmd_defs
 from Vintageous.vi.text_objects import word_reverse
 from Vintageous.vi.text_objects import word_end_reverse
@@ -87,7 +88,6 @@ class _vi_find_in_line(ViMotionCommand):
                 return utils.new_inclusive_region(new_a, target_pos)
 
         if not all([char, mode]):
-            print('char', char, 'mode', mode)
             raise ValueError('bad parameters')
 
         char = utils.translate_char(char)
@@ -880,8 +880,9 @@ class _vi_right_brace(ViMotionCommand):
             par_as_region = view.expand_by_class(start, sublime.CLASS_EMPTY_LINE)
 
             if mode == modes.NORMAL:
-                min_pt = max(0, min(par_as_region.b, view.size() - 1))
-                return sublime.Region(min_pt, min_pt)
+                next_start = units.next_paragraph_start(view, s.b, count)
+                return R(next_start)
+
 
             elif mode == modes.VISUAL:
                 return sublime.Region(s.a, par_as_region.b + 1)
@@ -913,7 +914,8 @@ class _vi_left_brace(ViMotionCommand):
             par_as_region = view.expand_by_class(start, sublime.CLASS_EMPTY_LINE)
 
             if mode == modes.NORMAL:
-                return sublime.Region(par_as_region.a, par_as_region.a)
+                next_start = units.prev_paragraph_start(view, s.b, count)
+                return R(next_start)
 
             elif mode == modes.VISUAL:
                 # FIXME: Improve motion when .b end crosses over .a end: must extend .a end
