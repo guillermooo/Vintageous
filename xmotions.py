@@ -938,10 +938,12 @@ class _vi_left_brace(ViMotionCommand):
                 return R(next_start)
 
             elif mode == modes.VISUAL:
-                return utils.resize_visual_region(s, par_as_region.a)
+                next_start = units.prev_paragraph_start(view, s.b, count)
+                return utils.resize_visual_region(s, next_start)
 
             elif mode == modes.INTERNAL_NORMAL:
-                return R(s.a, par_as_region.a)
+                next_start = units.prev_paragraph_start(view, s.b, count)
+                return R(s.a, next_start + 1)
 
             elif mode == modes.VISUAL_LINE:
                 if s.a <= s.b:
