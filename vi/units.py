@@ -1,16 +1,18 @@
 import sublime
 
-from sublime import CLASS_WORD_START
-from sublime import CLASS_WORD_END
-from sublime import CLASS_PUNCTUATION_START
-from sublime import CLASS_PUNCTUATION_END
 from sublime import CLASS_EMPTY_LINE
 from sublime import CLASS_LINE_END
 from sublime import CLASS_LINE_START
+from sublime import CLASS_PUNCTUATION_END
+from sublime import CLASS_PUNCTUATION_START
+from sublime import CLASS_WORD_END
+from sublime import CLASS_WORD_START
 
 
-from Vintageous.vi.utils import next_non_white_space_char
+from Vintageous.vi.search import reverse_search_by_pt
 from Vintageous.vi import utils
+from Vintageous.vi.utils import next_non_white_space_char
+from Vintageous.vi.utils import R
 
 import re
 
@@ -216,3 +218,96 @@ def inner_lines(view, s, count=1):
     begin = view.line(s.b).a
     begin = utils.next_non_white_space_char(view, begin, white_space=' \t')
     return sublime.Region(begin, view.line(end).b)
+
+
+def next_paragraph_start(view, pt, count=1, skip_empty=True):
+    if utils.row_at(view, pt) == utils.last_row(view):
+        if not view.line(view.size()).empty():
+            return view.size() - 1
+        return view.size()
+
+    # skip empty rows before moving for the first time
+    current_row = utils.row_at(view, pt)
+    if (view.line(view.text_point(current_row + 1, 0)).empty() and
+        view.line(pt).empty()):
+            pt, _ = _next_non_empty_row(view, pt)
+
+    for i in range (count):
+        pt, eol = _next_empty_row(view, pt)
+        if eol and not view.line(pt).empty():
+            return view.size() - 1
+
+        if skip_empty and (i != (count - 1)):
+            pt, eol = _next_non_empty_row(view, pt)
+            if eol:
+                if not view.line(pt).empty():
+                    return pt - 1
+                return pt
+    return pt
+
+
+def _next_empty_row(view, pt):
+    r = utils.row_at(view, pt)
+    while True:
+        r += 1
+        pt = view.text_point(r, 0)
+        if utils.row_at(view, pt) == utils.last_row(view):
+            return pt, True
+        if view.line(pt).empty():
+            return pt, False
+
+
+def _next_non_empty_row(view, pt):
+    r = utils.row_at(view, pt)
+    while True:
+        r += 1
+        reg = view.line(view.text_point(r, 0))
+        if r >= utils.last_row(view):
+            return reg.a, True
+        if not reg.empty():
+            return reg.a, False
+
+
+def prev_paragraph_start(view, pt, count=1, skip_empty=True):
+    if utils.row_at(view, pt) == utils.first_row(view):
+        return 0
+
+    current_row = utils.row_at(view, pt)
+    if view.line(view.text_point(current_row - 1, 0)).empty():
+        pt, _ = _prev_non_empty_row(view, pt)
+
+    for i in range(count):
+        pt, bol = _prev_empty_row(view, pt)
+        if bol:
+            return 0
+
+        if skip_empty and count > 1 and count != count - 1:
+            pt, bol = _prev_non_empty_row(view, pt)
+            if bol:
+                return 0
+
+    offset = 1 if count > 1 else 0
+    return view.text_point(utils.row_at(view, pt) + offset, 0)
+
+
+def _prev_empty_row(view, pt):
+    r = utils.row_at(view, pt)
+    while True:
+        r -= 1
+        pt = view.text_point(r, 0)
+        if utils.row_at(view, pt) == utils.first_row(view):
+            return pt, True
+        if view.line(pt).empty():
+            return pt, False
+
+
+def _prev_non_empty_row(view, pt):
+    r = utils.row_at(view, pt)
+    while True:
+        r -= 1
+        reg = view.line(view.text_point(r, 0))
+        if r <= utils.first_row(view):
+            return 0, True
+        if not reg.empty():
+            return reg.a, False
+

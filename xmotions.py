@@ -28,6 +28,7 @@ from Vintageous.vi.utils import IrreversibleTextCommand
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import regions_transformer
 from Vintageous.vi.utils import mark_as_widget
+from Vintageous.vi.utils import R
 from Vintageous.vi import cmd_defs
 from Vintageous.vi.text_objects import word_reverse
 from Vintageous.vi.text_objects import word_end_reverse
@@ -87,7 +88,6 @@ class _vi_find_in_line(ViMotionCommand):
                 return utils.new_inclusive_region(new_a, target_pos)
 
         if not all([char, mode]):
-            print('char', char, 'mode', mode)
             raise ValueError('bad parameters')
 
         char = utils.translate_char(char)
@@ -875,30 +875,51 @@ class _vi_zero(ViMotionCommand):
 class _vi_right_brace(ViMotionCommand):
     def run(self, mode=None, count=1):
         def f(view, s):
-            # TODO: must skip empty paragraphs.
-            start = utils.next_non_white_space_char(view, s.b, white_space='\n \t')
-            par_as_region = view.expand_by_class(start, sublime.CLASS_EMPTY_LINE)
-
             if mode == modes.NORMAL:
-                min_pt = max(0, min(par_as_region.b, view.size() - 1))
-                return sublime.Region(min_pt, min_pt)
+                par_begin = units.next_paragraph_start(view, s.b, count)
+                # find the next non-empty row if needed
+                row = utils.row_at(self.view, par_begin)
+                if self.view.line(utils.row_to_pt(self.view, row)).empty():
+                    pt = view.text_point(row + 1, 0)
+                    if self.view.line(pt).empty():
+                        par_begin, eol = units._next_non_empty_row(
+                            self.view,
+                            par_begin
+                            )
+                        if not eol:
+                            par_begin = utils.row_to_pt(
+                                self.view,
+                                utils.row_at(self.view, par_begin) - 1
+                                )
+                return R(par_begin)
 
             elif mode == modes.VISUAL:
-                return sublime.Region(s.a, par_as_region.b + 1)
+                next_start = units.next_paragraph_start(view,
+                                                        s.b,
+                                                        count,
+                                                        skip_empty=count > 1)
 
+                return utils.resize_visual_region(s, next_start)
+
+            # TODO(guillermooo): delete previous ws in remaining start line
             elif mode == modes.INTERNAL_NORMAL:
-                if view.substr(s.begin()) == '\n':
-                    return sublime.Region(s.a, par_as_region.b)
-                else:
-                    return sublime.Region(s.a, par_as_region.b - 1)
+                par_begin = units.next_paragraph_start(view, s.b, count,
+                    skip_empty=count > 1)
+                if par_begin == (self.view.size() - 1):
+                    return R(s.a, self.view.size())
+                if view.substr(s.a - 1) == '\n' or s.a == 0:
+                    return R(s.a, par_begin)
+                return R(s.a, par_begin - 1)
 
             elif mode == modes.VISUAL_LINE:
+                par_begin = units.next_paragraph_start(view, s.b, count,
+                    skip_empty=count > 1)
                 if s.a <= s.b:
-                    return sublime.Region(s.a, par_as_region.b + 1)
+                    return R(s.a, par_begin + 1)
                 else:
-                    if par_as_region.b > s.a:
-                        return sublime.Region(view.line(s.a - 1).a, par_as_region.b + 1)
-                    return sublime.Region(s.a, par_as_region.b)
+                    if par_begin > s.a:
+                        return R(view.line(s.a - 1).a, par_begin + 1)
+                    return R(s.a, par_begin)
 
             return s
 
@@ -913,25 +934,24 @@ class _vi_left_brace(ViMotionCommand):
             par_as_region = view.expand_by_class(start, sublime.CLASS_EMPTY_LINE)
 
             if mode == modes.NORMAL:
-                return sublime.Region(par_as_region.a, par_as_region.a)
+                next_start = units.prev_paragraph_start(view, s.b, count)
+                return R(next_start)
 
             elif mode == modes.VISUAL:
-                # FIXME: Improve motion when .b end crosses over .a end: must extend .a end
-                # by one.
-                if s.a == par_as_region.a:
-                    return sublime.Region(s.a, s.a + 1)
-                return sublime.Region(s.a, par_as_region.a)
+                next_start = units.prev_paragraph_start(view, s.b, count)
+                return utils.resize_visual_region(s, next_start)
 
             elif mode == modes.INTERNAL_NORMAL:
-                return sublime.Region(s.a, par_as_region.a)
+                next_start = units.prev_paragraph_start(view, s.b, count)
+                return R(s.a, next_start + 1)
 
             elif mode == modes.VISUAL_LINE:
                 if s.a <= s.b:
                     if par_as_region.a < s.a:
-                        return sublime.Region(view.full_line(s.a).b, par_as_region.a)
-                    return sublime.Region(s.a, par_as_region.a + 1)
+                        return R(view.full_line(s.a).b, par_as_region.a)
+                    return R(s.a, par_as_region.a + 1)
                 else:
-                    return sublime.Region(s.a, par_as_region.a)
+                    return R(s.a, par_as_region.a)
 
             return s
 

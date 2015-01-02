@@ -101,7 +101,6 @@ def get_user_defined_log_level():
     return getattr(logging, level.upper(), logging.ERROR)
 
 
-
 # Use strings because we need to pass modes as arguments in
 # Default.sublime-keymap and it's more readable.
 class modes:
@@ -229,6 +228,10 @@ def row_at(view, pt):
 
 def col_at(view, pt):
     return view.rowcol(pt)[1]
+
+
+def row_to_pt(view, row, col=0):
+    return view.text_point(row, col)
 
 
 @contextmanager
@@ -414,3 +417,27 @@ class directions:
     DOWN = 2
     LEFT = 3
     RIGHT = 4
+
+
+def resize_visual_region(r, b):
+    """
+    Defines a new visual mode region.
+
+    Returns a region where x.a != x.b.
+
+    @r
+      Existing region.
+    @b
+      New end point.
+    """
+    if b < r.a:
+        if r.b > r.a:
+            return R(r.a + 1, b)
+        return R(r.a, b)
+
+    if b > r.a:
+        if r.b < r.a:
+            return R(r.a - 1, b + 1)
+        return R(r.a, b + 1)
+
+    return R(b, b + 1)
