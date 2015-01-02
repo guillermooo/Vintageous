@@ -919,12 +919,7 @@ class _vi_right_brace(ViMotionCommand):
             elif mode == modes.VISUAL_LINE:
                 par_begin = units.next_paragraph_start(view, s.b, count,
                     skip_empty=count > 1)
-                if s.a <= s.b:
-                    return R(s.a, par_begin + 1)
-                else:
-                    if par_begin > s.a:
-                        return R(view.line(s.a - 1).a, par_begin + 1)
-                    return R(s.a, par_begin)
+                return utils.resize_visual_region(s, par_begin)
 
             return s
 
@@ -943,22 +938,18 @@ class _vi_left_brace(ViMotionCommand):
                 return R(next_start)
 
             elif mode == modes.VISUAL:
-                # FIXME: Improve motion when .b end crosses over .a end: must extend .a end
-                # by one.
-                if s.a == par_as_region.a:
-                    return sublime.Region(s.a, s.a + 1)
-                return sublime.Region(s.a, par_as_region.a)
+                return utils.resize_visual_region(s, par_as_region.a)
 
             elif mode == modes.INTERNAL_NORMAL:
-                return sublime.Region(s.a, par_as_region.a)
+                return R(s.a, par_as_region.a)
 
             elif mode == modes.VISUAL_LINE:
                 if s.a <= s.b:
                     if par_as_region.a < s.a:
-                        return sublime.Region(view.full_line(s.a).b, par_as_region.a)
-                    return sublime.Region(s.a, par_as_region.a + 1)
+                        return R(view.full_line(s.a).b, par_as_region.a)
+                    return R(s.a, par_as_region.a + 1)
                 else:
-                    return sublime.Region(s.a, par_as_region.a)
+                    return R(s.a, par_as_region.a)
 
             return s
 

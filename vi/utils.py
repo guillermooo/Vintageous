@@ -417,3 +417,27 @@ class directions:
     DOWN = 2
     LEFT = 3
     RIGHT = 4
+
+
+def resize_visual_region(r, b):
+    """
+    Defines a new visual mode region.
+
+    Returns a region where x.a != x.b.
+
+    @r
+      Existing region.
+    @b
+      New end point.
+    """
+    if b < r.a:
+        if r.b > r.a:
+            return R(r.a + 1, b)
+        return R(r.a, b)
+
+    if b > r.a:
+        if r.b < r.a:
+            return R(r.a - 1, b + 1)
+        return R(r.a, b + 1)
+
+    return R(b, b + 1)
