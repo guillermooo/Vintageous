@@ -899,14 +899,7 @@ class _vi_right_brace(ViMotionCommand):
                                                         count,
                                                         skip_empty=count > 1)
 
-                # is new .b crossing over .a?
-                if (s.b < s.a) and (s.a < (next_start + 1)):
-                    return R(s.a - 1, next_start + 1)
-
-                if s.a < (next_start + 1):
-                    return R(s.a, next_start + 1)
-
-                return R(s.a, next_start)
+                return utils.resize_visual_region(s, next_start)
 
             # TODO(guillermooo): delete previous ws in remaining start line
             elif mode == modes.INTERNAL_NORMAL:
@@ -919,7 +912,12 @@ class _vi_right_brace(ViMotionCommand):
             elif mode == modes.VISUAL_LINE:
                 par_begin = units.next_paragraph_start(view, s.b, count,
                     skip_empty=count > 1)
-                return utils.resize_visual_region(s, par_begin)
+                if s.a <= s.b:
+                    return R(s.a, par_begin + 1)
+                else:
+                    if par_begin > s.a:
+                        return R(view.line(s.a - 1).a, par_begin + 1)
+                    return R(s.a, par_begin)
 
             return s
 
