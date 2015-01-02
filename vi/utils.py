@@ -101,7 +101,6 @@ def get_user_defined_log_level():
     return getattr(logging, level.upper(), logging.ERROR)
 
 
-
 # Use strings because we need to pass modes as arguments in
 # Default.sublime-keymap and it's more readable.
 class modes:
