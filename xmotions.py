@@ -907,6 +907,8 @@ class _vi_right_brace(ViMotionCommand):
                     skip_empty=count > 1)
                 if par_begin == (self.view.size() - 1):
                     return R(s.a, self.view.size())
+                if view.substr(s.a - 1) == '\n':
+                    return R(s.a, par_begin)
                 return R(s.a, par_begin - 1)
 
             elif mode == modes.VISUAL_LINE:
