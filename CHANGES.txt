@@ -1,3 +1,27 @@
+3.8.3 - 03-01-2015
+
+	- refactor
+	- improve $ motion
+	- improve } in command mode
+	- improve { and } cmds
+	- improve internalmode (})
+	- fixes
+	- improve handling of visual selections for { and }
+	- improve selections
+	- improve } command for all modes
+	- add counts for { and } for normal mode
+	- fix dd command (yanking)
+	- add __init__
+	- fix tests
+	- refactor
+	- rename command
+	- presever multiple sels after dd'ing
+	- refactor cc command
+	- refactor dd command
+	- fix #790 - actions must scroll into view
+	- add tab completion for files for :tabedit, closes #725 (Thanks Kevin Lee)
+	- fix #720 - n and N take into account the last search command's direction
+
 3.8.2 - 20-10-2014
 
 	- Don't add macro if state needs to group commands.
