@@ -179,20 +179,12 @@ def regions_transformer(view, f):
     view.sel().add_all(new)
 
 
-def get_caret_pos_at_b(region):
-    """Returns the actual insertion point closest to @region.b for a visual
-    region.
-
-    For non-visual regions, the insertion point is always any of the region's
-    ends, so using this function is pointless.
+def get_caret_pos_at_b(r):
+    """Returns the insertion point closest to @r.b.
     """
-    if region.size() == 0:
-        raise TypeError('not a visual region')
-
-    if region.a < region.b:
-        return region.b - 1
-    elif region.b < region.a:
-        return region.b
+    if r.a < r.b:
+        return (r.b - 1)
+    return r.b
 
 
 def get_caret_pos_at_a(region):

@@ -710,34 +710,25 @@ class _vi_dollar(ViMotionCommand):
     def run(self, mode=None, count=1):
         def f(view, s):
             if mode == modes.NORMAL:
-                if count > 1:
-                    pt = view.line(target_row_pt).b
-                else:
-                    pt = view.line(s.b).b
-                if not view.line(pt).empty():
-                    return sublime.Region(pt - 1, pt - 1)
-                return sublime.Region(pt, pt)
+                if not view.line(eol).empty():
+                    return R(eol - 1)
+                return R(eol)
 
             elif mode == modes.VISUAL:
-                current_line_pt = (s.b - 1) if (s.a < s.b) else s.b
-                if count > 1:
-                    end = view.full_line(target_row_pt).b
-                else:
-                    end = s.end()
-                    if not end == view.full_line(s.b - 1).b:
-                        end = view.full_line(s.b).b
-                end = end if (s.a < end) else (end - 1)
-                start = s.a if ((s.a < s.b) or (end < s.a)) else s.a - 1
-                return sublime.Region(start, end)
+                # TODO(guillermooo): is this really a special case? can we not
+                # include this case in .resize_visual_region()?
+                # Perhaps we should always ensure that a minimal visual sel
+                # was always such that .a < .b?
+                if (s.a == eol) and not view.line(eol).empty():
+                    return R(s.a - 1, eol + 1)
+                return utils.resize_visual_region(s, eol)
 
             elif mode == modes.INTERNAL_NORMAL:
-                if count > 1:
-                    pt = view.line(target_row_pt).b
-                else:
-                    pt = view.line(s.b).b
-                if count == 1:
-                    return sublime.Region(s.a, pt)
-                return sublime.Region(s.a, pt + 1)
+                # TODO(guillermooo): perhaps create a
+                # .is_linewise_motion() helper?
+                if utils.get_bol(view, s.a) == s.a:
+                    return R(s.a, eol + 1)
+                return R(s.a, eol)
 
             elif mode == modes.VISUAL_LINE:
                 # TODO: Implement this. Not too useful, though.
@@ -745,12 +736,11 @@ class _vi_dollar(ViMotionCommand):
 
             return s
 
-        sel = self.view.sel()[0]
-        target_row_pt = (sel.b - 1) if (sel.b > sel.a) else sel.b
+        target = utils.get_caret_pos_at_b(utils.first_sel(self.view))
         if count > 1:
-            current_row = self.view.rowcol(target_row_pt)[0]
-            target_row = current_row + count - 1
-            target_row_pt = self.view.text_point(target_row, 0)
+            row = utils.row_at(self.view, target)
+            target = utils.row_to_pt(self.view, row + (count - 1))
+        eol = self.view.line(target).b
 
         regions_transformer(self.view, f)
 
