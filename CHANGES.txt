@@ -1,3 +1,9 @@
+3.8.4 - 03-01-2015
+
+	- fix v in empty lines
+	- support multiple sels for $ motion
+	- refactor
+
 3.8.3 - 03-01-2015
 
 	- refactor
