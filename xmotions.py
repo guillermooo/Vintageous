@@ -8,6 +8,8 @@ from collections import Counter
 
 
 from Vintageous import state as state_module
+from Vintageous.state import State
+from Vintageous.vi import cmd_defs
 from Vintageous.vi import units
 from Vintageous.vi import utils
 from Vintageous.vi.core import ViMotionCommand
@@ -20,22 +22,24 @@ from Vintageous.vi.search import find_wrapping
 from Vintageous.vi.search import reverse_find_wrapping
 from Vintageous.vi.search import reverse_search
 from Vintageous.vi.search import reverse_search_by_pt
-from Vintageous.state import State
+from Vintageous.vi.text_objects import find_containing_tag
+from Vintageous.vi.text_objects import find_next_lone_bracket
+from Vintageous.vi.text_objects import find_prev_lone_bracket
+from Vintageous.vi.text_objects import get_closest_tag
 from Vintageous.vi.text_objects import get_text_object_region
+from Vintageous.vi.text_objects import word_end_reverse
+from Vintageous.vi.text_objects import word_reverse
 from Vintageous.vi.utils import col_at
 from Vintageous.vi.utils import directions
 from Vintageous.vi.utils import IrreversibleTextCommand
-from Vintageous.vi.utils import modes
-from Vintageous.vi.utils import regions_transformer
 from Vintageous.vi.utils import mark_as_widget
+from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import R
-from Vintageous.vi import cmd_defs
-from Vintageous.vi.text_objects import word_reverse
-from Vintageous.vi.text_objects import word_end_reverse
-from Vintageous.vi.text_objects import get_closest_tag
-from Vintageous.vi.text_objects import find_containing_tag
-from Vintageous.vi.text_objects import find_prev_lone_bracket
-from Vintageous.vi.text_objects import find_next_lone_bracket
+from Vintageous.vi.utils import regions_transformer
+from Vintageous.vi.utils import resize_visual_region
+from Vintageous.vi.utils import resolve_insertion_point_at_a
+from Vintageous.vi.utils import resolve_insertion_point_at_b
+from Vintageous.vi.utils import row_at
 
 
 class _vi_find_in_line(ViMotionCommand):
@@ -52,7 +56,7 @@ class _vi_find_in_line(ViMotionCommand):
             b = s.b
             # If we are in any visual mode, get the actual insertion point.
             if s.size() > 0:
-                b = utils.get_caret_pos_at_b(s)
+                b = resolve_insertion_point_at_b(s)
 
             # Vim skips a character while performing the search
             # if the command is ';' or ',' after a 't' or 'T'
@@ -84,7 +88,7 @@ class _vi_find_in_line(ViMotionCommand):
                 return sublime.Region(s.a, target_pos + 1)
             # For visual modes...
             else:
-                new_a = utils.get_caret_pos_at_a(s)
+                new_a = resolve_insertion_point_at_a(s)
                 return utils.new_inclusive_region(new_a, target_pos)
 
         if not all([char, mode]):
@@ -109,7 +113,7 @@ class _vi_reverse_find_in_line(ViMotionCommand):
 
             b = s.b
             if s.size() > 0:
-                b = utils.get_caret_pos_at_b(s)
+                b = resolve_insertion_point_at_b(s)
 
             # Vim skips a character while performing the search
             # if the command is ';' or ',' after a 't' or 'T'
@@ -138,7 +142,7 @@ class _vi_reverse_find_in_line(ViMotionCommand):
                 return sublime.Region(b, target_pos)
             # For visual modes...
             else:
-                new_a = utils.get_caret_pos_at_a(s)
+                new_a = resolve_insertion_point_at_a(s)
                 return utils.new_inclusive_region(new_a, target_pos)
 
         if not all([char, mode]):
@@ -710,34 +714,25 @@ class _vi_dollar(ViMotionCommand):
     def run(self, mode=None, count=1):
         def f(view, s):
             if mode == modes.NORMAL:
-                if count > 1:
-                    pt = view.line(target_row_pt).b
-                else:
-                    pt = view.line(s.b).b
-                if not view.line(pt).empty():
-                    return sublime.Region(pt - 1, pt - 1)
-                return sublime.Region(pt, pt)
+                if not view.line(eol).empty():
+                    return R(eol - 1)
+                return R(eol)
 
             elif mode == modes.VISUAL:
-                current_line_pt = (s.b - 1) if (s.a < s.b) else s.b
-                if count > 1:
-                    end = view.full_line(target_row_pt).b
-                else:
-                    end = s.end()
-                    if not end == view.full_line(s.b - 1).b:
-                        end = view.full_line(s.b).b
-                end = end if (s.a < end) else (end - 1)
-                start = s.a if ((s.a < s.b) or (end < s.a)) else s.a - 1
-                return sublime.Region(start, end)
+                # TODO(guillermooo): is this really a special case? can we not
+                # include this case in .resize_visual_region()?
+                # Perhaps we should always ensure that a minimal visual sel
+                # was always such that .a < .b?
+                if (s.a == eol) and not view.line(eol).empty():
+                    return R(s.a - 1, eol + 1)
+                return resize_visual_region(s, eol)
 
             elif mode == modes.INTERNAL_NORMAL:
-                if count > 1:
-                    pt = view.line(target_row_pt).b
-                else:
-                    pt = view.line(s.b).b
-                if count == 1:
-                    return sublime.Region(s.a, pt)
-                return sublime.Region(s.a, pt + 1)
+                # TODO(guillermooo): perhaps create a
+                # .is_linewise_motion() helper?
+                if utils.get_bol(view, s.a) == s.a:
+                    return R(s.a, eol + 1)
+                return R(s.a, eol)
 
             elif mode == modes.VISUAL_LINE:
                 # TODO: Implement this. Not too useful, though.
@@ -745,12 +740,11 @@ class _vi_dollar(ViMotionCommand):
 
             return s
 
-        sel = self.view.sel()[0]
-        target_row_pt = (sel.b - 1) if (sel.b > sel.a) else sel.b
+        target = resolve_insertion_point_at_b(utils.first_sel(self.view))
         if count > 1:
-            current_row = self.view.rowcol(target_row_pt)[0]
-            target_row = current_row + count - 1
-            target_row_pt = self.view.text_point(target_row, 0)
+            target = utils.row_to_pt(self.view,
+                                     row_at(self.view, target) + (count - 1))
+        eol = self.view.line(target).b
 
         regions_transformer(self.view, f)
 
@@ -878,7 +872,7 @@ class _vi_right_brace(ViMotionCommand):
             if mode == modes.NORMAL:
                 par_begin = units.next_paragraph_start(view, s.b, count)
                 # find the next non-empty row if needed
-                row = utils.row_at(self.view, par_begin)
+                row = row_at(self.view, par_begin)
                 if self.view.line(utils.row_to_pt(self.view, row)).empty():
                     pt = view.text_point(row + 1, 0)
                     if self.view.line(pt).empty():
@@ -889,7 +883,7 @@ class _vi_right_brace(ViMotionCommand):
                         if not eol:
                             par_begin = utils.row_to_pt(
                                 self.view,
-                                utils.row_at(self.view, par_begin) - 1
+                                row_at(self.view, par_begin) - 1
                                 )
                 return R(par_begin)
 
@@ -899,7 +893,7 @@ class _vi_right_brace(ViMotionCommand):
                                                         count,
                                                         skip_empty=count > 1)
 
-                return utils.resize_visual_region(s, next_start)
+                return resize_visual_region(s, next_start)
 
             # TODO(guillermooo): delete previous ws in remaining start line
             elif mode == modes.INTERNAL_NORMAL:
@@ -939,7 +933,7 @@ class _vi_left_brace(ViMotionCommand):
 
             elif mode == modes.VISUAL:
                 next_start = units.prev_paragraph_start(view, s.b, count)
-                return utils.resize_visual_region(s, next_start)
+                return resize_visual_region(s, next_start)
 
             elif mode == modes.INTERNAL_NORMAL:
                 next_start = units.prev_paragraph_start(view, s.b, count)
@@ -1374,8 +1368,8 @@ class _vi_underscore(ViMotionCommand):
             a = s.a
             b = s.b
             if s.size() > 0:
-                a = utils.get_caret_pos_at_a(s)
-                b = utils.get_caret_pos_at_b(s)
+                a = resolve_insertion_point_at_a(s)
+                b = resolve_insertion_point_at_b(s)
 
             current_row = self.view.rowcol(b)[0]
             target_row = current_row + (count - 1)
@@ -1409,8 +1403,8 @@ class _vi_hat(ViMotionCommand):
             a = s.a
             b = s.b
             if s.size() > 0:
-                a = utils.get_caret_pos_at_a(s)
-                b = utils.get_caret_pos_at_b(s)
+                a = resolve_insertion_point_at_a(s)
+                b = resolve_insertion_point_at_b(s)
 
             bol = self.view.line(b).a
             bol = utils.next_non_white_space_char(self.view, bol, white_space='\t ')
