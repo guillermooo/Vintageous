@@ -353,10 +353,12 @@ class _enter_normal_mode_impl(sublime_plugin.TextCommand):
 
             if mode == modes.VISUAL:
                 if s.a < s.b:
-                    r = R(s.b - 1)
-                    if view.substr(r.b) == '\n':
-                        r.b -= 1
-                    return R(r.b)
+                    pt = s.b - 1
+                    if view.line(pt).empty():
+                        return R(pt)
+                    if view.substr(pt) == '\n':
+                        pt -= 1
+                    return R(pt)
                 return R(s.b)
 
             if mode in (modes.VISUAL_LINE, modes.VISUAL_BLOCK):
