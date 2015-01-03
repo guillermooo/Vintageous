@@ -716,6 +716,11 @@ class _vi_big_g(ViMotionCommand):
 class _vi_dollar(ViMotionCommand):
     def run(self, mode=None, count=1):
         def f(view, s):
+            target = resolve_insertion_point_at_b(s)
+            if count > 1:
+                target = row_to_pt(view, row_at(view, target) + (count - 1))
+            eol = view.line(target).b
+
             if mode == modes.NORMAL:
                 return R(eol if view.line(eol).empty() else (eol - 1))
 
@@ -740,12 +745,6 @@ class _vi_dollar(ViMotionCommand):
                 return s
 
             return s
-
-        target = resolve_insertion_point_at_b(first_sel(self.view))
-        if count > 1:
-            target = row_to_pt(self.view,
-                               row_at(self.view, target) + (count - 1))
-        eol = self.view.line(target).b
 
         regions_transformer(self.view, f)
 
