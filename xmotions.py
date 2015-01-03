@@ -31,6 +31,8 @@ from Vintageous.vi.text_objects import word_end_reverse
 from Vintageous.vi.text_objects import word_reverse
 from Vintageous.vi.utils import col_at
 from Vintageous.vi.utils import directions
+from Vintageous.vi.utils import first_sel
+from Vintageous.vi.utils import get_bol
 from Vintageous.vi.utils import IrreversibleTextCommand
 from Vintageous.vi.utils import mark_as_widget
 from Vintageous.vi.utils import modes
@@ -40,6 +42,7 @@ from Vintageous.vi.utils import resize_visual_region
 from Vintageous.vi.utils import resolve_insertion_point_at_a
 from Vintageous.vi.utils import resolve_insertion_point_at_b
 from Vintageous.vi.utils import row_at
+from Vintageous.vi.utils import row_to_pt
 
 
 class _vi_find_in_line(ViMotionCommand):
@@ -713,10 +716,13 @@ class _vi_big_g(ViMotionCommand):
 class _vi_dollar(ViMotionCommand):
     def run(self, mode=None, count=1):
         def f(view, s):
+            target = resolve_insertion_point_at_b(s)
+            if count > 1:
+                target = row_to_pt(view, row_at(view, target) + (count - 1))
+            eol = view.line(target).b
+
             if mode == modes.NORMAL:
-                if not view.line(eol).empty():
-                    return R(eol - 1)
-                return R(eol)
+                return R(eol if view.line(eol).empty() else (eol - 1))
 
             elif mode == modes.VISUAL:
                 # TODO(guillermooo): is this really a special case? can we not
@@ -730,7 +736,7 @@ class _vi_dollar(ViMotionCommand):
             elif mode == modes.INTERNAL_NORMAL:
                 # TODO(guillermooo): perhaps create a
                 # .is_linewise_motion() helper?
-                if utils.get_bol(view, s.a) == s.a:
+                if get_bol(view, s.a) == s.a:
                     return R(s.a, eol + 1)
                 return R(s.a, eol)
 
@@ -739,12 +745,6 @@ class _vi_dollar(ViMotionCommand):
                 return s
 
             return s
-
-        target = resolve_insertion_point_at_b(utils.first_sel(self.view))
-        if count > 1:
-            target = utils.row_to_pt(self.view,
-                                     row_at(self.view, target) + (count - 1))
-        eol = self.view.line(target).b
 
         regions_transformer(self.view, f)
 
@@ -873,7 +873,7 @@ class _vi_right_brace(ViMotionCommand):
                 par_begin = units.next_paragraph_start(view, s.b, count)
                 # find the next non-empty row if needed
                 row = row_at(self.view, par_begin)
-                if self.view.line(utils.row_to_pt(self.view, row)).empty():
+                if self.view.line(row_to_pt(self.view, row)).empty():
                     pt = view.text_point(row + 1, 0)
                     if self.view.line(pt).empty():
                         par_begin, eol = units._next_non_empty_row(
@@ -881,10 +881,9 @@ class _vi_right_brace(ViMotionCommand):
                             par_begin
                             )
                         if not eol:
-                            par_begin = utils.row_to_pt(
-                                self.view,
-                                row_at(self.view, par_begin) - 1
-                                )
+                            par_begin = row_to_pt(
+                                    self.view,
+                                    row_at(self.view, par_begin) - 1)
                 return R(par_begin)
 
             elif mode == modes.VISUAL:
