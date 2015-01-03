@@ -179,15 +179,13 @@ def regions_transformer(view, f):
     view.sel().add_all(new)
 
 
-def get_caret_pos_at_b(r):
-    """Returns the insertion point closest to @r.b.
-    """
+def resolve_insertion_point_at_b(r):
     if r.a < r.b:
         return (r.b - 1)
     return r.b
 
 
-def get_caret_pos_at_a(region):
+def resolve_insertion_point_at_a(region):
     """Returns the actual insertion point closest to @region.a for a visual
     region.
 
