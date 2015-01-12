@@ -2066,11 +2066,9 @@ class _vi_z_enter(IrreversibleTextCommand):
 
     def run(self, count=1, mode=None):
         first_sel = self.view.sel()[0]
-        current_row = self.view.rowcol(first_sel.b)[0] - 1
+        current_position = self.view.text_to_layout(first_sel.b)
 
-        topmost_visible_row, _ = self.view.rowcol(self.view.visible_region().a)
-
-        self.view.run_command('scroll_lines', {'amount': (topmost_visible_row - current_row)})
+        self.view.set_viewport_position(current_position)
 
 
 class _vi_z_minus(IrreversibleTextCommand):
@@ -2079,14 +2077,11 @@ class _vi_z_minus(IrreversibleTextCommand):
 
     def run(self, count=1, mode=None):
         first_sel = self.view.sel()[0]
-        current_row = self.view.rowcol(first_sel.b)[0]
+        current_position = self.view.text_to_layout(first_sel.b)
+        viewport_dim = self.view.viewport_extent()
+        new_pos =(0.0, current_position[1] - viewport_dim[1]) 
 
-        bottommost_visible_row, _ = self.view.rowcol(self.view.visible_region().b)
-
-        number_of_lines = (bottommost_visible_row - current_row) - 1
-
-        if number_of_lines > 1:
-            self.view.run_command('scroll_lines', {'amount': number_of_lines})
+        self.view.set_viewport_position(new_pos)
 
 
 class _vi_zz(IrreversibleTextCommand):
@@ -2095,14 +2090,11 @@ class _vi_zz(IrreversibleTextCommand):
 
     def run(self, count=1, mode=None):
         first_sel = self.view.sel()[0]
-        current_row = self.view.rowcol(first_sel.b)[0]
+        current_position = self.view.text_to_layout(first_sel.b)
+        viewport_dim = self.view.viewport_extent()
+        new_pos =(0.0, current_position[1] - viewport_dim[1] / 2) 
 
-        topmost_visible_row, _ = self.view.rowcol(self.view.visible_region().a)
-        bottommost_visible_row, _ = self.view.rowcol(self.view.visible_region().b)
-
-        middle_row = (topmost_visible_row + bottommost_visible_row) / 2
-
-        self.view.run_command('scroll_lines', {'amount': (middle_row - current_row)})
+        self.view.set_viewport_position(new_pos)
 
 
 class _vi_modify_numbers(sublime_plugin.TextCommand):
