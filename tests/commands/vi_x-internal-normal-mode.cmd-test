@@ -1,0 +1,43 @@
+_vi_x mode:mode_internal_normal
+can delete 1 char
+***
+aaa aaa aaa aaa aaa
+aaa aaa xbb aaa aaa
+aaa aaa aaa aaa aaa
+---
+aaa aaa aaa aaa aaa
+aaa aaa bb aaa aaa
+aaa aaa aaa aaa aaa
+---///---
+_vi_x mode:mode_internal_normal count:5
+can delete >1 char
+***
+aaa aaa aaa aaa aaa
+aaa xbb bbb bbb aaa
+aaa aaa aaa aaa aaa
+---
+aaa aaa aaa aaa aaa
+aaa bb bbb aaa
+aaa aaa aaa aaa aaa
+---///---
+_vi_x mode:mode_internal_normal count:500
+cannot delete past EOL
+***
+aaa aaa aaa aaa aaa
+aaa xbb bbb bbb aaa
+aaa aaa aaa aaa aaa
+---
+aaa aaa aaa aaa aaa
+aaa 
+aaa aaa aaa aaa aaa
+---///---
+_vi_x mode:mode_internal_normal count:500
+cannot delete empty line
+***
+aaa aaa aaa aaa aaa
+S
+bbb aaa aaa aaa aaa
+---
+aaa aaa aaa aaa aaa
+
+bbb aaa aaa aaa aaa

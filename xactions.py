@@ -1480,6 +1480,7 @@ class _vi_s(ViTextCommandBase):
 
 
 class _vi_x(ViTextCommandBase):
+
     """
     Implementation of Vim's x action.
     """
@@ -1494,9 +1495,16 @@ class _vi_x(ViTextCommandBase):
 
     def run(self, edit, mode=None, count=1, register=None):
         def select(view, s):
+            nonlocal abort
             if mode == modes.INTERNAL_NORMAL:
+                if view.line(s.b).empty():
+                    abort = True
                 eol = utils.get_eol(view, s.b)
                 return R(s.b, min(s.b + count, eol))
+            if s.size() == 1:
+                b = s.b - 1 if s.a < s.b else s.b
+                if view.line(b).empty():
+                    abort = True
             return s
 
         if mode not in (modes.VISUAL,
@@ -1507,9 +1515,13 @@ class _vi_x(ViTextCommandBase):
             utils.blink()
             self.enter_normal_mode(mode)
 
+        abort = False
+
         regions_transformer(self.view, select)
-        self.state.registers.yank(self, register)
-        self.view.run_command('right_delete')
+
+        if not abort:
+            self.state.registers.yank(self, register)
+            self.view.run_command('right_delete')
         self.enter_normal_mode(mode)
 
 
@@ -1752,23 +1764,34 @@ class _vi_big_x(ViTextCommandBase):
 
     def run(self, edit, mode=None, count=1, register=None):
         def select(view, s):
+            nonlocal abort
             if mode == modes.INTERNAL_NORMAL:
+                if view.line(s.b).empty():
+                    abort = True
                 return R(s.b, max(s.b - count,
                                                self.line_start(s.b)))
             elif mode == modes.VISUAL:
                 if s.a < s.b:
+                    if view.line(s.b - 1).empty() and s.size() == 1:
+                        abort = True
                     return R(view.full_line(s.b - 1).b,
                                           view.line(s.a).a)
+
+                if view.line(s.b).empty() and s.size() == 1:
+                    abort = True
                 return R(view.line(s.b).a,
                                       view.full_line(s.a - 1).b)
             return R(s.begin(), s.end())
+
+        abort = False
 
         regions_transformer(self.view, select)
 
         state = self.state
         state.registers.yank(self, register)
 
-        self.view.run_command('left_delete')
+        if not abort:
+            self.view.run_command('left_delete')
 
         self.enter_normal_mode(mode)
 
@@ -2079,7 +2102,7 @@ class _vi_z_minus(IrreversibleTextCommand):
         first_sel = self.view.sel()[0]
         current_position = self.view.text_to_layout(first_sel.b)
         viewport_dim = self.view.viewport_extent()
-        new_pos =(0.0, current_position[1] - viewport_dim[1]) 
+        new_pos =(0.0, current_position[1] - viewport_dim[1])
 
         self.view.set_viewport_position(new_pos)
 
@@ -2092,7 +2115,7 @@ class _vi_zz(IrreversibleTextCommand):
         first_sel = self.view.sel()[0]
         current_position = self.view.text_to_layout(first_sel.b)
         viewport_dim = self.view.viewport_extent()
-        new_pos =(0.0, current_position[1] - viewport_dim[1] / 2) 
+        new_pos =(0.0, current_position[1] - viewport_dim[1] / 2)
 
         self.view.set_viewport_position(new_pos)
 
