@@ -1,3 +1,9 @@
+3.8.5 - 19-01-2015
+
+	- add basic test spec format for command tests
+	- remove files
+	- changed _vi_z_enter _vi_z_minus _vi_zz to work on layout postion instead of line number (Thanks Francois)
+
 3.8.4 - 03-01-2015
 
 	- fix v in empty lines
