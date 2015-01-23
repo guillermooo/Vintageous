@@ -60,11 +60,12 @@ PAIRS = {
     '}': (('\\{', '\\}'), BRACKET),
     '<': (('<', '>'), BRACKET),
     '>': (('<', '>'), BRACKET),
-    't': (None, TAG),
-    'w': (None, WORD),
-    'W': (None, BIG_WORD),
-    's': (None, SENTENCE),
+    'b': (('\\(', '\\)'), BRACKET),
     'p': (None, PARAGRAPH),
+    's': (None, SENTENCE),
+    't': (None, TAG),
+    'W': (None, BIG_WORD),
+    'w': (None, WORD),
 }
 
 
