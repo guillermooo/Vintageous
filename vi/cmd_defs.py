@@ -2458,7 +2458,7 @@ class ViMotionEnter(ViMotionDef):
         return cmd
 
 
-@keys.assign(seq=seqs.ENTER, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.MINUS, modes=_MODES_MOTION)
 class ViMoveBackOneLine(ViMotionDef):
     """
     Vim: `-`

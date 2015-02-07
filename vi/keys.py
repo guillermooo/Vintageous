@@ -210,6 +210,7 @@ class seqs:
     LESS_THAN =                    '<lt>'
     LESS_THAN_LESS_THAN =          '<lt><lt>'
     M =                            'm'
+    MINUS =                        '-'
     N =                            'n'
     O =                            'o'
     P =                            'p'
