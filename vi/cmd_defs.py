@@ -2458,6 +2458,27 @@ class ViMotionEnter(ViMotionDef):
         return cmd
 
 
+@keys.assign(seq=seqs.ENTER, modes=_MODES_MOTION)
+class ViMoveBackOneLine(ViMotionDef):
+    """
+    Vim: `-`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViMotionDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['is_jump'] = True
+        cmd['motion'] = '_vi_minus'
+        cmd['motion_args'] = {'mode': state.mode,
+                              'count': state.count,
+                              }
+        return cmd
+
+
 @keys.assign(seq=seqs.G_UNDERSCORE, modes=_MODES_MOTION)
 class ViMoveToSoftEol(ViMotionDef):
     """
