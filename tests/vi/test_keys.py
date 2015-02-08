@@ -312,6 +312,7 @@ TESTS_KNOWN_SEQUENCES = (
     seq_test(actual=seqs.LEFT_PAREN,             expected= '('),
     seq_test(actual=seqs.LESS_THAN,              expected= '<lt>'),
     seq_test(actual=seqs.LESS_THAN_LESS_THAN,    expected= '<lt><lt>'),
+    seq_test(actual=seqs.MINUS,                  expected= '-'),
     seq_test(actual=seqs.M,                      expected= 'm'),
     seq_test(actual=seqs.N,                      expected= 'n'),
     seq_test(actual=seqs.O,                      expected= 'o'),
