@@ -2438,6 +2438,7 @@ class ViMoveToEol(ViMotionDef):
 
 
 @keys.assign(seq=seqs.ENTER, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.PLUS, modes=_MODES_MOTION)
 class ViMotionEnter(ViMotionDef):
     """
     Vim: `<CR>`

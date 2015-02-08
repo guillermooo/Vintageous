@@ -317,6 +317,7 @@ TESTS_KNOWN_SEQUENCES = (
     seq_test(actual=seqs.N,                      expected= 'n'),
     seq_test(actual=seqs.O,                      expected= 'o'),
     seq_test(actual=seqs.P,                      expected= 'p'),
+    seq_test(actual=seqs.PLUS,                   expected= '+'),
     seq_test(actual=seqs.OCTOTHORP,              expected= '#'),
     seq_test(actual=seqs.PAGE_DOWN,              expected= 'pagedown'),
     seq_test(actual=seqs.PAGE_UP,                expected= 'pageup'),
