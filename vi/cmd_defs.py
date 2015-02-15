@@ -2438,6 +2438,7 @@ class ViMoveToEol(ViMotionDef):
 
 
 @keys.assign(seq=seqs.ENTER, modes=_MODES_MOTION)
+@keys.assign(seq=seqs.PLUS, modes=_MODES_MOTION)
 class ViMotionEnter(ViMotionDef):
     """
     Vim: `<CR>`
@@ -2452,6 +2453,27 @@ class ViMotionEnter(ViMotionDef):
         cmd = {}
         cmd['is_jump'] = True
         cmd['motion'] = '_vi_enter'
+        cmd['motion_args'] = {'mode': state.mode,
+                              'count': state.count,
+                              }
+        return cmd
+
+
+@keys.assign(seq=seqs.MINUS, modes=_MODES_MOTION)
+class ViMoveBackOneLine(ViMotionDef):
+    """
+    Vim: `-`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViMotionDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['is_jump'] = True
+        cmd['motion'] = '_vi_minus'
         cmd['motion_args'] = {'mode': state.mode,
                               'count': state.count,
                               }
