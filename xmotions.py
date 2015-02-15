@@ -873,17 +873,6 @@ class _vi_right_brace(ViMotionCommand):
                 par_begin = units.next_paragraph_start(view, s.b, count)
                 # find the next non-empty row if needed
                 row = row_at(self.view, par_begin)
-                if self.view.line(row_to_pt(self.view, row)).empty():
-                    pt = view.text_point(row + 1, 0)
-                    if self.view.line(pt).empty():
-                        par_begin, eol = units._next_non_empty_row(
-                            self.view,
-                            par_begin
-                            )
-                        if not eol:
-                            par_begin = row_to_pt(
-                                    self.view,
-                                    row_at(self.view, par_begin) - 1)
                 return R(par_begin)
 
             elif mode == modes.VISUAL:
@@ -936,7 +925,7 @@ class _vi_left_brace(ViMotionCommand):
 
             elif mode == modes.INTERNAL_NORMAL:
                 next_start = units.prev_paragraph_start(view, s.b, count)
-                return R(s.a, next_start + 1)
+                return R(s.a, next_start)
 
             elif mode == modes.VISUAL_LINE:
                 if s.a <= s.b:
