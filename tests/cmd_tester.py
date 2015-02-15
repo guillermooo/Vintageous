@@ -48,9 +48,47 @@ class ViCmdTest (object):
         header, description = header.split('\n', 1)
         cmd_name, args = header.split(' ', 1)
         args = _make_args(args.split())
+        assert 'mode' in args, 'all commands need to know the current mode'
         before, after = body.split(TEST_RESULTS_DELIM)
         return ViCmdTest(cmd_name, args, description, before, after,
             file_name, test_nr)
+
+    def run_with(self, view):
+        view.run_command(self.cmd_name, self.args)
+        sels, after_text = self.process_notation(self.after_text)
+        return ((view.substr(sublime.Region(0, view.size())),
+                after_text, self.message),
+                (sels, list(view.sel()), self.message))
+
+    def process_notation(self, text):
+        SEL_START_TOKEN = '^'
+        SEL_END_TOKEN = '$'
+        deletions = 0
+        start = None
+        selections = []
+        chars = []
+
+        pos = 0
+        while pos < len(text):
+            c = text[pos]
+            if c == SEL_START_TOKEN:
+                if start is not None:
+                    raise ValueError('unexpected token %s at %d', c, pos)
+                start = pos - deletions
+                deletions += 1
+            elif c == SEL_END_TOKEN:
+                if start is None:
+                    raise ValueError('unexpected token %s at %d', c, pos)
+                selections.append((start, pos - deletions))
+                deletions += 1
+                start = None
+            else:
+                chars.append(c)
+            pos += 1
+
+        if start is not None:
+            raise ValueError('wrong format, orphan ^ at %d', start + deletions)
+        return selections, ''.join(chars)
 
 
 class ViCmdTester (unittest.TestCase):
@@ -60,24 +98,37 @@ class ViCmdTester (unittest.TestCase):
     Subclasses must implement setUp() and in it set self.path_to_test_specs.
     """
 
-    def get_tests(self):
+    def get_motion_tests(self):
+        specs = self.get_tests("*.motion-test")
+        return specs
+
+    def get_action_tests(self):
+        specs = self.get_tests("*.cmd-test")
+        return specs
+
+    def get_tests(self, ext):
         """
         Yields `ViCmdTest`s found under the self.path_to_test_specs dir.
         """
-        specs = glob.glob(os.path.join(self.path_to_test_specs, "*.cmd-test-solo"))
+        specs = glob.glob(os.path.join(self.path_to_test_specs, ext + "-solo"))
         if specs:
             specs = specs[0:1]
         else:
-            specs = glob.glob(os.path.join(self.path_to_test_specs, "*.cmd-test"))
+            specs = glob.glob(os.path.join(self.path_to_test_specs, ext))
+        return specs
 
-        for s in specs:
-            s = os.path.abspath(s)
+    def iter_tests(self):
+        specs = self.get_motion_tests() + self.get_action_tests()
+        for spec_path in specs:
+            spec_path = os.path.abspath(spec_path)
             content = None
-            with open(s, 'rt') as f:
+            with open(spec_path, 'rt') as f:
                 content = f.read()
             tests = content.split(TEST_DELIM)
-            for i, t in enumerate(tests):
-                yield ViCmdTest.from_text(t, s, i)
+            for i, test in enumerate(tests):
+                if not test:
+                    continue
+                yield ViCmdTest.from_text(test, spec_path, i)
 
     def append(self, text):
         self.view.run_command('append', {'characters': text})
@@ -88,7 +139,7 @@ class ViCmdTester (unittest.TestCase):
         self.view = sublime.active_window().new_file()
         self.view.set_scratch(True)
 
-    def set_sels(self):
+    def set_sels(self, test):
         """
         Enables adding selections to the buffer text using a minilanguage:
 
@@ -98,21 +149,24 @@ class ViCmdTester (unittest.TestCase):
         """
         self.view.sel().clear()
 
-        normal_mode_regs = self.view.find_all(r'x')
-        for nmr in normal_mode_regs:
-            self.view.sel().add(sublime.Region(nmr.a))
-
-        if len(self.view.sel()) > 0:
-            return
-
-        visual_mode_regs = self.view.find_all(r'v+')
-        for vmr in visual_mode_regs:
-            self.view.sel().add(vmr)
-
-        if len(self.view.sel()) > 0:
-            return
-
-        visual_mode_regs = self.view.find_all(r'S')
-        for vmr in visual_mode_regs:
-            self.view.sel().add(sublime.Region(vmr.a))
+        if test.args['mode'] in ('mode_normal', 'mode_internal_normal'):
+            regions = self.view.find_all(r'$', sublime.LITERAL)
+            if not regions:
+                # TODO(guillermooo): report this? we should expect some regions
+                return
+            self.view.sel().add_all(regions)
             self.view.run_command('right_delete')
+            return
+
+        if test.args ['mode'] == 'mode_visual':
+            visual_mode_regs = self.view.find_all(r'v+')
+            for vmr in visual_mode_regs:
+                self.view.sel().add(vmr)
+
+            if len(self.view.sel()) > 0:
+                return
+
+            visual_mode_regs = self.view.find_all(r'S')
+            for vmr in visual_mode_regs:
+                self.view.sel().add(sublime.Region(vmr.a))
+                self.view.run_command('right_delete')

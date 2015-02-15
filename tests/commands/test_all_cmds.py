@@ -16,15 +16,17 @@ class AllCommandsTester(ViCmdTester):
 
     def test_all(self):
         self.reset()
-        for t in self.get_tests():
-            self.append(t.before_text)
-            self.set_sels()
-            self.view.run_command(t.cmd_name, t.args)
-            self.assertEqual(
-                self.view.substr(sublime.Region(0, self.view.size())),
-                t.after_text,
-                t.message
-                )
+        for test in self.iter_tests():
+            self.append(test.before_text)
+            self.set_sels(test)
+            text_data, sel_data = test.run_with(self.view)
+            self.assertEqual(*text_data)
+            after_sels, before_sels, message = sel_data
+            self.assertEqual([(s.a, s.b) for s in before_sels], after_sels, message)
             self.reset()
         if self.view.is_scratch():
             self.view.close()
+
+    def tearDown(self):
+        self.view.close()
+        super().tearDown()
