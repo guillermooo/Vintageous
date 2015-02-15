@@ -1893,6 +1893,7 @@ class _vi_enter(ViMotionCommand):
 
         regions_transformer(self.view, advance)
 
+
 class _vi_minus(ViMotionCommand):
    def run(self, mode=None, count=1):
         self.view.run_command('_vi_k', {'mode': mode, 'count': count})
@@ -1901,15 +1902,15 @@ class _vi_minus(ViMotionCommand):
             if mode == modes.NORMAL:
                 pt = utils.next_non_white_space_char(view, s.b,
                                                      white_space=' \t')
-                return sublime.Region(pt)
+                return R(pt)
             elif mode == modes.VISUAL:
                 if s.a < s.b:
                     pt = utils.next_non_white_space_char(view, s.b - 1,
                                                          white_space=' \t')
-                    return sublime.Region(s.a, pt + 1)
+                    return R(s.a, pt + 1)
                 pt = utils.next_non_white_space_char(view, s.b,
                                                      white_space=' \t')
-                return sublime.Region(s.a, pt)
+                return R(s.a, pt)
             return s
 
         regions_transformer(self.view, advance)
