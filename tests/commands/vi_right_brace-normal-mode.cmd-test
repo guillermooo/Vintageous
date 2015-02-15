@@ -1,0 +1,100 @@
+_vi_right_brace mode:mode_normal
+can move 1 block
+***
+$
+aaa
+aaa
+
+bbb
+bbb
+
+---
+
+aaa
+aaa
+^$
+bbb
+bbb
+
+---///---
+_vi_right_brace mode:mode_normal count:2
+can move 2 blocks
+***
+$
+aaa
+aaa
+
+bbb
+bbb
+
+---
+
+aaa
+aaa
+
+bbb
+bbb
+^$
+---///---
+_vi_right_brace mode:mode_normal count:1
+skips over blank lines
+***
+$
+
+aaa
+aaa
+
+bbb
+bbb
+
+---
+
+
+aaa
+aaa
+^$
+bbb
+bbb
+
+---///---
+_vi_right_brace mode:mode_normal count:2
+skips over blank lines count >1
+***
+$
+
+aaa
+aaa
+
+
+bbb
+bbb
+
+---
+
+
+aaa
+aaa
+
+
+bbb
+bbb
+^$
+---///---
+_vi_right_brace mode:mode_normal count:20
+can reach EOF with large count
+***
+$
+aaa
+aaa
+
+bbb
+bbb
+xxx
+---
+
+aaa
+aaa
+
+bbb
+bbb
+xx^$x

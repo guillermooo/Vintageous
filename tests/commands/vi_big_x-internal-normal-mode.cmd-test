@@ -2,42 +2,42 @@ _vi_big_x mode:mode_internal_normal
 can delete 1 char
 ***
 aaa aaa aaa aaa aaa
-aaa aaa xbb aaa aaa
+aaa xxx $bbb aaa aaa
 aaa aaa aaa aaa aaa
 ---
 aaa aaa aaa aaa aaa
-aaa aaaxbb aaa aaa
+aaa xxx^$bbb aaa aaa
 aaa aaa aaa aaa aaa
 ---///---
 _vi_big_x mode:mode_internal_normal count:5
 can delete >1 char
 ***
 aaa aaa aaa aaa aaa
-aaa bbx aaa aaa aaa
+xxx bb$b aaa aaa aaa
 aaa aaa aaa aaa aaa
 ---
 aaa aaa aaa aaa aaa
-ax aaa aaa aaa
+x^$b aaa aaa aaa
 aaa aaa aaa aaa aaa
 ---///---
 _vi_big_x mode:mode_internal_normal count:500
 cannot delete past BOL
 ***
 aaa aaa aaa aaa aaa
-aaa xbb bbb bbb aaa
+xxx $bbb bbb bbb aaa
 aaa aaa aaa aaa aaa
 ---
 aaa aaa aaa aaa aaa
-xbb bbb bbb aaa
+^$bbb bbb bbb aaa
 aaa aaa aaa aaa aaa
 ---///---
 _vi_big_x mode:mode_internal_normal count:500
 cannot delete empty line
 ***
 aaa aaa aaa aaa aaa
-
+$
 bbb aaa aaa aaa aaa
 ---
 aaa aaa aaa aaa aaa
-
+^$
 bbb aaa aaa aaa aaa
