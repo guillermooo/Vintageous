@@ -1,0 +1,44 @@
+==============================================================================
+Vintageous 3.8.6
+==============================================================================
+
+*** Follow important announcements on Twitter: @VintageousS3 ***
+
+This version includes fixes.
+
+Guillermo
+
+
+CHANGES
+-------
+
+	- fix #822 - improve block motion
+	- Added key sequence for PLUS '+' to map to ENTER. (Thanks alex-carr)
+	- Added new class _vi_minus (a modified copy of _vi_enter). (Thanks alex-carr)
+	- fix #815: add 'b' text object
+
+
+FOUND BUGS?
+-----------
+
+Please report them here:
+
+    https://github.com/guillermooo/Vintageous/issues
+
+
+SUPPORT VINTAGEOUS
+------------------
+
+Is Vintageous worth your time? Developing Vintageous is hard work. If you use
+it often, please consider donating and make it worth my time too.
+
+    PayPal: http://www.pledgie.com/campaigns/19122
+    Gittip: https://www.gratipay.com/guillermooo/
+
+I'm the creator and main author of Vintageous, but some generous people have
+contributed their time and effort as well. See the more active ones here; you
+may want to show them some gratitude too:
+
+https://github.com/guillermooo/Vintageous/graphs/contributors
+
+Thanks for reading and for using Vintageous!

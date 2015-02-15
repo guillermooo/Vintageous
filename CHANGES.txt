@@ -1,3 +1,14 @@
+3.8.6 - 15-02-2015
+
+	- improve internal testing framework
+	- fix #822 - improve block motion
+	- Added key sequence for PLUS '+' to map to ENTER. (Thanks alex-carr)
+	- Added test for MINUS key '-' (Thanks alex-carr)
+	- Added new key sequence for '-' called MINUS. Set seqs.MINUS as key for class ViMoveBackOneLine. (Thanks alex-carr)
+	- Added new class ViMoveBackOneLine (a modified copy of ViMotionEnter). (Thanks alex-carr)
+	- Added new class _vi_minus (a modified copy of _vi_enter). (Thanks alex-carr)
+	- fix #815: 'b' as text object
+
 3.8.5 - 19-01-2015
 
 	- add basic test spec format for command tests
