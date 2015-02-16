@@ -13,10 +13,8 @@ class AllCommandsTester(ViCmdTester):
     def test_all(self):
         self.reset()
         for test in self.iter_tests():
-            try:
-                test.run_with(self)
-            finally:
-                self.reset()
+            test.run_with(self)
+            self.reset()
 
         if self.view.is_scratch():
             self.view.close()
