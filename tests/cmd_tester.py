@@ -23,6 +23,58 @@ def _make_args(args):
     return arg_dict
 
 
+def process_notation(text, sel_start_token='^', sel_end_token='$'):
+    '''
+    Processes @text assuming it contains markers defining selections.
+
+    @text
+      Text that contains @sel_start_token's and @sel_end_token's to define
+      selection regions.
+    @sel_start_token
+      Marks the start of a selection region.
+    @sel_end_token
+      Marks the end of a selection region.
+
+    Reversed selections can be defined too.
+
+    Returns (selections, processed_text), where `selections` are valid ST
+            ranges, and `processed_text` is @text without the special symbols.
+    '''
+    deletions = 0
+    start = None
+    selections = []
+    chars = []
+
+    pos = 0
+    while pos < len(text):
+        c = text[pos]
+        if c == sel_start_token:
+            if start == sel_start_token:
+                raise ValueError('unexpected token %s at %d', c, pos)
+            if start is None:
+                start = pos - deletions
+            else:
+                selections.append(sublime.Region(start, pos - deletions))
+                start = None
+            deletions += 1
+        elif c == sel_end_token:
+            if start == sel_end_token:
+                raise ValueError('unexpected token %s at %d', c, pos)
+            if start is None:
+                start = pos - deletions
+            else:
+                selections.append(sublime.Region(start, pos - deletions))
+                start = None
+            deletions += 1
+        else:
+            chars.append(c)
+        pos += 1
+
+    if start is not None:
+        raise ValueError('wrong format, orphan ^ at %d', start + deletions)
+    return selections, ''.join(chars)
+
+
 class ViCmdTest (object):
 
     def __init__(self, cmd_name, args, description,
@@ -53,42 +105,18 @@ class ViCmdTest (object):
         return ViCmdTest(cmd_name, args, description, before, after,
             file_name, test_nr)
 
-    def run_with(self, view):
+    def run_with(self, runner):
+        before_sels, before_text = process_notation(self.before_text)
+        runner.append(before_text)
+        runner.set_sels(before_sels)
+
+        view = runner.view
         view.run_command(self.cmd_name, self.args)
-        sels, after_text = self.process_notation(self.after_text)
-        return ((view.substr(sublime.Region(0, view.size())),
-                after_text, self.message),
-                (sels, list(view.sel()), self.message))
 
-    def process_notation(self, text):
-        SEL_START_TOKEN = '^'
-        SEL_END_TOKEN = '$'
-        deletions = 0
-        start = None
-        selections = []
-        chars = []
+        after_sels, after_text = process_notation(self.after_text)
 
-        pos = 0
-        while pos < len(text):
-            c = text[pos]
-            if c == SEL_START_TOKEN:
-                if start is not None:
-                    raise ValueError('unexpected token %s at %d', c, pos)
-                start = pos - deletions
-                deletions += 1
-            elif c == SEL_END_TOKEN:
-                if start is None:
-                    raise ValueError('unexpected token %s at %d', c, pos)
-                selections.append((start, pos - deletions))
-                deletions += 1
-                start = None
-            else:
-                chars.append(c)
-            pos += 1
-
-        if start is not None:
-            raise ValueError('wrong format, orphan ^ at %d', start + deletions)
-        return selections, ''.join(chars)
+        runner.assertEqual(view.substr(sublime.Region(0, view.size())), after_text, self.message)
+        runner.assertEqual(list(view.sel()), after_sels, self.message)
 
 
 class ViCmdTester (unittest.TestCase):
@@ -139,7 +167,7 @@ class ViCmdTester (unittest.TestCase):
         self.view = sublime.active_window().new_file()
         self.view.set_scratch(True)
 
-    def set_sels(self, test):
+    def set_sels(self, sels):
         """
         Enables adding selections to the buffer text using a minilanguage:
 
@@ -148,6 +176,8 @@ class ViCmdTester (unittest.TestCase):
         v = add sel from before the first 'v' to after the last contiguous 'v'
         """
         self.view.sel().clear()
+        self.view.sel().add_all(sels)
+        return
 
         if test.args['mode'] in ('mode_normal', 'mode_internal_normal'):
             regions = self.view.find_all(r'$', sublime.LITERAL)

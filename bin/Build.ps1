@@ -1,32 +1,32 @@
-param([switch]$Release)
+param([switch]$Release, [switch]$NoRestartEditor=$False)
 
-$script:thisDir = split-path $MyInvocation.MyCommand.Path -parent
+push-location $PSScriptRoot
+    . '.\Config.ps1'
+    if(!$?){
+        write-error "Could not read config."
+        exit 1
+    }
+pop-location
 
-. (join-path $script:thisDir "Config.ps1")
-
-if(!$?){
-	write-error "Could not read config."
-	exit 1
-}
-
-$publishRelease = join-path $script:thisDir "Publish.ps1"
-
-
-# XXX: Use @boundparams instead?
-& $publishRelease -Release:$Release
-
+push-location "$PSScriptRoot\.."
+& (join-path $PSScriptRoot '.\Publish.ps1') @PSBoundParameters
 if ($LASTEXITCODE -ne 0) {
     write-error "Could not publish package."
+    pop-location
     exit 1
 }
+pop-location
 
-get-process "sublime_text" | stop-process
+if ($NoRestartEditor) { exit 0 }
+
+get-process "sublime_text" -ea silentlycontinue | stop-process
+write-output "Trying to restart Sublime Text..."
 start-sleep -milliseconds 250
-# sss
+
 $editor = (GetConfigValue 'global-win' 'editor')
 if(!$?){
-	write-error "Could not locate editor command."
-	exit 1
+    write-error "Could not locate editor command."
+    exit 1
 }
 
 &$editor
