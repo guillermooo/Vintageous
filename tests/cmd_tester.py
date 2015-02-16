@@ -35,6 +35,8 @@ def process_notation(text, sel_start_token='^', sel_end_token='$'):
     @sel_end_token
       Marks the end of a selection region.
 
+    Reversed selections can be defined too.
+
     Returns (selections, processed_text), where `selections` are valid ST
             ranges, and `processed_text` is @text without the special symbols.
     '''
@@ -47,16 +49,23 @@ def process_notation(text, sel_start_token='^', sel_end_token='$'):
     while pos < len(text):
         c = text[pos]
         if c == sel_start_token:
-            if start is not None:
+            if start == sel_start_token:
                 raise ValueError('unexpected token %s at %d', c, pos)
-            start = pos - deletions
+            if start is None:
+                start = pos - deletions
+            else:
+                selections.append(sublime.Region(start, pos - deletions))
+                start = None
             deletions += 1
         elif c == sel_end_token:
-            if start is None:
+            if start == sel_end_token:
                 raise ValueError('unexpected token %s at %d', c, pos)
-            selections.append((start, pos - deletions))
+            if start is None:
+                start = pos - deletions
+            else:
+                selections.append(sublime.Region(start, pos - deletions))
+                start = None
             deletions += 1
-            start = None
         else:
             chars.append(c)
         pos += 1
@@ -97,13 +106,17 @@ class ViCmdTest (object):
             file_name, test_nr)
 
     def run_with(self, runner):
-        runner.append(self.before_text)
-        runner.set_sels(self)
+        before_sels, before_text = process_notation(self.before_text)
+        runner.append(before_text)
+        runner.set_sels(before_sels)
+
         view = runner.view
         view.run_command(self.cmd_name, self.args)
+
         after_sels, after_text = process_notation(self.after_text)
+
         runner.assertEqual(view.substr(sublime.Region(0, view.size())), after_text, self.message)
-        runner.assertEqual([(s.a, s.b) for s in view.sel()], after_sels, self.message)
+        runner.assertEqual(list(view.sel()), after_sels, self.message)
 
 
 class ViCmdTester (unittest.TestCase):
@@ -154,7 +167,7 @@ class ViCmdTester (unittest.TestCase):
         self.view = sublime.active_window().new_file()
         self.view.set_scratch(True)
 
-    def set_sels(self, test):
+    def set_sels(self, sels):
         """
         Enables adding selections to the buffer text using a minilanguage:
 
@@ -163,6 +176,8 @@ class ViCmdTester (unittest.TestCase):
         v = add sel from before the first 'v' to after the last contiguous 'v'
         """
         self.view.sel().clear()
+        self.view.sel().add_all(sels)
+        return
 
         if test.args['mode'] in ('mode_normal', 'mode_internal_normal'):
             regions = self.view.find_all(r'$', sublime.LITERAL)
