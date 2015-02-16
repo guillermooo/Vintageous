@@ -23,6 +23,49 @@ def _make_args(args):
     return arg_dict
 
 
+def process_notation(text, sel_start_token='^', sel_end_token='$'):
+    '''
+    Processes @text assuming it contains markers defining selections.
+
+    @text
+      Text that contains @sel_start_token's and @sel_end_token's to define
+      selection regions.
+    @sel_start_token
+      Marks the start of a selection region.
+    @sel_end_token
+      Marks the end of a selection region.
+
+    Returns (selections, processed_text), where `selections` are valid ST
+            ranges, and `processed_text` is @text without the special symbols.
+    '''
+    deletions = 0
+    start = None
+    selections = []
+    chars = []
+
+    pos = 0
+    while pos < len(text):
+        c = text[pos]
+        if c == sel_start_token:
+            if start is not None:
+                raise ValueError('unexpected token %s at %d', c, pos)
+            start = pos - deletions
+            deletions += 1
+        elif c == sel_end_token:
+            if start is None:
+                raise ValueError('unexpected token %s at %d', c, pos)
+            selections.append((start, pos - deletions))
+            deletions += 1
+            start = None
+        else:
+            chars.append(c)
+        pos += 1
+
+    if start is not None:
+        raise ValueError('wrong format, orphan ^ at %d', start + deletions)
+    return selections, ''.join(chars)
+
+
 class ViCmdTest (object):
 
     def __init__(self, cmd_name, args, description,
@@ -53,42 +96,14 @@ class ViCmdTest (object):
         return ViCmdTest(cmd_name, args, description, before, after,
             file_name, test_nr)
 
-    def run_with(self, view):
+    def run_with(self, runner):
+        runner.append(self.before_text)
+        runner.set_sels(self)
+        view = runner.view
         view.run_command(self.cmd_name, self.args)
-        sels, after_text = self.process_notation(self.after_text)
-        return ((view.substr(sublime.Region(0, view.size())),
-                after_text, self.message),
-                (sels, list(view.sel()), self.message))
-
-    def process_notation(self, text):
-        SEL_START_TOKEN = '^'
-        SEL_END_TOKEN = '$'
-        deletions = 0
-        start = None
-        selections = []
-        chars = []
-
-        pos = 0
-        while pos < len(text):
-            c = text[pos]
-            if c == SEL_START_TOKEN:
-                if start is not None:
-                    raise ValueError('unexpected token %s at %d', c, pos)
-                start = pos - deletions
-                deletions += 1
-            elif c == SEL_END_TOKEN:
-                if start is None:
-                    raise ValueError('unexpected token %s at %d', c, pos)
-                selections.append((start, pos - deletions))
-                deletions += 1
-                start = None
-            else:
-                chars.append(c)
-            pos += 1
-
-        if start is not None:
-            raise ValueError('wrong format, orphan ^ at %d', start + deletions)
-        return selections, ''.join(chars)
+        after_sels, after_text = process_notation(self.after_text)
+        runner.assertEqual(view.substr(sublime.Region(0, view.size())), after_text, self.message)
+        runner.assertEqual([(s.a, s.b) for s in view.sel()], after_sels, self.message)
 
 
 class ViCmdTester (unittest.TestCase):

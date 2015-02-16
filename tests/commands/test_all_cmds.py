@@ -1,9 +1,5 @@
-from collections import namedtuple
 import os
 
-import sublime
-
-from Vintageous.vi.utils import modes
 from Vintageous.tests.cmd_tester import ViCmdTester
 
 
@@ -17,16 +13,12 @@ class AllCommandsTester(ViCmdTester):
     def test_all(self):
         self.reset()
         for test in self.iter_tests():
-            self.append(test.before_text)
-            self.set_sels(test)
-            text_data, sel_data = test.run_with(self.view)
-            self.assertEqual(*text_data)
-            after_sels, before_sels, message = sel_data
-            self.assertEqual([(s.a, s.b) for s in before_sels], after_sels, message)
+            test.run_with(self)
             self.reset()
         if self.view.is_scratch():
             self.view.close()
 
     def tearDown(self):
-        self.view.close()
+        if self.view.is_scratch():
+            self.view.close()
         super().tearDown()
