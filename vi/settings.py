@@ -147,12 +147,15 @@ def set_global(view, name, value):
 
 def get_option(view, name):
     # TODO: Should probably return global, local values.
-    option_data = VI_OPTIONS[name]
+    try:
+        option_data = VI_OPTIONS[name]
+    except KeyError:
+        raise KeyError('not a vi editor option')
+
     if option_data.scope == SCOPE_WINDOW:
         value = view.window().settings().get('vintageous_' + name)
     else:
         value = view.settings().get('vintageous_' + name)
-
     return value if (value in option_data.values) else option_data.default
 
 
@@ -175,7 +178,19 @@ class SublimeSettings(object):
 
 
 class VintageSettings(object):
-    """ Helper class for accessing settings related to Vintage. """
+    """
+    Helper class for accessing settings related to Vintage.
+
+    Vintage settings data can be stored in:
+
+      a) the view.Settings object
+      b) the window.Settings object
+      c) VintageSettings._volatile
+
+    This class knows where to store the settings' data it's passed.
+
+    It is meant to be used as a descriptor.
+    """
 
     _volatile_settings = []
     # Stores volatile settings indexed by view.id().
@@ -191,28 +206,36 @@ class VintageSettings(object):
             self.view.window().settings().set('vintage', dict())
 
     def __get__(self, instance, owner):
+        # This method is called when this class is accessed as a data member.
         if instance is not None:
             return VintageSettings(instance.v)
         return VintageSettings()
 
     def __getitem__(self, key):
-
-        # Vi editor options.
-        if key in VI_OPTIONS:
+        # Deal with editor options first.
+        try:
             return get_option(self.view, key)
+        except KeyError:
+            pass
 
-        # Vintageous settings.
+        # Deal with state settings.
         try:
             if key not in WINDOW_SETTINGS:
-                value = self.view.settings().get('vintage').get(key)
+                try:
+                    return self._get_volatile(key)
+                except KeyError:
+                    value = self._get_vintageous_view_setting(key)
             else:
-                value = self.view.window().settings().get('vintage').get(key)
+                value = self._get_vintageous_window_setting(key)
         except (KeyError, AttributeError):
             value = None
         return value
 
     def __setitem__(self, key, value):
         if key not in WINDOW_SETTINGS:
+            if key in VintageSettings._volatile_settings:
+                self._set_volatile(key, value)
+                return
             setts, target = self.view.settings().get('vintage'), self.view
         else:
             setts, target = self.view.window().settings().get('vintage'), self.view.window()
@@ -220,17 +243,23 @@ class VintageSettings(object):
         setts[key] = value
         target.settings().set('vintage', setts)
 
-    def set(self, name, value):
-        if name in VintageSettings._volatile_settings:
-            VintageSettings._volatile[self.view.id()][name] = value
-            return
-        self[name] = value
+    def _get_vintageous_view_setting(self, key):
+        return self.view.settings().get('vintage').get(key)
 
-    def get(self, name):
+    def _get_vintageous_window_setting(self, key):
+        return self.view.window().settings().get('vintage').get(key)
+
+    def _get_volatile(self, key):
         try:
-            return VintageSettings._volatile[self.view.id()][name]
+            return VintageSettings._volatile[self.view.id()][key]
         except KeyError:
-            return self[name]
+            raise KeyError('error accessing volatile key: %s' % key)
+
+    def _set_volatile(self, key, value):
+        try:
+            VintageSettings._volatile[self.view.id()][key] = value
+        except KeyError:
+            raise KeyError('error while setting key "%s" to value "%s"' % (key, value))
 
 
 class SublimeWindowSettings(object):

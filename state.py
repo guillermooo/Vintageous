@@ -425,14 +425,14 @@ class State(object):
         `type` may be 'vi' or 'native'. `vi`-commands are executed via
         `ProcessNotation`, while `native`-commands are executed via .run_command().
         """
-        return self.settings.vi.get('repeat_data') or None
+        return self.settings.vi['repeat_data'] or None
 
     @repeat_data.setter
     def repeat_data(self, value):
         assert isinstance(value, tuple) or isinstance(value, list), 'bad call'
         assert len(value) == 4, 'bad call'
         self.logger.info("setting repeat data {0}".format(value))
-        self.settings.vi.set('repeat_data', value)
+        self.settings.vi['repeat_data'] = value
 
     @property
     def count(self):
