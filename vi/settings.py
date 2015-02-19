@@ -147,12 +147,15 @@ def set_global(view, name, value):
 
 def get_option(view, name):
     # TODO: Should probably return global, local values.
-    option_data = VI_OPTIONS[name]
+    try:
+        option_data = VI_OPTIONS[name]
+    except KeyError:
+        raise KeyError('not a vi editor option')
+
     if option_data.scope == SCOPE_WINDOW:
         value = view.window().settings().get('vintageous_' + name)
     else:
         value = view.settings().get('vintageous_' + name)
-
     return value if (value in option_data.values) else option_data.default
 
 
@@ -175,7 +178,19 @@ class SublimeSettings(object):
 
 
 class VintageSettings(object):
-    """ Helper class for accessing settings related to Vintage. """
+    """
+    Helper class for accessing settings related to Vintage.
+
+    Vintage settings data can be stored in:
+
+      a) the view.Settings object
+      b) the window.Settings object
+      c) VintageSettings._volatile
+
+    This class knows where to store the settings' data it's passed.
+
+    It is meant to be used as a descriptor.
+    """
 
     _volatile_settings = []
     # Stores volatile settings indexed by view.id().
@@ -191,23 +206,25 @@ class VintageSettings(object):
             self.view.window().settings().set('vintage', dict())
 
     def __get__(self, instance, owner):
+        # This method is called when this class is accessed as a data member.
         if instance is not None:
             return VintageSettings(instance.v)
         return VintageSettings()
 
     def __getitem__(self, key):
-        # Vi editor options.
-        if key in VI_OPTIONS:
+        # Deal with editor options first.
+        try:
             return get_option(self.view, key)
+        except KeyError:
+            pass
 
-        # Vintageous settings.
+        # Deal with state settings.
         try:
             if key not in WINDOW_SETTINGS:
                 try:
                     return VintageSettings._volatile[self.view.id()][key]
                 except KeyError:
-                    pass
-                value = self.view.settings().get('vintage').get(key)
+                    value = self.view.settings().get('vintage').get(key)
             else:
                 value = self.view.window().settings().get('vintage').get(key)
         except (KeyError, AttributeError):
