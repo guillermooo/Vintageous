@@ -5,6 +5,7 @@ from collections import Counter
 from Vintageous import local_logger
 from Vintageous.vi import cmd_base
 from Vintageous.vi import cmd_defs
+from Vintageous.vi import settings
 from Vintageous.vi import utils
 from Vintageous.vi.contexts import KeyContext
 from Vintageous.vi.dot_file import DotFile
@@ -20,6 +21,7 @@ from Vintageous.vi.utils import is_ignored_but_command_mode
 from Vintageous.vi.utils import is_view
 from Vintageous.vi.utils import modes
 from Vintageous.vi.variables import Variables
+
 # !! Avoid error due to sublime_plugin.py:45 expectations.
 from Vintageous.plugins import plugins as user_plugins
 
@@ -415,6 +417,7 @@ class State(object):
         self.settings.vi['action_count'] = value
 
     @property
+    @settings.volatile
     def repeat_data(self):
         """
         Stores (type, cmd_name_or_key_seq, , mode) for '.' to use.
@@ -422,14 +425,14 @@ class State(object):
         `type` may be 'vi' or 'native'. `vi`-commands are executed via
         `ProcessNotation`, while `native`-commands are executed via .run_command().
         """
-        return self.settings.vi['repeat_data'] or None
+        return self.settings.vi.get('repeat_data') or None
 
     @repeat_data.setter
     def repeat_data(self, value):
         assert isinstance(value, tuple) or isinstance(value, list), 'bad call'
         assert len(value) == 4, 'bad call'
         self.logger.info("setting repeat data {0}".format(value))
-        self.settings.vi['repeat_data'] = value
+        self.settings.vi.set('repeat_data', value)
 
     @property
     def count(self):
