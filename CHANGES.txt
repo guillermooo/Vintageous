@@ -1,3 +1,10 @@
+3.8.7 - 19-02-2015
+
+	- fix #817 - repeat data made command mode sluggish
+	- fix ST crash
+	- improve testing framework
+	- edit build scripts
+
 3.8.6 - 15-02-2015
 
 	- improve internal testing framework
