@@ -196,7 +196,6 @@ class VintageSettings(object):
         return VintageSettings()
 
     def __getitem__(self, key):
-
         # Vi editor options.
         if key in VI_OPTIONS:
             return get_option(self.view, key)
@@ -204,6 +203,10 @@ class VintageSettings(object):
         # Vintageous settings.
         try:
             if key not in WINDOW_SETTINGS:
+                try:
+                    return VintageSettings._volatile[self.view.id()][key]
+                except KeyError:
+                    pass
                 value = self.view.settings().get('vintage').get(key)
             else:
                 value = self.view.window().settings().get('vintage').get(key)
@@ -213,24 +216,15 @@ class VintageSettings(object):
 
     def __setitem__(self, key, value):
         if key not in WINDOW_SETTINGS:
+            if key in VintageSettings._volatile_settings:
+                VintageSettings._volatile[self.view.id()][key] = value
+                return
             setts, target = self.view.settings().get('vintage'), self.view
         else:
             setts, target = self.view.window().settings().get('vintage'), self.view.window()
 
         setts[key] = value
         target.settings().set('vintage', setts)
-
-    def set(self, name, value):
-        if name in VintageSettings._volatile_settings:
-            VintageSettings._volatile[self.view.id()][name] = value
-            return
-        self[name] = value
-
-    def get(self, name):
-        try:
-            return VintageSettings._volatile[self.view.id()][name]
-        except KeyError:
-            return self[name]
 
 
 class SublimeWindowSettings(object):
