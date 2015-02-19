@@ -1,9 +1,10 @@
 import sublime
 
-import collections
+from collections import defaultdict
+from collections import namedtuple
 import json
 
-vi_user_setting = collections.namedtuple('vi_editor_setting', 'scope values default parser action negatable')
+vi_user_setting = namedtuple('vi_editor_setting', 'scope values default parser action negatable')
 
 WINDOW_SETTINGS = [
     'last_buffer_search',
@@ -15,6 +16,17 @@ SCOPE_WINDOW = 1
 SCOPE_VIEW = 2
 SCOPE_VI_VIEW = 3
 SCOPE_VI_WINDOW = 4
+
+
+def volatile(f):
+    VintageSettings._volatile_settings.append(f.__name__)
+    return f
+
+def destroy(view):
+    try:
+        del VintageSettings._volatile[view.id()]
+    except KeyError:
+        pass
 
 
 def set_generic_view_setting(view, name, value, opt, globally=False):
@@ -165,6 +177,10 @@ class SublimeSettings(object):
 class VintageSettings(object):
     """ Helper class for accessing settings related to Vintage. """
 
+    _volatile_settings = []
+    # Stores volatile settings indexed by view.id().
+    _volatile = defaultdict(dict)
+
     def __init__(self, view=None):
         self.view = view
 
@@ -203,6 +219,18 @@ class VintageSettings(object):
 
         setts[key] = value
         target.settings().set('vintage', setts)
+
+    def set(self, name, value):
+        if name in VintageSettings._volatile_settings:
+            VintageSettings._volatile[self.view.id()][name] = value
+            return
+        self[name] = value
+
+    def get(self, name):
+        try:
+            return VintageSettings._volatile[self.view.id()][name]
+        except KeyError:
+            return self[name]
 
 
 class SublimeWindowSettings(object):

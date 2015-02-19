@@ -10,6 +10,7 @@ import sublime_plugin
 from Vintageous import local_logger
 from Vintageous.state import _init_vintageous
 from Vintageous.state import State
+from Vintageous.vi import settings
 from Vintageous.vi import cmd_defs
 from Vintageous.vi.dot_file import DotFile
 from Vintageous.vi.utils import modes
@@ -49,6 +50,9 @@ class VintageStateTracker(sublime_plugin.EventListener):
     def on_query_context(self, view, key, operator, operand, match_all):
         vintage_state = State(view)
         return vintage_state.context.check(key, operator, operand, match_all)
+
+    def on_close(self, view):
+        settings.destroy(view)
 
 
 class ViMouseTracker(sublime_plugin.EventListener):
