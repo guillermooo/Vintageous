@@ -1,3 +1,12 @@
+3.8.8 - 06-03-2015
+
+	- fix variable name
+	- fix #839 - exit loop in { if at BOF
+	- fix #837 - dd and cc should accept registers
+	- remove unused import
+	- fix #759 - improve switching to visual block mode from visual mode
+	- refactor settings code
+
 3.8.7 - 19-02-2015
 
 	- fix #817 - repeat data made command mode sluggish
