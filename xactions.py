@@ -1,7 +1,6 @@
 # TODO: weird name to avoid init issues with state.py::State.
 
 from functools import partial
-from itertools import chain
 import re
 
 import sublime
