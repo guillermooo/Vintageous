@@ -278,7 +278,10 @@ def prev_paragraph_start(view, pt, count=1, skip_empty=True):
     current_row = utils.row_at(view, pt)
     if (view.line(view.text_point(current_row - 1, 0)).empty() and
         view.line(view.text_point(current_row, 0)).empty()):
-            pt, _ = _prev_non_empty_row(view, pt)
+            pt, bol = _prev_non_empty_row(view, pt)
+
+            if bol:
+                return 0
 
     for i in range(count):
         pt, bol = _prev_empty_row(view, pt)
