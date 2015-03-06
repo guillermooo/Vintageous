@@ -2389,6 +2389,59 @@ class _enter_visual_block_mode(ViTextCommandBase):
     def run(self, edit, mode=None):
         def f(view, s):
             return R(s.b, s.b + 1)
+
+        if mode in (modes.VISUAL_LINE,):
+            return
+
+        if mode == modes.VISUAL_BLOCK:
+            self.enter_normal_mode(mode)
+            return
+
+        if mode == modes.VISUAL:
+            first = utils.first_sel(self.view)
+
+            if self.view.line(first.end() - 1).empty():
+                self.enter_normal_mode(mode)
+                utils.blink()
+                return
+
+            self.view.sel().clear()
+            lhs_edge = self.view.rowcol(first.b)[1]
+            regs = self.view.split_by_newlines(first)
+
+            offset_a, offset_b = self.view.rowcol(first.a)[1], self.view.rowcol(first.b)[1]
+            min_offset_x = min(offset_a, offset_b)
+            max_offset_x = max(offset_a, offset_b)
+
+            new_regs = []
+            for r in regs:
+                if r.empty():
+                    break
+                row, _ = self.view.rowcol(r.end() - 1)
+                a = self.view.text_point(row, min_offset_x)
+                eol = self.view.rowcol(self.view.line(r.end() - 1).b)[1]
+                b = self.view.text_point(row, min(max_offset_x, eol))
+
+                if first.a <= first.b:
+                    if offset_b < offset_a:
+                        new_r = R(a - 1, b + 1, eol)
+                    else:
+                        new_r = R(a, b, eol)
+                elif offset_b < offset_a:
+                    new_r = R(a, b, eol)
+                else:
+                    new_r = R(a - 1, b + 1, eol)
+
+                new_regs.append(new_r)
+
+            if not new_regs:
+                new_regs.append(first)
+
+            self.view.sel().add_all(new_regs)
+            state = State(self.view)
+            state.enter_visual_block_mode()
+            return
+
         # Handling multiple visual blocks seems quite hard, so ensure we only
         # have one.
         first = list(self.view.sel())[0]
