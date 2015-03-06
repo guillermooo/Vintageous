@@ -393,7 +393,11 @@ class ViChangeLine(ViOperatorDef):
 
         cmd = {}
         cmd['action'] = '_vi_cc'
-        cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+        cmd['action_args'] = {
+            'mode': state.mode,
+            'count': state.count,
+            'register': state.register
+            }
         return cmd
 
 
@@ -412,7 +416,11 @@ class ViDeleteLine(ViOperatorDef):
     def translate(self, state):
         cmd = {}
         cmd['action'] = '_vi_dd'
-        cmd['action_args'] = {'mode': state.mode, 'count': state.count}
+        cmd['action_args'] = {
+            'mode': state.mode,
+            'count': state.count,
+            'register': state.register
+            }
         return cmd
 
 

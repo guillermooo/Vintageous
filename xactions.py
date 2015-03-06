@@ -967,14 +967,14 @@ class _vi_dot(ViWindowCommandBase):
 class _vi_dd(ViTextCommandBase):
 
     _can_yank = True
-    _yanks_linewise = False
+    _yanks_linewise = True
     _populates_small_delete_register = False
     _synthetize_new_line_at_eof = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def run(self, edit, mode=None, count=1):
+    def run(self, edit, mode=None, count=1, register='"'):
         def do_motion(view, s):
             if mode != modes.INTERNAL_NORMAL:
                 return s
@@ -997,7 +997,7 @@ class _vi_dd(ViTextCommandBase):
             self.view.sel().add_all([R(pt) for pt in new])
 
         regions_transformer(self.view, do_motion)
-        self.state.registers.yank(self)
+        self.state.registers.yank(self, register)
         self.view.run_command('right_delete')
         set_sel()
         # TODO(guillermooo): deleting last line leaves the caret at \n
@@ -1006,7 +1006,7 @@ class _vi_dd(ViTextCommandBase):
 class _vi_cc(ViTextCommandBase):
 
     _can_yank = True
-    _yanks_linewise = False
+    _yanks_linewise = True
     _populates_small_delete_register = False
     _synthetize_new_line_at_eof = True
 
@@ -1024,7 +1024,7 @@ class _vi_cc(ViTextCommandBase):
             return units.inner_lines(view, s, count)
 
         regions_transformer(self.view, motion)
-        self.state.registers.yank(self)
+        self.state.registers.yank(self, register)
         self.view.run_command ('right_delete')
         self.enter_insert_mode(mode)
         self.set_xpos(self.state)
