@@ -21,6 +21,7 @@
 			["./vi/*.py", []],
 			["./ex/*.py", []],
 			["./ex/parsers/*.py", []],
+			["./ex/parsers/new/*.py", []],
 			["./plugins/*.py", []],
 			["./ex/plat/*.py", []],
 
@@ -47,6 +48,7 @@
 			["./ex/*.py", []],
 			["./plugins/*.py", []],
 			["./ex/parsers/*.py", []],
+			["./ex/parsers/new/*.py", []],
 			["./ex/plat/*.py", []]
 		]
 	}
