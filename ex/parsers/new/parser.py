@@ -56,7 +56,7 @@ def parse_line_ref(state, command_line):
 
     if isinstance(token, TokenComma):
         init_line_range(command_line)
-        command_line.line_range.right_hand_side = True
+        command_line.line_range.right_hand_side = not command_line.line_range.right_hand_side
         return parse_line_ref, command_line
 
     if isinstance(token, TokenSemicolon):
@@ -69,16 +69,37 @@ def parse_line_ref(state, command_line):
         init_line_range(command_line)
         return parse_line_ref_digits(token, state, command_line)
 
+    if isinstance (token, TokenDollar):
+        init_line_range(command_line)
+        return parse_line_ref_dollar(token, state, command_line)
+
+    if isinstance (token, TokenOfCommand):
+        init_line_range(command_line)
+        command_line.command = token
+        return None, command_line
+
     return None, command_line
 
 
-def parse_line_ref_digits(token, state, command_line):
+def parse_line_ref_dollar(token, state, command_line):
     if not command_line.line_range.right_hand_side:
         if command_line.line_range.start_line:
             raise ValueError('bad range: {0}'.format(state.scanner.state.source))
         command_line.line_range.start_line = token.content
     else:
         if command_line.line_range.end_line:
+            raise ValueError('bad range: {0}'.format(state.scanner.state.source))
+        command_line.line_range.end_line = token.content
+    return parse_line_ref, command_line
+
+
+def parse_line_ref_digits(token, state, command_line):
+    if not command_line.line_range.right_hand_side:
+        if command_line.line_range.start_line == '.':
+            raise ValueError('bad range: {0}'.format(state.scanner.state.source))
+        command_line.line_range.start_line = token.content
+    else:
+        if command_line.line_range.end_line == '.':
             raise ValueError('bad range: {0}'.format(state.scanner.state.source))
         command_line.line_range.end_line = token.content
     return parse_line_ref, command_line
@@ -109,10 +130,14 @@ def parse_line_ref_search_backward(token, state, command_line):
 
 
 def parse_line_ref_offset(token, state, command_line):
-    if command_line.line_range.right_hand_side:
-        command_line.line_range.end_offset.extend(token.content)
-    else:
+    if not command_line.line_range.right_hand_side:
+        if command_line.line_range.start_line == '$':
+            raise ValueError ('bad command line {}'.format (state.scanner.state.source))
         command_line.line_range.start_offset.extend(token.content)
+    else:
+        if command_line.line_range.end_line == '$':
+            raise ValueError ('bad command line {}'.format (state.scanner.state.source))
+        command_line.line_range.end_offset.extend(token.content)
     return parse_line_ref, command_line
 
 
