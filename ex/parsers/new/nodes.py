@@ -50,6 +50,7 @@ class RangeNode(Node):
         self._end_offset = value
 
 
+# TODO: remove this
 class CommandNode(Node):
     def __init__(self, command_token):
         self.name = command_token.content
@@ -60,5 +61,10 @@ class CommandNode(Node):
 
 class CommandLineNode(Node):
     def __init__(self, line_range, command):
+        # A RangeNode
         self.line_range = line_range
+        # A TokenOfCommand
         self.command = command
+
+    def __str__(self):
+        return '{0}, {1}'.format(str(self.line_range), str(self.command))
