@@ -274,7 +274,6 @@ class State(object):
 
     @last_buffer_search_command.setter
     def last_buffer_search_command(self, value):
-        print("aaaa", value)
         self.settings.window['_vintageous_last_buffer_search_command'] = value
 
     @property

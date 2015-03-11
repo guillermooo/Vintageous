@@ -3,6 +3,7 @@ import sublime_plugin
 
 import os
 
+from Vintageous.ex.parsers.new.parser import start_parsing
 from Vintageous.ex import ex_error
 from Vintageous.ex.ex_command_parser import EX_COMMANDS
 from Vintageous.ex.ex_command_parser import parse_command
@@ -95,7 +96,11 @@ class ViColonInput(sublime_plugin.WindowCommand):
         else:
             self.non_interactive = False
         ex_cmd = parse_command(cmd_line)
-        print(ex_cmd)
+        try:
+            new_ex_cmd = start_parsing(cmd_line[1:])
+            print('Vintageous:', new_ex_cmd)
+        except Exception:
+            pass
 
         if ex_cmd and ex_cmd.parse_errors:
             ex_error.display_error(ex_cmd.parse_errors[0])
