@@ -117,7 +117,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
 
         if parsed and parsed.name:
             if parsed.can_have_range:
-                parsed.args["line_range"] = parsed.line_range
+                parsed.args['line_range'] = parsed.line_range
 
             if parsed.forced:
                 parsed.args['forced'] = parsed.forced
