@@ -100,8 +100,6 @@ class ViColonInput(sublime_plugin.WindowCommand):
     def on_done(self, cmd_line):
         if ViColonInput.interactive_call:
             update_command_line_history('cmdline', cmd_line)
-        else:
-            ViColonInput.interactive_call = True
 
         # Use old parser for most commands.
         ex_cmd = parse_command(cmd_line)
