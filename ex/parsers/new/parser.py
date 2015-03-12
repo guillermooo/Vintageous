@@ -8,6 +8,7 @@ from .tokens import TokenDigits
 from .tokens import TokenDollar
 from .tokens import TokenDot
 from .tokens import TokenEof
+from .tokens import TokenMark
 from .tokens import TokenOffset
 from .tokens import TokenPercent
 from .tokens import TokenSearchBackward
@@ -73,12 +74,24 @@ def parse_line_ref(state, command_line):
         init_line_range(command_line)
         return parse_line_ref_dollar(token, state, command_line)
 
+    if isinstance (token, TokenMark):
+        init_line_range(command_line)
+        return parse_line_ref_mark(token, state, command_line)
+
     if isinstance (token, TokenOfCommand):
         init_line_range(command_line)
         command_line.command = token
         return None, command_line
 
     return None, command_line
+
+
+def parse_line_ref_mark(token, state, command_line):
+    if not command_line.line_range.right_hand_side:
+        command_line.line_range.start_line = token.content
+    else:
+        command_line.line_range.end_line = token.content
+    return parse_line_ref, command_line
 
 
 def parse_line_ref_dollar(token, state, command_line):

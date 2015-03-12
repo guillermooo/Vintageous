@@ -10,6 +10,7 @@ from .tokens import TokenDigits
 from .tokens import TokenSemicolon
 from .tokens import TokenOffset
 from .tokens import TokenEof
+from .tokens import TokenMark
 from .tokens_commands import TokenCommandSubstitute
 from .tokens_commands_substitute import scan_command_substitute
 
@@ -49,6 +50,9 @@ def scan_range(state):
         state.emit()
         return scan_range, [token()]
 
+    if c == "'":
+        return scan_mark(state)
+
     if c in '/?':
         return scan_search(state)
 
@@ -68,6 +72,11 @@ def scan_range(state):
 
     state.backup()
     return scan_command, []
+
+
+def scan_mark(state):
+    c = state.expect_match(r'[a-zA-Z\[\]()<>]')
+    return scan_range, [TokenMark(c.group(0))]
 
 
 def scan_digits(state):

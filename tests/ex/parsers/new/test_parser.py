@@ -268,3 +268,14 @@ class parse_line_ref_ParseSubstituteCommand(unittest.TestCase):
         self.assertEqual(parsed.line_range.start_line, '0')
         self.assertEqual(parsed.line_range.end_line, '$')
         self.assertEqual(parsed.command.content, 'substitute')
+
+
+class parse_line_ref_ParseMarks(unittest.TestCase):
+    def test_CanParseItOnItsOwn(self):
+        parsed = start_parsing("'a")
+        self.assertEqual(parsed.line_range.start_line, 'a')
+
+    def test_CanParseOnTwoSides(self):
+        parsed = start_parsing("'a,'b")
+        self.assertEqual(parsed.line_range.start_line, 'a')
+        self.assertEqual(parsed.line_range.end_line, 'b')

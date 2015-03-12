@@ -12,6 +12,7 @@ from Vintageous.ex.parsers.new.tokens import TokenOffset
 from Vintageous.ex.parsers.new.tokens import TokenPercent
 from Vintageous.ex.parsers.new.tokens import TokenSearchForward
 from Vintageous.ex.parsers.new.tokens import TokenSearchBackward
+from Vintageous.ex.parsers.new.tokens import TokenMark
 from Vintageous.ex.parsers.new.tokens_commands import TokenCommandSubstitute
 
 
@@ -117,3 +118,10 @@ class ScannerCommandNameTests(unittest.TestCase):
         tokens = list(scanner.scan())
         params = {"search_term": "foo", "replacement": "bar", "flags": [], "count": 10}
         self.assertEqual([TokenCommandSubstitute(params), TokenEof()], tokens)
+
+
+class ScannerMarksScanner_Tests(unittest.TestCase):
+    def testCanInstantiate(self):
+        scanner = Scanner("'a")
+        tokens = list(scanner.scan())
+        self.assertEqual([TokenMark('a'), TokenEof()], tokens)

@@ -54,3 +54,13 @@ class TokenDigits(TokenOfRange):
     def __init__(self, content, *args, **kwargs):
         super().__init__(TOKEN_DIGITS, content, *args, **kwargs)
 
+
+class TokenMark(TokenOfRange):
+    def __init__(self, content, *args, **kwargs):
+        super().__init__(TOKEN_MARK, content, *args, **kwargs)
+
+    def __str__(self):
+        return "'{}".format(self.content)
+
+    def __repr__(self):
+        return "<[{0}]('{1})>".format(self.__class__.__name__, self.content)
