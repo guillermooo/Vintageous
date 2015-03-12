@@ -35,7 +35,7 @@ EX_HISTORY = {
 }
 
 
-def update_command_line_history(item, slot_name):
+def update_command_line_history(slot_name, item):
     if len(EX_HISTORY[slot_name]) >= EX_HISTORY_MAX_LENGTH:
         EX_HISTORY[slot_name] = EX_HISTORY[slot_name][1:]
     if item in EX_HISTORY[slot_name]:
@@ -52,27 +52,34 @@ class ViColonInput(sublime_plugin.WindowCommand):
     def __init__(self, window):
         sublime_plugin.WindowCommand.__init__(self, window)
 
+    def adjust_initial_text(self, text):
+        state = State(self.window.active_view())
+        if state.mode in (modes.VISUAL, modes.VISUAL_LINE):
+            text = ":'<,'>" + text[1:]
+        return text
+
     def run(self, initial_text=':', cmd_line=''):
-        # non-interactive call
         if cmd_line:
-            self.non_interactive = True
+            # The caller has provided a command, to we're not in interactive
+            # mode -- just run the command.
+            ViColonInput.interactive_call = False
             self.on_done(cmd_line)
             return
+        else:
+            ViColonInput.interactive_call = True
 
         FsCompletion.invalidate()
 
-        state = State(self.window.active_view())
-        if state.mode in (modes.VISUAL, modes.VISUAL_LINE):
-            initial_text = ":'<,'>" + initial_text[1:]
-
         v = mark_as_widget(show_ipanel(self.window,
-                                       initial_text=initial_text,
-                                       on_done=self.on_done,
-                                       on_change=self.on_change))
+               initial_text=self.adjust_initial_text(initial_text),
+               on_done=self.on_done,
+               on_change=self.on_change))
+
         v.set_syntax_file('Packages/Vintageous/VintageousEx Cmdline.tmLanguage')
         v.settings().set('gutter', False)
         v.settings().set('rulers', [])
 
+        state = State(self.window.active_view())
         state.reset_during_init = False
 
     def on_change(self, s):
@@ -91,23 +98,29 @@ class ViColonInput(sublime_plugin.WindowCommand):
         ViColonInput.interactive_call = True
 
     def on_done(self, cmd_line):
-        if not getattr(self, 'non_interactive', None):
-            update_command_line_history(cmd_line, 'cmdline')
+        if ViColonInput.interactive_call:
+            update_command_line_history('cmdline', cmd_line)
         else:
-            self.non_interactive = False
+            ViColonInput.interactive_call = True
+
+        # Use old parser for most commands.
         ex_cmd = parse_command(cmd_line)
         try:
+            # Use new parser for some commands.
             new_ex_cmd = start_parsing(cmd_line[1:])
             print('Vintageous:', new_ex_cmd)
         except Exception:
+            # TODO: Display errors from parser.
             pass
 
         if ex_cmd and ex_cmd.parse_errors:
             ex_error.display_error(ex_cmd.parse_errors[0])
             return
+
         if ex_cmd and ex_cmd.name:
             if ex_cmd.can_have_range:
                 ex_cmd.args["line_range"] = ex_cmd.line_range
+
             if ex_cmd.forced:
                 ex_cmd.args['forced'] = ex_cmd.forced
             self.window.run_command(ex_cmd.command, ex_cmd.args)
