@@ -8,11 +8,11 @@ class RangeNode(Node):
             start_line=None,
             end_line=None,
             must_recompute_start_line=False):
-        self.start_line = start_line
-        self.end_line = end_line
+        self.start_line =  start_line or []
+        self.end_line = end_line or []
         self._must_recompute_start_line = must_recompute_start_line
         self.start_offset = []
-        self._end_offset = []
+        self.end_offset = []
         self.right_hand_side = False
 
     def __repr__(self):
@@ -38,16 +38,6 @@ class RangeNode(Node):
         if self._must_recompute_start_line is True:
             raise ValueError("must_recompute_start_line is already set")
         self._must_recompute_start_line = value
-
-    @property
-    def end_offset(self):
-        return self._end_offset
-
-    @end_offset.setter
-    def end_offset(self, value):
-        if len(self._end_offset) > 0:
-            raise ValueError("end_offset is already set")
-        self._end_offset = value
 
 
 # TODO: remove this
