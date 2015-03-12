@@ -102,26 +102,26 @@ class ViColonInput(sublime_plugin.WindowCommand):
             update_command_line_history('cmdline', cmd_line)
 
         # Use old parser for most commands.
-        ex_cmd = parse_command(cmd_line)
+        parsed = parse_command(cmd_line)
         try:
             # Use new parser for some commands.
-            new_ex_cmd = start_parsing(cmd_line[1:])
-            print('Vintageous:', new_ex_cmd)
+            parsed_new = start_parsing(cmd_line[1:])
+            print('Vintageous:', parsed_new)
         except Exception:
             # TODO: Display errors from parser.
             pass
 
-        if ex_cmd and ex_cmd.parse_errors:
-            ex_error.display_error(ex_cmd.parse_errors[0])
+        if parsed and parsed.parse_errors:
+            ex_error.display_error(parsed.parse_errors[0])
             return
 
-        if ex_cmd and ex_cmd.name:
-            if ex_cmd.can_have_range:
-                ex_cmd.args["line_range"] = ex_cmd.line_range
+        if parsed and parsed.name:
+            if parsed.can_have_range:
+                parsed.args["line_range"] = parsed.line_range
 
-            if ex_cmd.forced:
-                ex_cmd.args['forced'] = ex_cmd.forced
-            self.window.run_command(ex_cmd.command, ex_cmd.args)
+            if parsed.forced:
+                parsed.args['forced'] = parsed.forced
+            self.window.run_command(parsed.command, parsed.args)
         else:
             ex_error.display_error(ex_error.ERR_UNKNOWN_COMMAND, cmd_line)
 
