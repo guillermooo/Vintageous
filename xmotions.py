@@ -1234,8 +1234,8 @@ class _vi_star(ViMotionCommand, ExactWordBufferSearchBase):
                     return sublime.Region(match.begin(), match.begin())
 
             elif mode == modes.NORMAL:
-                pt = utils.previous_white_space_char(view, s.b)
-                return sublime.Region(pt + 1)
+                pt = view.word(s.end()).begin()
+                return sublime.Region(pt)
 
             return s
 
