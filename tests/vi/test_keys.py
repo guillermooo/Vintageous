@@ -174,6 +174,7 @@ TESTS_KNOWN_SEQUENCES = (
 
     seq_test(actual=seqs.CTRL_C,               expected='<C-c>'),
     seq_test(actual=seqs.CTRL_ENTER,           expected='<C-cr>'),
+    seq_test(actual=seqs.CTRL_SHIFT_B,         expected='<C-S-b>'),
     seq_test(actual=seqs.CTRL_SHIFT_ENTER,     expected='<C-S-cr>'),
     seq_test(actual=seqs.CTRL_DOT,             expected='<C-.>'),
     seq_test(actual=seqs.CTRL_SHIFT_DOT,       expected='<C-S-.>'),

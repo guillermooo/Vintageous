@@ -263,6 +263,8 @@
 
 	{"keys": ["shift+ctrl+."], "command": "press_key", "args": {"key": "<C-S-.>"}, "context": [{"key": "vi_command_mode_aware"}, 	{"key": "vi_use_ctrl_keys"}]},
 
+	{"keys": ["shift+ctrl+b"], "command": "press_key", "args": {"key": "<C-S-b>"}, "context": [{"key": "vi_command_mode_aware"}, 	{"key": "vi_use_ctrl_keys"}]},
+
 	// {"keys": ["shift+alt+a"], "command": "press_key", "args": {"key": "alt+A"}, "context": [{"key": "vi_command_mode_aware"}, {"key": "vi_use_ctrl_keys"}]},
 	// {"keys": ["shift+alt+b"], "command": "press_key", "args": {"key": "alt+B"}, "context": [{"key": "vi_command_mode_aware"}, {"key": "vi_use_ctrl_keys"}]},
 	// {"keys": ["shift+alt+c"], "command": "press_key", "args": {"key": "alt+C"}, "context": [{"key": "vi_command_mode_aware"}, {"key": "vi_use_ctrl_keys"}]},

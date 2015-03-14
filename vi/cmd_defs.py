@@ -1103,6 +1103,24 @@ class StToggleSidebar(ViOperatorDef):
         return cmd
 
 
+@keys.assign(seq=seqs.CTRL_SHIFT_B, modes=_MODES_ACTION)
+class StShowBuildSystemsMenu(ViOperatorDef):
+    """
+    Vintageous: `<C-S-b>`
+    """
+
+    def __init__(self, *args, **kwargs):
+        ViOperatorDef.__init__(self, *args, **kwargs)
+        self.updates_xpos = True
+        self.scroll_into_view = True
+
+    def translate(self, state):
+        cmd = {}
+        cmd['action'] = 'build'
+        cmd['action_args'] = { 'select': True }
+        return cmd
+
+
 @keys.assign(seq=seqs.CTRL_BIG_F, modes=_MODES_ACTION)
 class StFinInFiles(ViOperatorDef):
     """

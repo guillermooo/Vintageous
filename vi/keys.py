@@ -74,6 +74,7 @@ class seqs:
 
     CTRL_C =                       '<C-c>'
     CTRL_ENTER =                   '<C-cr>'
+    CTRL_SHIFT_B =                 '<C-S-b>'
     CTRL_SHIFT_ENTER =             '<C-S-cr>'
     CTRL_DOT =                     '<C-.>'
     CTRL_SHIFT_DOT =               '<C-S-.>'
