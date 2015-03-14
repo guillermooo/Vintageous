@@ -3,6 +3,7 @@
 class Node(object):
     pass
 
+
 class RangeNode(Node):
     def __init__(self,
             start_line=None,
@@ -10,10 +11,10 @@ class RangeNode(Node):
             must_recompute_start_line=False):
         self.start_line =  start_line or []
         self.end_line = end_line or []
-        self._must_recompute_start_line = must_recompute_start_line
+        self.must_recompute_start_line = must_recompute_start_line
         self.start_offset = []
         self.end_offset = []
-        self.right_hand_side = False
+        self.separator = None
 
     def __repr__(self):
         return ('<{0}(start:{1}, end:{2}, loffset:{3}, roffset:{4}, semicolon:{5}]>'
@@ -25,28 +26,9 @@ class RangeNode(Node):
             return False
         return (self.start_line == other.start_line and
                 self.end_line == other.end_line and
-                self.must_recompute_start_line == other.must_recompute_start_line and
+                self.separator == other.separator and
                 self.start_offset == other.start_offset and
                 self.end_offset == other.end_offset)
-
-    @property
-    def must_recompute_start_line(self):
-        return self._must_recompute_start_line
-
-    @must_recompute_start_line.setter
-    def must_recompute_start_line(self, value):
-        if self._must_recompute_start_line is True:
-            raise ValueError("must_recompute_start_line is already set")
-        self._must_recompute_start_line = value
-
-
-# TODO: remove this
-class CommandNode(Node):
-    def __init__(self, command_token):
-        self.name = command_token.content
-        self.arguments = command_token.params
-        self.flags = command_token.params.get('flags', [])
-        self.count = command_token.params.get('count', 1)
 
 
 class CommandLineNode(Node):
