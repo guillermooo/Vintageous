@@ -29,7 +29,6 @@ class parse_line_ref_Tests(unittest.TestCase):
         self.assertEqual(parsed.line_range.end_line, [])
         self.assertEqual(parsed.line_range.start_offset, [10])
         self.assertEqual(parsed.line_range.end_offset, [])
-        self.assertEqual(parsed.line_range.must_recompute_start_line, False)
 
     def test_CanParseLoneOffset(self):
         parsed = start_parsing('+10')
@@ -37,7 +36,6 @@ class parse_line_ref_Tests(unittest.TestCase):
         self.assertEqual(parsed.line_range.end_line, [])
         self.assertEqual(parsed.line_range.start_offset, [10])
         self.assertEqual(parsed.line_range.end_offset, [])
-        self.assertEqual(parsed.line_range.must_recompute_start_line, False)
 
     def test_FailsIfDotAfterOffset(self):
         self.assertRaises(ValueError, start_parsing, '+10.')
@@ -48,7 +46,6 @@ class parse_line_ref_Tests(unittest.TestCase):
         self.assertEqual(parsed.line_range.end_line, [])
         self.assertEqual(parsed.line_range.start_offset, [10, 10])
         self.assertEqual(parsed.line_range.end_offset, [])
-        self.assertEqual(parsed.line_range.must_recompute_start_line, False)
 
     def test_CanParseSearchForward(self):
         parsed = start_parsing('/foo/')
@@ -56,7 +53,6 @@ class parse_line_ref_Tests(unittest.TestCase):
         self.assertEqual(parsed.line_range.end_line, [])
         self.assertEqual(parsed.line_range.start_offset, [])
         self.assertEqual(parsed.line_range.end_offset, [])
-        self.assertEqual(parsed.line_range.must_recompute_start_line, False)
 
     def test_SearchForwardClearsPreviousReferences(self):
         parsed = start_parsing('./foo/')
@@ -64,7 +60,6 @@ class parse_line_ref_Tests(unittest.TestCase):
         self.assertEqual(parsed.line_range.end_line, [])
         self.assertEqual(parsed.line_range.start_offset, [])
         self.assertEqual(parsed.line_range.end_offset, [])
-        self.assertEqual(parsed.line_range.must_recompute_start_line, False)
 
     def test_SearchForwardClearsPreviousReferencesWithOffsets(self):
         parsed = start_parsing('.+10/foo/')
@@ -72,7 +67,6 @@ class parse_line_ref_Tests(unittest.TestCase):
         self.assertEqual(parsed.line_range.end_line, [])
         self.assertEqual(parsed.line_range.start_offset, [])
         self.assertEqual(parsed.line_range.end_offset, [])
-        self.assertEqual(parsed.line_range.must_recompute_start_line, False)
 
     def test_CanParseSearchBackward(self):
         parsed = start_parsing('?foo?')
@@ -80,7 +74,6 @@ class parse_line_ref_Tests(unittest.TestCase):
         self.assertEqual(parsed.line_range.end_line, [])
         self.assertEqual(parsed.line_range.start_offset, [])
         self.assertEqual(parsed.line_range.end_offset, [])
-        self.assertEqual(parsed.line_range.must_recompute_start_line, False)
 
     def test_SearchBackwardClearsPreviousReferences(self):
         parsed = start_parsing('.?foo?')
@@ -88,7 +81,6 @@ class parse_line_ref_Tests(unittest.TestCase):
         self.assertEqual(parsed.line_range.end_line, [])
         self.assertEqual(parsed.line_range.start_offset, [])
         self.assertEqual(parsed.line_range.end_offset, [])
-        self.assertEqual(parsed.line_range.must_recompute_start_line, False)
 
     def test_SearchBackwardClearsPreviousReferencesWithOffsets(self):
         parsed = start_parsing('.+10?foo?')
@@ -96,7 +88,6 @@ class parse_line_ref_Tests(unittest.TestCase):
         self.assertEqual(parsed.line_range.end_line, [])
         self.assertEqual(parsed.line_range.start_offset, [])
         self.assertEqual(parsed.line_range.end_offset, [])
-        self.assertEqual(parsed.line_range.must_recompute_start_line, False)
 
     def test_CanParseSearchForwardWithOffset(self):
         parsed = start_parsing('/foo/+10')
@@ -104,7 +95,6 @@ class parse_line_ref_Tests(unittest.TestCase):
         self.assertEqual(parsed.line_range.end_line, [])
         self.assertEqual(parsed.line_range.start_offset, [10])
         self.assertEqual(parsed.line_range.end_offset, [])
-        self.assertEqual(parsed.line_range.must_recompute_start_line, False)
 
     def test_CanParseSearchForwardWithOffsets(self):
         parsed = start_parsing('/foo/+10+10+10')
@@ -112,7 +102,6 @@ class parse_line_ref_Tests(unittest.TestCase):
         self.assertEqual(parsed.line_range.end_line, [])
         self.assertEqual(parsed.line_range.start_offset, [10, 10, 10])
         self.assertEqual(parsed.line_range.end_offset, [])
-        self.assertEqual(parsed.line_range.must_recompute_start_line, False)
 
     def test_CanParseSearchBacwardWithOffset(self):
         parsed = start_parsing('?foo?+10')
@@ -120,7 +109,6 @@ class parse_line_ref_Tests(unittest.TestCase):
         self.assertEqual(parsed.line_range.end_line, [])
         self.assertEqual(parsed.line_range.start_offset, [10])
         self.assertEqual(parsed.line_range.end_offset, [])
-        self.assertEqual(parsed.line_range.must_recompute_start_line, False)
 
     def test_CanParseSearchBacwardWithOffsets(self):
         parsed = start_parsing('?foo?+10+10+10')
@@ -128,7 +116,6 @@ class parse_line_ref_Tests(unittest.TestCase):
         self.assertEqual(parsed.line_range.end_line, [])
         self.assertEqual(parsed.line_range.start_offset, [10, 10, 10])
         self.assertEqual(parsed.line_range.end_offset, [])
-        self.assertEqual(parsed.line_range.must_recompute_start_line, False)
 
     def test_CanParseDollarOnItsOwn(self):
         parsed = start_parsing('$')
@@ -192,7 +179,6 @@ class parse_line_ref_Tests(unittest.TestCase):
         self.assertEqual(parsed.line_range.start_line, [])
         self.assertEqual(parsed.line_range.end_line, [])
         self.assertEqual(parsed.line_range.end_offset, [10])
-        self.assertTrue(parsed.line_range.must_recompute_start_line)
 
     def test_CanParseOffsetCommaOffset(self):
         parsed = start_parsing('+10,+10')
