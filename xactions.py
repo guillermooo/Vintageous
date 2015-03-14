@@ -241,6 +241,13 @@ class _vi_c(ViTextCommandBase):
                 self.enter_insert_mode(mode)
                 return
 
+            # If we ci' and the target is an empty pair of quotes, we should
+            # not delete anything.
+            # FIXME: This will not work well with multiple selections.
+            if all(s.empty() for s in self.view.sel()):
+                self.enter_insert_mode(mode)
+                return
+
         self.state.registers.yank(self, register)
 
         self.view.run_command('right_delete')
@@ -1137,6 +1144,12 @@ class _vi_d(ViTextCommandBase):
             # The motion has failed, so abort.
             if not self.has_sel_changed():
                 utils.blink()
+                self.enter_normal_mode(mode)
+                return
+
+            # If the target's an empty pair of quotes, don't delete.
+            # FIXME: This won't work well with multiple sels.
+            if all(s.empty() for s in self.view.sel()):
                 self.enter_normal_mode(mode)
                 return
 
