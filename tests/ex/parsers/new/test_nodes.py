@@ -16,6 +16,7 @@ class RangeNode_Tests(unittest.TestCase):
         self.assertEqual(node.must_recompute_start_line, False)
         self.assertEqual(node.start_offset, [10])
         self.assertEqual(node.end_offset, [10])
+        self.assertEqual(getattr(node, 'separator'), None)
 
 
 class CommandNode_Tests(unittest.TestCase):

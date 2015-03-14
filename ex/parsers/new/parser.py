@@ -57,11 +57,13 @@ def parse_line_ref(state, command_line):
 
     if isinstance(token, TokenComma):
         init_line_range(command_line)
+        command_line.line_range.separator = TokenComma()
         command_line.line_range.right_hand_side = not command_line.line_range.right_hand_side
         return parse_line_ref, command_line
 
     if isinstance(token, TokenSemicolon):
         init_line_range(command_line)
+        command_line.line_range.separator = TokenSemicolon()
         command_line.line_range.right_hand_side = True
         command_line.line_range.must_recompute_start_line = True
         return parse_line_ref, command_line

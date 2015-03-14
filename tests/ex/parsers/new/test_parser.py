@@ -8,6 +8,8 @@ from Vintageous.ex.parsers.new.tokens import TokenSearchBackward
 from Vintageous.ex.parsers.new.tokens import TokenDollar
 from Vintageous.ex.parsers.new.tokens import TokenDigits
 from Vintageous.ex.parsers.new.tokens import TokenMark
+from Vintageous.ex.parsers.new.tokens import TokenComma
+from Vintageous.ex.parsers.new.tokens import TokenSemicolon
 
 
 class parse_line_ref_Tests(unittest.TestCase):
@@ -274,6 +276,32 @@ class parse_line_ref_ParseSubstituteCommand(unittest.TestCase):
         self.assertEqual(parsed.line_range.start_line, [TokenDigits('0')])
         self.assertEqual(parsed.line_range.end_line, [TokenDollar()])
         self.assertEqual(parsed.command.content, 'substitute')
+
+
+class parse_line_ref_SetLineRangeSeparator(unittest.TestCase):
+    def test_CanSetComma(self):
+        parsed = start_parsing(",")
+        self.assertEqual(parsed.line_range.separator, TokenComma())
+
+    def test_CanSetSemicolon(self):
+        parsed = start_parsing(";")
+        self.assertEqual(parsed.line_range.separator, TokenSemicolon())
+
+    def test_CanSetCommaMultipleTimes(self):
+        parsed = start_parsing("1,2,3,4")
+        self.assertEqual(parsed.line_range.separator, TokenComma())
+
+    def test_CanSetSemicolonMultipleTimes(self):
+        parsed = start_parsing("1;2;3;4")
+        self.assertEqual(parsed.line_range.separator, TokenSemicolon())
+
+    def test_CanSetMultipleTimesSemicolonLast(self):
+        parsed = start_parsing("1;2,3;4")
+        self.assertEqual(parsed.line_range.separator, TokenSemicolon())
+
+    def test_CanSetMultipleTimesCommaLast(self):
+        parsed = start_parsing("1;2;3,4")
+        self.assertEqual(parsed.line_range.separator, TokenComma())
 
 
 class parse_line_ref_ParseMarks(unittest.TestCase):
