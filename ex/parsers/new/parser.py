@@ -1,5 +1,4 @@
 from .nodes import CommandLineNode
-from .nodes import CommandNode
 from .nodes import RangeNode
 from .parser_state import ParserState
 from .scanner import Scanner

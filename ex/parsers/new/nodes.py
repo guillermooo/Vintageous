@@ -31,15 +31,6 @@ class RangeNode(Node):
                 self.end_offset == other.end_offset)
 
 
-# TODO: remove this
-class CommandNode(Node):
-    def __init__(self, command_token):
-        self.name = command_token.content
-        self.arguments = command_token.params
-        self.flags = command_token.params.get('flags', [])
-        self.count = command_token.params.get('count', 1)
-
-
 class CommandLineNode(Node):
     def __init__(self, line_range, command):
         # A RangeNode
