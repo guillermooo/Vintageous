@@ -149,49 +149,46 @@ class parse_line_ref_Tests(unittest.TestCase):
 
     def test_CanParseLoneComma(self):
         parsed = start_parsing(',')
-        self.assertTrue(parsed.line_range.right_hand_side)
+        self.assertEqual(parsed.line_range.separator, TokenComma())
 
     def test_CanParseDotComma(self):
         parsed = start_parsing('.,')
         self.assertEqual(parsed.line_range.start_line, [TokenDot()])
         self.assertEqual(parsed.line_range.end_line, [])
-        self.assertTrue(parsed.line_range.right_hand_side)
+        self.assertEqual(parsed.line_range.separator, TokenComma())
 
     def test_CanParseCommaDot(self):
         parsed = start_parsing(',.')
-        self.assertTrue(parsed.line_range.right_hand_side)
+        self.assertEqual(parsed.line_range.separator, TokenComma())
         self.assertEqual(parsed.line_range.start_line, [])
         self.assertEqual(parsed.line_range.end_line, [TokenDot()])
 
     def test_CanParseLoneSmicolon(self):
         parsed = start_parsing(';')
-        self.assertTrue(parsed.line_range.right_hand_side)
-        self.assertTrue(parsed.line_range.must_recompute_start_line)
+        self.assertEqual(parsed.line_range.separator, TokenSemicolon())
 
     def test_CanParseDotSmicolon(self):
         parsed = start_parsing('.;')
         self.assertEqual(parsed.line_range.start_line, [TokenDot()])
         self.assertEqual(parsed.line_range.end_line, [])
-        self.assertTrue(parsed.line_range.right_hand_side)
-        self.assertTrue(parsed.line_range.must_recompute_start_line)
+        self.assertEqual(parsed.line_range.separator, TokenSemicolon())
 
     def test_CanParseSmicolonDot(self):
         parsed = start_parsing(';.')
-        self.assertTrue(parsed.line_range.right_hand_side)
         self.assertEqual(parsed.line_range.start_line, [])
         self.assertEqual(parsed.line_range.end_line, [TokenDot()])
-        self.assertTrue(parsed.line_range.must_recompute_start_line)
+        self.assertEqual(parsed.line_range.separator, TokenSemicolon())
 
     def test_CanParseCommaOffset(self):
         parsed = start_parsing(',+10')
-        self.assertTrue(parsed.line_range.right_hand_side)
+        self.assertEqual(parsed.line_range.separator, TokenComma())
         self.assertEqual(parsed.line_range.start_line, [])
         self.assertEqual(parsed.line_range.end_line, [])
         self.assertEqual(parsed.line_range.end_offset, [10])
 
     def test_CanParseSemicolonOffset(self):
         parsed = start_parsing(';+10')
-        self.assertTrue(parsed.line_range.right_hand_side)
+        self.assertEqual(parsed.line_range.separator, TokenComma())
         self.assertEqual(parsed.line_range.start_line, [])
         self.assertEqual(parsed.line_range.end_line, [])
         self.assertEqual(parsed.line_range.end_offset, [10])
@@ -199,7 +196,7 @@ class parse_line_ref_Tests(unittest.TestCase):
 
     def test_CanParseOffsetCommaOffset(self):
         parsed = start_parsing('+10,+10')
-        self.assertTrue(parsed.line_range.right_hand_side)
+        self.assertEqual(parsed.line_range.separator, TokenComma())
         self.assertEqual(parsed.line_range.start_line, [])
         self.assertEqual(parsed.line_range.end_line, [])
         self.assertEqual(parsed.line_range.start_offset, [10])
@@ -207,12 +204,11 @@ class parse_line_ref_Tests(unittest.TestCase):
 
     def test_CanParseSemicolonOffset(self):
         parsed = start_parsing('+10;+10')
-        self.assertTrue(parsed.line_range.right_hand_side)
         self.assertEqual(parsed.line_range.start_line, [])
         self.assertEqual(parsed.line_range.end_line, [])
         self.assertEqual(parsed.line_range.start_offset, [10])
         self.assertEqual(parsed.line_range.end_offset, [10])
-        self.assertTrue(parsed.line_range.must_recompute_start_line)
+        self.assertEqual(parsed.line_range.separator, TokenSemicolon())
 
     def test_CanParseNumber(self):
         parsed = start_parsing('10')

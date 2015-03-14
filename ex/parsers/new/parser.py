@@ -58,14 +58,13 @@ def parse_line_ref(state, command_line):
     if isinstance(token, TokenComma):
         init_line_range(command_line)
         command_line.line_range.separator = TokenComma()
-        command_line.line_range.right_hand_side = not command_line.line_range.right_hand_side
+        state.is_range_start_line_parsed = not state.is_range_start_line_parsed
         return parse_line_ref, command_line
 
     if isinstance(token, TokenSemicolon):
         init_line_range(command_line)
         command_line.line_range.separator = TokenSemicolon()
-        command_line.line_range.right_hand_side = True
-        command_line.line_range.must_recompute_start_line = True
+        state.is_range_start_line_parsed = True
         return parse_line_ref, command_line
 
     if isinstance(token, TokenDigits):
@@ -89,7 +88,7 @@ def parse_line_ref(state, command_line):
 
 
 def parse_line_ref_mark(token, state, command_line):
-    if not command_line.line_range.right_hand_side:
+    if not state.is_range_start_line_parsed:
         command_line.line_range.start_line.append(token)
     else:
         command_line.line_range.end_line.append(token)
@@ -97,7 +96,7 @@ def parse_line_ref_mark(token, state, command_line):
 
 
 def parse_line_ref_dollar(token, state, command_line):
-    if not command_line.line_range.right_hand_side:
+    if not state.is_range_start_line_parsed:
         if command_line.line_range.start_line:
             raise ValueError('bad range: {0}'.format(state.scanner.state.source))
         command_line.line_range.start_line.append(token)
@@ -109,7 +108,7 @@ def parse_line_ref_dollar(token, state, command_line):
 
 
 def parse_line_ref_digits(token, state, command_line):
-    if not command_line.line_range.right_hand_side:
+    if not state.is_range_start_line_parsed:
         if (command_line.line_range.start_line and
             command_line.line_range.start_line[-1]) == TokenDot():
             raise ValueError('bad range: {0}'.format(state.scanner.state.source))
@@ -131,7 +130,7 @@ def parse_line_ref_digits(token, state, command_line):
 
 
 def parse_line_ref_search_forward(token, state, command_line):
-    if not command_line.line_range.right_hand_side:
+    if not state.is_range_start_line_parsed:
         if command_line.line_range.start_line:
             command_line.line_range.start_offset = []
         command_line.line_range.start_line.append(token)
@@ -143,7 +142,7 @@ def parse_line_ref_search_forward(token, state, command_line):
 
 
 def parse_line_ref_search_backward(token, state, command_line):
-    if not command_line.line_range.right_hand_side:
+    if not state.is_range_start_line_parsed:
         if command_line.line_range.start_line:
             command_line.line_range.start_offset = []
         command_line.line_range.start_line.append(token)
@@ -155,7 +154,7 @@ def parse_line_ref_search_backward(token, state, command_line):
 
 
 def parse_line_ref_offset(token, state, command_line):
-    if not command_line.line_range.right_hand_side:
+    if not state.is_range_start_line_parsed:
         if (command_line.line_range.start_line and
             command_line.line_range.start_line[-1] == TokenDollar()):
                 raise ValueError ('bad command line {}'.format (state.scanner.state.source))
@@ -170,7 +169,7 @@ def parse_line_ref_offset(token, state, command_line):
 
 def parse_line_ref_dot(state, command_line):
         init_line_range(command_line)
-        if not command_line.line_range.right_hand_side:
+        if not state.is_range_start_line_parsed:
             if command_line.line_range.start_offset:
                 raise ValueError('bad range {0}'.format(state.scanner.state.source))
             command_line.line_range.start_line.append(TokenDot())

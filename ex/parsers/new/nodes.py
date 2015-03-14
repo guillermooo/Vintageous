@@ -15,7 +15,6 @@ class RangeNode(Node):
         self.start_offset = []
         self.end_offset = []
         self.separator = None
-        self.right_hand_side = False
 
     def __repr__(self):
         return ('<{0}(start:{1}, end:{2}, loffset:{3}, roffset:{4}, semicolon:{5}]>'
@@ -27,7 +26,7 @@ class RangeNode(Node):
             return False
         return (self.start_line == other.start_line and
                 self.end_line == other.end_line and
-                self.must_recompute_start_line == other.must_recompute_start_line and
+                self.separator == other.separator and
                 self.start_offset == other.start_offset and
                 self.end_offset == other.end_offset)
 

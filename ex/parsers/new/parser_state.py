@@ -6,7 +6,7 @@ from .nodes import RangeNode
 class ParserState(object):
     def __init__(self, source):
         self.scanner = Scanner(source)
-        self.parsed_start_line = False
+        self.is_range_start_line_parsed = False
         range_node = RangeNode()
         self.command_line = CommandLineNode(None, None)
 
