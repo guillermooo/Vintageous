@@ -1,3 +1,6 @@
+from Vintageous.vi.utils import R
+from Vintageous.vi.utils import first_sel
+from Vintageous.vi.utils import row_at
 
 
 class Node(object):
@@ -5,11 +8,11 @@ class Node(object):
 
 
 class RangeNode(Node):
-    def __init__(self,
-            start=None,
-            end=None,
-            separator=None,
-            start_offset=None,
+    '''
+    Represents a Vim line range.
+    '''
+
+    def __init__(self, start=None, end=None, separator=None, start_offset=None,
             end_offset=None):
         self.start =  start or []
         self.end = end or []
@@ -40,6 +43,42 @@ class RangeNode(Node):
             'end_offset': [int(item) for item in self.end_offset],
         }
 
+    @property
+    def has_offsets(self):
+        return bool(self.start_offset or self.end_offset)
+
+    @property
+    def is_empty(self):
+        return not (self.start or self.end or self.has_offsets or self.separator)
+
+    def resolve_notation(self, notation, view, offset=0):
+        '''
+        Returns a line number.
+        '''
+        if notation == '.':
+            sel = first_sel(view)
+            return row_at(view, sel.b)
+
+        if notation.isdigit():
+            return int(notation) - 1
+
+        raise NotImplementedError()
+
+    def resolve_line_reference(self, line_reference):
+        pass
+
+    def resolve(self, view):
+        start = self.resolve_notation(self.start or '.', view)
+        start += sum(self.start_offset)
+
+        if not self.separator:
+            return view.full_line(view.text_point(start, 0))
+
+        end_start = start.end() if self.separator == ';' else None
+        end = self.resolve_notation(self.end or '.', view, start_at=end_start)
+        end += self.end_offset
+
+        return R(start.begin(), end.end())
 
 
 class CommandLineNode(Node):
