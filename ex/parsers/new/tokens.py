@@ -10,6 +10,10 @@ class TokenOfRange(Token):
     pass
 
 
+class TokenOfSearch(TokenOfRange):
+    pass
+
+
 class TokenDollar(TokenOfRange):
     def __init__(self, *args, **kwargs):
         super().__init__(TOKEN_DOLLAR, '$', *args, **kwargs)
@@ -40,12 +44,12 @@ class TokenDot(TokenOfRange):
         super().__init__(TOKEN_DOT, '.', *args, **kwargs)
 
 
-class TokenSearchForward(TokenOfRange):
+class TokenSearchForward(TokenOfSearch):
     def __init__(self, content, *args, **kwargs):
         super().__init__(TOKEN_SEARCH_FORWARD, content, *args, **kwargs)
 
 
-class TokenSearchBackward(TokenOfRange):
+class TokenSearchBackward(TokenOfSearch):
     def __init__(self, content, *args, **kwargs):
         super().__init__(TOKEN_SEARCH_BACKWARD, content, *args, **kwargs)
 

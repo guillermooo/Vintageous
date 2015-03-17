@@ -5,6 +5,7 @@ from Vintageous.ex.parsers.new.tokens import TokenDot
 from Vintageous.ex.parsers.new.tokens import TokenDigits
 from Vintageous.ex.parsers.new.tokens import TokenPercent
 from Vintageous.ex.parsers.new.tokens import TokenSearchForward
+from Vintageous.ex.parsers.new.tokens import TokenOfSearch
 
 
 class Node(object):
@@ -97,10 +98,11 @@ class RangeNode(Node):
         '''
         last = None
         for token in line_reference:
-            # If we've searched right before this one, we need to start searching again from
-            # the line after the previous match.
-            if isinstance(last, TokenSearchForward) and isinstance(token, TokenSearchForward):
-                current += 1
+            # Make sure a search forward doesn't overlap with a match obtained
+            # right before this search.
+            if isinstance(last, TokenOfSearch) and isinstance(token, TokenOfSearch):
+                if isinstance(token, TokenSearchForward):
+                    current += 1
 
             current = self.resolve_notation(view, token, current)
 
