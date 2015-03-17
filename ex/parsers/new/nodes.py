@@ -4,6 +4,7 @@ from Vintageous.vi.utils import row_at
 from Vintageous.ex.parsers.new.tokens import TokenDot
 from Vintageous.ex.parsers.new.tokens import TokenDigits
 from Vintageous.ex.parsers.new.tokens import TokenPercent
+from Vintageous.ex.parsers.new.tokens import TokenSearchForward
 
 
 class Node(object):
@@ -73,6 +74,14 @@ class RangeNode(Node):
         if isinstance(token, TokenPercent):
             return row_at(view, view.size())
 
+        if isinstance(token, TokenSearchForward):
+            start_pt = view.text_point(current, 0)
+            match = view.find(str(token), start_pt)
+            if not match:
+                # TODO: Convert this to a VimError or something like that.
+                raise ValueError('pattern not found')
+            return row_at(view, match.a)
+
         raise NotImplementedError()
 
     def resolve_line_reference(self, view, line_reference, current=0):
@@ -86,8 +95,17 @@ class RangeNode(Node):
         @current
           Line number where we are now.
         '''
+        last = None
         for token in line_reference:
+            # If we've searched right before this one, we need to start searching again from
+            # the line after the previous match.
+            if isinstance(last, TokenSearchForward) and isinstance(token, TokenSearchForward):
+                current += 1
+
             current = self.resolve_notation(view, token, current)
+
+            last = token
+
         return current
 
     def resolve(self, view):

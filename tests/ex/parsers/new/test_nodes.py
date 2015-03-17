@@ -4,6 +4,7 @@ from Vintageous.ex.parsers.new.nodes import RangeNode
 from Vintageous.ex.parsers.new.nodes import CommandLineNode
 from Vintageous.ex.parsers.new.tokens import TokenDot
 from Vintageous.ex.parsers.new.tokens import TokenDigits
+from Vintageous.ex.parsers.new.tokens import TokenSearchForward
 from Vintageous.ex.parsers.new.tokens import TokenPercent
 from Vintageous.ex.parsers.new.tokens_commands import TokenCommandSubstitute
 
@@ -134,3 +135,38 @@ ddd ddd
         self.add_sel(self.R((0,0), (0,0)))
         region = RangeNode(start=[TokenPercent()]).resolve(self.view)
         self.assert_equal_regions(self.R(0, 32), region)
+
+    def testCanSearchForward(self):
+        self.write('''aaa aaa
+bbb bbb
+ccc cat
+ddd cat
+''')
+        self.clear_sel()
+        self.add_sel(self.R((0,0), (0,0)))
+        region = RangeNode(start=[TokenSearchForward('cat')]).resolve(self.view)
+        self.assert_equal_regions(self.R(16, 24), region)
+
+    def testFailedSearchThrows(self):
+        self.write('''aaa aaa
+bbb bbb
+ccc cat
+ddd cat
+''')
+        self.clear_sel()
+        self.add_sel(self.R((0,0), (0,0)))
+        line_range = RangeNode(start=[TokenSearchForward('dog')])
+        self.assertRaises(ValueError, line_range.resolve, self.view)
+
+    def testCanSearchMultipleTimesForward(self):
+        self.write('''aaa aaa
+bbb bbb
+ccc cat
+ddd ddd
+eee eee
+fff cat
+''')
+        self.clear_sel()
+        self.add_sel(self.R((0,0), (0,0)))
+        region = RangeNode(start=[TokenSearchForward('cat'), TokenSearchForward('cat')]).resolve(self.view)
+        self.assert_equal_regions(self.R(40, 48), region)
