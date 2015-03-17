@@ -1,6 +1,8 @@
 from Vintageous.vi.utils import R
 from Vintageous.vi.utils import first_sel
 from Vintageous.vi.utils import row_at
+from Vintageous.ex.parsers.new.tokens import TokenDot
+from Vintageous.ex.parsers.new.tokens import TokenDigits
 
 
 class Node(object):
@@ -49,34 +51,55 @@ class RangeNode(Node):
 
     @property
     def is_empty(self):
-        return not (self.start or self.end or self.has_offsets or self.separator)
+        '''
+        Indicates whether this range has ever been defined. For example, in
+        interactive mode, if `true`, it means that the user hasn't provided
+        any line range on the command line.
+        '''
+        return not any((self.start, self.end, self.has_offsets, self.separator))
 
-    def resolve_notation(self, notation, view, offset=0):
+    def resolve_notation(self, view, token, current=0):
         '''
         Returns a line number.
         '''
-        if notation == '.':
+        if isinstance(token, TokenDot):
             sel = first_sel(view)
             return row_at(view, sel.b)
 
-        if notation.isdigit():
-            return int(notation) - 1
+        if isinstance(token, TokenDigits):
+            return int(str(token)) - 1
 
         raise NotImplementedError()
 
-    def resolve_line_reference(self, line_reference):
-        pass
+    def resolve_line_reference(self, view, line_reference, current=0):
+        '''
+        Calculates the line offset determined by @line_reference.
+
+        @view
+          The view where the calculation is made.
+        @line_reference
+          The sequence of tokens defining the line range to be calculated.
+        @current
+          Line number where we are now.
+        '''
+        for token in line_reference:
+            current = self.resolve_notation(view, token, current)
+        return current
 
     def resolve(self, view):
-        start = self.resolve_notation(self.start or '.', view)
+        '''
+        Returns a Sublime Text range representing the Vim line range that the
+        ex command should operate on.
+        '''
+        start = self.resolve_line_reference(view, self.start or [TokenDot()])
         start += sum(self.start_offset)
 
         if not self.separator:
             return view.full_line(view.text_point(start, 0))
 
-        end_start = start.end() if self.separator == ';' else None
-        end = self.resolve_notation(self.end or '.', view, start_at=end_start)
-        end += self.end_offset
+        start = start if self.separator == ';' else 0
+        end = self.resolve_line_reference(view, self.end or [TokenDot()], current=start)
+        end += sum(self.end_offset)
 
         return R(start.begin(), end.end())
 

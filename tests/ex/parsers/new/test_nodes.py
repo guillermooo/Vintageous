@@ -2,6 +2,8 @@ import unittest
 
 from Vintageous.ex.parsers.new.nodes import RangeNode
 from Vintageous.ex.parsers.new.nodes import CommandLineNode
+from Vintageous.ex.parsers.new.tokens import TokenDot
+from Vintageous.ex.parsers.new.tokens import TokenDigits
 from Vintageous.ex.parsers.new.tokens_commands import TokenCommandSubstitute
 
 from Vintageous.tests import ViewTest
@@ -96,7 +98,7 @@ ddd ddd
 ''')
         self.clear_sel()
         self.add_sel(self.R((0,0), (0,0)))
-        region = RangeNode(start='2').resolve(self.view)
+        region = RangeNode(start=[TokenDigits('2')]).resolve(self.view)
         self.assert_equal_regions(self.R(8, 16), region)
 
     def testRetursRequestedStartLineNumberAndAddsOffset(self):
@@ -107,7 +109,7 @@ ddd ddd
 ''')
         self.clear_sel()
         self.add_sel(self.R((0,0), (0,0)))
-        region = RangeNode(start='2', start_offset=[1]).resolve(self.view)
+        region = RangeNode(start=[TokenDigits('2')], start_offset=[1]).resolve(self.view)
         self.assert_equal_regions(self.R(16, 24), region)
 
     def testRetursRequestedStartLineNumberAndAddsOffset(self):
@@ -118,5 +120,5 @@ ddd ddd
 ''')
         self.clear_sel()
         self.add_sel(self.R((0,0), (0,0)))
-        region = RangeNode(start='2', start_offset=[2]).resolve(self.view)
+        region = RangeNode(start=[TokenDigits('2')], start_offset=[2]).resolve(self.view)
         self.assert_equal_regions(self.R(24, 32), region)
