@@ -10,8 +10,8 @@ class RangeNode_Tests(unittest.TestCase):
         node = RangeNode('foo', 'bar', ';')
         node.start_offset = [10]
         node.end_offset = [10]
-        self.assertEqual(node.start_line, 'foo')
-        self.assertEqual(node.end_line, 'bar')
+        self.assertEqual(node.start, 'foo')
+        self.assertEqual(node.end, 'bar')
         self.assertEqual(node.start_offset, [10])
         self.assertEqual(node.end_offset, [10])
         self.assertEqual(node.separator, ';')
