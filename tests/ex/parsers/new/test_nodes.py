@@ -7,15 +7,14 @@ from Vintageous.ex.parsers.new.tokens_commands import TokenCommandSubstitute
 
 class RangeNode_Tests(unittest.TestCase):
     def testCanInstantiate(self):
-        node = RangeNode('foo', 'bar', False)
+        node = RangeNode('foo', 'bar', ';')
         node.start_offset = [10]
         node.end_offset = [10]
         self.assertEqual(node.start_line, 'foo')
         self.assertEqual(node.end_line, 'bar')
-        self.assertEqual(node.must_recompute_start_line, False)
         self.assertEqual(node.start_offset, [10])
         self.assertEqual(node.end_offset, [10])
-        self.assertEqual(getattr(node, 'separator'), None)
+        self.assertEqual(node.separator, ';')
 
 
 class CommandLineNode_Tests(unittest.TestCase):

@@ -8,18 +8,17 @@ class RangeNode(Node):
     def __init__(self,
             start_line=None,
             end_line=None,
-            must_recompute_start_line=False):
+            separator=None):
         self.start_line =  start_line or []
         self.end_line = end_line or []
-        self.must_recompute_start_line = must_recompute_start_line
         self.start_offset = []
         self.end_offset = []
-        self.separator = None
+        self.separator = separator
 
     def __repr__(self):
-        return ('<{0}(start:{1}, end:{2}, loffset:{3}, roffset:{4}, semicolon:{5}]>'
+        return ('<{0}(start:{1}, end:{2}, loffset:{3}, roffset:{4}, separator:{5}]>'
             .format(self.__class__.__name__, self.start_line, self.end_line,
-                self.start_offset, self.end_offset, self.must_recompute_start_line))
+                self.start_offset, self.end_offset, self.separator))
 
     def __eq__(self, other):
         if not isinstance(other, RangeNode):
