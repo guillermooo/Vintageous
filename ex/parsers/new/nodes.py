@@ -3,6 +3,7 @@ from Vintageous.vi.utils import first_sel
 from Vintageous.vi.utils import row_at
 from Vintageous.ex.parsers.new.tokens import TokenDot
 from Vintageous.ex.parsers.new.tokens import TokenDigits
+from Vintageous.ex.parsers.new.tokens import TokenPercent
 
 
 class Node(object):
@@ -67,7 +68,10 @@ class RangeNode(Node):
             return row_at(view, sel.b)
 
         if isinstance(token, TokenDigits):
-            return int(str(token)) - 1
+            return max(int(str(token)) - 1, 0)
+
+        if isinstance(token, TokenPercent):
+            return row_at(view, view.size())
 
         raise NotImplementedError()
 
@@ -95,6 +99,9 @@ class RangeNode(Node):
         start += sum(self.start_offset)
 
         if not self.separator:
+            if len(self.start) == 1 and isinstance(self.start[0], TokenPercent):
+                return R(0, view.size())
+
             return view.full_line(view.text_point(start, 0))
 
         start = start if self.separator == ';' else 0

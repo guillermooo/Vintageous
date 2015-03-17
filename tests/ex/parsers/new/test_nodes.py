@@ -4,6 +4,7 @@ from Vintageous.ex.parsers.new.nodes import RangeNode
 from Vintageous.ex.parsers.new.nodes import CommandLineNode
 from Vintageous.ex.parsers.new.tokens import TokenDot
 from Vintageous.ex.parsers.new.tokens import TokenDigits
+from Vintageous.ex.parsers.new.tokens import TokenPercent
 from Vintageous.ex.parsers.new.tokens_commands import TokenCommandSubstitute
 
 from Vintageous.tests import ViewTest
@@ -122,3 +123,14 @@ ddd ddd
         self.add_sel(self.R((0,0), (0,0)))
         region = RangeNode(start=[TokenDigits('2')], start_offset=[2]).resolve(self.view)
         self.assert_equal_regions(self.R(24, 32), region)
+
+    def testRetursWholeBufferIfPercentRequested(self):
+        self.write('''aaa aaa
+bbb bbb
+ccc ccc
+ddd ddd
+''')
+        self.clear_sel()
+        self.add_sel(self.R((0,0), (0,0)))
+        region = RangeNode(start=[TokenPercent()]).resolve(self.view)
+        self.assert_equal_regions(self.R(0, 32), region)
