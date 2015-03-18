@@ -80,7 +80,7 @@ class ScannerTests(unittest.TestCase):
 
 
 class ScannerOffsets(unittest.TestCase):
-    def testCanScanDigits(self):
+    def testCanScanNegativeOffset(self):
         scanner = Scanner(".-100")
         tokens = list(scanner.scan())
         self.assertEqual([TokenDot(), TokenOffset([-100]), TokenEof()], tokens)
