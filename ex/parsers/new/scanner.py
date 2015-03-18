@@ -89,6 +89,7 @@ def scan_digits(state):
             break
     return scan_range, [TokenDigits(state.emit())]
 
+
 def scan_search(state):
     delim = state.source[state.position - 1]
     while True:
