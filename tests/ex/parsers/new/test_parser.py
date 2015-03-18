@@ -8,6 +8,7 @@ from Vintageous.ex.parsers.new.tokens import TokenSearchBackward
 from Vintageous.ex.parsers.new.tokens import TokenDollar
 from Vintageous.ex.parsers.new.tokens import TokenDigits
 from Vintageous.ex.parsers.new.tokens import TokenMark
+from Vintageous.ex.parsers.new.tokens import TokenOffset
 from Vintageous.ex.parsers.new.tokens import TokenComma
 from Vintageous.ex.parsers.new.tokens import TokenSemicolon
 
@@ -25,97 +26,71 @@ class parse_line_ref_Tests(unittest.TestCase):
 
     def test_CanParseDotWithOffset(self):
         parsed = start_parsing('.+10')
-        self.assertEqual(parsed.line_range.start, [TokenDot()])
+        self.assertEqual(parsed.line_range.start, [TokenDot(), TokenOffset([10])])
         self.assertEqual(parsed.line_range.end, [])
-        self.assertEqual(parsed.line_range.start_offset, [10])
-        self.assertEqual(parsed.line_range.end_offset, [])
 
     def test_CanParseLoneOffset(self):
         parsed = start_parsing('+10')
-        self.assertEqual(parsed.line_range.start, [])
+        self.assertEqual(parsed.line_range.start, [TokenOffset([10])])
         self.assertEqual(parsed.line_range.end, [])
-        self.assertEqual(parsed.line_range.start_offset, [10])
-        self.assertEqual(parsed.line_range.end_offset, [])
 
     def test_FailsIfDotAfterOffset(self):
         self.assertRaises(ValueError, start_parsing, '+10.')
 
     def test_CanParseMultipleOffsets(self):
         parsed = start_parsing('+10+10')
-        self.assertEqual(parsed.line_range.start, [])
+        self.assertEqual(parsed.line_range.start, [TokenOffset([10, 10])])
         self.assertEqual(parsed.line_range.end, [])
-        self.assertEqual(parsed.line_range.start_offset, [10, 10])
-        self.assertEqual(parsed.line_range.end_offset, [])
 
     def test_CanParseSearchForward(self):
         parsed = start_parsing('/foo/')
         self.assertEqual(parsed.line_range.start, [TokenSearchForward('foo')])
         self.assertEqual(parsed.line_range.end, [])
-        self.assertEqual(parsed.line_range.start_offset, [])
-        self.assertEqual(parsed.line_range.end_offset, [])
 
     def test_SearchForwardClearsPreviousReferences(self):
         parsed = start_parsing('./foo/')
         self.assertEqual(parsed.line_range.start, [TokenDot(), TokenSearchForward ('foo')])
         self.assertEqual(parsed.line_range.end, [])
-        self.assertEqual(parsed.line_range.start_offset, [])
-        self.assertEqual(parsed.line_range.end_offset, [])
 
     def test_SearchForwardClearsPreviousReferencesWithOffsets(self):
         parsed = start_parsing('.+10/foo/')
-        self.assertEqual(parsed.line_range.start, [TokenDot(), TokenSearchForward('foo')])
+        self.assertEqual(parsed.line_range.start, [TokenDot(), TokenOffset([10]), TokenSearchForward('foo')])
         self.assertEqual(parsed.line_range.end, [])
-        self.assertEqual(parsed.line_range.start_offset, [])
-        self.assertEqual(parsed.line_range.end_offset, [])
 
     def test_CanParseSearchBackward(self):
         parsed = start_parsing('?foo?')
         self.assertEqual(parsed.line_range.start, [TokenSearchBackward('foo')])
         self.assertEqual(parsed.line_range.end, [])
-        self.assertEqual(parsed.line_range.start_offset, [])
-        self.assertEqual(parsed.line_range.end_offset, [])
 
     def test_SearchBackwardClearsPreviousReferences(self):
         parsed = start_parsing('.?foo?')
         self.assertEqual(parsed.line_range.start, [TokenDot(), TokenSearchBackward('foo')])
         self.assertEqual(parsed.line_range.end, [])
-        self.assertEqual(parsed.line_range.start_offset, [])
-        self.assertEqual(parsed.line_range.end_offset, [])
 
     def test_SearchBackwardClearsPreviousReferencesWithOffsets(self):
         parsed = start_parsing('.+10?foo?')
-        self.assertEqual(parsed.line_range.start, [TokenDot(), TokenSearchBackward('foo')])
+        self.assertEqual(parsed.line_range.start, [TokenDot(), TokenOffset([10]), TokenSearchBackward('foo')])
         self.assertEqual(parsed.line_range.end, [])
-        self.assertEqual(parsed.line_range.start_offset, [])
-        self.assertEqual(parsed.line_range.end_offset, [])
 
     def test_CanParseSearchForwardWithOffset(self):
         parsed = start_parsing('/foo/+10')
-        self.assertEqual(parsed.line_range.start, [TokenSearchForward('foo')])
+        self.assertEqual(parsed.line_range.start, [TokenSearchForward('foo'), TokenOffset([10])])
         self.assertEqual(parsed.line_range.end, [])
-        self.assertEqual(parsed.line_range.start_offset, [10])
-        self.assertEqual(parsed.line_range.end_offset, [])
 
     def test_CanParseSearchForwardWithOffsets(self):
         parsed = start_parsing('/foo/+10+10+10')
-        self.assertEqual(parsed.line_range.start, [TokenSearchForward('foo')])
+        self.assertEqual(parsed.line_range.start, [TokenSearchForward('foo'), TokenOffset ([10, 10, 10])])
         self.assertEqual(parsed.line_range.end, [])
-        self.assertEqual(parsed.line_range.start_offset, [10, 10, 10])
-        self.assertEqual(parsed.line_range.end_offset, [])
 
     def test_CanParseSearchBacwardWithOffset(self):
         parsed = start_parsing('?foo?+10')
-        self.assertEqual(parsed.line_range.start, [TokenSearchBackward('foo')])
+        self.assertEqual(parsed.line_range.start, [TokenSearchBackward('foo'), TokenOffset ([10])])
         self.assertEqual(parsed.line_range.end, [])
-        self.assertEqual(parsed.line_range.start_offset, [10])
-        self.assertEqual(parsed.line_range.end_offset, [])
 
     def test_CanParseSearchBacwardWithOffsets(self):
         parsed = start_parsing('?foo?+10+10+10')
-        self.assertEqual(parsed.line_range.start, [TokenSearchBackward('foo')])
+        self.assertEqual(parsed.line_range.start, [TokenSearchBackward('foo'), TokenOffset ([10, 10, 10])])
         self.assertEqual(parsed.line_range.end, [])
-        self.assertEqual(parsed.line_range.start_offset, [10, 10, 10])
-        self.assertEqual(parsed.line_range.end_offset, [])
 
     def test_CanParseDollarOnItsOwn(self):
         parsed = start_parsing('$')
@@ -170,8 +145,7 @@ class parse_line_ref_Tests(unittest.TestCase):
         parsed = start_parsing(',+10')
         self.assertEqual(parsed.line_range.separator, TokenComma())
         self.assertEqual(parsed.line_range.start, [])
-        self.assertEqual(parsed.line_range.end, [])
-        self.assertEqual(parsed.line_range.end_offset, [10])
+        self.assertEqual(parsed.line_range.end, [TokenOffset([10])])
 
     def test_CanParseSemicolonOffset(self):
         parsed = start_parsing(';+10')
@@ -183,17 +157,13 @@ class parse_line_ref_Tests(unittest.TestCase):
     def test_CanParseOffsetCommaOffset(self):
         parsed = start_parsing('+10,+10')
         self.assertEqual(parsed.line_range.separator, TokenComma())
-        self.assertEqual(parsed.line_range.start, [])
-        self.assertEqual(parsed.line_range.end, [])
-        self.assertEqual(parsed.line_range.start_offset, [10])
-        self.assertEqual(parsed.line_range.end_offset, [10])
+        self.assertEqual(parsed.line_range.start, [TokenOffset([10])])
+        self.assertEqual(parsed.line_range.end, [TokenOffset ([10])])
 
     def test_CanParseSemicolonOffset(self):
         parsed = start_parsing('+10;+10')
-        self.assertEqual(parsed.line_range.start, [])
-        self.assertEqual(parsed.line_range.end, [])
-        self.assertEqual(parsed.line_range.start_offset, [10])
-        self.assertEqual(parsed.line_range.end_offset, [10])
+        self.assertEqual(parsed.line_range.start, [TokenOffset([10])])
+        self.assertEqual(parsed.line_range.end, [TokenOffset([10])])
         self.assertEqual(parsed.line_range.separator, TokenSemicolon())
 
     def test_CanParseNumber(self):

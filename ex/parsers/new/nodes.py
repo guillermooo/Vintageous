@@ -4,6 +4,7 @@ from Vintageous.ex.parsers.new.tokens import TokenOfSearch
 from Vintageous.ex.parsers.new.tokens import TokenPercent
 from Vintageous.ex.parsers.new.tokens import TokenSearchBackward
 from Vintageous.ex.parsers.new.tokens import TokenSearchForward
+from Vintageous.ex.parsers.new.tokens import TokenOffset
 from Vintageous.vi.search import reverse_search_by_pt
 from Vintageous.vi.utils import first_sel
 from Vintageous.vi.utils import R
@@ -19,40 +20,29 @@ class RangeNode(Node):
     Represents a Vim line range.
     '''
 
-    def __init__(self, start=None, end=None, separator=None, start_offset=None,
-            end_offset=None):
+    def __init__(self, start=None, end=None, separator=None):
         self.start =  start or []
         self.end = end or []
-        self.start_offset = start_offset or []
-        self.end_offset = end_offset or []
         self.separator = separator
 
     def __repr__(self):
         return ('<{0}(start:{1}, end:{2}, loffset:{3}, roffset:{4}, separator:{5}]>'
             .format(self.__class__.__name__, self.start, self.end,
-                self.start_offset, self.end_offset, self.separator))
+                    self.separator))
 
     def __eq__(self, other):
         if not isinstance(other, RangeNode):
             return False
         return (self.start == other.start and
                 self.end == other.end and
-                self.separator == other.separator and
-                self.start_offset == other.start_offset and
-                self.end_offset == other.end_offset)
+                self.separator == other.separator)
 
     def to_json(self):
         return {
             'start': [str(item) for item in self.start],
             'end': [str(item) for item in self.end],
             'separator': str(self.separator) if self.separator else None,
-            'start_offset': [int(item) for item in self.start_offset],
-            'end_offset': [int(item) for item in self.end_offset],
         }
-
-    @property
-    def has_offsets(self):
-        return bool(self.start_offset or self.end_offset)
 
     @property
     def is_empty(self):
@@ -61,7 +51,7 @@ class RangeNode(Node):
         interactive mode, if `true`, it means that the user hasn't provided
         any line range on the command line.
         '''
-        return not any((self.start, self.end, self.has_offsets, self.separator))
+        return not any((self.start, self.end, self.separator))
 
     def resolve_notation(self, view, token, current):
         '''
@@ -76,6 +66,9 @@ class RangeNode(Node):
 
         if isinstance(token, TokenPercent):
             return row_at(view, view.size())
+
+        if isinstance(token, TokenOffset):
+            return current + sum(token.content)
 
         if isinstance(token, TokenSearchForward):
             start_pt = view.text_point(current, 0)
@@ -128,7 +121,6 @@ class RangeNode(Node):
         ex command should operate on.
         '''
         start = self.resolve_line_reference(view, self.start or [TokenDot()])
-        start += sum(self.start_offset)
 
         if not self.separator:
             if len(self.start) == 1 and isinstance(self.start[0], TokenPercent):
@@ -138,7 +130,6 @@ class RangeNode(Node):
 
         start = start if self.separator == ';' else 0
         end = self.resolve_line_reference(view, self.end or [TokenDot()], current=start)
-        end += sum(self.end_offset)
 
         return R(start.begin(), end.end())
 

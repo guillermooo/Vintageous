@@ -156,24 +156,24 @@ def parse_line_ref_offset(token, state, command_line):
     if not state.is_range_start_line_parsed:
         if (command_line.line_range.start and
             command_line.line_range.start[-1] == TokenDollar()):
-                raise ValueError ('bad command line {}'.format (state.scanner.state.source))
-        command_line.line_range.start_offset.extend(token.content)
+                raise ValueError ('bad command line {}'.format(state.scanner.state.source))
+        command_line.line_range.start.append(token)
     else:
         if (command_line.line_range.end and
             command_line.line_range.end[-1] == TokenDollar()):
-                raise ValueError ('bad command line {}'.format (state.scanner.state.source))
-        command_line.line_range.end_offset.extend(token.content)
+                raise ValueError ('bad command line {}'.format(state.scanner.state.source))
+        command_line.line_range.end.append(token)
     return parse_line_ref, command_line
 
 
 def parse_line_ref_dot(state, command_line):
         init_line_range(command_line)
         if not state.is_range_start_line_parsed:
-            if command_line.line_range.start_offset:
+            if command_line.line_range.start and isinstance(command_line.line_range.start[-1], TokenOffset):
                 raise ValueError('bad range {0}'.format(state.scanner.state.source))
             command_line.line_range.start.append(TokenDot())
         else:
-            if command_line.line_range.end_offset:
+            if command_line.line_range.end and isinstance(command_line.line_range.end[-1], TokenOffset):
                 raise ValueError('bad range {0}'.format(state.scanner.source))
             command_line.line_range.end.append(TokenDot())
 

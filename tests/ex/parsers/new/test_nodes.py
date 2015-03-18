@@ -7,6 +7,7 @@ from Vintageous.ex.parsers.new.tokens import TokenDigits
 from Vintageous.ex.parsers.new.tokens import TokenSearchForward
 from Vintageous.ex.parsers.new.tokens import TokenSearchBackward
 from Vintageous.ex.parsers.new.tokens import TokenPercent
+from Vintageous.ex.parsers.new.tokens import TokenOffset
 from Vintageous.ex.parsers.new.tokens_commands import TokenCommandSubstitute
 
 from Vintageous.tests import ViewTest
@@ -27,17 +28,6 @@ class RangeNode_Tests(unittest.TestCase):
         node = RangeNode()
         self.assertTrue(node.is_empty)
 
-    def test_CanDetectDoesNotHaveOffsets(self):
-        node = RangeNode()
-        self.assertFalse(node.has_offsets)
-
-    def test_CanDetectHasOffsets(self):
-        node = RangeNode(start_offset=[100])
-        self.assertTrue(node.has_offsets)
-        node = RangeNode(end_offset=[100])
-        self.assertTrue(node.has_offsets)
-        node = RangeNode(start_offset=[200], end_offset=[100])
-        self.assertTrue(node.has_offsets)
 
 class CommandLineNode_Tests(unittest.TestCase):
     def testCanInstantiate(self):
@@ -79,7 +69,7 @@ ddd ddd
 ''')
         self.clear_sel()
         self.add_sel(self.R((0,0), (0,0)))
-        region = RangeNode(start_offset=[1, 1]).resolve(self.view)
+        region = RangeNode(start=[TokenOffset([1, 1])]).resolve(self.view)
         self.assert_equal_regions(self.R(16, 24), region)
 
     def testRetursCurrentLineIfRangeIsEmptyAndAddsOffsets(self):
@@ -90,7 +80,7 @@ ddd ddd
 ''')
         self.clear_sel()
         self.add_sel(self.R((0,0), (0,0)))
-        region = RangeNode(start_offset=[2]).resolve(self.view)
+        region = RangeNode(start=[TokenOffset([2])]).resolve(self.view)
         self.assert_equal_regions(self.R(16, 24), region)
 
     def testRetursRequestedStartLineNumber(self):
@@ -123,7 +113,7 @@ ddd ddd
 ''')
         self.clear_sel()
         self.add_sel(self.R((0,0), (0,0)))
-        region = RangeNode(start=[TokenDigits('2')], start_offset=[2]).resolve(self.view)
+        region = RangeNode(start=[TokenDigits('2'), TokenOffset([2])]).resolve(self.view)
         self.assert_equal_regions(self.R(24, 32), region)
 
     def testRetursWholeBufferIfPercentRequested(self):
@@ -159,7 +149,7 @@ ddd ddd
 ''')
         self.clear_sel()
         self.add_sel(self.R((0,0), (0,0)))
-        region = RangeNode(start=[TokenSearchForward('cat')], start_offset=[1]).resolve(self.view)
+        region = RangeNode(start=[TokenSearchForward('cat'), TokenOffset([1])]).resolve(self.view)
         self.assert_equal_regions(self.R(24, 32), region)
 
     def testFailedSearchThrows(self):
@@ -210,7 +200,7 @@ xxx xxx
 ''')
         self.clear_sel()
         self.add_sel(self.R(self.view.size()))
-        region = RangeNode(start=[TokenSearchBackward('cat')], start_offset=[1]).resolve(self.view)
+        region = RangeNode(start=[TokenSearchBackward('cat'), TokenOffset([1])]).resolve(self.view)
         self.assert_equal_regions(self.R(24, 32), region)
 
     def testFailedSearchThrows(self):
