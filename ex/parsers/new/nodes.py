@@ -1,11 +1,13 @@
-from Vintageous.vi.utils import R
-from Vintageous.vi.utils import first_sel
-from Vintageous.vi.utils import row_at
-from Vintageous.ex.parsers.new.tokens import TokenDot
 from Vintageous.ex.parsers.new.tokens import TokenDigits
-from Vintageous.ex.parsers.new.tokens import TokenPercent
-from Vintageous.ex.parsers.new.tokens import TokenSearchForward
+from Vintageous.ex.parsers.new.tokens import TokenDot
 from Vintageous.ex.parsers.new.tokens import TokenOfSearch
+from Vintageous.ex.parsers.new.tokens import TokenPercent
+from Vintageous.ex.parsers.new.tokens import TokenSearchBackward
+from Vintageous.ex.parsers.new.tokens import TokenSearchForward
+from Vintageous.vi.search import reverse_search_by_pt
+from Vintageous.vi.utils import first_sel
+from Vintageous.vi.utils import R
+from Vintageous.vi.utils import row_at
 
 
 class Node(object):
@@ -61,13 +63,13 @@ class RangeNode(Node):
         '''
         return not any((self.start, self.end, self.has_offsets, self.separator))
 
-    def resolve_notation(self, view, token, current=0):
+    def resolve_notation(self, view, token, current):
         '''
         Returns a line number.
         '''
         if isinstance(token, TokenDot):
-            sel = first_sel(view)
-            return row_at(view, sel.b)
+            pt = view.text_point(current, 0)
+            return row_at(view, pt)
 
         if isinstance(token, TokenDigits):
             return max(int(str(token)) - 1, 0)
@@ -78,6 +80,14 @@ class RangeNode(Node):
         if isinstance(token, TokenSearchForward):
             start_pt = view.text_point(current, 0)
             match = view.find(str(token), start_pt)
+            if not match:
+                # TODO: Convert this to a VimError or something like that.
+                raise ValueError('pattern not found')
+            return row_at(view, match.a)
+
+        if isinstance(token, TokenSearchBackward):
+            start_pt = view.text_point(current, 0)
+            match = reverse_search_by_pt(view, str(token), 0, start_pt)
             if not match:
                 # TODO: Convert this to a VimError or something like that.
                 raise ValueError('pattern not found')
@@ -96,17 +106,19 @@ class RangeNode(Node):
         @current
           Line number where we are now.
         '''
-        last = None
+        last_token = None
+        # XXX: what happens if ther is no selection in the view?
+        current = row_at(view, first_sel(view).b)
         for token in line_reference:
             # Make sure a search forward doesn't overlap with a match obtained
             # right before this search.
-            if isinstance(last, TokenOfSearch) and isinstance(token, TokenOfSearch):
+            if isinstance(last_token, TokenOfSearch) and isinstance(token, TokenOfSearch):
                 if isinstance(token, TokenSearchForward):
                     current += 1
 
             current = self.resolve_notation(view, token, current)
 
-            last = token
+            last_token = token
 
         return current
 
