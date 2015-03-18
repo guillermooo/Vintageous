@@ -79,6 +79,13 @@ class ScannerTests(unittest.TestCase):
         self.assertEqual(12, scanner.state.position)
 
 
+class ScannerOffsets(unittest.TestCase):
+    def testCanScanDigits(self):
+        scanner = Scanner(".-100")
+        tokens = list(scanner.scan())
+        self.assertEqual([TokenDot(), TokenOffset([-100]), TokenEof()], tokens)
+
+
 class ScannerDigits(unittest.TestCase):
     def testCanScanDigits(self):
         scanner = Scanner("100")

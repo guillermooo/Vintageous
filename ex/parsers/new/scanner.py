@@ -56,7 +56,7 @@ def scan_range(state):
     if c in '/?':
         return scan_search(state)
 
-    if c == '+':
+    if c == '+' or c == '-':
         return scan_offset(state)
 
     if c == '%':
@@ -109,9 +109,10 @@ def scan_search(state):
 def scan_offset(state):
     offsets = []
     to_int = lambda x: int(x, 10)
+    sign = '-' if state.source[state.position - 1] == '-' else ''
 
     digits = state.expect_match(r'\s*(\d+)')
-    offsets.append(digits.group(1))
+    offsets.append(sign + digits.group(1))
 
     while True:
         c = state.consume()
@@ -120,9 +121,10 @@ def scan_offset(state):
             state.ignore()
             return None, [TokenOffset(list(map(to_int, offsets))), TokenEof()]
 
-        if c == '+':
-            digits = state.expect_match('\s*(\d+)')
-            offsets.append(digits.group(1))
+        if c == '+' or c == '-':
+            digits = state.expect_match(r'\s*(\d+)')
+            sign = '-' if state.source[state.position - 1] == '-' else ''
+            offsets.append(sign + digits.group(1))
             continue
 
         if not c.isdigit():
