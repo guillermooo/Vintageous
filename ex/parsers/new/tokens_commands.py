@@ -3,11 +3,13 @@ from .tokens_base import Token
 
 TOKEN_COMMAND_UNKNOWN = 0
 TOKEN_COMMAND_SUBSTITUTE = 1
+TOKEN_COMMAND_ONLY = 1
 
 
 class TokenOfCommand(Token):
-    def __init__(self, params, *args, **kwargs):
+    def __init__(self, params, *args, forced=False, **kwargs):
         self.params = params or {}
+        self.forced = forced
         # Accepts a range?
         self.addressable = False
         self.target_command = None
@@ -21,6 +23,14 @@ class TokenOfCommand(Token):
 
     def __str__(self):
         return '{0} {1}'.format(self.content, self.params)
+
+
+class TokenCommandOnly(TokenOfCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__({},
+                        TOKEN_COMMAND_ONLY,
+                        'only', *args, **kwargs)
+        self.target_command = 'ex_only'
 
 
 class TokenCommandSubstitute(TokenOfCommand):

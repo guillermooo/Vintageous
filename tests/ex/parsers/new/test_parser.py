@@ -272,3 +272,13 @@ class parse_line_ref_ParseMarks(unittest.TestCase):
         parsed = parse_ex_command("'a,'b")
         self.assertEqual(parsed.line_range.start, [TokenMark ('a')])
         self.assertEqual(parsed.line_range.end, [TokenMark ('b')])
+
+
+class parse_line_ref_ParseOnlyCommand(unittest.TestCase):
+    def test_CanParseItOnItsOwn(self):
+        parsed = parse_ex_command('only')
+        self.assertEqual(parsed.command.content, 'only')
+
+    def test_CanParseAlias(self):
+        parsed = parse_ex_command('on')
+        self.assertEqual(parsed.command.content, 'only')

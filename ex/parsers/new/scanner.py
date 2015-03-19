@@ -13,6 +13,7 @@ from .tokens import TokenEof
 from .tokens import TokenMark
 from .tokens_commands import TokenCommandSubstitute
 from .tokens_commands_substitute import scan_command_substitute
+from .tokens_commands_only import scan_command_only
 
 
 class Scanner(object):
@@ -139,6 +140,11 @@ def scan_command(state):
         # drop the name
         state.ignore()
         return scan_command_substitute(state)
+
+    if state.match(r'on(?:ly)?(?=!$|$)'):
+        # drop the name
+        state.ignore()
+        return scan_command_only(state)
 
     state.expect(EOF)
     return None, [TokenEof()]

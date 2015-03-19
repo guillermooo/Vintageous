@@ -106,11 +106,16 @@ class ViColonInput(sublime_plugin.WindowCommand):
         try:
             # Use new parser for some commands.
             parsed_new = parse_ex_command(cmd_line[1:])
-            if parsed_new.command.target_command != 'ex_substitute':
+            if parsed_new.command.target_command not in (
+                    'ex_substitute',
+                    'ex_only',
+                    ):
                 raise NotImplementedError()
             self.window.run_command(parsed_new.command.target_command, {'command_line': cmd_line[1:]})
             return
         except Exception as e:
+            # print ('EXCP:', e)
+            # print (e)
             # TODO: Display errors from parser.
             pass
 
