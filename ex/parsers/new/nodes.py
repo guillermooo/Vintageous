@@ -14,6 +14,9 @@ from Vintageous.vi.utils import row_at
 class Node(object):
     pass
 
+    def to_json(self):
+        raise NotImplementedError('implementation required')
+
 
 class RangeNode(Node):
     '''
@@ -39,8 +42,8 @@ class RangeNode(Node):
 
     def to_json(self):
         return {
-            'start': [str(item) for item in self.start],
-            'end': [str(item) for item in self.end],
+            'start': [item.to_json() for item in self.start],
+            'end': [item.to_json() for item in self.end],
             'separator': str(self.separator) if self.separator else None,
         }
 
