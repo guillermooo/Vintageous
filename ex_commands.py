@@ -24,7 +24,7 @@ from Vintageous.vi.settings import set_local
 from Vintageous.vi.sublime import has_dirty_buffers
 from Vintageous.vi.utils import IrreversibleTextCommand
 from Vintageous.vi.utils import modes
-from Vintageous.ex.parsers.new.parse import parse_ex_command
+from Vintageous.ex.parsers.new.parser import parse_ex_command
 
 
 GLOBAL_RANGES = []
