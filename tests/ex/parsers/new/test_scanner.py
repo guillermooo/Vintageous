@@ -126,6 +126,12 @@ class ScannerCommandNameTests(unittest.TestCase):
         params = {"search_term": "foo", "replacement": "bar", "flags": [], "count": 10}
         self.assertEqual([TokenCommandSubstitute(params), TokenEof()], tokens)
 
+    def testCanScanSubstituteParamaterWithRange(self):
+        scanner = Scanner(r'%substitute:foo:bar: 10')
+        tokens = list(scanner.scan())
+        params = {"search_term": "foo", "replacement": "bar", "flags": [], "count": 10}
+        self.assertEqual([TokenPercent(), TokenCommandSubstitute(params), TokenEof()], tokens)
+
 
 class ScannerMarksScanner_Tests(unittest.TestCase):
     def testCanInstantiate(self):

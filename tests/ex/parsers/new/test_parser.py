@@ -7,6 +7,7 @@ from Vintageous.ex.parsers.new.tokens import TokenSearchForward
 from Vintageous.ex.parsers.new.tokens import TokenSearchBackward
 from Vintageous.ex.parsers.new.tokens import TokenDollar
 from Vintageous.ex.parsers.new.tokens import TokenDigits
+from Vintageous.ex.parsers.new.tokens import TokenPercent
 from Vintageous.ex.parsers.new.tokens import TokenMark
 from Vintageous.ex.parsers.new.tokens import TokenOffset
 from Vintageous.ex.parsers.new.tokens import TokenComma
@@ -228,6 +229,12 @@ class parse_line_ref_ParseSubstituteCommand(unittest.TestCase):
         self.assertEqual(parsed.line_range.start, [TokenDigits('0')])
         self.assertEqual(parsed.line_range.end, [TokenDollar()])
         self.assertEqual(parsed.command.content, 'substitute')
+
+
+class parse_line_ref_Percent(unittest.TestCase):
+    def test_CanParsePercent(self):
+        parsed = parse_ex_command("%")
+        self.assertEqual(parsed.line_range.start, [TokenPercent()])
 
 
 class parse_line_ref_SetLineRangeSeparator(unittest.TestCase):

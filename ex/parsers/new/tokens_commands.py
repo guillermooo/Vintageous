@@ -7,7 +7,7 @@ TOKEN_COMMAND_SUBSTITUTE = 1
 
 class TokenOfCommand(Token):
     def __init__(self, params, *args, **kwargs):
-        self.params = params
+        self.params = params or {}
         # Accepts a range?
         self.addressable = False
         self.target_command = None

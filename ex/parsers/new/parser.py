@@ -74,6 +74,10 @@ def parse_line_ref(state, command_line):
         init_line_range(command_line)
         return parse_line_ref_dollar(token, state, command_line)
 
+    if isinstance (token, TokenPercent):
+        init_line_range(command_line)
+        return parse_line_ref_percent(token, state, command_line)
+
     if isinstance (token, TokenMark):
         init_line_range(command_line)
         return parse_line_ref_mark(token, state, command_line)
@@ -90,6 +94,18 @@ def parse_line_ref_mark(token, state, command_line):
     if not state.is_range_start_line_parsed:
         command_line.line_range.start.append(token)
     else:
+        command_line.line_range.end.append(token)
+    return parse_line_ref, command_line
+
+
+def parse_line_ref_percent(token, state, command_line):
+    if not state.is_range_start_line_parsed:
+        if command_line.line_range.start:
+            raise ValueError('bad range: {0}'.format(state.scanner.state.source))
+        command_line.line_range.start.append(token)
+    else:
+        if command_line.line_range.end:
+            raise ValueError('bad range: {0}'.format(state.scanner.state.source))
         command_line.line_range.end.append(token)
     return parse_line_ref, command_line
 

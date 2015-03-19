@@ -710,10 +710,10 @@ class ExSubstitute(sublime_plugin.TextCommand):
             raise ValueError('no command line passed; that seems wrong')
 
         parsed = parse_ex_command(command_line)
-        pattern = parsed.command.params['search_term']
-        replacement = parsed.command.params['replacement']
-        count = parsed.command.params['count']
-        flags = parsed.command.params['flags']
+        pattern = parsed.command.params.get('search_term')
+        replacement = parsed.command.params.get('replacement')
+        count = parsed.command.params.get('count', 0)
+        flags = parsed.command.params.get('flags', [])
 
         # :s
         if not pattern:
@@ -721,6 +721,10 @@ class ExSubstitute(sublime_plugin.TextCommand):
             replacement = ExSubstitute.most_recent_replacement
             flags = []
             count = 0
+
+        if not pattern:
+            # TODO: give feedback
+            return
 
         ExSubstitute.most_recent_pat = pattern
         ExSubstitute.most_recent_replacement = replacement
@@ -730,18 +734,20 @@ class ExSubstitute(sublime_plugin.TextCommand):
         computed_flags |= re.IGNORECASE if ('i' in flags) else 0
 
         try:
-            pattern = re.compile(pattern, flags=computed_flags)
+            compiled_rx = re.compile(pattern, flags=computed_flags)
         except Exception as e:
-            sublime.status_message("Vintageous [regex error]: %s ... in pattern '%s'" % (e.message, pattern))
-            print("Vintageous [regex error]: %s ... in pattern '%s'" % (e.message, pattern))
+            sublime.status_message(
+                "Vintageous: bad pattern '%s'" % (e.message, pattern))
+            print("Vintageous [regex error]: %s ... in pattern '%s'"
+                % (e.message, pattern))
             return
 
         replace_count = 0 if (flags and 'g' in flags) else 1
 
         target_region = parsed.line_range.resolve(self.view)
-        line_text = self.view.substr(self.view.line(target_region))
-        new_text = re.sub(pattern, replacement, line_text, count=replace_count)
-        self.view.replace(edit, self.view.line(target_region), new_text)
+        line_text = self.view.substr(target_region)
+        new_text = re.sub(compiled_rx, replacement, line_text, count=replace_count)
+        self.view.replace(edit, target_region, new_text)
 
 
 class ExDelete(ExTextCommandBase):
