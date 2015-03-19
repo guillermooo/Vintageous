@@ -24,6 +24,7 @@ from Vintageous.vi.settings import set_local
 from Vintageous.vi.sublime import has_dirty_buffers
 from Vintageous.vi.utils import IrreversibleTextCommand
 from Vintageous.vi.utils import modes
+from Vintageous.ex.parsers.new.parser import parse_ex_command
 
 
 GLOBAL_RANGES = []
@@ -700,46 +701,34 @@ class ExDoubleAmpersand(sublime_plugin.TextCommand):
 
 class ExSubstitute(sublime_plugin.TextCommand):
     most_recent_pat = None
-    most_recent_flags = ''
+    most_recent_flags = []
     most_recent_replacement = ''
 
-    def run(self, edit, line_range=None, pattern=''):
+    def run(self, edit, command_line=''):
+
+        if not command_line:
+            raise ValueError('wtf')
+
+        parsed = parse_ex_command(command_line)
+        pattern = parsed.command.params['search_term']
+        replacement = parsed.command.params['replacement']
+        count = parsed.command.params['count']
+        flags = parsed.command.params['flags']
 
         # :s
         if not pattern:
             pattern = ExSubstitute.most_recent_pat
             replacement = ExSubstitute.most_recent_replacement
-            flags = ''
+            flags = []
             count = 0
-        # :s g 100 | :s/ | :s// | s:/foo/bar/g 100 | etc.
-        else:
-            try:
-                parts = parsers.s_cmd.split(pattern)
-            except SyntaxError as e:
-                sublime.status_message("Vintageous: (substitute) %s" % e)
-                print("Vintageous: (substitute) %s" % e)
-                return
-            else:
-                if len(parts) == 4:
-                    # This is a full command in the form :s/foo/bar/g 100 or a
-                    # partial version of it.
-                    (pattern, replacement, flags, count) = parts
-                else:
-                    # This is a short command in the form :s g 100 or a partial
-                    # version of it.
-                    (flags, count) = parts
-                    pattern = ExSubstitute.most_recent_pat
-                    replacement = ExSubstitute.most_recent_replacement
 
-        if not pattern:
-            pattern = ExSubstitute.most_recent_pat
-        else:
-            ExSubstitute.most_recent_pat = pattern
-            ExSubstitute.most_recent_replacement = replacement
-            ExSubstitute.most_recent_flags = flags
+        ExSubstitute.most_recent_pat = pattern
+        ExSubstitute.most_recent_replacement = replacement
+        ExSubstitute.most_recent_flags = flags
 
         computed_flags = 0
-        computed_flags |= re.IGNORECASE if (flags and 'i' in flags) else 0
+        computed_flags |= re.IGNORECASE if ('i' in flags) else 0
+
         try:
             pattern = re.compile(pattern, flags=computed_flags)
         except Exception as e:
@@ -749,11 +738,10 @@ class ExSubstitute(sublime_plugin.TextCommand):
 
         replace_count = 0 if (flags and 'g' in flags) else 1
 
-        target_region = get_region_by_range(self.view, line_range=line_range, as_lines=True)
-        for r in reversed(target_region):
-            line_text = self.view.substr(self.view.line(r))
-            rv = re.sub(pattern, replacement, line_text, count=replace_count)
-            self.view.replace(edit, self.view.line(r), rv)
+        target_region = parsed.line_range.resolve(self.view)
+        line_text = self.view.substr(self.view.line(target_region))
+        new_text = re.sub(pattern, replacement, line_text, count=replace_count)
+        self.view.replace(edit, self.view.line(target_region), new_text)
 
 
 class ExDelete(ExTextCommandBase):

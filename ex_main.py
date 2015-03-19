@@ -3,7 +3,7 @@ import sublime_plugin
 
 import os
 
-from Vintageous.ex.parsers.new.parser import start_parsing
+from Vintageous.ex.parsers.new.parser import parse_ex_command
 from Vintageous.ex import ex_error
 from Vintageous.ex.ex_command_parser import EX_COMMANDS
 from Vintageous.ex.ex_command_parser import parse_command
@@ -105,9 +105,12 @@ class ViColonInput(sublime_plugin.WindowCommand):
         parsed = parse_command(cmd_line)
         try:
             # Use new parser for some commands.
-            parsed_new = start_parsing(cmd_line[1:])
-            # print('Vintageous:', parsed_new)
-        except Exception:
+            parsed_new = parse_ex_command(cmd_line[1:])
+            if parsed_new.command.target_command != 'ex_substitute':
+                raise NotImplementedError()
+            self.window.run_command(parsed_new.command.target_command, {'command_line': cmd_line[1:]})
+            return
+        except Exception as e:
             # TODO: Display errors from parser.
             pass
 

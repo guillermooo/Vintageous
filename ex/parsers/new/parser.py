@@ -16,7 +16,7 @@ from .tokens import TokenSemicolon
 from .tokens_commands import TokenOfCommand
 
 
-def start_parsing(source):
+def parse_ex_command(source):
     state = ParserState(source)
     parse_func = parse_line_ref
     command_line = CommandLineNode(None, None)

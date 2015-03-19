@@ -29,9 +29,8 @@ class RangeNode(Node):
         self.separator = separator
 
     def __repr__(self):
-        return ('<{0}(start:{1}, end:{2}, loffset:{3}, roffset:{4}, separator:{5}]>'
-            .format(self.__class__.__name__, self.start, self.end,
-                    self.separator))
+        return ('<{0}(start:{1}, end:{2}, separator:{3}]>'
+            .format(self.__class__.__name__, self.start, self.end, self.separator))
 
     def __eq__(self, other):
         if not isinstance(other, RangeNode):

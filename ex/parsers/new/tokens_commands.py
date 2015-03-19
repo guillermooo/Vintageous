@@ -29,4 +29,4 @@ class TokenCommandSubstitute(TokenOfCommand):
                         TOKEN_COMMAND_SUBSTITUTE,
                         'substitute', *args, **kwargs)
         self.addressable = True
-        self.target_command = '_ex_substitute'
+        self.target_command = 'ex_substitute'
