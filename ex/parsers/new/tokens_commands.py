@@ -30,3 +30,20 @@ class TokenCommandSubstitute(TokenOfCommand):
                         'substitute', *args, **kwargs)
         self.addressable = True
         self.target_command = 'ex_substitute'
+
+    @property
+    def pattern(self):
+        return self.params.get('search_term')
+
+    @property
+    def replacement(self):
+        return self.params.get('replacement')
+
+    @property
+    def flags(self):
+        return self.params.get('flags', [])
+
+    @property
+    def count(self):
+        # XXX why 0?
+        return self.params.get('count', 0)

@@ -700,35 +700,46 @@ class ExDoubleAmpersand(sublime_plugin.TextCommand):
 
 
 class ExSubstitute(sublime_plugin.TextCommand):
-    most_recent_pat = None
-    most_recent_flags = []
-    most_recent_replacement = ''
+    '''
+    Command :s[ubstitute]
+
+    http://vimdoc.sourceforge.net/htmldoc/change.html#:substitute
+    '''
+
+    last_pattern = None
+    last_flags = []
+    last_replacement = ''
 
     def run(self, edit, command_line=''):
 
         if not command_line:
             raise ValueError('no command line passed; that seems wrong')
 
+        # ST commands only accept Json-encoded parameters.
+        # We parse the command line again because the alternative is to
+        # serialize the parsed command line before calling this command.
+        # Parsing twice seems simpler.
         parsed = parse_ex_command(command_line)
-        pattern = parsed.command.params.get('search_term')
-        replacement = parsed.command.params.get('replacement')
-        count = parsed.command.params.get('count', 0)
-        flags = parsed.command.params.get('flags', [])
+        pattern = parsed.command.pattern
+        replacement = parsed.command.replacement
+        count = parsed.command.count
+        flags = parsed.command.flags
 
         # :s
         if not pattern:
-            pattern = ExSubstitute.most_recent_pat
-            replacement = ExSubstitute.most_recent_replacement
+            pattern = ExSubstitute.last_pattern
+            replacement = ExSubstitute.last_replacement
             flags = []
             count = 0
 
         if not pattern:
-            # TODO: give feedback
+            sublime.status_message("Vintageous: no previous pattern available")
+            print("Vintageous: no previous pattern available")
             return
 
-        ExSubstitute.most_recent_pat = pattern
-        ExSubstitute.most_recent_replacement = replacement
-        ExSubstitute.most_recent_flags = flags
+        ExSubstitute.last_pattern = pattern
+        ExSubstitute.last_replacement = replacement
+        ExSubstitute.last_flags = flags
 
         computed_flags = 0
         computed_flags |= re.IGNORECASE if ('i' in flags) else 0
@@ -742,6 +753,7 @@ class ExSubstitute(sublime_plugin.TextCommand):
                 % (e.message, pattern))
             return
 
+        # TODO: Implement 'count'
         replace_count = 0 if (flags and 'g' in flags) else 1
 
         target_region = parsed.line_range.resolve(self.view)
