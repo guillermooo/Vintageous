@@ -12,8 +12,9 @@ from .tokens import TokenOffset
 from .tokens import TokenEof
 from .tokens import TokenMark
 from .tokens_commands import TokenCommandSubstitute
-from .tokens_commands_substitute import scan_command_substitute
 from .tokens_commands_only import scan_command_only
+from .tokens_commands_register import scan_command_register
+from .tokens_commands_substitute import scan_command_substitute
 
 
 class Scanner(object):
@@ -145,6 +146,11 @@ def scan_command(state):
         # drop the name
         state.ignore()
         return scan_command_only(state)
+
+    if state.match(r'reg(?:isters)?(?=\s+[a-z0-9]+$|$)'):
+        # drop the name
+        state.ignore()
+        return scan_command_register(state)
 
     state.expect(EOF)
     return None, [TokenEof()]

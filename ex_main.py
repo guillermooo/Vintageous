@@ -109,6 +109,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
             if parsed_new.command.target_command not in (
                     'ex_substitute',
                     'ex_only',
+                    'ex_list_registers',
                     ):
                 raise NotImplementedError()
             self.window.run_command(parsed_new.command.target_command, {'command_line': cmd_line[1:]})

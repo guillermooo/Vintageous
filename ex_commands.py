@@ -741,6 +741,7 @@ class ExSubstitute(sublime_plugin.TextCommand):
         if not pattern:
             pattern = ExSubstitute.last_pattern
             replacement = ExSubstitute.last_replacement
+            # TODO: Don't we have to reuse the previous flags?
             flags = []
             count = 0
 
@@ -1052,32 +1053,41 @@ class ExExit(sublime_plugin.TextCommand):
             w.run_command('exit')
 
 
-class ExListRegisters(sublime_plugin.TextCommand):
-    """Lists registers in quick panel and saves selected to `"` register.
+class ExListRegisters(sublime_plugin.WindowCommand):
+    '''
+    Command :reg[isters] {arg}
 
-       In Vintageous, registers store lists of values (due to multiple selections).
-    """
+    Lists registers in quick panel and saves selected to `"` register.
 
-    def run(self, edit):
+    In Vintageous, registers store lists of values (due to multiple selections).
+
+    http://vimdoc.sourceforge.net/htmldoc/change.html#:registers
+    '''
+
+    def run(self, command_line):
         def show_lines(line_count):
             lines_display = '... [+{0}]'.format(line_count - 1)
             return lines_display if line_count > 1 else ''
 
-        state = State(self.view)
+        parsed = parse_ex_command(command_line)
+
+        # TODO: implement arguments.
+
+        state = State(self.window.active_view())
         pairs = [(k, v) for (k, v) in state.registers.to_dict().items() if v]
         pairs = [(k, repr(v[0]), len(v)) for (k, v) in pairs]
         pairs = ['"{0}  {1}  {2}'.format(k, v, show_lines(lines)) for (k, v, lines) in pairs]
 
-        self.view.window().show_quick_panel(pairs, self.on_done, flags=sublime.MONOSPACE_FONT)
+        self.window.show_quick_panel(pairs, self.on_done, flags=sublime.MONOSPACE_FONT)
 
     def on_done(self, idx):
         """Save selected value to `"` register."""
         if idx == -1:
             return
 
-        state = State(self.view)
+        state = State(self.window.active_view())
         value = list(state.registers.to_dict().values())[idx]
-        state.registers['"'] = value
+        state.registers['"'] = [value]
 
 
 class ExNew(sublime_plugin.TextCommand):
@@ -1107,7 +1117,6 @@ class ExYank(sublime_plugin.TextCommand):
         state.registers[register] = [text]
         if register == '"':
             state.registers['0'] = [text]
-
 
 
 class TabControlCommand(sublime_plugin.WindowCommand):

@@ -4,6 +4,7 @@ from .tokens_base import Token
 TOKEN_COMMAND_UNKNOWN = 0
 TOKEN_COMMAND_SUBSTITUTE = 1
 TOKEN_COMMAND_ONLY = 1
+TOKEN_COMMAND_REGISTERS = 2
 
 
 class TokenOfCommand(Token):
@@ -31,6 +32,14 @@ class TokenCommandOnly(TokenOfCommand):
                         TOKEN_COMMAND_ONLY,
                         'only', *args, **kwargs)
         self.target_command = 'ex_only'
+
+
+class TokenCommandRegisters(TokenOfCommand):
+    def __init__(self, params, *args, **kwargs):
+        super().__init__(params,
+                        TOKEN_COMMAND_REGISTERS,
+                        'registers', *args, **kwargs)
+        self.target_command = 'ex_list_registers'
 
 
 class TokenCommandSubstitute(TokenOfCommand):
