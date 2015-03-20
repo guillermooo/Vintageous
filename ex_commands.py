@@ -672,28 +672,28 @@ class ExCopy(ExTextCommandBase, ExAddressableCommandMixin):
         self.set_next_sel([(cursor_dest, cursor_dest)])
 
 
-class ExOnly(sublime_plugin.TextCommand):
+class ExOnly(sublime_plugin.WindowCommand):
     """
     Command: :on[ly][!]
 
     http://vimdoc.sourceforge.net/htmldoc/windows.html#:only
     """
 
-    def run(self, edit, command_line=''):
+    def run(self, command_line=''):
 
         if not command_line:
             raise ValueError('empty command line; that seems wrong')
 
         parsed = parse_ex_command(command_line)
 
-        if not parsed.command.forced and has_dirty_buffers(self.view.window()):
+        if not parsed.command.forced and has_dirty_buffers(self.window):
                 ex_error.display_error(ex_error.ERR_OTHER_BUFFER_HAS_CHANGES)
                 return
 
-        window = self.view.window()
-        current_id = self.view.id()
+        view = self.window.active_view()
+        current_id = view.id()
 
-        for view in window.views():
+        for view in self.window.views():
             if view.id() == current_id:
                 continue
 
