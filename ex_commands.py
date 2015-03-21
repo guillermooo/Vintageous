@@ -2,33 +2,33 @@ import sublime
 import sublime_plugin
 
 import os
-import stat
 import re
+import stat
 import subprocess
 
 from Vintageous.ex import ex_error
 from Vintageous.ex import ex_range
 from Vintageous.ex import parsers
 from Vintageous.ex import shell
+from Vintageous.ex.parsers.new.parser import parse_ex_command
 from Vintageous.ex.plat.windows import get_oem_cp
 from Vintageous.ex.plat.windows import get_startup_info
 from Vintageous.state import State
 from Vintageous.vi import abbrev
 from Vintageous.vi import utils
-from Vintageous.vi.core import ViWindowCommandBase
-from Vintageous.vi.utils import R
-from Vintageous.vi.utils import first_sel
-from Vintageous.vi.utils import resolve_insertion_point_at_b
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
+from Vintageous.vi.core import ViWindowCommandBase
 from Vintageous.vi.mappings import Mappings
 from Vintageous.vi.settings import set_global
 from Vintageous.vi.settings import set_local
 from Vintageous.vi.sublime import has_dirty_buffers
+from Vintageous.vi.utils import first_sel
 from Vintageous.vi.utils import IrreversibleTextCommand
 from Vintageous.vi.utils import modes
-from Vintageous.ex.parsers.new.parser import parse_ex_command
+from Vintageous.vi.utils import R
+from Vintageous.vi.utils import resolve_insertion_point_at_b
 
 
 GLOBAL_RANGES = []
