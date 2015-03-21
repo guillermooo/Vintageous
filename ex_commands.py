@@ -444,109 +444,75 @@ class ExPrintWorkingDir(IrreversibleTextCommand):
 
 
 class ExWriteFile(sublime_plugin.WindowCommand):
+    '''
+    Command :w[rite]
+
+    http://vimdoc.sourceforge.net/htmldoc/editing.html#:write
+    '''
+
+    def check_is_readonly(self, fname):
+        if not fname:
+            return
+
+        mode = os.stat(fname)
+        read_only = (stat.S_IMODE(mode.st_mode) & stat.S_IWUSR != stat.S_IWUSR)
+
+        return read_only
+
     @changing_cd
-    def run(self,
-            line_range=None,
-            forced=False,
-            file_name='',
-            plusplus_args='',
-            operator='',
-            target_redirect='',
-            subcmd=''):
+    def run(self, command_line=''):
 
-        if file_name and target_redirect:
-            sublime.status_message('Vintageous: Too many arguments.')
+        if not command_line:
+            raise ValueError('empty command line; that seems to be an error')
+
+        parsed = parse_ex_command(command_line)
+
+        if not self.window.active_view():
             return
 
-        appending = operator == '>>'
-        a_range = line_range['text_range']
-        self.view = self.window.active_view()
-        content = get_region_by_range(self.view, line_range=line_range) if a_range else \
-                        [sublime.Region(0, self.view.size())]
-
-        read_only = False
-        if self.view.file_name():
-            mode = os.stat(self.view.file_name())
-            read_only = (stat.S_IMODE(mode.st_mode) & stat.S_IWUSR !=
-                                                                stat.S_IWUSR)
-
-        if target_redirect:
-            target = self.window.new_file()
-            target.set_name(target_redirect)
-        elif file_name:
-
-            def report_error(msg):
-                sublime.status_message('Vintageous: %s' % msg)
-
-            file_path = os.path.abspath(os.path.expanduser(file_name))
-
-            if os.path.exists(file_path) and (file_path != self.view.file_name()):
-                # TODO add w! flag
-                # TODO: Hook this up with ex error handling (ex/errors.py).
-                msg = "File '{0}' already exists.".format(file_path)
-                report_error(msg)
+        if parsed.command.params['>>'] and parsed.command.params['file_name']:
+            if os.path.exists(parsed.command.params['filename']):
+                print ('would append to file ', parsed.command.params ['file_name'])
+                pass
+                # append using current encoding
+            elif not forced:
+                sublime.status_message('Vintageous: File does not exist.')
                 return
-
-            if not os.path.exists(os.path.dirname(file_path)):
-                msg = "Directory '{0}' does not exist.".format(os.path.dirname(file_path))
-                report_error(msg)
-                return
-
-            try:
-                # FIXME: We need to do some work with encodings here, don't we?
-                with open(file_path, 'w+') as temp_file:
-                    for frag in reversed(content):
-                        temp_file.write(self.view.substr(frag))
-                    temp_file.close()
-                    sublime.status_message("Vintageous: Saved {0}".format(file_path))
-
-                    row, col = self.view.rowcol(self.view.sel()[0].b)
-                    encoded_fn = "{0}:{1}:{2}".format(file_path, row + 1, col + 1)
-                    self.view.set_scratch(True)
-                    w = self.window
-                    w.run_command('close')
-                    w.open_file(encoded_fn, sublime.ENCODED_POSITION)
-                    return
-            except IOError as e:
-                report_error( "Failed to create file '%s'." % file_name )
-                return
-
-            window = self.window
-            window.open_file(file_path)
+            # create file and append
+            print ('would create and append to file ', parsed.command.params ['file_name'])
             return
-        else:
-            target = self.view
 
-            if (read_only or self.view.is_read_only()) and not forced:
-                utils.blink()
-                sublime.status_message("Vintageous: Can't write read-only file.")
+        if parsed.command.params['>>']:
+            print ('would append to this file')
+            return
+
+        if parsed.command.params['cmd']:
+            print ('would execute external command')
+            return
+
+        if parsed.command.params['file_name']:
+            if parsed.line_range.is_empty():
+                print ('would write this whole file to indicated file')
                 return
+            print ('would write lines to indicated file')
+            return
 
-        start = 0 if not appending else target.size()
-        prefix = '\n' if appending and target.size() > 0 else ''
+        view = self.window.active_view()
+        if not view:
+            return
 
-        if appending or target_redirect:
-            for frag in reversed(content):
-                target.run_command('append', {'characters': prefix + self.view.substr(frag) + '\n'})
-        elif a_range:
-            start_deleting = 0
-            text = ''
-            for frag in content:
-                text += self.view.substr(frag) + '\n'
-            start_deleting = len(text)
-            self.view.run_command('ex_replace_file', {'start': 0, 'end': 0, 'with_what': text})
-        else:
-            dirname = os.path.dirname(self.view.file_name())
-            if not os.path.exists(dirname):
-                os.makedirs(dirname)
-            self.window.run_command('save')
+        if not view.file_name():
+            sublime.status_message('Vintageous: no file name provided')
+            return
 
-        # This may unluckily prevent the user from seeing ST's feedback about saving the current
-        # file.
-        state = State(self.window.active_view())
-        if state.mode != MODE_NORMAL:
-            state.enter_normal_mode()
-            self.window.run_command('vi_enter_normal_mode')
+        read_only = self.check_is_readonly(view.file_name()) or view.is_read_only()
+
+        if read_only and not parsed.command.forced:
+            utils.blink()
+            sublime.status_message("Vintageous: Can't write read-only file.")
+            return
+
+        self.window.run_command('save')
 
 
 class ExReplaceFile(sublime_plugin.TextCommand):

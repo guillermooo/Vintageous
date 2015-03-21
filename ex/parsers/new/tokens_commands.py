@@ -66,3 +66,12 @@ class TokenCommandSubstitute(TokenOfCommand):
     def count(self):
         # XXX why 0?
         return self.params.get('count', 0)
+
+
+class TokenCommandWrite(TokenOfCommand):
+    def __init__(self, params, *args, **kwargs):
+        super().__init__(params,
+                        TOKEN_COMMAND_SUBSTITUTE,
+                        'write', *args, **kwargs)
+        self.addressable = True
+        self.target_command = 'ex_write_file'

@@ -14,6 +14,7 @@ from Vintageous.ex.parsers.new.tokens import TokenSearchForward
 from Vintageous.ex.parsers.new.tokens import TokenSearchBackward
 from Vintageous.ex.parsers.new.tokens import TokenMark
 from Vintageous.ex.parsers.new.tokens_commands import TokenCommandSubstitute
+from Vintageous.ex.parsers.new.tokens_commands import TokenCommandWrite
 
 
 class ScannerTests(unittest.TestCase):
@@ -138,3 +139,119 @@ class ScannerMarksScanner_Tests(unittest.TestCase):
         scanner = Scanner("'a")
         tokens = list(scanner.scan())
         self.assertEqual([TokenMark('a'), TokenEof()], tokens)
+
+
+class ScannerWriteCommand_Tests(unittest.TestCase):
+    def testCanInstantiate(self):
+        scanner = Scanner("write")
+        tokens = list(scanner.scan())
+        params = {'++': '', 'file_name': '', '>>': False, 'cmd': ''}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)
+
+    def testCanInstantiateAlias(self):
+        scanner = Scanner("w")
+        tokens = list(scanner.scan())
+        params = {'++': '', 'file_name': '', '>>': False, 'cmd': ''}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)
+
+    def testCanParsePlusPlusBin(self):
+        scanner = Scanner("w ++bin")
+        tokens = list(scanner.scan())
+        params = {'++': 'binary', 'file_name': '', '>>': False, 'cmd': ''}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)
+
+        scanner = Scanner("w ++binary")
+        tokens = list(scanner.scan())
+        params = {'++': 'binary', 'file_name': '', '>>': False, 'cmd': ''}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)
+
+    def testCanParsePlusPlusNobin(self):
+        scanner = Scanner("w ++nobinary")
+        tokens = list(scanner.scan())
+        params = {'++': 'nobinary', 'file_name': '', '>>': False, 'cmd': ''}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)
+
+        scanner = Scanner("w ++nobin")
+        tokens = list(scanner.scan())
+        params = {'++': 'nobinary', 'file_name': '', '>>': False, 'cmd': ''}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)
+
+    def testCanParsePlusPlusFileformat(self):
+        scanner = Scanner("w ++fileformat")
+        tokens = list(scanner.scan())
+        params = {'++': 'fileformat', 'file_name': '', '>>': False, 'cmd': ''}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)
+
+        scanner = Scanner("w ++ff")
+        tokens = list(scanner.scan())
+        params = {'++': 'fileformat', 'file_name': '', '>>': False, 'cmd': ''}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)
+
+    def testCanParsePlusPlusFileencoding(self):
+        scanner = Scanner("w ++fileencoding")
+        tokens = list(scanner.scan())
+        params = {'++': 'fileencoding', 'file_name': '', '>>': False, 'cmd': ''}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)
+
+        scanner = Scanner("w ++enc")
+        tokens = list(scanner.scan())
+        params = {'++': 'fileencoding', 'file_name': '', '>>': False, 'cmd': ''}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)
+
+    def testCanParsePlusPlusBad(self):
+        scanner = Scanner("w ++bad")
+        tokens = list(scanner.scan())
+        params = {'++': 'bad', 'file_name': '', '>>': False, 'cmd': ''}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)
+
+        scanner = Scanner("w ++fileformat")
+        tokens = list(scanner.scan())
+        params = {'++': 'fileformat', 'file_name': '', '>>': False, 'cmd': ''}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)
+
+    def testCanParsePlusPlusEdit(self):
+        scanner = Scanner("w ++edit")
+        tokens = list(scanner.scan())
+        params = {'++': 'edit', 'file_name': '', '>>': False, 'cmd': ''}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)
+
+        scanner = Scanner("w ++fileformat")
+        tokens = list(scanner.scan())
+        params = {'++': 'fileformat', 'file_name': '', '>>': False, 'cmd': ''}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)
+
+    def testCanParseRedirection(self):
+        scanner = Scanner("w>>")
+        tokens = list(scanner.scan())
+        params = {'++': '', 'file_name': '', '>>': True, 'cmd': ''}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)
+
+    def testCanParseRedirectionFollowedByFilename(self):
+        scanner = Scanner("w>>foo.txt")
+        tokens = list(scanner.scan())
+        params = {'++': '', 'file_name': 'foo.txt', '>>': True, 'cmd': ''}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)
+
+    def testCanParseRedirectionFollowedByFilenameSeparated(self):
+        scanner = Scanner("w>> foo.txt")
+        tokens = list(scanner.scan())
+        params = {'++': '', 'file_name': 'foo.txt', '>>': True, 'cmd': ''}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)
+
+    def testCanParseCommand(self):
+        scanner = Scanner("w !dostuff")
+        tokens = list(scanner.scan())
+        params = {'++': '', 'file_name': '', '>>': False, 'cmd': 'dostuff'}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)
+
+    def testCanParseCommandAbsorbsEveryThing(self):
+        scanner = Scanner("w !dostuff here")
+        tokens = list(scanner.scan())
+        params = {'++': '', 'file_name': '', '>>': False, 'cmd': 'dostuff here'}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)
+
+    def testCanParseCommandAndDetectFileName(self):
+        scanner = Scanner("w foo.txt")
+        tokens = list(scanner.scan())
+        params = {'++': '', 'file_name': 'foo.txt', '>>': False, 'cmd': ''}
+        self.assertEqual([TokenCommandWrite(params), TokenEof()], tokens)

@@ -292,3 +292,13 @@ class parse_line_ref_ParseRegistersCommand(unittest.TestCase):
     def test_CanParseAlias(self):
         parsed = parse_ex_command('reg')
         self.assertEqual(parsed.command.content, 'registers')
+
+
+class parse_line_ref_ParseWriteCommand(unittest.TestCase):
+    def test_CanParseItOnItsOwn(self):
+        parsed = parse_ex_command('write')
+        self.assertEqual(parsed.command.content, 'write')
+
+    def test_CanParseAlias(self):
+        parsed = parse_ex_command('w')
+        self.assertEqual(parsed.command.content, 'write')
