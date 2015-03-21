@@ -15,7 +15,9 @@ from Vintageous.ex.plat.windows import get_startup_info
 from Vintageous.state import State
 from Vintageous.vi import abbrev
 from Vintageous.vi import utils
+from Vintageous.vi.core import ViWindowCommandBase
 from Vintageous.vi.utils import R
+from Vintageous.vi.utils import first_sel
 from Vintageous.vi.utils import resolve_insertion_point_at_b
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL
@@ -445,7 +447,7 @@ class ExPrintWorkingDir(IrreversibleTextCommand):
         sublime.status_message(os.getcwd())
 
 
-class ExWriteFile(sublime_plugin.WindowCommand):
+class ExWriteFile(ViWindowCommandBase):
     '''
     Command :w[rite]
 
@@ -485,15 +487,18 @@ class ExWriteFile(sublime_plugin.WindowCommand):
             return
 
         if parsed.command.params['>>']:
-            view = self.window.active_view()
-            r = parsed.line_range.resolve(view)
-            text = view.substr(r)
+            r = parsed.line_range.resolve(self._view)
+            text = self._view.substr(r)
             text = text if text.startswith('\n') else '\n' + text
-            location = resolve_insertion_point_at_b(view.sel()[0])
-            view.run_command('append', {'characters': text})
-            utils.replace_sel(view, R(view.line(location).a))
-            State(view).enter_normal_mode()
-            self.window.run_command('_enter_normal_mode', {'mode': modes.VISUAL})
+
+            location = resolve_insertion_point_at_b(first_sel(self._view))
+
+            self._view.run_command('append', {'characters': text})
+
+            utils.replace_sel(self._view, R(self._view.line(location).a))
+
+            self.enter_normal_mode(mode=self.state.mode)
+            self.state.enter_normal_mode()
             return
 
         if parsed.command.params['cmd']:
