@@ -75,3 +75,19 @@ class TokenCommandWrite(TokenOfCommand):
                         'write', *args, **kwargs)
         self.addressable = True
         self.target_command = 'ex_write_file'
+
+    @property
+    def options(self):
+        return self.params['++']
+
+    @property
+    def target_file(self):
+        return self.params['file_name']
+
+    @property
+    def appends(self):
+        return self.params['>>']
+
+    @property
+    def command(self):
+        return self.params['cmd']

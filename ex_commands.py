@@ -470,7 +470,7 @@ class ExWriteFile(ViWindowCommandBase):
 
         parsed = parse_ex_command(command_line)
 
-        if parsed.command.params ['++']:
+        if parsed.command.options:
             msg = "Vintageous: ++opt isn't implemented for :write"
             sublime.status_message(msg)
             print(msg)
@@ -479,17 +479,17 @@ class ExWriteFile(ViWindowCommandBase):
         if not self._view:
             return
 
-        if parsed.command.params['>>']:
+        if parsed.command.appends:
             self.do_append(parsed)
             return
 
-        if parsed.command.params['cmd']:
+        if parsed.command.command:
             msg = "Vintageous: !cmd isn't implemented for :write"
             sublime.status_message(msg)
             print(msg)
             return
 
-        fname = parsed.command.params['file_name']
+        fname = parsed.command.target_file
         if fname:
             self.do_write(parsed)
             return
@@ -509,7 +509,7 @@ class ExWriteFile(ViWindowCommandBase):
         self.window.run_command('save')
 
     def do_append(self, parsed_command):
-        if parsed_command.command.params['file_name']:
+        if parsed_command.command.target_file:
             self.do_append_to_file(parsed_command)
             return
 
@@ -540,7 +540,7 @@ class ExWriteFile(ViWindowCommandBase):
         else:
             r = parsed_command.line_range.resolve(self._view)
 
-        fname = parsed_command.command.params ['file_name']
+        fname = parsed_command.command.target_file
 
         if not os.path.exists(fname) and not forced:
             sublime.status_message('Vintageous: File does not exist.')
@@ -560,7 +560,7 @@ class ExWriteFile(ViWindowCommandBase):
             print('=======================')
 
     def do_write(self, parsed_command):
-        fname = parsed_command.command.params['file_name']
+        fname = parsed_command.command.target_file
         if (not os.path.exists(fname) and not parsed_command.command.forced):
             msg = 'Vintageous: file does not exist'
             print(msg)
