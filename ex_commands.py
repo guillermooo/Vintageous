@@ -465,81 +465,33 @@ class ExWriteFile(ViWindowCommandBase):
 
     @changing_cd
     def run(self, command_line=''):
-
         if not command_line:
             raise ValueError('empty command line; that seems to be an error')
 
         parsed = parse_ex_command(command_line)
 
-        if not self.window.active_view():
+        if parsed.command.params ['++']:
+            msg = "Vintageous: ++opt isn't implemented for :write"
+            sublime.status_message(msg)
+            print(msg)
             return
 
-        if parsed.command.params['>>'] and parsed.command.params['file_name']:
-            if os.path.exists(parsed.command.params['filename']):
-                print ('would append to file ', parsed.command.params ['file_name'])
-                pass
-                # append using current encoding
-            elif not forced:
-                sublime.status_message('Vintageous: File does not exist.')
-                return
-            # create file and append
-            print ('would create and append to file ', parsed.command.params ['file_name'])
+        if not self._view:
             return
 
         if parsed.command.params['>>']:
-            r = None
-            if parsed.line_range.is_empty:
-                # If the user didn't provide any range data, Vim appends whe whole buffer.
-                r = R(0, self._view.size())
-            else:
-                r = parsed.line_range.resolve(self._view)
-
-            text = self._view.substr(r)
-            text = text if text.startswith('\n') else '\n' + text
-
-            location = resolve_insertion_point_at_b(first_sel(self._view))
-
-            self._view.run_command('append', {'characters': text})
-
-            utils.replace_sel(self._view, R(self._view.line(location).a))
-
-            self.enter_normal_mode(mode=self.state.mode)
-            self.state.enter_normal_mode()
+            self.do_append(parsed)
             return
 
         if parsed.command.params['cmd']:
-            print ('would execute external command')
+            msg = "Vintageous: !cmd isn't implemented for :write"
+            sublime.status_message(msg)
+            print(msg)
             return
 
         fname = parsed.command.params['file_name']
         if fname:
-            if (not os.path.exists(fname) and not parsed.command.forced):
-                print ('Vintageous: file does not exist')
-                return
-
-            r = None
-            if parsed.line_range.is_empty:
-                # If the user didn't provide any range data, Vim writes whe whole buffer.
-                r = R(0, self._view.size())
-            else:
-                r = parsed.line_range.resolve(self._view)
-
-            try:
-                # FIXME: we should write in the current dir, but I don't think we're doing that.
-                with open(fname, 'wt') as f:
-                    text = self._view.substr(r)
-                    f.write(text)
-                msg = 'Vintageous: Saved ' + os.path.abspath(fname)
-                sublime.status_message(msg)
-            except IOError as e:
-                # TODO: Add logging.
-                sublime.status_message("Vintageous: Could not write file.")
-                print('Vintageous =======')
-                print (e)
-                print('==================')
-            return
-
-        if not self._view:
+            self.do_write(parsed)
             return
 
         if not self._view.file_name():
@@ -555,6 +507,86 @@ class ExWriteFile(ViWindowCommandBase):
             return
 
         self.window.run_command('save')
+
+    def do_append(self, parsed_command):
+        if parsed_command.command.params['file_name']:
+            self.do_append_to_file(parsed_command)
+            return
+
+        r = None
+        if parsed_command.line_range.is_empty:
+            # If the user didn't provide any range data, Vim appends whe whole buffer.
+            r = R(0, self._view.size())
+        else:
+            r = parsed_command.line_range.resolve(self._view)
+
+        text = self._view.substr(r)
+        text = text if text.startswith('\n') else '\n' + text
+
+        location = resolve_insertion_point_at_b(first_sel(self._view))
+
+        self._view.run_command('append', {'characters': text})
+
+        utils.replace_sel(self._view, R(self._view.line(location).a))
+
+        self.enter_normal_mode(mode=self.state.mode)
+        self.state.enter_normal_mode()
+
+    def do_append_to_file(self, parsed_command):
+        r = None
+        if parsed_command.line_range.is_empty:
+            # If the user didn't provide any range data, Vim writes whe whole buffer.
+            r = R(0, self._view.size())
+        else:
+            r = parsed_command.line_range.resolve(self._view)
+
+        fname = parsed_command.command.params ['file_name']
+
+        if not os.path.exists(fname) and not forced:
+            sublime.status_message('Vintageous: File does not exist.')
+            return
+
+        try:
+            with open(fname, 'at') as f:
+                text = self._view.substr(r)
+                f.write(text)
+            msg = 'Vintageous: Appended to ' + os.path.abspath(fname)
+            sublime.status_message(msg)
+            return
+        except IOError as e:
+            print('Vintageous: could not write file')
+            print('Vintageous ============')
+            print(e)
+            print('=======================')
+
+    def do_write(self, parsed_command):
+        fname = parsed_command.command.params['file_name']
+        if (not os.path.exists(fname) and not parsed_command.command.forced):
+            msg = 'Vintageous: file does not exist'
+            print(msg)
+            sublime.status_message(msg)
+            return
+
+        r = None
+        if parsed_command.line_range.is_empty:
+            # If the user didn't provide any range data, Vim writes whe whole buffer.
+            r = R(0, self._view.size())
+        else:
+            r = parsed_command.line_range.resolve(self._view)
+
+        try:
+            # FIXME: we should write in the current dir, but I don't think we're doing that.
+            with open(fname, 'wt') as f:
+                text = self._view.substr(r)
+                f.write(text)
+            msg = 'Vintageous: Saved ' + os.path.abspath(fname)
+            sublime.status_message(msg)
+        except IOError as e:
+            # TODO: Add logging.
+            sublime.status_message("Vintageous: Could not write file.")
+            print('Vintageous =======')
+            print (e)
+            print('==================')
 
 
 class ExReplaceFile(sublime_plugin.TextCommand):
