@@ -5,6 +5,7 @@ from Vintageous.ex.parsers.new.tokens import TokenPercent
 from Vintageous.ex.parsers.new.tokens import TokenSearchBackward
 from Vintageous.ex.parsers.new.tokens import TokenSearchForward
 from Vintageous.ex.parsers.new.tokens import TokenOffset
+from Vintageous.ex.parsers.new.tokens import TokenMark
 from Vintageous.vi.search import reverse_search_by_pt
 from Vintageous.vi.utils import first_sel
 from Vintageous.vi.utils import R
@@ -88,6 +89,30 @@ class RangeNode(Node):
                 raise ValueError('pattern not found')
             return row_at(view, match.a)
 
+        if isinstance(token, TokenMark):
+            return self.resolve_mark(view, token)
+
+        raise NotImplementedError()
+
+    def resolve_mark(self, view, token):
+        if token.content == '<':
+            sel = list(view.sel())[0]
+            view.sel().clear()
+            view.sel().add(sel)
+            if sel.a < sel.b:
+                return row_at(view, sel.a)
+            else:
+                return row_at(view, sel.a - 1)
+
+        if token.content == '>':
+            sel = list(view.sel())[0]
+            view.sel().clear()
+            view.sel().add(sel)
+            if sel.a < sel.b:
+                return row_at(view, sel.b - 1)
+            else:
+                return row_at(view, sel.b)
+            # return staring visual region
         raise NotImplementedError()
 
     def resolve_line_reference(self, view, line_reference, current=0):
@@ -130,10 +155,10 @@ class RangeNode(Node):
 
             return view.full_line(view.text_point(start, 0))
 
-        start = start if self.separator == ';' else 0
-        end = self.resolve_line_reference(view, self.end or [TokenDot()], current=start)
+        new_start = start if self.separator == ';' else 0
+        end = self.resolve_line_reference(view, self.end or [TokenDot()], current=new_start)
 
-        return R(start.begin(), end.end())
+        return view.full_line(R(view.text_point(start, 0), view.text_point(end, 0)))
 
 
 class CommandLineNode(Node):

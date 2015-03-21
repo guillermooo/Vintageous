@@ -15,6 +15,8 @@ from Vintageous.ex.plat.windows import get_startup_info
 from Vintageous.state import State
 from Vintageous.vi import abbrev
 from Vintageous.vi import utils
+from Vintageous.vi.utils import R
+from Vintageous.vi.utils import resolve_insertion_point_at_b
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
@@ -483,7 +485,15 @@ class ExWriteFile(sublime_plugin.WindowCommand):
             return
 
         if parsed.command.params['>>']:
-            print ('would append to this file')
+            view = self.window.active_view()
+            r = parsed.line_range.resolve(view)
+            text = view.substr(r)
+            text = text if text.startswith('\n') else '\n' + text
+            location = resolve_insertion_point_at_b(view.sel()[0])
+            view.run_command('append', {'characters': text})
+            utils.replace_sel(view, R(view.line(location).a))
+            State(view).enter_normal_mode()
+            self.window.run_command('_enter_normal_mode', {'mode': modes.VISUAL})
             return
 
         if parsed.command.params['cmd']:

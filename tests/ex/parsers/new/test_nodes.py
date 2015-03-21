@@ -8,6 +8,7 @@ from Vintageous.ex.parsers.new.tokens import TokenSearchForward
 from Vintageous.ex.parsers.new.tokens import TokenSearchBackward
 from Vintageous.ex.parsers.new.tokens import TokenPercent
 from Vintageous.ex.parsers.new.tokens import TokenOffset
+from Vintageous.ex.parsers.new.tokens import TokenMark
 from Vintageous.ex.parsers.new.tokens_commands import TokenCommandSubstitute
 
 from Vintageous.tests import ViewTest
@@ -226,3 +227,68 @@ fff fff
         self.add_sel(self.R(self.view.size()))
         region = RangeNode(start=[TokenSearchBackward('cat'), TokenSearchBackward('cat')]).resolve(self.view)
         self.assert_equal_regions(self.R(16, 24), region)
+
+
+class Tests_Marks(ViewTest):
+    def testCanCalculateVisualStart(self):
+        self.write('''xxx xxx
+aaa aaa
+xxx xxx
+bbb bbb
+''')
+        self.clear_sel()
+        self.add_sel(self.R(8, 10))
+        region = RangeNode(start=[TokenMark("<")]).resolve(self.view)
+        self.assert_equal_regions(self.R(8, 16), region)
+
+    def testCanCalculateVisualStartWithMultipleSels(self):
+        self.write('''xxx xxx
+aaa aaa
+xxx xxx
+bbb bbb
+xxx xxx
+ccc ccc
+''')
+        self.clear_sel()
+        self.add_sel(self.R(8, 10))
+        self.add_sel(self.R(24, 27))
+        region = RangeNode(start=[TokenMark("<")]).resolve(self.view)
+        self.assert_equal_regions(self.R(8, 16), region)
+
+    def testCanCalculateVisualEnd(self):
+        self.write('''xxx xxx
+aaa aaa
+xxx xxx
+bbb bbb
+''')
+        self.clear_sel()
+        self.add_sel(self.R(8, 10))
+        region = RangeNode(start=[TokenMark(">")]).resolve(self.view)
+        self.assert_equal_regions(self.R(8, 16), region)
+
+    def testCanCalculateVisualEndWithMultipleSels(self):
+        self.write('''xxx xxx
+aaa aaa
+xxx xxx
+bbb bbb
+xxx xxx
+ccc ccc
+''')
+        self.clear_sel()
+        self.add_sel(self.R(8, 10))
+        self.add_sel(self.R(24, 27))
+        region = RangeNode(start=[TokenMark(">")]).resolve(self.view)
+        self.assert_equal_regions(self.R(8, 16), region)
+
+    def testCanCalculateVisualEndWithMultipleSels(self):
+        self.write('''xxx xxx
+aaa aaa
+xxx xxx
+bbb bbb
+xxx xxx
+ccc ccc
+''')
+        self.clear_sel()
+        self.add_sel(self.R(8, 10))
+        region = RangeNode(start=[TokenMark("<"), TokenMark(">")]).resolve(self.view)
+        self.assert_equal_regions(self.R(8, 16), region)
