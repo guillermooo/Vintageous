@@ -488,7 +488,7 @@ class ExWriteFile(ViWindowCommandBase):
 
         if parsed.command.params['>>']:
             r = None
-            if parsed.line_range.empty():
+            if parsed.line_range.is_empty:
                 # If the user didn't provide any range data, Vim appends whe whole buffer.
                 r = R(0, self._view.size())
             else:
@@ -511,22 +511,43 @@ class ExWriteFile(ViWindowCommandBase):
             print ('would execute external command')
             return
 
-        if parsed.command.params['file_name']:
-            if parsed.line_range.is_empty():
-                print ('would write this whole file to indicated file')
+        fname = parsed.command.params['file_name']
+        if fname:
+            if (not os.path.exists(fname) and not parsed.command.forced):
+                print ('Vintageous: file does not exist')
                 return
-            print ('would write lines to indicated file')
+
+            r = None
+            if parsed.line_range.is_empty:
+                # If the user didn't provide any range data, Vim writes whe whole buffer.
+                r = R(0, self._view.size())
+            else:
+                r = parsed.line_range.resolve(self._view)
+
+            try:
+                # FIXME: we should write in the current dir, but I don't think we're doing that.
+                with open(fname, 'wt') as f:
+                    text = self._view.substr(r)
+                    f.write(text)
+                msg = 'Vintageous: Saved ' + os.path.abspath(fname)
+                sublime.status_message(msg)
+            except IOError as e:
+                # TODO: Add logging.
+                sublime.status_message("Vintageous: Could not write file.")
+                print('Vintageous =======')
+                print (e)
+                print('==================')
             return
 
-        view = self.window.active_view()
-        if not view:
+        if not self._view:
             return
 
-        if not view.file_name():
+        if not self._view.file_name():
             sublime.status_message('Vintageous: no file name provided')
             return
 
-        read_only = self.check_is_readonly(view.file_name()) or view.is_read_only()
+        read_only = (self.check_is_readonly(self._view.file_name())
+                     or self._view.is_read_only())
 
         if read_only and not parsed.command.forced:
             utils.blink()

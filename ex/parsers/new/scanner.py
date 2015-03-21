@@ -154,7 +154,7 @@ def scan_command(state):
         state.ignore()
         return scan_command_register(state)
 
-    if state.match(r'w(?:rite)?!?(?=(?:\+\+|>>| |$))'):
+    if state.match(r'w(?:rite)?(?=(?:!?(?:\+\+|>>| |$)))'):
         # drop the name
         state.ignore()
         return scan_command_write(state)
