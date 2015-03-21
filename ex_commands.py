@@ -487,7 +487,13 @@ class ExWriteFile(ViWindowCommandBase):
             return
 
         if parsed.command.params['>>']:
-            r = parsed.line_range.resolve(self._view)
+            r = None
+            if parsed.line_range.empty():
+                # If the user didn't provide any range data, Vim appends whe whole buffer.
+                r = R(0, self._view.size())
+            else:
+                r = parsed.line_range.resolve(self._view)
+
             text = self._view.substr(r)
             text = text if text.startswith('\n') else '\n' + text
 
