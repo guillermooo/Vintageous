@@ -449,7 +449,14 @@ class ExPrintWorkingDir(IrreversibleTextCommand):
 
 class ExWriteFile(ViWindowCommandBase):
     '''
-    Command :w[rite]
+    Command :w[rite] [++opt]
+            :w[rite]! [++opt]
+            :[range]w[rite][!] [++opt]
+            :[range]w[rite] [++opt] {file}
+            :[range]w[rite]! [++opt] {file}
+            :[range]w[rite][!] [++opt] >>
+            :[range]w[rite][!] [++opt] >> {file}
+            :[range]w[rite] [++opt] {!cmd}
 
     http://vimdoc.sourceforge.net/htmldoc/editing.html#:write
     '''
@@ -489,8 +496,7 @@ class ExWriteFile(ViWindowCommandBase):
             print(msg)
             return
 
-        fname = parsed.command.target_file
-        if fname:
+        if parsed.command.target_file:
             self.do_write(parsed)
             return
 
@@ -1093,7 +1099,7 @@ class ExExit(sublime_plugin.TextCommand):
             w.run_command('exit')
 
 
-class ExListRegisters(sublime_plugin.WindowCommand):
+class ExListRegisters(ViWindowCommandBase):
     '''
     Command :reg[isters] {arg}
 
