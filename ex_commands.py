@@ -11,9 +11,9 @@ from Vintageous.ex import ex_range
 from Vintageous.ex import parsers
 from Vintageous.ex import shell
 from Vintageous.ex.ex_error import display_error2
-from Vintageous.ex.ex_error import handle_not_implemented
 from Vintageous.ex.ex_error import ERR_NO_FILE_NAME
 from Vintageous.ex.ex_error import ERR_READONLY_FILE
+from Vintageous.ex.ex_error import handle_not_implemented
 from Vintageous.ex.ex_error import VimError
 from Vintageous.ex.parsers.new.parser import parse_ex_command
 from Vintageous.ex.plat.windows import get_oem_cp
