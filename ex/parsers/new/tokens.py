@@ -6,10 +6,6 @@ class TokenEof(Token):
         super().__init__(TOKEN_EOF, '__EOF__', *args, **kwargs)
 
 
-class TokenOfRange(Token):
-    pass
-
-
 class TokenOfSearch(TokenOfRange):
     pass
 

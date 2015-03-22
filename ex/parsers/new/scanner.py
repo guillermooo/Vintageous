@@ -11,8 +11,6 @@ from .tokens import TokenSemicolon
 from .tokens import TokenOffset
 from .tokens import TokenEof
 from .tokens import TokenMark
-from .tokens_commands import TokenCommandSubstitute
-from .tokens_commands import TokenCommandWrite
 from .tokens_commands_only import scan_command_only
 from .tokens_commands_register import scan_command_register
 from .tokens_commands_substitute import scan_command_substitute

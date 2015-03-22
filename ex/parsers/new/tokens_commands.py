@@ -1,29 +1,10 @@
-from .tokens_base import Token
+from .tokens_base import TokenOfCommand
 
 
 TOKEN_COMMAND_UNKNOWN = 0
 TOKEN_COMMAND_SUBSTITUTE = 1
 TOKEN_COMMAND_ONLY = 1
 TOKEN_COMMAND_REGISTERS = 2
-
-
-class TokenOfCommand(Token):
-    def __init__(self, params, *args, forced=False, **kwargs):
-        self.params = params or {}
-        self.forced = forced
-        # Accepts a range?
-        self.addressable = False
-        self.target_command = None
-        super().__init__(*args, **kwargs)
-
-    def __eq__(self, other):
-        return super().__eq__(other) and other.params == self.params
-
-    def to_command_data(self):
-        return self.target_command, self.params
-
-    def __str__(self):
-        return '{0} {1}'.format(self.content, self.params)
 
 
 class TokenCommandOnly(TokenOfCommand):

@@ -43,3 +43,27 @@ class Token(object):
         local_data = data.copy()
         del local_data['token_type']
         return cls(*local_data['args'], **local_data['kwargs'])
+
+
+class TokenOfRange(Token):
+    pass
+
+
+class TokenOfCommand(Token):
+    def __init__(self, params, *args, forced=False, **kwargs):
+        self.params = params or {}
+        self.forced = forced
+        # Accepts a range?
+        self.addressable = False
+        self.target_command = None
+        super().__init__(*args, **kwargs)
+
+    def __eq__(self, other):
+        return super().__eq__(other) and other.params == self.params
+
+    def to_command_data(self):
+        return self.target_command, self.params
+
+    def __str__(self):
+        return '{0} {1}'.format(self.content, self.params)
+
