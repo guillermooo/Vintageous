@@ -2,6 +2,9 @@ from .state import EOF
 from .tokens import TokenEof
 from .tokens_commands import TokenCommandWrite
 
+from Vintageous.ex.ex_error import ERR_INVALID_ARGUMENT
+from Vintageous.ex.ex_error import VimError
+
 
 plus_plus_translations = {
     'ff': 'fileformat',
@@ -44,7 +47,9 @@ def scan_command_write(state):
             state.ignore()
             # TODO: expect_match should work with emit()
             # http://vimdoc.sourceforge.net/htmldoc/editing.html#[++opt]
-            m = state.expect_match(r'(?:f(?:ile)?f(?:ormat)?|(?:file)?enc(?:oding)?|(?:no)?bin(?:ary)?|bad|edit)(?=\s|$)')
+            m = state.expect_match(
+                    r'(?:f(?:ile)?f(?:ormat)?|(?:file)?enc(?:oding)?|(?:no)?bin(?:ary)?|bad|edit)(?=\s|$)',
+                    lambda: VimError(ERR_INVALID_ARGUMENT))
             name = m.group(0)
             params['++'] = plus_plus_translations.get(name, name)
             state.ignore()

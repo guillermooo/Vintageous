@@ -5,6 +5,8 @@ import os
 
 from Vintageous.ex.parsers.new.parser import parse_ex_command
 from Vintageous.ex import ex_error
+from Vintageous.ex.ex_error import VimError
+from Vintageous.ex.ex_error import display_error2
 from Vintageous.ex.ex_command_parser import EX_COMMANDS
 from Vintageous.ex.ex_command_parser import parse_command
 from Vintageous.ex.completions import iter_paths
@@ -115,11 +117,13 @@ class ViColonInput(sublime_plugin.WindowCommand):
                 raise NotImplementedError()
             self.window.run_command(parsed_new.command.target_command, {'command_line': cmd_line[1:]})
             return
+        except VimError as ve:
+            # only new code emits VimErrors, so handle it.
+            display_error2(ve)
+            return
         except Exception as e:
-            # print ('EXCP:', e)
-            # print (e)
-            # TODO: Display errors from parser.
-            pass
+            # let the old ex code take care of this
+            print ('Vintageous: ', e)
 
         if parsed and parsed.parse_errors:
             ex_error.display_error(parsed.parse_errors[0])

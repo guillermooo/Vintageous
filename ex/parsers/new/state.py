@@ -53,12 +53,14 @@ class State(object):
            raise ValueError('expected {0}, got {1} instead'.format(item, c))
         return c
 
-    def expect_match(self, pattern):
+    def expect_match(self, pattern, on_error=None):
         m = re.compile(pattern).match(self.source, self.position)
         if m:
             self.position += m.end() - m.start()
             return m
-        raise ValueError('expected match with {0}, at {1}'.format(pattern, self.source[self.position:]))
+        if not on_error:
+            raise ValueError('expected match with {0}, at {1}'.format(pattern, self.source[self.position:]))
+        raise on_error()
 
     def peek(self, item):
         return self.source[self.position:self.position + len(item)] == item

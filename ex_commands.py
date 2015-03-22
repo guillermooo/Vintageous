@@ -10,6 +10,11 @@ from Vintageous.ex import ex_error
 from Vintageous.ex import ex_range
 from Vintageous.ex import parsers
 from Vintageous.ex import shell
+from Vintageous.ex.ex_error import display_error2
+from Vintageous.ex.ex_error import handle_not_implemented
+from Vintageous.ex.ex_error import ERR_NO_FILE_NAME
+from Vintageous.ex.ex_error import ERR_READONLY_FILE
+from Vintageous.ex.ex_error import VimError
 from Vintageous.ex.parsers.new.parser import parse_ex_command
 from Vintageous.ex.plat.windows import get_oem_cp
 from Vintageous.ex.plat.windows import get_startup_info
@@ -478,9 +483,7 @@ class ExWriteFile(ViWindowCommandBase):
         parsed = parse_ex_command(command_line)
 
         if parsed.command.options:
-            msg = "Vintageous: ++opt isn't implemented for :write"
-            sublime.status_message(msg)
-            print(msg)
+            handle_not_implemented("++opt isn't implemented for :write")
             return
 
         if not self._view:
@@ -491,9 +494,7 @@ class ExWriteFile(ViWindowCommandBase):
             return
 
         if parsed.command.command:
-            msg = "Vintageous: !cmd isn't implemented for :write"
-            sublime.status_message(msg)
-            print(msg)
+            handle_not_implemented("!cmd isn't implemented for :write")
             return
 
         if parsed.command.target_file:
@@ -501,7 +502,7 @@ class ExWriteFile(ViWindowCommandBase):
             return
 
         if not self._view.file_name():
-            sublime.status_message('Vintageous: no file name provided')
+            display_error2(VimError(ERR_NO_FILE_NAME))
             return
 
         read_only = (self.check_is_readonly(self._view.file_name())
@@ -509,7 +510,7 @@ class ExWriteFile(ViWindowCommandBase):
 
         if read_only and not parsed.command.forced:
             utils.blink()
-            sublime.status_message("Vintageous: Can't write read-only file.")
+            display_error2(VimError(ERR_READONLY_FILE))
             return
 
         self.window.run_command('save')
