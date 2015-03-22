@@ -9,7 +9,7 @@ from Vintageous.ex.parsers.new.tokens import TokenSearchBackward
 from Vintageous.ex.parsers.new.tokens import TokenPercent
 from Vintageous.ex.parsers.new.tokens import TokenOffset
 from Vintageous.ex.parsers.new.tokens import TokenMark
-from Vintageous.ex.parsers.new.tokens_commands import TokenCommandSubstitute
+from Vintageous.ex.parsers.new.scanner_command_substitute import TokenCommandSubstitute
 
 from Vintageous.tests import ViewTest
 

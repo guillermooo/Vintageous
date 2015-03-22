@@ -1,6 +1,15 @@
 from .state import EOF
 from .tokens import TokenEof
-from .tokens_commands import TokenCommandRegisters
+from .tokens_base import TOKEN_COMMAND_REGISTERS
+from .tokens_base import TokenOfCommand
+
+
+class TokenCommandRegisters(TokenOfCommand):
+    def __init__(self, params, *args, **kwargs):
+        super().__init__(params,
+                        TOKEN_COMMAND_REGISTERS,
+                        'registers', *args, **kwargs)
+        self.target_command = 'ex_list_registers'
 
 
 def scan_command_register(state):

@@ -1,6 +1,33 @@
 from .state import EOF
 from .tokens import TokenEof
-from .tokens_commands import TokenCommandSubstitute
+from .tokens_base import TOKEN_COMMAND_SUBSTITUTE
+from .tokens_base import TokenOfCommand
+
+
+class TokenCommandSubstitute(TokenOfCommand):
+    def __init__(self, params, *args, **kwargs):
+        super().__init__(params,
+                        TOKEN_COMMAND_SUBSTITUTE,
+                        'substitute', *args, **kwargs)
+        self.addressable = True
+        self.target_command = 'ex_substitute'
+
+    @property
+    def pattern(self):
+        return self.params.get('search_term')
+
+    @property
+    def replacement(self):
+        return self.params.get('replacement')
+
+    @property
+    def flags(self):
+        return self.params.get('flags', [])
+
+    @property
+    def count(self):
+        # XXX why 0?
+        return self.params.get('count', 0)
 
 
 def scan_command_substitute(state):

@@ -1,5 +1,9 @@
 from .state import EOF
 from .state import State
+from .subscanners import scan_command_only
+from .subscanners import scan_command_register
+from .subscanners import scan_command_substitute
+from .subscanners import scan_command_write
 from .tokens import TokenComma
 from .tokens import TokenDigits
 from .tokens import TokenDollar
@@ -11,10 +15,6 @@ from .tokens import TokenPercent
 from .tokens import TokenSearchBackward
 from .tokens import TokenSearchForward
 from .tokens import TokenSemicolon
-from .tokens_commands_only import scan_command_only
-from .tokens_commands_register import scan_command_register
-from .tokens_commands_substitute import scan_command_substitute
-from .tokens_commands_write import scan_command_write
 
 
 class Scanner(object):

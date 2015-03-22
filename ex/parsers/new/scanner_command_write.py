@@ -1,6 +1,7 @@
 from .state import EOF
 from .tokens import TokenEof
-from .tokens_commands import TokenCommandWrite
+from .tokens_base import TOKEN_COMMAND_WRITE
+from .tokens_base import TokenOfCommand
 
 from Vintageous.ex.ex_error import ERR_INVALID_ARGUMENT
 from Vintageous.ex.ex_error import VimError
@@ -12,6 +13,31 @@ plus_plus_translations = {
     'enc': 'fileencoding',
     'nobin': 'nobinary',
 }
+
+
+class TokenCommandWrite(TokenOfCommand):
+    def __init__(self, params, *args, **kwargs):
+        super().__init__(params,
+                        TOKEN_COMMAND_WRITE,
+                        'write', *args, **kwargs)
+        self.addressable = True
+        self.target_command = 'ex_write_file'
+
+    @property
+    def options(self):
+        return self.params['++']
+
+    @property
+    def target_file(self):
+        return self.params['file_name']
+
+    @property
+    def appends(self):
+        return self.params['>>']
+
+    @property
+    def command(self):
+        return self.params['cmd']
 
 
 def scan_command_write(state):

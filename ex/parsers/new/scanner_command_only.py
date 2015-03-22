@@ -1,6 +1,15 @@
 from .state import EOF
 from .tokens import TokenEof
-from .tokens_commands import TokenCommandOnly
+from .tokens_base import TOKEN_COMMAND_ONLY
+from .tokens_base import TokenOfCommand
+
+
+class TokenCommandOnly(TokenOfCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__({},
+                        TOKEN_COMMAND_ONLY,
+                        'only', *args, **kwargs)
+        self.target_command = 'ex_only'
 
 
 def scan_command_only(state):

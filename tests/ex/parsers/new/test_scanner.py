@@ -1,20 +1,20 @@
 import unittest
 
 from Vintageous.ex.parsers.new.scanner import Scanner
+from Vintageous.ex.parsers.new.scanner_command_substitute import TokenCommandSubstitute
+from Vintageous.ex.parsers.new.scanner_command_write import TokenCommandWrite
 from Vintageous.ex.parsers.new.state import EOF
-from Vintageous.ex.parsers.new.tokens import TokenEof
-from Vintageous.ex.parsers.new.tokens import TokenDot
-from Vintageous.ex.parsers.new.tokens import TokenDollar
 from Vintageous.ex.parsers.new.tokens import TokenComma
 from Vintageous.ex.parsers.new.tokens import TokenDigits
-from Vintageous.ex.parsers.new.tokens import TokenSemicolon
+from Vintageous.ex.parsers.new.tokens import TokenDollar
+from Vintageous.ex.parsers.new.tokens import TokenDot
+from Vintageous.ex.parsers.new.tokens import TokenEof
+from Vintageous.ex.parsers.new.tokens import TokenMark
 from Vintageous.ex.parsers.new.tokens import TokenOffset
 from Vintageous.ex.parsers.new.tokens import TokenPercent
-from Vintageous.ex.parsers.new.tokens import TokenSearchForward
 from Vintageous.ex.parsers.new.tokens import TokenSearchBackward
-from Vintageous.ex.parsers.new.tokens import TokenMark
-from Vintageous.ex.parsers.new.tokens_commands import TokenCommandSubstitute
-from Vintageous.ex.parsers.new.tokens_commands import TokenCommandWrite
+from Vintageous.ex.parsers.new.tokens import TokenSearchForward
+from Vintageous.ex.parsers.new.tokens import TokenSemicolon
 
 
 class ScannerTests(unittest.TestCase):

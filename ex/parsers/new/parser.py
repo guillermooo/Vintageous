@@ -13,7 +13,7 @@ from .tokens import TokenPercent
 from .tokens import TokenSearchBackward
 from .tokens import TokenSearchForward
 from .tokens import TokenSemicolon
-from .tokens_commands import TokenOfCommand
+from .tokens_base import TokenOfCommand
 
 
 def parse_ex_command(source):
