@@ -719,7 +719,7 @@ class ExCopy(ExTextCommandBase, ExAddressableCommandMixin):
         self.set_next_sel([(cursor_dest, cursor_dest)])
 
 
-class ExOnly(sublime_plugin.WindowCommand):
+class ExOnly(ViWindowCommandBase):
     """
     Command: :on[ly][!]
 
@@ -737,8 +737,7 @@ class ExOnly(sublime_plugin.WindowCommand):
                 ex_error.display_error(ex_error.ERR_OTHER_BUFFER_HAS_CHANGES)
                 return
 
-        view = self.window.active_view()
-        current_id = view.id()
+        current_id = self._view.id()
 
         for view in self.window.views():
             if view.id() == current_id:
