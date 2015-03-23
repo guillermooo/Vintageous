@@ -123,7 +123,8 @@ class ViColonInput(sublime_plugin.WindowCommand):
             return
         except Exception as e:
             # let the old ex code take care of this
-            print ('Vintageous: ', e)
+            # print ('Vintageous: ', e)
+            pass
 
         if parsed and parsed.parse_errors:
             ex_error.display_error(parsed.parse_errors[0])
