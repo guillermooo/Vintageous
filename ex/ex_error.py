@@ -6,6 +6,7 @@ utilities to handle them.
 import sublime
 
 
+ERR_FILE_EXISTS = 13
 ERR_ADDRESS_REQUIRED = 14 # Command needs an address.
 ERR_INVALID_ADDRESS = 14 # Invalid range.
 ERR_INVALID_RANGE = 16 # Invalid range.
@@ -13,6 +14,7 @@ ERR_NO_FILE_NAME = 32 # Command can't take arguments.
 ERR_UNSAVED_CHANGES = 37 # The buffer has been modified but not saved.
 ERR_READONLY_FILE = 45
 ERR_CANT_MOVE_LINES_ONTO_THEMSELVES = 134
+ERR_CANT_WRITE_FILE = 212
 ERR_CANT_FIND_DIR_IN_CDPATH = 344
 ERR_OTHER_BUFFER_HAS_CHANGES = 445 # :only, for example, may trigger this
 ERR_INVALID_ARGUMENT = 474
@@ -23,20 +25,22 @@ ERR_UNKNOWN_COMMAND = 492 # Command can't take arguments.
 
 
 ERR_MESSAGES = {
-    ERR_INVALID_ARGUMENT: "Invalid argument.",
-    ERR_READONLY_FILE: "'readonly' option is set (add ! to override)",
+    ERR_FILE_EXISTS: 'File exists (add ! to override).',
+    ERR_ADDRESS_REQUIRED: 'Invalid address.',
+    ERR_INVALID_ADDRESS: 'Invalid address.',
+    ERR_INVALID_RANGE: 'Invalid range.',
     ERR_NO_FILE_NAME: 'No file name.',
+    ERR_UNSAVED_CHANGES: 'There are unsaved changes.',
+    ERR_READONLY_FILE: "'readonly' option is set (add ! to override)",
+    ERR_CANT_MOVE_LINES_ONTO_THEMSELVES: "Move lines into themselves.",
+    ERR_CANT_WRITE_FILE: "Can't open file for writing.",
+    ERR_CANT_FIND_DIR_IN_CDPATH: "Can't fin directory in 'cdpath'.",
+    ERR_OTHER_BUFFER_HAS_CHANGES: "Other buffer contains changes.",
+    ERR_INVALID_ARGUMENT: "Invalid argument.",
+    ERR_NO_BANG_ALLOWED: 'No ! allowed.',
+    ERR_NO_RANGE_ALLOWED: 'No range allowed.',
     ERR_TRAILING_CHARS: 'Traling characters.',
     ERR_UNKNOWN_COMMAND: 'Not an editor command.',
-    ERR_NO_BANG_ALLOWED: 'No ! allowed.',
-    ERR_INVALID_RANGE: 'Invalid range.',
-    ERR_INVALID_ADDRESS: 'Invalid address.',
-    ERR_NO_RANGE_ALLOWED: 'No range allowed.',
-    ERR_UNSAVED_CHANGES: 'There are unsaved changes.',
-    ERR_ADDRESS_REQUIRED: 'Invalid address.',
-    ERR_OTHER_BUFFER_HAS_CHANGES: "Other buffer contains changes.",
-    ERR_CANT_MOVE_LINES_ONTO_THEMSELVES: "Move lines into themselves.",
-    ERR_CANT_FIND_DIR_IN_CDPATH: "Can't fin directory in 'cdpath'.",
 }
 
 

@@ -11,7 +11,12 @@ from Vintageous.ex import ex_range
 from Vintageous.ex import parsers
 from Vintageous.ex import shell
 from Vintageous.ex.ex_error import display_error2
+from Vintageous.ex.ex_error import display_message
+from Vintageous.ex.ex_error import DISPLAY_STATUS
+from Vintageous.ex.ex_error import ERR_CANT_WRITE_FILE
+from Vintageous.ex.ex_error import ERR_FILE_EXISTS
 from Vintageous.ex.ex_error import ERR_NO_FILE_NAME
+from Vintageous.ex.ex_error import ERR_OTHER_BUFFER_HAS_CHANGES
 from Vintageous.ex.ex_error import ERR_READONLY_FILE
 from Vintageous.ex.ex_error import handle_not_implemented
 from Vintageous.ex.ex_error import VimError
@@ -549,30 +554,38 @@ class ExWriteFile(ViWindowCommandBase):
 
         fname = parsed_command.command.target_file
 
-        if not os.path.exists(fname) and not forced:
-            sublime.status_message('Vintageous: File does not exist.')
+        if not parsed_command.command.forced and not os.path.exists(fname):
+            display_error2(VimError(ERR_CANT_WRITE_FILE))
             return
 
         try:
             with open(fname, 'at') as f:
                 text = self._view.substr(r)
                 f.write(text)
-            msg = 'Vintageous: Appended to ' + os.path.abspath(fname)
-            sublime.status_message(msg)
+            # TODO: make this `show_info` instead.
+            display_message('Appended to ' + os.path.abspath(fname),
+                    devices=DISPLAY_STATUS)
             return
         except IOError as e:
             print('Vintageous: could not write file')
             print('Vintageous ============')
             print(e)
             print('=======================')
+            return
 
     def do_write(self, parsed_command):
         fname = parsed_command.command.target_file
-        if (not os.path.exists(fname) and not parsed_command.command.forced):
-            msg = 'Vintageous: file does not exist'
-            print(msg)
-            sublime.status_message(msg)
-            return
+
+        if not parsed_command.command.forced:
+            if os.path.exists(fname):
+                utils.blink()
+                display_error2(VimError(ERR_FILE_EXISTS))
+                return
+
+            if self.check_is_readonly(fname):
+                utils.blink()
+                display_error2(VimError(ERR_READONLY_FILE))
+                return
 
         r = None
         if parsed_command.line_range.is_empty:
@@ -581,16 +594,18 @@ class ExWriteFile(ViWindowCommandBase):
         else:
             r = parsed_command.line_range.resolve(self._view)
 
+        assert r is not None, "range cannot be None"
+
         try:
             # FIXME: we should write in the current dir, but I don't think we're doing that.
             with open(fname, 'wt') as f:
                 text = self._view.substr(r)
                 f.write(text)
-            msg = 'Vintageous: Saved ' + os.path.abspath(fname)
-            sublime.status_message(msg)
+            display_message('Saved ' + os.path.abspath(fname),
+                    devices=DISPLAY_STATUS)
         except IOError as e:
             # TODO: Add logging.
-            sublime.status_message("Vintageous: Could not write file.")
+            display_error2(VimError(ERR_CANT_WRITE_FILE))
             print('Vintageous =======')
             print (e)
             print('==================')
@@ -734,7 +749,7 @@ class ExOnly(ViWindowCommandBase):
         parsed = parse_ex_command(command_line)
 
         if not parsed.command.forced and has_dirty_buffers(self.window):
-                ex_error.display_error(ex_error.ERR_OTHER_BUFFER_HAS_CHANGES)
+                display_error2(VimError(ERR_OTHER_BUFFER_HAS_CHANGES))
                 return
 
         current_id = self._view.id()
@@ -1119,8 +1134,7 @@ class ExListRegisters(ViWindowCommandBase):
 
         # TODO: implement arguments.
 
-        state = State(self.window.active_view())
-        pairs = [(k, v) for (k, v) in state.registers.to_dict().items() if v]
+        pairs = [(k, v) for (k, v) in self.state.registers.to_dict().items() if v]
         pairs = [(k, repr(v[0]), len(v)) for (k, v) in pairs]
         pairs = ['"{0}  {1}  {2}'.format(k, v, show_lines(lines)) for (k, v, lines) in pairs]
 
@@ -1131,9 +1145,8 @@ class ExListRegisters(ViWindowCommandBase):
         if idx == -1:
             return
 
-        state = State(self.window.active_view())
-        value = list(state.registers.to_dict().values())[idx]
-        state.registers['"'] = [value]
+        value = list(self.state.registers.to_dict().values())[idx]
+        self.state.registers['"'] = [value]
 
 
 class ExNew(sublime_plugin.TextCommand):
