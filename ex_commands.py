@@ -475,8 +475,11 @@ class ExWriteFile(ViWindowCommandBase):
         if not fname:
             return
 
-        mode = os.stat(fname)
-        read_only = (stat.S_IMODE(mode.st_mode) & stat.S_IWUSR != stat.S_IWUSR)
+        try:
+            mode = os.stat(fname)
+            read_only = (stat.S_IMODE(mode.st_mode) & stat.S_IWUSR != stat.S_IWUSR)
+        except FileNotFoundError:
+            return
 
         return read_only
 
