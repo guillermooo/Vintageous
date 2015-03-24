@@ -1,3 +1,23 @@
+3.8.9 - 24-03-2015
+
+	- fix #878: fix c<motion> - ignore exclude whitespace
+	- remove unused code
+	- move parser state to parser
+	- improve parser awareness of range separators
+	- fix #855 improve caret positioning after * motion
+	- fix #855 - improve quote text object with empty regions
+	- fix #862 - add command to open build system selection
+	- use tokens
+	- add TokenMark for cmdline parser
+	- format code
+	- rename variables
+	- remove redundant code
+	- format code
+	- import the new cmdline parser for testing
+	- add methods
+	- improve parser
+	- add new cmdline parser
+
 3.8.8 - 06-03-2015
 
 	- fix variable name
