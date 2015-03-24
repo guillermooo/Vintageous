@@ -1,0 +1,63 @@
+==============================================================================
+Vintageous 3.8.9
+==============================================================================
+
+*** Follow important announcements on Twitter: @VintageousS3 ***
+
+This version includes fixes and improvements to commands.
+
+//////////////////////////////////////////////////////////////////////////////
+//// Please help test Vintageous 4 ///////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+   The next major version of Vintageous, Vintageous 4, is about to be released.
+   Vintageous is mainly tested on Windows, so if you're using it on any other
+   OS, you can try a beta of Vintageous 4 and report any issues. If you want
+   to help, head over to:
+
+   https://github.com/guillermooo/Vintageous/issues/879
+
+   Also, if you're using Vintageous to get payed work done, please consider
+   donating:
+   
+   https://github.com/guillermooo/Vintageous/blob/master/README.md
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+Guillermo
+
+
+CHANGES
+-------
+
+	- fix #878: fix c<motion> - ignore exclude whitespace
+	- fix #855 improve caret positioning after * motion
+	- fix #855 - improve quote text object with empty regions
+	- fix #862 - add command to open build system selection (Ctrl+Shift+B)
+
+
+FOUND BUGS?
+-----------
+
+Please report them here:
+
+    https://github.com/guillermooo/Vintageous/issues
+
+
+SUPPORT VINTAGEOUS
+------------------
+
+Is Vintageous worth your time? Developing Vintageous is hard work. If you use
+it often, please consider donating and make it worth my time too.
+
+    PayPal: http://www.pledgie.com/campaigns/19122
+    Gittip: https://www.gratipay.com/guillermooo/
+
+I'm the creator and main author of Vintageous, but some generous people have
+contributed their time and effort as well. See the more active ones here; you
+may want to show them some gratitude too:
+
+https://github.com/guillermooo/Vintageous/graphs/contributors
+
+Thanks for reading and for using Vintageous!

@@ -106,7 +106,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
         try:
             # Use new parser for some commands.
             parsed_new = start_parsing(cmd_line[1:])
-            print('Vintageous:', parsed_new)
+            # print('Vintageous:', parsed_new)
         except Exception:
             # TODO: Display errors from parser.
             pass
