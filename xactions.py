@@ -215,9 +215,13 @@ class _vi_c(ViTextCommandBase):
     def run(self, edit, count=1, mode=None, motion=None, register=None):
         def compact(view, s):
             if view.substr(s).strip():
-                pt = utils.previous_non_white_space_char(view, s.b - 1,
-                                                         white_space=' \t')
-                return R(s.a, pt + 1)
+                if s.b > s.a:
+                    pt = utils.previous_non_white_space_char(
+                            view, s.b - 1, white_space=' \t\n')
+                    return R(s.a, pt + 1)
+                pt = utils.previous_non_white_space_char(
+                        view, s.a - 1, white_space=' \t\n')
+                return R(pt + 1, s.b)
             return s
 
         if mode is None:
@@ -231,11 +235,9 @@ class _vi_c(ViTextCommandBase):
         if motion:
             self.view.run_command(motion['motion'], motion['motion_args'])
 
-            # In these cases, Vim treats the motion differently and ignores
-            # trailing white space.
-            if ((mode == modes.INTERNAL_NORMAL) and
-               (motion['motion'] in ('_vi_w', '_vi_big_w'))):
-                    regions_transformer(self.view, compact)
+            # Vim ignores trailing white space for c. XXX Always?
+            if mode == modes.INTERNAL_NORMAL:
+                regions_transformer(self.view, compact)
 
             if not self.has_sel_changed():
                 self.enter_insert_mode(mode)
