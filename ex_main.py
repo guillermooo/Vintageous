@@ -3,22 +3,23 @@ import sublime_plugin
 
 import os
 
-from Vintageous.ex.parsers.new.parser import parse_ex_command
 from Vintageous.ex import ex_error
-from Vintageous.ex.ex_error import VimError
-from Vintageous.ex.ex_error import display_error2
-from Vintageous.ex.ex_command_parser import EX_COMMANDS
-from Vintageous.ex.ex_command_parser import parse_command
 from Vintageous.ex.completions import iter_paths
 from Vintageous.ex.completions import parse
 from Vintageous.ex.completions import parse_for_setting
 from Vintageous.ex.completions import wants_fs_completions
 from Vintageous.ex.completions import wants_setting_completions
+from Vintageous.ex.ex_command_parser import EX_COMMANDS
+from Vintageous.ex.ex_command_parser import parse_command
+from Vintageous.ex.parsers.new.scanner_command_goto import TokenCommandGoto
+from Vintageous.ex.ex_error import display_error2
+from Vintageous.ex.ex_error import VimError
+from Vintageous.ex.parsers.new.parser import parse_ex_command
+from Vintageous.state import State
 from Vintageous.vi.settings import iter_settings
 from Vintageous.vi.sublime import show_ipanel
-from Vintageous.vi.utils import modes
-from Vintageous.state import State
 from Vintageous.vi.utils import mark_as_widget
+from Vintageous.vi.utils import modes
 
 
 def plugin_loaded():
@@ -108,11 +109,16 @@ class ViColonInput(sublime_plugin.WindowCommand):
         try:
             # Use new parser for some commands.
             parsed_new = parse_ex_command(cmd_line[1:])
+
+            if not parsed_new.command:
+                parsed_new.command = TokenCommandGoto()
+
             if parsed_new.command.target_command not in (
                     'ex_substitute',
                     'ex_only',
                     'ex_list_registers',
-                    'ex_write_file'
+                    'ex_write_file',
+                    'ex_goto'
                     ):
                 raise NotImplementedError()
             self.window.run_command(parsed_new.command.target_command, {'command_line': cmd_line[1:]})

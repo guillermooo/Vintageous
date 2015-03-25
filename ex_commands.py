@@ -39,6 +39,7 @@ from Vintageous.vi.utils import IrreversibleTextCommand
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import R
 from Vintageous.vi.utils import resolve_insertion_point_at_b
+from Vintageous.vi.utils import row_at
 
 
 GLOBAL_RANGES = []
@@ -156,32 +157,25 @@ class ExAddressableCommandMixin(object):
         return address
 
 
-class ExGoto(sublime_plugin.TextCommand):
-    def run(self, edit, line_range=None):
-        if not line_range['text_range']:
-            # No-op: user issued ":".
+class ExGoto(ViWindowCommandBase):
+    def run(self, command_line):
+        if not command_line:
+            # No-op: user issues ':'.
             return
-        ranges, _ = ex_range.new_calculate_range(self.view, line_range)
-        a, b = ranges[0]
-        # FIXME: This should be handled by the parser.
-        # FIXME: In Vim, 0 seems to equal 1 in ranges.
-        b = b if line_range['text_range'] != '0' else 1
-        state = State(self.view)
-        # FIXME: In Visual mode, goto line does some weird stuff.
-        if state.mode == MODE_NORMAL:
-            # TODO: push all this code down to ViGoToLine?
-            self.view.window().run_command('_vi_add_to_jump_list')
-            self.view.run_command('_vi_go_to_line', {'line': b, 'mode': state.mode})
-            self.view.window().run_command('_vi_add_to_jump_list')
-            self.view.show(self.view.sel()[0])
-        elif state.mode in (MODE_VISUAL, MODE_VISUAL_LINE) and line_range['right_offset']:
-            # TODO: push all this code down to ViGoToLine?
-            self.view.window().run_command('_vi_add_to_jump_list')
-            # FIXME: The parser fails with '<,'>100. 100 is not the right_offset, but an argument.
-            b = self.view.rowcol(self.view.sel()[0].b - 1)[0] + line_range['right_offset'] + 1
-            self.view.run_command('_vi_go_to_line', {'line': b, 'mode': state.mode})
-            self.view.window().run_command('_vi_add_to_jump_list')
-            self.view.show(self.view.sel()[0])
+
+        parsed = parse_ex_command(command_line)
+
+        r = parsed.line_range.resolve(self._view)
+        line_nr = row_at(self._view, r.a) + 1
+
+        # TODO: .enter_normal_mode has access to self.state.mode
+        self.enter_normal_mode(mode=self.state.mode)
+        self.state.enter_normal_mode()
+
+        self.window.run_command('_vi_add_to_jump_list')
+        self.window.run_command('_vi_go_to_line', {'line': line_nr, 'mode': self.state.mode})
+        self.window.run_command('_vi_add_to_jump_list')
+        self._view.show(self._view.sel()[0])
 
 
 class ExShellOut(sublime_plugin.TextCommand):
