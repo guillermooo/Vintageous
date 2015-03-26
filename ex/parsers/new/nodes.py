@@ -1,11 +1,12 @@
+from Vintageous.ex.ex_error import ERR_NO_RANGE_ALLOWED
 from Vintageous.ex.parsers.new.tokens import TokenDigits
 from Vintageous.ex.parsers.new.tokens import TokenDot
+from Vintageous.ex.parsers.new.tokens import TokenMark
+from Vintageous.ex.parsers.new.tokens import TokenOffset
 from Vintageous.ex.parsers.new.tokens import TokenOfSearch
 from Vintageous.ex.parsers.new.tokens import TokenPercent
 from Vintageous.ex.parsers.new.tokens import TokenSearchBackward
 from Vintageous.ex.parsers.new.tokens import TokenSearchForward
-from Vintageous.ex.parsers.new.tokens import TokenOffset
-from Vintageous.ex.parsers.new.tokens import TokenMark
 from Vintageous.vi.search import reverse_search_by_pt
 from Vintageous.vi.utils import first_sel
 from Vintageous.vi.utils import R
@@ -39,13 +40,6 @@ class RangeNode(Node):
         return (self.start == other.start and
                 self.end == other.end and
                 self.separator == other.separator)
-
-    def to_json(self):
-        return {
-            'start': [item.to_json() for item in self.start],
-            'end': [item.to_json() for item in self.end],
-            'separator': str(self.separator) if self.separator else None,
-        }
 
     @property
     def is_empty(self):
@@ -170,3 +164,13 @@ class CommandLineNode(Node):
 
     def __str__(self):
         return '{0}, {1}'.format(str(self.line_range), str(self.command))
+
+    def validate(self):
+        '''
+        Raises an error for known conditions.
+        '''
+        if not (self.command and self.line_range):
+            return
+
+        if not self.command.addressable and not self.line_range.is_empty:
+            raise VimError(ERR_NO_RANGE_ALLOWED)

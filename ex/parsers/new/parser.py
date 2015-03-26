@@ -23,6 +23,7 @@ def parse_ex_command(source):
     while True:
         parse_func, command_line = parse_func(state, command_line)
         if parse_func is None:
+            command_line.validate()
             return command_line
 
 
