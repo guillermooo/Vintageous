@@ -106,7 +106,7 @@ class RangeNode(Node):
                 return row_at(view, sel.b - 1)
             else:
                 return row_at(view, sel.b)
-            # return staring visual region
+
         raise NotImplementedError()
 
     def resolve_line_reference(self, view, line_reference, current=0):
@@ -121,7 +121,7 @@ class RangeNode(Node):
           Line number where we are now.
         '''
         last_token = None
-        # XXX: what happens if ther is no selection in the view?
+        # XXX: what happens if there is no selection in the view?
         current = row_at(view, first_sel(view).b)
         for token in line_reference:
             # Make sure a search forward doesn't overlap with a match obtained
