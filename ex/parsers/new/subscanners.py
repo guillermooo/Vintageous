@@ -13,5 +13,5 @@ patterns = {
     r'reg(?:isters)?(?=\s+[a-z0-9]+$|$)': scan_command_register,
     r'w(?:rite)?(?=(?:!?(?:\+\+|>>| |$)))': scan_command_write,
     r'(?:ls|files|buffers)!?': scan_command_buffers,
-    r'(?:ab(?:breviate))': scan_command_abbreviate,
+    r'(?:ab(?:breviate)?)': scan_command_abbreviate,
 }
