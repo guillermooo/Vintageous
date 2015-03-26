@@ -420,22 +420,34 @@ class ExVunmap(sublime_plugin.TextCommand):
             sublime.status_message('Vintageous: Mapping  not found.')
 
 
-class ExAbbreviate(sublime_plugin.TextCommand):
-    def run(self, edit, short=None, full=None):
-        if not (short and full):
+class ExAbbreviate(ViWindowCommandBase):
+    '''
+    Command: :ab[breviate]
+
+    http://vimdoc.sourceforge.net/htmldoc/map.html#:abbreviate
+    '''
+
+    def run(self, command_line=''):
+        if not command_line:
             self.show_abbreviations()
             return
 
-        abbrev.Store().set(short, full)
+        parsed = parse_ex_command(command_line)
+
+        if not (parsed.command.short and parsed.command.full):
+            handle_not_implemented(':abbreviate not fully implemented')
+            return
+
+        abbrev.Store().set(parsed.command.short, parsed.command.full)
 
     def show_abbreviations(self):
         abbrevs = ['{0} --> {1}'.format(item['trigger'], item['contents'])
                                                     for item in
                                                     abbrev.Store().get_all()]
 
-        self.view.window().show_quick_panel(abbrevs,
-                                            None, # Simply show the list.
-                                            flags=sublime.MONOSPACE_FONT)
+        self.window.show_quick_panel(abbrevs,
+                                     None, # Simply show the list.
+                                     flags=sublime.MONOSPACE_FONT)
 
 
 class ExUnabbreviate(sublime_plugin.TextCommand):
