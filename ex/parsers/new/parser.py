@@ -36,7 +36,6 @@ def parse_line_ref(state, command_line):
     token = state.next_token()
 
     if isinstance(token, TokenEof):
-        init_line_range(command_line)
         return None, command_line
 
     if isinstance(token, TokenDot):
