@@ -16,9 +16,6 @@ from Vintageous.vi.utils import row_at
 class Node(object):
     pass
 
-    def to_json(self):
-        raise NotImplementedError('implementation required')
-
 
 class RangeNode(Node):
     '''

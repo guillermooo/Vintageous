@@ -40,13 +40,6 @@ class Token(object):
         return (other.content == self.content and
                 other.token_type == self.token_type)
 
-    def to_json(self):
-        return {
-            'token_type': self.token_type,
-            'args': [],
-            'kwargs': {},
-        }
-
     @classmethod
     def from_json(cls, data):
         local_data = data.copy()
