@@ -1,9 +1,6 @@
+from . import subscanners
 from .state import EOF
 from .state import State
-from .subscanners import scan_command_only
-from .subscanners import scan_command_register
-from .subscanners import scan_command_substitute
-from .subscanners import scan_command_write
 from .tokens import TokenComma
 from .tokens import TokenDigits
 from .tokens import TokenDollar
@@ -137,25 +134,10 @@ def scan_offset(state):
 
 
 def scan_command(state):
-    if state.match(r's(?:ubstitute)?(?=[%&:/=]|$)'):
-        # drop the name
-        state.ignore()
-        return scan_command_substitute(state)
-
-    if state.match(r'on(?:ly)?(?=!$|$)'):
-        # drop the name
-        state.ignore()
-        return scan_command_only(state)
-
-    if state.match(r'reg(?:isters)?(?=\s+[a-z0-9]+$|$)'):
-        # drop the name
-        state.ignore()
-        return scan_command_register(state)
-
-    if state.match(r'w(?:rite)?(?=(?:!?(?:\+\+|>>| |$)))'):
-        # drop the name
-        state.ignore()
-        return scan_command_write(state)
+    for (pattern, subscanner) in subscanners.patterns.items():
+        if state.match(pattern):
+            state.ignore()
+            return subscanner(state)
 
     state.expect(EOF)
     return None, [TokenEof()]

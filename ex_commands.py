@@ -68,7 +68,7 @@ def changing_cd(f, *args, **kwargs):
     return inner
 
 
-def gather_buffer_info(v):
+def get_view_info(v):
     """gathers data to be displayed by :ls or :buffers
     """
     path = v.file_name()
@@ -304,27 +304,29 @@ class ExReadShellOut(sublime_plugin.TextCommand):
             return
 
 
-class ExPromptSelectOpenFile(sublime_plugin.TextCommand):
-    """Ex command(s): :ls, :files
+class ExPromptSelectOpenFile(ViWindowCommandBase):
+    '''
+    Command: :ls[!]
+             :buffers[!]
+             :files[!]
 
-    Shows a quick panel listing the open files only. Provides concise
-    information about the buffers's state: 'transient', 'unsaved'.
-    """
-    def run(self, edit):
-        self.file_names = [gather_buffer_info(v)
-                                        for v in self.view.window().views()]
-        self.view.window().show_quick_panel(self.file_names, self.on_done)
+    http://vimdoc.sourceforge.net/htmldoc/windows.html#:ls
+    '''
 
-    def on_done(self, idx):
-        if idx == -1: return
-        sought_fname = self.file_names[idx]
-        for v in self.view.window().views():
-            if v.file_name() and v.file_name().endswith(sought_fname[1]):
-                self.view.window().focus_view(v)
-            # XXX Base all checks on buffer id?
-            elif sought_fname[1].isdigit() and \
-                                        v.buffer_id() == int(sought_fname[1]):
-                self.view.window().focus_view(v)
+    def run(self):
+        self.file_names = [get_view_info(view) for view in self.window.views()]
+        self.view_ids = [view.id() for view in self.window.views()]
+        self.window.show_quick_panel(self.file_names, self.on_done)
+
+    def on_done(self, index):
+        if index == -1:
+            return
+
+        sought_id = self.view_ids[index]
+        for view in self.window.views():
+            # TODO: Start looking in current group.
+            if view.id() == sought_id:
+                self.window.focus_view(view)
 
 
 class ExMap(sublime_plugin.TextCommand):
