@@ -4,6 +4,7 @@ from .scanner_command_substitute import scan_command_substitute
 from .scanner_command_write import scan_command_write
 from .scanner_command_buffers import scan_command_buffers
 from .scanner_command_abbreviate import scan_command_abbreviate
+from .scanner_command_vsplit import scan_command_vsplit
 
 
 # TODO: compile regexes.
@@ -14,4 +15,5 @@ patterns = {
     r'w(?:rite)?(?=(?:!?(?:\+\+|>>| |$)))': scan_command_write,
     r'(?:ls|files|buffers)!?': scan_command_buffers,
     r'(?:ab(?:breviate)?)': scan_command_abbreviate,
+    r'(?:vs(?:plit)?)': scan_command_vsplit,
 }

@@ -13,6 +13,7 @@ from Vintageous.ex import shell
 from Vintageous.ex.ex_error import display_error2
 from Vintageous.ex.ex_error import display_message
 from Vintageous.ex.ex_error import DISPLAY_STATUS
+from Vintageous.ex.ex_error import DISPLAY_ALL
 from Vintageous.ex.ex_error import ERR_CANT_WRITE_FILE
 from Vintageous.ex.ex_error import ERR_FILE_EXISTS
 from Vintageous.ex.ex_error import ERR_NO_FILE_NAME
@@ -1312,7 +1313,13 @@ class ExCddCommand(IrreversibleTextCommand):
             ex_error.display_error(ex_error.ERR_CANT_FIND_DIR_IN_CDPATH)
 
 
-class ExVsplit(sublime_plugin.WindowCommand):
+class ExVsplit(ViWindowCommandBase):
+    '''
+    Command: :[N]vs[plit] [++opt] [+cmd] [file]
+
+    http://vimdoc.sourceforge.net/htmldoc/windows.html#:vsplit
+    '''
+
     MAX_SPLITS = 4
     LAYOUT_DATA = {
         1: {"cells": [[0,0, 1, 1]], "rows": [0.0, 1.0], "cols": [0.0, 1.0]},
@@ -1320,13 +1327,18 @@ class ExVsplit(sublime_plugin.WindowCommand):
         3: {"cells": [[0,0, 1, 1], [1, 0, 2, 1], [2, 0, 3, 1]], "rows": [0.0, 1.0], "cols": [0.0, 0.33, 0.66, 1.0]},
         4: {"cells": [[0,0, 1, 1], [1, 0, 2, 1], [2, 0, 3, 1], [3,0, 4, 1]], "rows": [0.0, 1.0], "cols": [0.0, 0.25, 0.50, 0.75, 1.0]},
     }
-    def run(self, file_name=None):
+
+    def run(self, command_line=''):
+        parsed = parse_ex_command(command_line)
+
+        file_name = parsed.command.params['file_name']
+
         groups = self.window.num_groups()
         if groups >= ExVsplit.MAX_SPLITS:
-            sublime.status_message("Vintageous: Can't create more groups.")
+            display_message("Can't create more groups.", devices=DISPLAY_ALL)
             return
 
-        old_view = self.window.active_view()
+        old_view = self._view
         pos = ":{0}:{1}".format(*old_view.rowcol(old_view.sel()[0].b))
         current_file_name = old_view.file_name() + pos
         self.window.run_command('set_layout', ExVsplit.LAYOUT_DATA[groups + 1])

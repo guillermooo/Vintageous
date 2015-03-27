@@ -121,6 +121,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
                     'ex_goto',
                     'ex_prompt_select_open_file',
                     'ex_abbreviate',
+                    'ex_vsplit',
                     ):
                 raise NotImplementedError()
             self.window.run_command(parsed_new.command.target_command, {'command_line': cmd_line[1:]})

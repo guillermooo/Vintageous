@@ -21,6 +21,7 @@ TOKEN_COMMAND_WRITE = 4
 TOKEN_COMMAND_GOTO = 5
 TOKEN_COMMAND_BUFFERS = 6
 TOKEN_COMMAND_ABBREVIATE = 7
+TOKEN_COMMAND_VSPLIT = 8
 
 
 class Token(object):
@@ -39,12 +40,6 @@ class Token(object):
             return False
         return (other.content == self.content and
                 other.token_type == self.token_type)
-
-    @classmethod
-    def from_json(cls, data):
-        local_data = data.copy()
-        del local_data['token_type']
-        return cls(*local_data['args'], **local_data['kwargs'])
 
 
 class TokenOfRange(Token):
