@@ -866,6 +866,13 @@ class ExSubstitute(sublime_plugin.TextCommand):
 
 
 class ExDelete(ExTextCommandBase):
+    '''
+    Command: :[range]d[elete] [x]
+             :[range]d[elete] [x] {count}
+
+    http://vimdoc.sourceforge.net/htmldoc/change.html#:delete
+    '''
+
     def select(self, regions, register):
         self.view.sel().clear()
         to_store = []
@@ -882,24 +889,21 @@ class ExDelete(ExTextCommandBase):
             state = State(self.view)
             state.registers[register] = [text]
 
-    def run_ex_command(self, edit, line_range=None, register='', count=''):
-        # XXX somewhat different to vim's behavior
-        line_range = line_range if line_range else CURRENT_LINE_RANGE
-        if line_range.get('text_range') == '0':
-            # FIXME: This seems to be a bug in the parser or get_region_by_range.
-            # We should be settings 'left_ref', not 'left_offset'.
-            line_range['left_offset'] = 1
-            line_range['text_range'] = '1'
-        rs = get_region_by_range(self.view, line_range=line_range)
+    def run_ex_command(self, edit, command_line=''):
+        assert command_line, 'expected non-empty command line'
 
-        self.select(rs, register)
+        parsed = parse_ex_command(command_line)
 
-        self.view.run_command('split_selection_into_lines')
-        self.view.run_command(
-                    'run_macro_file',
-                    {'file': 'Packages/Default/Delete Line.sublime-macro'})
+        r = parsed.line_range.resolve(self.view)
 
-        self.set_next_sel([(rs[0].a, rs[0].a)])
+        if r == R(-1, -1):
+            r = self.view.full_line(0)
+
+        self.select([r], parsed.command.params['register'])
+
+        self.view.erase(edit, r)
+
+        self.set_next_sel([(r.a, r.a)])
 
 
 class ExGlobal(sublime_plugin.TextCommand):

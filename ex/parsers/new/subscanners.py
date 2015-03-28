@@ -10,8 +10,8 @@ from .scanner_command_browse import scan_command_browse
 from .scanner_command_cd_command import scan_command_cd_command
 from .scanner_command_cdd_command import scan_command_cdd_command
 from .scanner_command_copy import scan_command_copy
-
 from .scanner_command_cquit import scan_command_cquit
+
 from .scanner_command_delete import scan_command_delete
 from .scanner_command_double_ampersand import scan_command_double_ampersand
 from .scanner_command_edit import scan_command_edit
@@ -68,4 +68,5 @@ patterns = {
     r'^cd(?=[^d]|$)': scan_command_cd_command,
     r'(?:co(?:py)?)': scan_command_copy,
     r'(?:cq(?:uit)?)': scan_command_cquit,
+    r'(?:d(?:elete)?)': scan_command_delete,
 }
