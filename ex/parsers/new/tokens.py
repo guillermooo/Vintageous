@@ -29,6 +29,12 @@ class TokenOffset(TokenOfRange):
     def __init__(self, content, *args, **kwargs):
         super().__init__(TOKEN_OFFSET, content, *args, **kwargs)
 
+    def __str__(self):
+        offsets = []
+        for offset in self.content:
+            offsets.append('{0}{1}'.format('' if offset < 0 else '+', offset))
+        return ''.join(offsets)
+
 
 class TokenPercent(TokenOfRange):
     def __init__(self, *args, **kwargs):
@@ -44,10 +50,16 @@ class TokenSearchForward(TokenOfSearch):
     def __init__(self, content, *args, **kwargs):
         super().__init__(TOKEN_SEARCH_FORWARD, content, *args, **kwargs)
 
+    def __str__(self):
+        return '/{0}/'.format(self.content)
+
 
 class TokenSearchBackward(TokenOfSearch):
     def __init__(self, content, *args, **kwargs):
         super().__init__(TOKEN_SEARCH_BACKWARD, content, *args, **kwargs)
+
+    def __str__(self):
+        return '?{0}?'.format(self.content)
 
 
 class TokenDigits(TokenOfRange):

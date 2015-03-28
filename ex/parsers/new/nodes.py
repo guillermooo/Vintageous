@@ -28,8 +28,15 @@ class RangeNode(Node):
         self.end = end or []
         self.separator = separator
 
-    def __repr__(self):
-        return ('<{0}(start:{1}, end:{2}, separator:{3}]>'
+    def __str__(self):
+        return '{0}{1}{2}'.format(
+            ''.join(str(x) for x in self.start),
+            str(self.separator) if self.separator else '',
+            ''.join(str(x) for x in self.end),
+            )
+
+    def __rpr__(self):
+        return ('RangeNode<{0}(start:{1}, end:{2}, separator:{3}]>'
             .format(self.__class__.__name__, self.start, self.end, self.separator))
 
     def __eq__(self, other):
@@ -67,7 +74,7 @@ class RangeNode(Node):
 
         if isinstance(token, TokenSearchForward):
             start_pt = view.text_point(current, 0)
-            match = view.find(str(token), start_pt)
+            match = view.find(str(token)[1:-1], start_pt)
             if not match:
                 # TODO: Convert this to a VimError or something like that.
                 raise ValueError('pattern not found')
@@ -75,7 +82,7 @@ class RangeNode(Node):
 
         if isinstance(token, TokenSearchBackward):
             start_pt = view.text_point(current, 0)
-            match = reverse_search_by_pt(view, str(token), 0, start_pt)
+            match = reverse_search_by_pt(view, str(token)[1:-1], 0, start_pt)
             if not match:
                 # TODO: Convert this to a VimError or something like that.
                 raise ValueError('pattern not found')

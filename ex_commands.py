@@ -793,12 +793,27 @@ class ExOnly(ViWindowCommandBase):
             view.close()
 
 
-class ExDoubleAmpersand(sublime_plugin.TextCommand):
-    """ Command :&&
-    """
-    def run(self, edit, line_range=None, flags='', count=''):
-        self.view.run_command('ex_substitute', {'line_range': line_range,
-                                                'pattern': flags + count})
+class ExDoubleAmpersand(ViWindowCommandBase):
+    '''
+    Command: :[range]&[&][flags] [count]
+
+    http://vimdoc.sourceforge.net/htmldoc/change.html#:&
+    '''
+
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+
+        new_command_line = '{0}substitute///{1} {2}'.format(
+                str(parsed.line_range),
+                ''.join(parsed.command.params['flags']),
+                parsed.command.params['count'],
+                )
+
+        self.window.run_command('ex_substitute', {
+            'command_line': new_command_line.strip()
+            })
 
 
 class ExSubstitute(sublime_plugin.TextCommand):
