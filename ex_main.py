@@ -122,6 +122,8 @@ class ViColonInput(sublime_plugin.WindowCommand):
                     'ex_prompt_select_open_file',
                     'ex_abbreviate',
                     'ex_vsplit',
+                    'ex_browse',
+                    'ex_cd',
                     ):
                 raise NotImplementedError()
             self.window.run_command(parsed_new.command.target_command, {'command_line': cmd_line[1:]})
@@ -132,8 +134,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
             return
         except Exception as e:
             # let the old ex code take care of this
-            # print ('Vintageous: ', e)
-            pass
+            print ('DEBUG::Vintageous:', e)
 
         if parsed and parsed.parse_errors:
             ex_error.display_error(parsed.parse_errors[0])

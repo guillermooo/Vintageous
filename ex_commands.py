@@ -1045,9 +1045,17 @@ class ExWriteAndQuitCommand(sublime_plugin.TextCommand):
         self.view.window().run_command('ex_quit')
 
 
-class ExBrowse(sublime_plugin.TextCommand):
-    def run(self, edit):
-        self.view.window().run_command('prompt_open_file')
+class ExBrowse(ViWindowCommandBase):
+    '''
+    :bro[wse] {command}
+
+    http://vimdoc.sourceforge.net/htmldoc/editing.html#:browse
+    '''
+
+    def run(self, command_line):
+        assert command_line, 'expected a non-empty command line'
+
+        self.window.run_command('prompt_open_file')
 
 
 class ExEdit(IrreversibleTextCommand):
@@ -1250,43 +1258,51 @@ class ExTabOnlyCommand(sublime_plugin.WindowCommand):
         self.window.run_command("tab_control", {"command": "only", "forced": forced, }, )
 
 
-class ExCdCommand(IrreversibleTextCommand):
-    """Ex command(s): :cd [<path>|%:h]
+class ExCdCommand(ViWindowCommandBase):
+    '''
+    Command: :cd[!]
+             :cd[!] {path}
+             :cd[!] -
 
     Print or change the current directory.
 
     :cd without an argument behaves as in Unix for all platforms.
-    """
+
+    http://vimdoc.sourceforge.net/htmldoc/editing.html#:cd
+    '''
+
     @changing_cd
-    def run(self, path=None, forced=False):
-        if self.view.is_dirty() and not forced:
-            ex_error.display_error(ex_error.ERR_UNSAVED_CHANGES)
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+
+        if self._view.is_dirty() and not parsed.command.forced:
+            display_error2(ex_error.ERR_UNSAVED_CHANGES)
             return
 
-        state = State(self.view)
-
-        if not path:
-            state.settings.vi['_cmdline_cd'] = os.path.expanduser("~")
-            self.view.run_command('ex_print_working_dir')
+        if not parsed.command.path:
+            self.state.settings.vi['_cmdline_cd'] = os.path.expanduser("~")
+            self._view.run_command('ex_print_working_dir')
             return
 
         # TODO: It seems there a few symbols that are always substituted when they represent a
         # filename. We should have a global method of substiting them.
-        if path == '%:h':
-            fname = self.view.file_name()
+        if parsed.command.path == '%:h':
+            fname = self._view.file_name()
             if fname:
-                state.settings.vi['_cmdline_cd'] = os.path.dirname(fname)
-                self.view.run_command('ex_print_working_dir')
+                self.state.settings.vi['_cmdline_cd'] = os.path.dirname(fname)
+                self._view.run_command('ex_print_working_dir')
             return
 
-        path = os.path.realpath(os.path.expandvars(os.path.expanduser(path)))
+        path = os.path.realpath(os.path.expandvars(os.path.expanduser(parsed.command.path)))
         if not os.path.exists(path):
             # TODO: Add error number in ex_error.py.
-            ex_error.display_error(ex_error.ERR_CANT_FIND_DIR_IN_CDPATH)
+            display_error2(ex_error.ERR_CANT_FIND_DIR_IN_CDPATH)
             return
 
-        state.settings.vi['_cmdline_cd'] = path
-        self.view.run_command('ex_print_working_dir')
+        self.state.settings.vi['_cmdline_cd'] = path
+        self._view.run_command('ex_print_working_dir')
 
 
 class ExCddCommand(IrreversibleTextCommand):
