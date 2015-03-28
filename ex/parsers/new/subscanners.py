@@ -8,8 +8,8 @@ from .scanner_command_vsplit import scan_command_vsplit
 
 from .scanner_command_browse import scan_command_browse
 from .scanner_command_cd_command import scan_command_cd_command
-
 from .scanner_command_cdd_command import scan_command_cdd_command
+
 from .scanner_command_copy import scan_command_copy
 from .scanner_command_cquit import scan_command_cquit
 from .scanner_command_delete import scan_command_delete
@@ -64,5 +64,6 @@ patterns = {
     r'(?:ab(?:breviate)?)': scan_command_abbreviate,
     r'(?:vs(?:plit)?)': scan_command_vsplit,
     r'(?:bro(?:wse)?)': scan_command_browse,
-    r'^cd': scan_command_cd_command,
+    r'^cdd': scan_command_cdd_command,
+    r'^cd(?=[^d]|$)': scan_command_cd_command,
 }

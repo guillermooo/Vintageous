@@ -1298,33 +1298,41 @@ class ExCdCommand(ViWindowCommandBase):
         path = os.path.realpath(os.path.expandvars(os.path.expanduser(parsed.command.path)))
         if not os.path.exists(path):
             # TODO: Add error number in ex_error.py.
-            display_error2(ex_error.ERR_CANT_FIND_DIR_IN_CDPATH)
+            display_error2(VimError(ex_error.ERR_CANT_FIND_DIR_IN_CDPATH))
             return
 
         self.state.settings.vi['_cmdline_cd'] = path
         self._view.run_command('ex_print_working_dir')
 
 
-class ExCddCommand(IrreversibleTextCommand):
-    """Ex command(s) [non-standard]: :cdd
+class ExCddCommand(ViWindowCommandBase):
+    """
+    Command (non-standard): :cdd[!]
 
     Non-standard command to change the current directory to the active
-    view's path.:
+    view's directory.
 
     In Sublime Text, the current directory doesn't follow the active view, so
     it's convenient to be able to align both easily.
 
+    XXX: Is the above still true?
+
     (This command may be removed at any time.)
     """
-    def run(self, forced=False):
-        if self.view.is_dirty() and not forced:
-            ex_error.display_error(ex_error.ERR_UNSAVED_CHANGES)
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+
+        if self._view.is_dirty() and not parsed.command.forced:
+            display_error2(VimError(ex_error.ERR_UNSAVED_CHANGES))
             return
-        path = os.path.dirname(self.view.file_name())
-        state = State(self.view)
+
+        path = os.path.dirname(self._view.file_name())
+
         try:
-            state.settings.vi['_cmdline_cd'] = path
-            self.view.run_command('ex_print_working_dir')
+            self.state.settings.vi['_cmdline_cd'] = path
+            self._view.run_command('ex_print_working_dir')
         except IOError:
             ex_error.display_error(ex_error.ERR_CANT_FIND_DIR_IN_CDPATH)
 
