@@ -1127,9 +1127,16 @@ class ExEdit(IrreversibleTextCommand):
         ex_error.display_error(ex_error.ERR_UNSAVED_CHANGES)
 
 
-class ExCquit(sublime_plugin.TextCommand):
-    def run(self, edit):
-        self.view.window().run_command('exit')
+class ExCquit(ViWindowCommandBase):
+    '''
+    Command: :cq[uit][!]
+
+    http://vimdoc.sourceforge.net/htmldoc/quickfix.html#:cquit
+    '''
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command_line'
+
+        self.window.run_command('exit')
 
 
 class ExExit(sublime_plugin.TextCommand):

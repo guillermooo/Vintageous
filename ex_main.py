@@ -126,6 +126,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
                     'ex_cd',
                     'ex_cdd',
                     'ex_copy',
+                    'ex_cquit',
                     ):
                 raise NotImplementedError()
             self.window.run_command(parsed_new.command.target_command, {'command_line': cmd_line[1:]})
