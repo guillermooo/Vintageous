@@ -229,6 +229,19 @@ fff fff
         self.assert_equal_regions(self.R(16, 24), region)
 
 
+class Tests_Line0(ViewTest):
+    def testCanCalculateVisualStart(self):
+        self.write('''xxx xxx
+aaa aaa
+xxx xxx
+bbb bbb
+''')
+        self.clear_sel()
+        self.add_sel(self.R(8, 10))
+        region = RangeNode(start=[TokenDigits('0')]).resolve(self.view)
+        self.assert_equal_regions(self.R(-1, -1), region)
+
+
 class Tests_Marks(ViewTest):
     def testCanCalculateVisualStart(self):
         self.write('''xxx xxx

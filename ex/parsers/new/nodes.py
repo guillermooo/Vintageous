@@ -1,4 +1,5 @@
 from Vintageous.ex.ex_error import ERR_NO_RANGE_ALLOWED
+from Vintageous.ex.ex_error import VimError
 from Vintageous.ex.parsers.new.tokens import TokenDigits
 from Vintageous.ex.parsers.new.tokens import TokenDot
 from Vintageous.ex.parsers.new.tokens import TokenMark
@@ -56,7 +57,7 @@ class RangeNode(Node):
             return row_at(view, pt)
 
         if isinstance(token, TokenDigits):
-            return max(int(str(token)) - 1, 0)
+            return max(int(str(token)) - 1, -1)
 
         if isinstance(token, TokenPercent):
             return row_at(view, view.size())
@@ -141,6 +142,9 @@ class RangeNode(Node):
         start = self.resolve_line_reference(view, self.start or [TokenDot()])
 
         if not self.separator:
+            if start == -1:
+                return R(-1, -1)
+
             if len(self.start) == 1 and isinstance(self.start[0], TokenPercent):
                 return R(0, view.size())
 

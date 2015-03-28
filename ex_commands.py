@@ -720,29 +720,46 @@ class ExMove(ExTextCommandBase, ExAddressableCommandMixin):
 
 
 class ExCopy(ExTextCommandBase, ExAddressableCommandMixin):
+    '''
+    Command: :[range]co[py] {address}
+
+    http://vimdoc.sourceforge.net/htmldoc/change.html#:copy
+    '''
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def run_ex_command(self, edit, line_range=CURRENT_LINE_RANGE,
-                       forced=False, address=''):
-        address = self.get_address(address)
-        if address is None:
-            ex_error.display_error(ex_error.ERR_INVALID_ADDRESS)
+    def run_ex_command(self, edit, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+
+        unresolved = parsed.command.calculate_address()
+
+        if unresolved is None:
+            display_error2(VimError(ex_error.ERR_INVALID_ADDRESS))
             return
 
-        if address != 0:
-            dest = self.view.line(self.view.text_point(address, 0)).end() + 1
-        else:
-            dest = address
+        # TODO: how do we signal row 0?
+        target_region = unresolved.resolve(self.view)
 
-        text = self.line_range_to_text(line_range)
-        if dest > self.view.size():
-            dest = self.view.size()
+        address = None
+        if target_region == R(-1, -1):
+            address = 0
+        else:
+            row = utils.row_at(self.view, target_region.begin()) + 1
+            address = self.view.text_point(row, 0)
+
+        source = parsed.line_range.resolve(self.view)
+        text = self.view.substr(source)
+
+        if address >= self.view.size():
+            address = self.view.size()
             text = '\n' + text[:-1]
 
-        self.view.insert(edit, dest, text)
+        self.view.insert(edit, address, text)
 
-        cursor_dest = self.view.line(dest + len(text) - 1).begin()
+        cursor_dest = self.view.line(address + len(text) - 1).begin()
         self.set_next_sel([(cursor_dest, cursor_dest)])
 
 

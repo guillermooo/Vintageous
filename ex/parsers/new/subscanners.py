@@ -66,4 +66,5 @@ patterns = {
     r'(?:bro(?:wse)?)': scan_command_browse,
     r'^cdd': scan_command_cdd_command,
     r'^cd(?=[^d]|$)': scan_command_cd_command,
+    r'(?:co(?:py)?)': scan_command_copy,
 }

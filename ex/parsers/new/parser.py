@@ -1,7 +1,7 @@
+# some imports at the bottom to avoid circular refs
+
 from .nodes import CommandLineNode
 from .nodes import RangeNode
-from .parser_state import ParserState
-from .scanner import Scanner
 from .tokens import TokenComma
 from .tokens import TokenDigits
 from .tokens import TokenDollar
@@ -14,6 +14,16 @@ from .tokens import TokenSearchBackward
 from .tokens import TokenSearchForward
 from .tokens import TokenSemicolon
 from .tokens_base import TokenOfCommand
+
+
+class ParserState(object):
+    def __init__(self, source):
+        self.scanner = Scanner(source)
+        self.is_range_start_line_parsed = False
+        self.tokens = self.scanner.scan()
+
+    def next_token(self):
+        return next(self.tokens)
 
 
 def parse_ex_command(source):
@@ -195,3 +205,7 @@ def parse_line_ref_dot(state, command_line):
             command_line.line_range.end.append(TokenDot())
 
         return parse_line_ref, command_line
+
+
+# avoid circular ref: some subscanners import parse_ex_command()
+from .scanner import Scanner
