@@ -12,9 +12,9 @@ from .scanner_command_cdd_command import scan_command_cdd_command
 from .scanner_command_copy import scan_command_copy
 from .scanner_command_cquit import scan_command_cquit
 from .scanner_command_delete import scan_command_delete
-
 from .scanner_command_double_ampersand import scan_command_double_ampersand
 from .scanner_command_edit import scan_command_edit
+
 from .scanner_command_exit import scan_command_exit
 from .scanner_command_file import scan_command_file
 from .scanner_command_global import scan_command_global
@@ -70,4 +70,5 @@ patterns = {
     r'(?:cq(?:uit)?)': scan_command_cquit,
     r'(?:d(?:elete)?)': scan_command_delete,
     r'&&?': scan_command_double_ampersand,
+    r'e(?:dit)?(?= |$)?': scan_command_edit,
 }

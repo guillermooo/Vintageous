@@ -1094,56 +1094,68 @@ class ExBrowse(ViWindowCommandBase):
         self.window.run_command('prompt_open_file')
 
 
-class ExEdit(IrreversibleTextCommand):
-    """Ex command(s): :e <file_name>
-
-    Reverts unsaved changes to the buffer.
-
-    If there's a <file_name>, open it for editing.
+class ExEdit(ViWindowCommandBase):
     """
+    Command: :e[dit] [++opt] [+cmd]
+             :e[dit]! [++opt] [+cmd]
+             :e[dit] [++opt] [+cmd] {file}
+             :e[dit]! [++opt] [+cmd] {file}
+             :e[dit] [++opt] [+cmd] #[count]
+
+    http://vimdoc.sourceforge.net/htmldoc/editing.html#:edit
+    """
+
     @changing_cd
-    def run(self, forced=False, file_name=None):
-        if file_name:
-            file_name = os.path.expanduser(os.path.expandvars(file_name))
-            if self.view.is_dirty() and not forced:
-                ex_error.display_error(ex_error.ERR_UNSAVED_CHANGES)
-                return
-            file_name = os.path.expanduser(file_name)
-            if os.path.isdir(file_name):
-                sublime.status_message('Vintageous: "{0}" is a directory'.format(file_name))
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+
+        if parsed.command.file_name:
+            file_name = os.path.expanduser(
+                    os.path.expandvars(parsed.command.file_name))
+
+            if self._view.is_dirty() and not parsed.command.forced:
+                display_error2(VimError(ex_error.ERR_UNSAVED_CHANGES))
                 return
 
-            message = ''
+            if os.path.isdir(file_name):
+                # TODO: Open a file-manager in a buffer.
+                display_message('Cannot open directory', devices=DISPLAY_ALL)
+                # 'prompt_open_file' does not accept initial root parameter
+                # self.window.run_command('prompt_open_file', {'path': file_name})
+                return
 
             if not os.path.isabs(file_name):
                 file_name = os.path.join(
-                                State(self.view).settings.vi['_cmdline_cd'],
-                                file_name)
+                        self.state.settings.vi['_cmdline_cd'],
+                        file_name)
 
             if not os.path.exists(file_name):
-                message = '[New File]'
-                path = os.path.dirname(file_name)
-                if path and not os.path.exists(path):
-                    message = '[New DIRECTORY]'
-                self.view.window().open_file(file_name)
+                msg = '"{0}" [New File]'.format(os.path.basename(file_name))
+                parent = os.path.dirname(file_name)
+                if parent and not os.path.exists(parent):
+                    msg = '"{0}" [New DIRECTORY]'.format(parsed.command.file_name)
+                self.window.open_file(file_name)
 
-                # TODO: Collect message and show at the end of the command.
-                def show_message():
-                    sublime.status_message('Vintageous: "{0}" {1}'.format((file_name, message)))
-                sublime.set_timeout(show_message, 250)
-                return
-        else:
-            if forced or not self.view.is_dirty():
-                self.view.run_command('revert')
-                return
-            elif not file_name and self.view.is_dirty():
-                ex_error.display_error(ex_error.ERR_UNSAVED_CHANGES)
+                # Give ST some time to load the new view.
+                sublime.set_timeout(
+                        lambda: display_message(msg, devices=DISPLAY_ALL), 150)
                 return
 
-        if forced or not self.view.is_dirty():
-            self.view.window().open_file(file_name)
+            handle_not_implemented(
+                    'not implemented case for :edit ({0})'.format(command_line))
             return
-        ex_error.display_error(ex_error.ERR_UNSAVED_CHANGES)
+
+        if parsed.command.forced or not self._view.is_dirty():
+            self._view.run_command('revert')
+            return
+
+        if self._view.is_dirty():
+            display_error2(VimError(ex_error.ERR_UNSAVED_CHANGES))
+            return
+
+        display_error2(VimError(ex_error.ERR_UNSAVED_CHANGES))
 
 
 class ExCquit(ViWindowCommandBase):
