@@ -47,7 +47,7 @@ class State(object):
         if c != EOF:
             self.backup()
 
-    def expect(self, item, on_error):
+    def expect(self, item, on_error=None):
         c = self.consume()
         if c != item:
             if on_error:
