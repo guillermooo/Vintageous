@@ -131,6 +131,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
                     'ex_double_ampersand',
                     'ex_edit',
                     'ex_exit',
+                    'ex_file',
                     ):
                 raise NotImplementedError()
             self.window.run_command(parsed_new.command.target_command, {'command_line': cmd_line[1:]})

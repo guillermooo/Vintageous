@@ -47,10 +47,12 @@ class State(object):
         if c != EOF:
             self.backup()
 
-    def expect(self, item):
+    def expect(self, item, on_error):
         c = self.consume()
         if c != item:
-           raise ValueError('expected {0}, got {1} instead'.format(item, c))
+            if on_error:
+                raise on_error()
+            raise ValueError('expected {0}, got {1} instead'.format(item, c))
         return c
 
     def expect_match(self, pattern, on_error=None):

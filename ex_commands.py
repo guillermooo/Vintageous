@@ -641,31 +641,36 @@ class ExNewFile(sublime_plugin.WindowCommand):
         self.window.run_command('new_file')
 
 
-class ExFile(sublime_plugin.TextCommand):
-    def run(self, edit, forced=False):
+class ExFile(ViWindowCommandBase):
+    '''
+    Command: :f[file][!]
+
+    http://vimdoc.sourceforge.net/htmldoc/editing.html#:file
+    '''
+    def run(self, command_line=''):
         # XXX figure out what the right params are. vim's help seems to be
         # wrong
-        if self.view.file_name():
-            fname = self.view.file_name()
+        if self._view.file_name():
+            fname = self._view.file_name()
         else:
             fname = 'untitled'
 
         attrs = ''
-        if self.view.is_read_only():
+        if self._view.is_read_only():
             attrs = 'readonly'
 
-        if self.view.is_dirty():
+        if self._view.is_dirty():
             attrs = 'modified'
 
         lines = 'no lines in the buffer'
-        if self.view.rowcol(self.view.size())[0]:
-            lines = self.view.rowcol(self.view.size())[0] + 1
+        if self._view.rowcol(self._view.size())[0]:
+            lines = self._view.rowcol(self._view.size())[0] + 1
 
         # fixme: doesn't calculate the buffer's % correctly
         if not isinstance(lines, str):
-            vr = self.view.visible_region()
-            start_row, end_row = self.view.rowcol(vr.begin())[0], \
-                                              self.view.rowcol(vr.end())[0]
+            vr = self._view.visible_region()
+            start_row, end_row = self._view.rowcol(vr.begin())[0], \
+                                              self._view.rowcol(vr.end())[0]
             mid = (start_row + end_row + 2) / 2
             percent = float(mid) / lines * 100.0
 

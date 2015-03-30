@@ -15,8 +15,8 @@ from .scanner_command_delete import scan_command_delete
 from .scanner_command_double_ampersand import scan_command_double_ampersand
 from .scanner_command_edit import scan_command_edit
 from .scanner_command_exit import scan_command_exit
-
 from .scanner_command_file import scan_command_file
+
 from .scanner_command_global import scan_command_global
 from .scanner_command_let import scan_command_let
 from .scanner_command_map import scan_command_map
@@ -73,4 +73,5 @@ patterns = {
     r'e(?:dit)?(?= |$)?': scan_command_edit,
     r'(?:exi(?:t)?)': scan_command_exit,
     r'(?:x(?:it)?)': scan_command_exit,
+    r'(?:f(?:ile)?)': scan_command_file,
 }
