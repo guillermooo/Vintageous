@@ -1170,23 +1170,22 @@ class ExCquit(ViWindowCommandBase):
         self.window.run_command('exit')
 
 
-class ExExit(sublime_plugin.TextCommand):
-    """Ex command(s): :x[it], :exi[t]
-
-    Like :wq, but write only when changes have been made.
-
-    TODO: Support ranges, like :w.
+class ExExit(ViWindowCommandBase):
     """
-    def run(self, edit, line_range=None, mode=None, count=1):
-        w = self.view.window()
+    Command: :[range]exi[t][!] [++opt] [file]
+             :xit
 
-        if w.active_view().is_dirty():
-            w.run_command('save')
+    http://vimdoc.sourceforge.net/htmldoc/editing.html#:exit
+    """
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+        if self._view.is_dirty():
+            self.window.run_command('save')
 
-        w.run_command('close')
+        self.window.run_command('close')
 
-        if len(w.views()) == 0:
-            w.run_command('exit')
+        if len(self.window.views()) == 0:
+            self.window.run_command('exit')
 
 
 class ExListRegisters(ViWindowCommandBase):
