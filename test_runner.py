@@ -114,7 +114,8 @@ class RunVintageousTests(sublime_plugin.WindowCommand):
             suite = unittest.TestLoader().discover(p, pattern=patt)
 
             file_regex = r'^\s*File\s*"([^.].*?)",\s*line\s*(\d+),.*$'
-            display = OutputPanel('vintageous.tests', file_regex=file_regex)
+            display = OutputPanel('vintageous.tests', file_regex=file_regex,
+                    word_wrap=True)
             display.show()
             runner = unittest.TextTestRunner(stream=display, verbosity=1)
 
