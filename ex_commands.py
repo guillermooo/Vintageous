@@ -27,6 +27,7 @@ from Vintageous.ex.plat.windows import get_startup_info
 from Vintageous.state import State
 from Vintageous.vi import abbrev
 from Vintageous.vi import utils
+from Vintageous.vi.search import find_all_in_range
 from Vintageous.vi.constants import MODE_NORMAL
 from Vintageous.vi.constants import MODE_VISUAL
 from Vintageous.vi.constants import MODE_VISUAL_LINE
@@ -926,8 +927,11 @@ class ExDelete(ExTextCommandBase):
         self.set_next_sel([(r.a, r.a)])
 
 
-class ExGlobal(sublime_plugin.TextCommand):
+class ExGlobal(ViWindowCommandBase):
     """Ex command(s): :global
+
+    Command: :[range]g[lobal]/{pattern}/[cmd]
+             :[range]g[lobal]!/{pattern}/[cmd]
 
     :global filters lines where a pattern matches and then applies the supplied
     action to all those lines.
@@ -951,71 +955,90 @@ class ExGlobal(sublime_plugin.TextCommand):
         :g!/DON'T TOUCH THIS/delete
     """
     most_recent_pat = None
-    def run(self, edit, line_range=None, forced=False, pattern=''):
+    def run(self, command_line=''):
 
-        if not line_range['text_range']:
-            line_range['text_range'] = '%'
-            line_range['left_ref'] = '%'
+        assert command_line, 'expected non-empty command_line'
+
+        parsed = parse_ex_command(command_line)
+
+        global_range = None
+        if parsed.line_range.is_empty:
+            global_range = R(0, self._view.size())
+        else:
+            global_range = parsed.line_range.resolve(self._view)
+
+
+        pattern = parsed.command.pattern
+        if pattern:
+            ExGlobal.most_recent_pat = pattern
+        else:
+            pattern = ExGlobal.most_recent_pat
+
+        # Should default to 'print'
+        subcmd = parsed.command.subcommand
+
         try:
-            global_pattern, subcmd = parsers.g_cmd.split(pattern)
-        except ValueError:
-            msg = "Vintageous: Bad :global pattern. (%s)" % pattern
+            matches = find_all_in_range(self._view, pattern,
+                    global_range.begin(), global_range.end())
+        except Exception as e:
+            msg = "Vintageous (global): %s ... in pattern '%s'" % (str(e), pattern)
             sublime.status_message(msg)
             print(msg)
             return
 
-        if global_pattern:
-            ExGlobal.most_recent_pat = global_pattern
-        else:
-            global_pattern = ExGlobal.most_recent_pat
-
-        # Make sure we always have a subcommand to exectute. This is what
-        # Vim does too.
-        subcmd = subcmd or 'print'
-
-        rs = get_region_by_range(self.view, line_range=line_range, as_lines=True)
-
-        for r in rs:
-            try:
-                match = re.search(global_pattern, self.view.substr(r))
-            except Exception as e:
-                msg = "Vintageous (global): %s ... in pattern '%s'" % (str(e), global_pattern)
-                sublime.status_message(msg)
-                print(msg)
-                return
-            if (match and not forced) or (not match and forced):
-                GLOBAL_RANGES.append(r)
-
-        # don't do anything if we didn't found any target ranges
-        if not GLOBAL_RANGES:
+        if not matches or not parsed.command.subcommand.cooperates_with_global:
             return
-        self.view.window().run_command('vi_colon_input',
-                              {'cmd_line': ':' +
-                                    str(self.view.rowcol(r.a)[0] + 1) +
-                                    subcmd})
+
+        matches = [self._view.full_line(r.begin()) for r in matches]
+        matches = [[r.a, r.b] for r in matches]
+        self.window.run_command(subcmd.target_command, {
+            'command_line': str(subcmd),
+            # Ex commands cooperating with :global must accept this additional
+            # parameter.
+            'global_lines': matches,
+            })
 
 
-class ExPrint(sublime_plugin.TextCommand):
-    def run(self, edit, line_range=None, count='1', flags=''):
-        if not count.isdigit():
-            flags, count = count, ''
-        rs = get_region_by_range(self.view, line_range=line_range)
+class ExPrint(ViWindowCommandBase):
+    '''
+    Command: :[range]p[rint] [flags]
+             :[range]p[rint] {count} [flags]
+
+    http://vimdoc.sourceforge.net/htmldoc/various.html#:print
+    '''
+    def run(self, command_line='', global_lines=None):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+
+        r = parsed.line_range.resolve(self._view)
+
+        lines = self.get_lines(r, global_lines)
+
+        display = self.window.new_file()
+        display.set_scratch(True)
+
+        if 'l' in parsed.command.flags:
+            display.settings().set('draw_white_space', 'all')
+
+        for (text, row) in lines:
+            characters = ''
+            if '#' in parsed.command.flags:
+                characters = "{} {}".format(row, text).lstrip()
+            else:
+                characters = text.lstrip()
+            display.run_command('append', {'characters': characters})
+
+    def get_lines(self, parsed_range, global_lines):
+        # If :global called us, ignore the parsed range.
+        if global_lines:
+            return [(self._view.substr(R(a, b)), row_at(self._view, a)) for (a, b) in global_lines]
+
         to_display = []
-        for r in rs:
-            for line in self.view.lines(r):
-                text = self.view.substr(line)
-                if '#' in flags:
-                    row = self.view.rowcol(line.begin())[0] + 1
-                else:
-                    row = ''
-                to_display.append((text, row))
-
-        v = self.view.window().new_file()
-        v.set_scratch(True)
-        if 'l' in flags:
-            v.settings().set('draw_white_space', 'all')
-        for t, r in to_display:
-            v.insert(edit, v.size(), (str(r) + ' ' + t + '\n').lstrip())
+        for line in self._view.full_lines(parsed_range):
+            text = self._view.substr(line)
+            to_display.append((text, row_at(self._view, line.begin())))
+        return to_display
 
 
 class ExQuitCommand(sublime_plugin.WindowCommand):

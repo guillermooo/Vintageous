@@ -96,10 +96,17 @@ class TokenOfRange(Token):
 class TokenOfCommand(Token):
     def __init__(self, params, *args, forced=False, **kwargs):
         self.params = params or {}
+        # Indicates whether ! was passed on the command line (if the command
+        # accepts it.)
         self.forced = forced
-        # Accepts a range?
+        # Set to `True` in subclass if it accepts ranges.
         self.addressable = False
+        # The name of the Sublime Text command that executes ultimately.
         self.target_command = None
+        # Indicates whether this command cooperates with :global.
+        # NOTE: It seems that some ex commands work well with :global and
+        # others don't.
+        self.cooperates_with_global = False
         super().__init__(*args, **kwargs)
 
     def __eq__(self, other):

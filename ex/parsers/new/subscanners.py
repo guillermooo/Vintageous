@@ -18,6 +18,7 @@ from .scanner_command_exit import scan_command_exit
 from .scanner_command_file import scan_command_file
 
 from .scanner_command_global import scan_command_global
+
 from .scanner_command_let import scan_command_let
 from .scanner_command_map import scan_command_map
 from .scanner_command_move import scan_command_move
@@ -74,4 +75,6 @@ patterns = {
     r'(?:exi(?:t)?)': scan_command_exit,
     r'(?:x(?:it)?)': scan_command_exit,
     r'(?:f(?:ile)?)': scan_command_file,
+    r'(?:g(?:lobal)?(?=[^ ]))': scan_command_global,
+    r'p(?:rint)?': scan_command_print,
 }
