@@ -104,8 +104,9 @@ class TokenOfCommand(Token):
         # The name of the Sublime Text command that executes ultimately.
         self.target_command = None
         # Indicates whether this command cooperates with :global.
-        # NOTE: It seems that some ex commands work well with :global and
-        # others don't.
+        # XXX: It seems that in Vim, some ex commands work well with :global
+        # and others ignore global's ranges. However, according to the docs,
+        # all ex commands should work with :global ranges?
         self.cooperates_with_global = False
         super().__init__(*args, **kwargs)
 
