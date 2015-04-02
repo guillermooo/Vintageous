@@ -344,7 +344,7 @@ class ExMap(ViWindowCommandBase):
         parsed = parse_ex_command(command_line)
 
         if not (parsed.command.keys and parsed.command.command):
-            handle_not_implemented()
+            handle_not_implemented('Showing mappings now implemented')
             return
 
         mappings = Mappings(self.state)

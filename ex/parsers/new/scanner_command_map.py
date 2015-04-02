@@ -28,6 +28,7 @@ def scan_command_map(state):
 
     m = state.match(r'\s*(?P<keys>.+?)\s+(?P<command>.+?)\s*$')
 
-    params.update(m.groupdict())
+    if m:
+	    params.update(m.groupdict())
 
     return None, [TokenCommandMap(params), TokenEof()]
