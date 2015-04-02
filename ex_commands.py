@@ -711,7 +711,7 @@ class ExMove(ExTextCommandBase, ExAddressableCommandMixin):
 
         text = self.view.substr(source)
         if destination.end() >= self.view.size():
-            text = '\n' + text
+            text = '\n' + text.rstrip()
 
         if destination == R(-1):
             destination = R(0)
@@ -724,7 +724,7 @@ class ExMove(ExTextCommandBase, ExAddressableCommandMixin):
 
         self.view.insert(edit, destination.end(), text)
         self.view.erase(edit, source)
-        self.set_next_sel([[destination.a, destination.b]])
+        self.set_next_sel([[destination.a, destination.a]])
 
 
 class ExCopy(ExTextCommandBase, ExAddressableCommandMixin):
