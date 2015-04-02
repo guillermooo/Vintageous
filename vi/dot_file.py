@@ -44,8 +44,7 @@ class DotFile(object):
                 return ('ex_vmap', {'cmd': line.rstrip()})
 
             if line.startswith((':let ')):
-                line = line[len(':let '):]
-                parts = line.split('=', 1)
+                line = line[1:]
                 return ('ex_let', {'command_line': line.strip()})
         except Exception:
             print('Vintageous: bad config in dotfile: "%s"' % line.rstrip())
