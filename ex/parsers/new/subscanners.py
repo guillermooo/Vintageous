@@ -16,10 +16,10 @@ from .scanner_command_double_ampersand import scan_command_double_ampersand
 from .scanner_command_edit import scan_command_edit
 from .scanner_command_exit import scan_command_exit
 from .scanner_command_file import scan_command_file
-
 from .scanner_command_global import scan_command_global
-
+from .scanner_command_print import scan_command_print
 from .scanner_command_let import scan_command_let
+
 from .scanner_command_map import scan_command_map
 from .scanner_command_move import scan_command_move
 from .scanner_command_new import scan_command_new
@@ -28,7 +28,6 @@ from .scanner_command_nmap import scan_command_nmap
 from .scanner_command_nunmap import scan_command_nunmap
 from .scanner_command_omap import scan_command_omap
 from .scanner_command_ounmap import scan_command_ounmap
-from .scanner_command_print import scan_command_print
 from .scanner_command_print_working_dir import scan_command_print_working_dir
 from .scanner_command_quit_all_command import scan_command_quit_all_command
 from .scanner_command_quit_command import scan_command_quit_command
@@ -77,4 +76,5 @@ patterns = {
     r'(?:f(?:ile)?)': scan_command_file,
     r'(?:g(?:lobal)?(?=[^ ]))': scan_command_global,
     r'p(?:rint)?': scan_command_print,
+    r'let\s': scan_command_let,
 }

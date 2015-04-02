@@ -1506,7 +1506,14 @@ class ExSet(IrreversibleTextCommand):
             sublime.status_message("Vintageous: Invalid value for option.")
 
 
-class ExLet(IrreversibleTextCommand):
-    def run(self, name=None, operator='=', value=None):
-        state = State(self.view)
-        state.variables.set(name, value)
+class ExLet(ViWindowCommandBase):
+    '''
+    Command: :let {var-name} = {expr1}
+
+    http://vimdoc.sourceforge.net/htmldoc/eval.html#:let
+    '''
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+        parsed = parse_ex_command(command_line)
+        self.state.variables.set(parsed.command.variable_name,
+                parsed.command.variable_value)

@@ -13,6 +13,7 @@ ERR_INVALID_RANGE = 16 # Invalid range.
 ERR_NO_FILE_NAME = 32 # Command can't take arguments.
 ERR_UNSAVED_CHANGES = 37 # The buffer has been modified but not saved.
 ERR_READONLY_FILE = 45
+ERR_UNDEFINED_VARIABLE = 121
 ERR_CANT_MOVE_LINES_ONTO_THEMSELVES = 134
 ERR_CANT_WRITE_FILE = 212
 ERR_CANT_FIND_DIR_IN_CDPATH = 344
@@ -32,6 +33,8 @@ ERR_MESSAGES = {
     ERR_NO_FILE_NAME: 'No file name.',
     ERR_UNSAVED_CHANGES: 'There are unsaved changes.',
     ERR_READONLY_FILE: "'readonly' option is set (add ! to override)",
+    # TODO: Should pass the name of the variable to this message:
+    ERR_UNDEFINED_VARIABLE: "Undefined variable.",
     ERR_CANT_MOVE_LINES_ONTO_THEMSELVES: "Move lines into themselves.",
     ERR_CANT_WRITE_FILE: "Can't open file for writing.",
     ERR_CANT_FIND_DIR_IN_CDPATH: "Can't fin directory in 'cdpath'.",
