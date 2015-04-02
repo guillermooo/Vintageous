@@ -21,35 +21,41 @@ from .scanner_command_print import scan_command_print
 from .scanner_command_let import scan_command_let
 from .scanner_command_map import scan_command_map
 from .scanner_command_move import scan_command_move
-
 from .scanner_command_new import scan_command_new
-from .scanner_command_new_file import scan_command_new_file
+
 from .scanner_command_nmap import scan_command_nmap
 from .scanner_command_nunmap import scan_command_nunmap
 from .scanner_command_omap import scan_command_omap
 from .scanner_command_ounmap import scan_command_ounmap
+from .scanner_command_unmap import scan_command_unmap
+from .scanner_command_vmap import scan_command_vmap
+from .scanner_command_vunmap import scan_command_vunmap
+
+from .scanner_command_unvsplit import scan_command_unvsplit
+
 from .scanner_command_print_working_dir import scan_command_print_working_dir
+
 from .scanner_command_quit_all_command import scan_command_quit_all_command
 from .scanner_command_quit_command import scan_command_quit_command
 
 from .scanner_command_read_shell_out import scan_command_read_shell_out
 
 from .scanner_command_replace_file import scan_command_replace_file
+
 from .scanner_command_set import scan_command_set
 from .scanner_command_set_local import scan_command_set_local
+
 from .scanner_command_shell import scan_command_shell
 from .scanner_command_shell_out import scan_command_shell_out
+
 from .scanner_command_tab_first_command import scan_command_tab_first_command
 from .scanner_command_tab_last_command import scan_command_tab_last_command
 from .scanner_command_tab_next_command import scan_command_tab_next_command
 from .scanner_command_tab_only_command import scan_command_tab_only_command
 from .scanner_command_tab_open_command import scan_command_tab_open_command
 from .scanner_command_tab_prev_command import scan_command_tab_prev_command
+
 from .scanner_command_unabbreviate import scan_command_unabbreviate
-from .scanner_command_unmap import scan_command_unmap
-from .scanner_command_unvsplit import scan_command_unvsplit
-from .scanner_command_vmap import scan_command_vmap
-from .scanner_command_vunmap import scan_command_vunmap
 
 from .scanner_command_write_all import scan_command_write_all
 
@@ -85,4 +91,5 @@ patterns = {
     r'let\s': scan_command_let,
     r'map': scan_command_map,
     r'm(?:ove)?(?=[^a]|$)': scan_command_move,
+    r'new': scan_command_new,
 }

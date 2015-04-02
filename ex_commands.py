@@ -639,12 +639,6 @@ class ExWriteAll(sublime_plugin.WindowCommand):
             v.run_command('save')
 
 
-class ExNewFile(sublime_plugin.WindowCommand):
-    @changing_cd
-    def run(self, forced=False):
-        self.window.run_command('new_file')
-
-
 class ExFile(ViWindowCommandBase):
     '''
     Command: :f[file][!]
@@ -1259,16 +1253,15 @@ class ExListRegisters(ViWindowCommandBase):
         self.state.registers['"'] = [value]
 
 
-class ExNew(sublime_plugin.TextCommand):
-    """Ex command(s): :new
+class ExNew(ViWindowCommandBase):
+    """Ex command(s): :[N]new [++opt] [+cmd]
 
-    Create a new buffer.
-
-    TODO: Create new buffer by splitting the screen.
+    http://vimdoc.sourceforge.net/htmldoc/windows.html#:new
     """
     @changing_cd
-    def run(self, edit, line_range=None):
-        self.view.window().run_command('new_file')
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+        self.window.run_command('new_file')
 
 
 class ExYank(sublime_plugin.TextCommand):
