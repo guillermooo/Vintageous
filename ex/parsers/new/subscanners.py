@@ -19,8 +19,8 @@ from .scanner_command_file import scan_command_file
 from .scanner_command_global import scan_command_global
 from .scanner_command_print import scan_command_print
 from .scanner_command_let import scan_command_let
-
 from .scanner_command_map import scan_command_map
+
 from .scanner_command_move import scan_command_move
 from .scanner_command_new import scan_command_new
 from .scanner_command_new_file import scan_command_new_file
@@ -78,4 +78,5 @@ patterns = {
     r'p(?:rint)?': scan_command_print,
     r'let\s': scan_command_let,
     r'map': scan_command_map,
+    r'm(?:ove)?(?=[^a]|$)': scan_command_move,
 }

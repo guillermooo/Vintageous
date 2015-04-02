@@ -690,42 +690,47 @@ class ExFile(ViWindowCommandBase):
 
 
 class ExMove(ExTextCommandBase, ExAddressableCommandMixin):
-    def run_ex_command(self, edit, line_range=CURRENT_LINE_RANGE, forced=False, address=''):
-        # make sure we have a default range
-        if ('text_range' not in line_range) or not line_range['text_range']:
-            line_range['text_range'] = '.'
+    '''
+    Command: :[range]m[ove] {address}
 
-        address = self.get_address(address)
-        if address is None:
-            ex_error.display_error(ex_error.ERR_INVALID_ADDRESS)
+    http://vimdoc.sourceforge.net/htmldoc/change.html#:move
+    '''
+    def run_ex_command(self, edit, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        move_command = parse_ex_command(command_line)
+
+        if move_command.command.address is None:
+            ex_error.display_error2(ex_error.ERR_INVALID_ADDRESS)
             return
 
-        if address != 0:
-            dest = self.view.line(self.view.text_point(address, 0)).end() + 1
-        else:
-            dest = 0
+        source = move_command.line_range.resolve(self.view)
 
-        # Don't move lines onto themselves.
-        for sel in self.view.sel():
-            if sel.contains(dest):
-                ex_error.display_error(ex_error.ERR_CANT_MOVE_LINES_ONTO_THEMSELVES)
-                return
+        if any(s.contains(source) for s in self.view.sel()):
+            display_error2(ex_error.ERR_CANT_MOVE_LINES_ONTO_THEMSELVES)
+            return
 
-        text = self.line_range_to_text(line_range)
-        if dest > self.view.size():
-            dest = self.view.size()
-            text = '\n' + text[:-1]
-        self.view.insert(edit, dest, text)
+        destination = move_command.command.address.resolve(self.view)
 
-        for r in reversed(get_region_by_range(self.view, line_range)):
-            self.view.erase(edit, self.view.full_line(r))
+        if destination == source:
+            return
 
-        new_address = address
-        if address < self.view.rowcol(self.view.sel()[0].b)[0]:
-            new_pt = self.view.text_point(new_address + 1, 0)
-            new_address = self.view.rowcol(new_pt + len(text) - 1)[0]
-        next_sel = self.view.text_point(new_address, 0)
-        self.set_next_sel([(next_sel, next_sel)])
+        text = self.view.substr(source)
+        if destination.end() >= self.view.size():
+            text = '\n' + text
+
+        if destination == R(-1):
+            destination = R(0)
+
+        if destination.end() < source.begin():
+            self.view.erase(edit, source)
+            self.view.insert(edit, destination.end(), text)
+            self.set_next_sel([[destination.a, destination.b]])
+            return
+
+        self.view.insert(edit, destination.end(), text)
+        self.view.erase(edit, source)
+        self.set_next_sel([[destination.a, destination.b]])
 
 
 class ExCopy(ExTextCommandBase, ExAddressableCommandMixin):
