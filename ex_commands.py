@@ -331,23 +331,26 @@ class ExPromptSelectOpenFile(ViWindowCommandBase):
                 self.window.focus_view(view)
 
 
-class ExMap(sublime_plugin.TextCommand):
+class ExMap(ViWindowCommandBase):
     """
-    Remaps keys.
+    Command: :map {lhs} {rhs}
+
+    http://vimdoc.sourceforge.net/htmldoc/map.html#:map
     """
-    def run(self, edit, mode=None, count=None, cmd=''):
-        try:
-            # TODO(guillermooo): Instead of parsing this here, add parsers
-            # to ex command defs and reuse them here.
-            keys, command = cmd.lstrip().split(' ', 1)
-        except ValueError:
-            sublime.status_message('Vintageous: Bad mapping format')
+    def run(self, command_line=''):
+    # def run(self, edit, mode=None, count=None, cmd=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+
+        if not (parsed.command.keys and parsed.command.command):
+            handle_not_implemented()
             return
-        else:
-            mappings = Mappings(State(self.view))
-            mappings.add(modes.NORMAL, keys, command)
-            mappings.add(modes.OPERATOR_PENDING, keys, command)
-            mappings.add(modes.VISUAL, keys, command)
+
+        mappings = Mappings(self.state)
+        mappings.add(modes.NORMAL, parsed.command.keys, parsed.command.command)
+        mappings.add(modes.OPERATOR_PENDING, parsed.command.keys, parsed.command.command)
+        mappings.add(modes.VISUAL, parsed.command.keys, parsed.command.command)
 
 
 class ExUnmap(sublime_plugin.TextCommand):

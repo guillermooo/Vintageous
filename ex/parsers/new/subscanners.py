@@ -77,4 +77,5 @@ patterns = {
     r'(?:g(?:lobal)?(?=[^ ]))': scan_command_global,
     r'p(?:rint)?': scan_command_print,
     r'let\s': scan_command_let,
+    r'map': scan_command_map,
 }

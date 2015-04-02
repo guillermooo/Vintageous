@@ -135,6 +135,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
                     'ex_global',
                     'ex_print',
                     'ex_let',
+                    'ex_map',
                     ):
                 raise NotImplementedError()
             self.window.run_command(parsed_new.command.target_command, {'command_line': cmd_line[1:]})

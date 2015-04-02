@@ -32,8 +32,8 @@ class DotFile(object):
         try:
             _logger().info('[DotFile] parsing line: {0}'.format(line))
             if line.startswith((':map ')):
-                line = line[len(':map '):]
-                return ('ex_map', {'cmd': line.rstrip()})
+                line = line[1:]
+                return ('ex_map', {'command_line': line.rstrip()})
 
             if line.startswith((':omap ')):
                 line = line[len(':omap '):]
@@ -46,8 +46,7 @@ class DotFile(object):
             if line.startswith((':let ')):
                 line = line[len(':let '):]
                 parts = line.split('=', 1)
-                return ('ex_let', {'name': parts[0].strip(),
-                                   'value': parts[1].strip()})
+                return ('ex_let', {'command_line': line.strip()})
         except Exception:
             print('Vintageous: bad config in dotfile: "%s"' % line.rstrip())
             _logger().debug('bad config inf dotfile: "%s"', line.rstrip())
