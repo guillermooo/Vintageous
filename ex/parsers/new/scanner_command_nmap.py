@@ -4,14 +4,31 @@ from .tokens_base import TOKEN_COMMAND_NMAP
 from .tokens_base import TokenOfCommand
 
 
-class TokenNmap(TokenOfCommand):
-	def __init__(self, params, *args, **kwargs):
-		super().__init__([],
-						 TOKEN_COMMAND_XXX,
-						 'xxx', *args, **kwargs)
-		self.target_command = 'ex_xxx'
+class TokenCommandNmap(TokenOfCommand):
+    def __init__(self, params, *args, **kwargs):
+        super().__init__(params,
+                         TOKEN_COMMAND_NMAP,
+                         'nmap', *args, **kwargs)
+        self.target_command = 'ex_nmap'
+
+    @property
+    def keys(self):
+        return self.params['keys']
+
+    @property
+    def command(self):
+        return self.params['command']
 
 
 def scan_command_nmap(state):
-	raise NotImplementedError()
-	
+    params = {
+        'keys': None,
+        'command': None,
+    }
+
+    m = state.match(r'\s*(?P<keys>.+?)\s+(?P<command>.+?)\s*$')
+
+    if m:
+        params.update(m.groupdict())
+
+    return None, [TokenCommandNmap(params), TokenEof()]

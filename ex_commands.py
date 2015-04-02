@@ -364,63 +364,99 @@ class ExUnmap(sublime_plugin.TextCommand):
             sublime.status_message('Vintageous: Mapping not found.')
 
 
-class ExNmap(sublime_plugin.TextCommand):
+class ExNmap(ViWindowCommandBase):
     """
-    Remaps keys.
+    Command: :nm[ap] {lhs} {rhs}
+
+    http://vimdoc.sourceforge.net/htmldoc/map.html#:nmap
     """
-    def run(self, edit, mode=None, count=None, cmd=''):
-        keys, command = cmd.lstrip().split(' ', 1)
-        mappings = Mappings(State(self.view))
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+        nmap_command = parse_ex_command(command_line)
+        keys, command = (nmap_command.command.keys,
+                nmap_command.command.command)
+        mappings = Mappings(self.state)
         mappings.add(modes.NORMAL, keys, command)
 
 
-class ExNunmap(sublime_plugin.TextCommand):
-    def run(self, edit, mode=None, count=None, cmd=''):
-        mappings = Mappings(State(self.view))
+class ExNunmap(ViWindowCommandBase):
+    """
+    Command: :nun[map] {lhs}
+
+    http://vimdoc.sourceforge.net/htmldoc/map.html#:nunmap
+    """
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+        nunmap_command = parse_ex_command(command_line)
+        mappings = Mappings(self.state)
         try:
-            mappings.remove(modes.NORMAL, cmd)
+            mappings.remove(modes.NORMAL, nunmap_command.command.keys)
         except KeyError:
             sublime.status_message('Vintageous: Mapping not found.')
 
 
-class ExOmap(sublime_plugin.TextCommand):
+class ExOmap(ViWindowCommandBase):
     """
-    Remaps keys.
+    Command: :om[ap] {lhs} {rhs}
+
+    http://vimdoc.sourceforge.net/htmldoc/map.html#:omap
     """
-    def run(self, edit, mode=None, count=None, cmd=''):
-        keys, command = cmd.lstrip().split(' ', 1)
-        mappings = Mappings(State(self.view))
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+        omap_command = parse_ex_command(command_line)
+        keys, command = (omap_command.command.keys,
+                omap_command.command.command)
+        mappings = Mappings(self.state)
         mappings.add(modes.OPERATOR_PENDING, keys, command)
 
 
-class ExOunmap(sublime_plugin.TextCommand):
-    def run(self, edit, mode=None, count=None, cmd=''):
-        mappings = Mappings(State(self.view))
+class ExOunmap(ViWindowCommandBase):
+    """
+    Command: :ou[nmap] {lhs}
+
+    http://vimdoc.sourceforge.net/htmldoc/map.html#:ounmap
+    """
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+        ounmap_command = parse_ex_command(command_line)
+        mappings = Mappings(self.state)
         try:
-            mappings.remove(modes.OPERATOR_PENDING, cmd)
+            mappings.remove(modes.OPERATOR_PENDING, ounmap_command.command.keys)
         except KeyError:
             sublime.status_message('Vintageous: Mapping not found.')
 
 
-class ExVmap(sublime_plugin.TextCommand):
+class ExVmap(ViWindowCommandBase):
     """
-    Remaps keys.
+    Command: :vm[ap] {lhs} {rhs}
+
+    http://vimdoc.sourceforge.net/htmldoc/map.html#:vmap
     """
-    def run(self, edit, mode=None, count=None, cmd=''):
-        keys, command = cmd.lstrip().split(' ', 1)
-        mappings = Mappings(State(self.view))
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+        vmap_command = parse_ex_command(command_line)
+        keys, command = (vmap_command.command.keys,
+                vmap_command.command.command)
+        mappings = Mappings(self.state)
         mappings.add(modes.VISUAL, keys, command)
         mappings.add(modes.VISUAL_LINE, keys, command)
         mappings.add(modes.VISUAL_BLOCK, keys, command)
 
 
-class ExVunmap(sublime_plugin.TextCommand):
-    def run(self, edit, mode=None, count=None, cmd=''):
-        mappings = Mappings(State(self.view))
+class ExVunmap(ViWindowCommandBase):
+    """
+    Command: :vu[nmap] {lhs}
+
+    http://vimdoc.sourceforge.net/htmldoc/map.html#:vunmap
+    """
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+        vunmap_command = parse_ex_command(command_line)
+        mappings = Mappings(self.state)
         try:
-            mappings.remove(modes.VISUAL, cmd)
-            mappings.remove(modes.VISUAL_LINE, cmd)
-            mappings.remove(modes.VISUAL_BLOCK, cmd)
+            mappings.remove(modes.VISUAL, vunmap_command.command.keys)
+            mappings.remove(modes.VISUAL_LINE, vunmap_command.command.keys)
+            mappings.remove(modes.VISUAL_BLOCK, vunmap_command.command.keys)
         except KeyError:
             sublime.status_message('Vintageous: Mapping  not found.')
 

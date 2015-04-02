@@ -92,4 +92,10 @@ patterns = {
     r'map': scan_command_map,
     r'm(?:ove)?(?=[^a]|$)': scan_command_move,
     r'new': scan_command_new,
+    r'nm(?:ap)?': scan_command_nmap,
+    r'nun(?:map)?': scan_command_nunmap,
+    r'om(?:ap)?': scan_command_omap,
+    r'ounm(?:ap)?': scan_command_ounmap,
+    r'vm(?:ap)?': scan_command_vmap,
+    r'vu(?:nmap)?': scan_command_vunmap,
 }
