@@ -22,14 +22,14 @@ from .scanner_command_let import scan_command_let
 from .scanner_command_map import scan_command_map
 from .scanner_command_move import scan_command_move
 from .scanner_command_new import scan_command_new
-
 from .scanner_command_nmap import scan_command_nmap
 from .scanner_command_nunmap import scan_command_nunmap
 from .scanner_command_omap import scan_command_omap
 from .scanner_command_ounmap import scan_command_ounmap
-from .scanner_command_unmap import scan_command_unmap
 from .scanner_command_vmap import scan_command_vmap
 from .scanner_command_vunmap import scan_command_vunmap
+
+from .scanner_command_unmap import scan_command_unmap
 
 from .scanner_command_unvsplit import scan_command_unvsplit
 
