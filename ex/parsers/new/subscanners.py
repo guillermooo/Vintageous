@@ -67,6 +67,7 @@ from .scanner_command_yank import scan_command_yank
 
 
 # TODO: compile regexes.
+# TODO: Use ordered dict?
 patterns = {
     r's(?:ubstitute)?(?=[%&:/=]|$)': scan_command_substitute,
     r'on(?:ly)?(?=!$|$)': scan_command_only,
@@ -98,4 +99,10 @@ patterns = {
     r'ounm(?:ap)?': scan_command_ounmap,
     r'vm(?:ap)?': scan_command_vmap,
     r'vu(?:nmap)?': scan_command_vunmap,
+    r'tabo(?:nly)?': scan_command_tab_only_command,
+    r'tabn(?:ext)?': scan_command_tab_next_command,
+    r'tabp(?:revious)?': scan_command_tab_prev_command,
+    r'tabfir(?:st)?': scan_command_tab_first_command,
+    r'tabr(?:ewind)?': scan_command_tab_first_command,
+    r'tabl(?:ast)?': scan_command_tab_last_command,
 }

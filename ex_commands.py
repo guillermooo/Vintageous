@@ -1352,29 +1352,74 @@ class ExTabOpenCommand(sublime_plugin.WindowCommand):
         self.window.run_command("tab_control", {"command": "open", "file_name": file_name}, )
 
 
-class ExTabNextCommand(sublime_plugin.WindowCommand):
-    def run(self):
+class ExTabnextCommand(ViWindowCommandBase):
+    '''
+    Command: :tabn[ext]
+
+    http://vimdoc.sourceforge.net/htmldoc/tabpage.html#:tabnext
+    '''
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+
         self.window.run_command("tab_control", {"command": "next"}, )
 
 
-class ExTabPrevCommand(sublime_plugin.WindowCommand):
-    def run(self):
+class ExTabprevCommand(ViWindowCommandBase):
+    '''
+    Command: :tabp[revious]
+
+    http://vimdoc.sourceforge.net/htmldoc/tabpage.html#:tabprevious
+    '''
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+
         self.window.run_command("tab_control", {"command": "prev"}, )
 
 
-class ExTabLastCommand(sublime_plugin.WindowCommand):
-    def run(self):
+class ExTablastCommand(ViWindowCommandBase):
+    '''
+    Command: :tabl[ast]
+
+    http://vimdoc.sourceforge.net/htmldoc/tabpage.html#:tablast
+    '''
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+
         self.window.run_command("tab_control", {"command": "last"}, )
 
 
-class ExTabFirstCommand(sublime_plugin.WindowCommand):
-    def run(self):
+class ExTabfirstCommand(ViWindowCommandBase):
+    '''
+    Command: :tabf[irst]
+
+    http://vimdoc.sourceforge.net/htmldoc/tabpage.html#:tabfirst
+    '''
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+
         self.window.run_command("tab_control", {"command": "first"}, )
 
 
-class ExTabOnlyCommand(sublime_plugin.WindowCommand):
-    def run(self, forced=False):
-        self.window.run_command("tab_control", {"command": "only", "forced": forced, }, )
+class ExTabonlyCommand(ViWindowCommandBase):
+    '''
+    Command: :tabo[only]
+
+    http://vimdoc.sourceforge.net/htmldoc/tabpage.html#:tabonly
+    '''
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+
+        self.window.run_command("tab_control", {"command": "only", "forced": parsed.command.forced})
 
 
 class ExCdCommand(ViWindowCommandBase):

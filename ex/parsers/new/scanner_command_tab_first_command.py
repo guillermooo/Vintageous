@@ -5,13 +5,18 @@ from .tokens_base import TokenOfCommand
 
 
 class TokenTabFirstCommand(TokenOfCommand):
-	def __init__(self, params, *args, **kwargs):
-		super().__init__([],
-						 TOKEN_COMMAND_XXX,
-						 'xxx', *args, **kwargs)
-		self.target_command = 'ex_xxx'
+    def __init__(self, *args, **kwargs):
+        super().__init__([],
+                         TOKEN_COMMAND_TAB_FIRST_COMMAND,
+                         'tabfirst', *args, **kwargs)
+        self.target_command = 'ex_tabfirst'
 
 
 def scan_command_tab_first_command(state):
-	raise NotImplementedError()
-	
+    c = state.consume()
+
+    if c == EOF:
+        return None, [TokenTabFirstCommand(), TokenEof()]
+
+    bang = c == '!'
+    return None, [TokenTabFirstCommand(forced=bang), TokenEof()]

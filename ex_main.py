@@ -143,6 +143,11 @@ class ViColonInput(sublime_plugin.WindowCommand):
                     'ex_ounmap',
                     'ex_vmap',
                     'ex_vunmap',
+                    'ex_tabonly',
+                    'ex_tabnext',
+                    'ex_tabprev',
+                    'ex_tabfirst',
+                    'ex_tablast',
                     ):
                 raise NotImplementedError()
             self.window.run_command(parsed_new.command.target_command, {'command_line': cmd_line[1:]})
