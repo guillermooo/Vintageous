@@ -1,12 +1,6 @@
-from .scanner_command_only import scan_command_only
-from .scanner_command_register import scan_command_register
-from .scanner_command_substitute import scan_command_substitute
-from .scanner_command_write import scan_command_write
-from .scanner_command_buffers import scan_command_buffers
 from .scanner_command_abbreviate import scan_command_abbreviate
-from .scanner_command_vsplit import scan_command_vsplit
-
 from .scanner_command_browse import scan_command_browse
+from .scanner_command_buffers import scan_command_buffers
 from .scanner_command_cd_command import scan_command_cd_command
 from .scanner_command_cdd_command import scan_command_cdd_command
 from .scanner_command_copy import scan_command_copy
@@ -17,7 +11,6 @@ from .scanner_command_edit import scan_command_edit
 from .scanner_command_exit import scan_command_exit
 from .scanner_command_file import scan_command_file
 from .scanner_command_global import scan_command_global
-from .scanner_command_print import scan_command_print
 from .scanner_command_let import scan_command_let
 from .scanner_command_map import scan_command_map
 from .scanner_command_move import scan_command_move
@@ -25,9 +18,21 @@ from .scanner_command_new import scan_command_new
 from .scanner_command_nmap import scan_command_nmap
 from .scanner_command_nunmap import scan_command_nunmap
 from .scanner_command_omap import scan_command_omap
+from .scanner_command_only import scan_command_only
 from .scanner_command_ounmap import scan_command_ounmap
+from .scanner_command_print import scan_command_print
+from .scanner_command_register import scan_command_register
+from .scanner_command_substitute import scan_command_substitute
+from .scanner_command_tab_first_command import scan_command_tab_first_command
+from .scanner_command_tab_last_command import scan_command_tab_last_command
+from .scanner_command_tab_next_command import scan_command_tab_next_command
+from .scanner_command_tab_only_command import scan_command_tab_only_command
+from .scanner_command_tab_open_command import scan_command_tab_open_command
+from .scanner_command_tab_prev_command import scan_command_tab_prev_command
 from .scanner_command_vmap import scan_command_vmap
+from .scanner_command_vsplit import scan_command_vsplit
 from .scanner_command_vunmap import scan_command_vunmap
+from .scanner_command_write import scan_command_write
 
 from .scanner_command_unmap import scan_command_unmap
 
@@ -47,13 +52,6 @@ from .scanner_command_set_local import scan_command_set_local
 
 from .scanner_command_shell import scan_command_shell
 from .scanner_command_shell_out import scan_command_shell_out
-
-from .scanner_command_tab_first_command import scan_command_tab_first_command
-from .scanner_command_tab_last_command import scan_command_tab_last_command
-from .scanner_command_tab_next_command import scan_command_tab_next_command
-from .scanner_command_tab_only_command import scan_command_tab_only_command
-from .scanner_command_tab_open_command import scan_command_tab_open_command
-from .scanner_command_tab_prev_command import scan_command_tab_prev_command
 
 from .scanner_command_unabbreviate import scan_command_unabbreviate
 
