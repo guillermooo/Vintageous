@@ -677,10 +677,22 @@ class ExReplaceFile(sublime_plugin.TextCommand):
         self.view.replace(edit, sublime.Region(0, self.view.size()), with_what)
 
 
-class ExWriteAll(sublime_plugin.WindowCommand):
+class ExWriteAll(ViWindowCommandBase):
+    '''
+    Commmand: :wa[ll][!]
+
+    http://vimdoc.sourceforge.net/htmldoc/editing.html#:wa
+    '''
     @changing_cd
-    def run(self, forced=False):
-        for v in self.window.views():
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+        forced = parsed.command.forced
+
+        for v in (v for v in self.window.views() if v.file_name()):
+            if v.is_read_only() and not forced:
+                continue
             v.run_command('save')
 
 
@@ -1088,21 +1100,21 @@ class ExPrint(ViWindowCommandBase):
         return to_display
 
 
-class ExQuitCommand(sublime_plugin.WindowCommand):
-    """Ex command(s): :quit
-    Closes the window.
+class ExQuitCommand(ViWindowCommandBase):
+    '''
+    Command: :q[uit][!]
 
-        * Don't close the window if there are dirty buffers
-          TODO:
-          (Doesn't make too much sense if hot_exit is on, though.)
-          Although ST's window command 'exit' would take care of this, it
-          displays a modal dialog, so spare ourselves that.
-    """
-    def run(self, forced=False, count=1, flags=''):
-        v = self.window.active_view()
-        if forced:
-            v.set_scratch(True)
-        if v.is_dirty():
+    http://vimdoc.sourceforge.net/htmldoc/editing.html#:q
+    '''
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+
+        view = self._view
+        if parsed.command.forced:
+            view.set_scratch(True)
+        if view.is_dirty():
             sublime.status_message("There are unsaved changes!")
             return
 
@@ -1116,14 +1128,18 @@ class ExQuitCommand(sublime_plugin.WindowCommand):
             self.window.run_command('ex_unvsplit')
 
 
-class ExQuitAllCommand(sublime_plugin.WindowCommand):
-    """Ex command(s): :qall
-    Close all windows and then exit Sublime Text.
-
-    If there are dirty buffers, exit only if :qall!.
+class ExQuitAllCommand(ViWindowCommandBase):
     """
-    def run(self, forced=False):
-        if forced:
+    Command: :qa[ll][!]
+
+    http://vimdoc.sourceforge.net/htmldoc/editing.html#:qa
+    """
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+
+        if parsed.command.forced:
             for v in self.window.views():
                 if v.is_dirty():
                     v.set_scratch(True)
@@ -1135,25 +1151,30 @@ class ExQuitAllCommand(sublime_plugin.WindowCommand):
         self.window.run_command('exit')
 
 
-class ExWriteAndQuitCommand(sublime_plugin.TextCommand):
-    """Ex command(s): :wq
+class ExWriteAndQuitCommand(ViWindowCommandBase):
+    """
+    Command: :wq[!] [++opt] {file}
 
     Write and then close the active buffer.
     """
-    def run(self, edit, line_range=None, forced=False):
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+
         # TODO: implement this
-        if forced:
+        if parsed.command.forced:
             ex_error.handle_not_implemented()
             return
-        if self.view.is_read_only():
+        if self._view.is_read_only():
             sublime.status_message("Can't write a read-only buffer.")
             return
-        if not self.view.file_name():
+        if not self._view.file_name():
             sublime.status_message("Can't save a file without name.")
             return
 
-        self.view.run_command('save')
-        self.view.window().run_command('ex_quit')
+        self.window.run_command('save')
+        self.window.run_command('ex_quit', {'command_line': 'quit'})
 
 
 class ExBrowse(ViWindowCommandBase):

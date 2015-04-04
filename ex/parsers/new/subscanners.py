@@ -91,4 +91,8 @@ patterns = {
     r'tabr(?:ewind)?': scan_command_tab_first_command,
     r'tabl(?:ast)?': scan_command_tab_last_command,
     r'unm(?:ap)?': scan_command_unmap,
+    r'q(?!a)(?:uit)?': scan_command_quit_command,
+    r'qa(?:ll)?': scan_command_quit_all_command,
+    r'wa(?:ll)?': scan_command_write_all,
+    r'wq(?=[^a-zA-Z]|$)?': scan_command_write_and_quit_command,
 }

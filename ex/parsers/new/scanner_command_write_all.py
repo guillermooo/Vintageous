@@ -4,14 +4,19 @@ from .tokens_base import TOKEN_COMMAND_WRITE_ALL
 from .tokens_base import TokenOfCommand
 
 
-class TokenWriteAll(TokenOfCommand):
-	def __init__(self, params, *args, **kwargs):
-		super().__init__([],
-						 TOKEN_COMMAND_XXX,
-						 'xxx', *args, **kwargs)
-		self.target_command = 'ex_xxx'
+class TokenWriteAllCommand(TokenOfCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__({},
+                         TOKEN_COMMAND_WRITE_ALL,
+                         'write_all', *args, **kwargs)
+        self.target_command = 'ex_write_all'
 
 
 def scan_command_write_all(state):
-	raise NotImplementedError()
-	
+    c = state.consume()
+
+    bang = c == '!'
+
+    state.expect(EOF)
+
+    return None, [TokenWriteAllCommand(forced=bang), TokenEof()]

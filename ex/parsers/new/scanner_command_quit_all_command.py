@@ -5,13 +5,18 @@ from .tokens_base import TokenOfCommand
 
 
 class TokenQuitAllCommand(TokenOfCommand):
-	def __init__(self, params, *args, **kwargs):
-		super().__init__([],
-						 TOKEN_COMMAND_XXX,
-						 'xxx', *args, **kwargs)
-		self.target_command = 'ex_xxx'
+    def __init__(self, *args, **kwargs):
+        super().__init__({},
+                         TOKEN_COMMAND_QUIT_ALL_COMMAND,
+                         'qall', *args, **kwargs)
+        self.target_command = 'ex_quit_all'
 
 
 def scan_command_quit_all_command(state):
-	raise NotImplementedError()
-	
+    c = state.consume()
+
+    bang = c == '!'
+
+    state.expect(EOF)
+
+    return None, [TokenQuitAllCommand(forced=bang), TokenEof()]
