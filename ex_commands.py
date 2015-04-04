@@ -500,18 +500,32 @@ class ExAbbreviate(ViWindowCommandBase):
                                      flags=sublime.MONOSPACE_FONT)
 
 
-class ExUnabbreviate(sublime_plugin.TextCommand):
-    def run(self, edit, short):
-        if not short:
+class ExUnabbreviate(ViWindowCommandBase):
+    '''
+    Command: :una[bbreviate] {lhs}
+
+    http://vimdoc.sourceforge.net/htmldoc/map.html#:unabbreviate
+    '''
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+
+        if not parsed.command.short:
             return
 
-        abbrev.Store().erase(short)
+        abbrev.Store().erase(parsed.command.short)
 
 
-class ExPrintWorkingDir(IrreversibleTextCommand):
+class ExPrintWorkingDir(ViWindowCommandBase):
+    '''
+    Command: :pw[d]
+
+    http://vimdoc.sourceforge.net/htmldoc/editing.html#:pwd
+    '''
     @changing_cd
-    def run(self):
-        state = State(self.view)
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
         sublime.status_message(os.getcwd())
 
 

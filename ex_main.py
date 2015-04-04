@@ -153,6 +153,8 @@ class ViColonInput(sublime_plugin.WindowCommand):
                     'ex_write_and_quit',
                     'ex_write_file',
                     'ex_quit_all',
+                    'ex_print_working_dir',
+                    'ex_unabbreviate',
                     ):
                 raise NotImplementedError()
             self.window.run_command(parsed_new.command.target_command, {'command_line': cmd_line[1:]})
