@@ -686,11 +686,6 @@ class ExWriteFile(ViWindowCommandBase):
             print('==================')
 
 
-class ExReplaceFile(sublime_plugin.TextCommand):
-    def run(self, edit, start, end, with_what):
-        self.view.replace(edit, sublime.Region(0, self.view.size()), with_what)
-
-
 class ExWriteAll(ViWindowCommandBase):
     '''
     Commmand: :wa[ll][!]
