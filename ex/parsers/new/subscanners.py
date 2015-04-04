@@ -103,4 +103,5 @@ patterns = {
     r'tabfir(?:st)?': scan_command_tab_first_command,
     r'tabr(?:ewind)?': scan_command_tab_first_command,
     r'tabl(?:ast)?': scan_command_tab_last_command,
+    r'unm(?:ap)?': scan_command_unmap,
 }

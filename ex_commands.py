@@ -353,13 +353,22 @@ class ExMap(ViWindowCommandBase):
         mappings.add(modes.VISUAL, parsed.command.keys, parsed.command.command)
 
 
-class ExUnmap(sublime_plugin.TextCommand):
-    def run(self, edit, mode=None, count=None, cmd=''):
-        mappings = Mappings(State(self.view))
+class ExUnmap(ViWindowCommandBase):
+    '''
+    Command: :unm[ap]  {lhs}
+
+    http://vimdoc.sourceforge.net/htmldoc/map.html#:unmap
+    '''
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        unmap = parse_ex_command(command_line)
+
+        mappings = Mappings(self.state)
         try:
-            mappings.remove(modes.NORMAL, cmd)
-            mappings.remove(modes.OPERATOR_PENDING, cmd)
-            mappings.remove(modes.VISUAL, cmd)
+            mappings.remove(modes.NORMAL, unmap.command.keys)
+            mappings.remove(modes.OPERATOR_PENDING, unmap.command.keys)
+            mappings.remove(modes.VISUAL, unmap.command.keys)
         except KeyError:
             sublime.status_message('Vintageous: Mapping not found.')
 

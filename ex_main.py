@@ -141,6 +141,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
                     'ex_nunmap',
                     'ex_omap',
                     'ex_ounmap',
+                    'ex_unmap',
                     'ex_vmap',
                     'ex_vunmap',
                     'ex_tabonly',
