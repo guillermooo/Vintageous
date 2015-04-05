@@ -1588,8 +1588,15 @@ class ExVsplit(ViWindowCommandBase):
                               flags=flags)
 
 
-class ExUnvsplit(sublime_plugin.WindowCommand):
-    def run(self):
+class ExUnvsplit(ViWindowCommandBase):
+    '''
+    Command: :unvsplit
+
+    Non-standard Vim command.
+    '''
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
         groups = self.window.num_groups()
         if groups == 1:
             sublime.status_message("Vintageous: Can't delete more groups.")

@@ -97,4 +97,5 @@ patterns = {
     r'wq(?=[^a-zA-Z]|$)?': scan_command_write_and_quit_command,
     r'pwd?$': scan_command_print_working_dir,
     r'una(?:bbreviate)?': scan_command_unabbreviate,
+    r'unvsplit$': scan_command_unvsplit,
 }
