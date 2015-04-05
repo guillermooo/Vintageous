@@ -102,4 +102,5 @@ patterns = {
     # TODO: implement other set variants.
     r'se(?:t)?(?=$|\s)': scan_command_set,
     r'setl(?:ocal)?': scan_command_set_local,
+    r'y(?:ank)?': scan_command_yank,
 }

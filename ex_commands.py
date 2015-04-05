@@ -1340,18 +1340,28 @@ class ExNew(ViWindowCommandBase):
 
 
 class ExYank(sublime_plugin.TextCommand):
-    """Ex command(s): :y[ank]
+    """
+    Command: :[range]y[ank] [x] {count}
+
+    http://vimdoc.sourceforge.net/htmldoc/windows.html#:yank
     """
 
-    def run(self, edit, line_range, register=None, count=None):
+    def run(self, edit, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+
+        register = parsed.command.register
+        line_range = parsed.line_range.resolve(self.view)
+
         if not register:
             register = '"'
 
-        regs = get_region_by_range(self.view, line_range)
-        text = '\n'.join([self.view.substr(line) for line in regs]) + '\n'
+        text = self.view.substr(line_range)
 
         state = State(self.view)
         state.registers[register] = [text]
+        # TODO: o_O?
         if register == '"':
             state.registers['0'] = [text]
 
