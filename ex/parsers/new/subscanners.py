@@ -98,4 +98,8 @@ patterns = {
     r'pwd?$': scan_command_print_working_dir,
     r'una(?:bbreviate)?': scan_command_unabbreviate,
     r'unvsplit$': scan_command_unvsplit,
+    r'una(?:bbreviate)?': scan_command_unabbreviate,
+    # TODO: implement other set variants.
+    r'se(?:t)?(?=$|\s)': scan_command_set,
+    r'setl(?:ocal)?': scan_command_set_local,
 }

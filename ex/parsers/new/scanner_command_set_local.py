@@ -4,14 +4,33 @@ from .tokens_base import TOKEN_COMMAND_SET_LOCAL
 from .tokens_base import TokenOfCommand
 
 
-class TokenSetLocal(TokenOfCommand):
-	def __init__(self, params, *args, **kwargs):
-		super().__init__([],
-						 TOKEN_COMMAND_XXX,
-						 'xxx', *args, **kwargs)
-		self.target_command = 'ex_xxx'
+class TokenSet(TokenOfCommand):
+    def __init__(self, params, *args, **kwargs):
+        super().__init__(params,
+                         TOKEN_COMMAND_SET_LOCAL,
+                         'setlocal', *args, **kwargs)
+        self.target_command = 'ex_set_local'
+
+    @property
+    def value(self):
+        return self.params['value']
+
+    @property
+    def option(self):
+        return self.params['option']
 
 
 def scan_command_set_local(state):
-	raise NotImplementedError()
-	
+    params = {
+        'option': None,
+        'value': None,
+    }
+
+    state.skip(' ')
+    state.ignore()
+
+    # TODO(guillermooo): implement other options.
+    m = state.expect_match(r'(?P<option>.+?)(?:[:=](?P<value>.+?))?$')
+    params.update(m.groupdict())
+
+    return None, [TokenSet(params), TokenEof()]

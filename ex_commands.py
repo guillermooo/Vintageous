@@ -1608,26 +1608,41 @@ class ExUnvsplit(ViWindowCommandBase):
         self.window.run_command('set_layout', ExVsplit.LAYOUT_DATA[groups - 1])
 
 
-class ExSetLocal(IrreversibleTextCommand):
-    def run(self, option=None, operator=None, value=None):
+class ExSetLocal(ViWindowCommandBase):
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+        option = parsed.command.option
+        value = parsed.command.value
+
         if option.endswith('?'):
             ex_error.handle_not_implemented()
             return
         try:
-            set_local(self.view, option, value)
+            set_local(self._view, option, value)
         except KeyError:
             sublime.status_message("Vintageuos: No such option.")
         except ValueError:
             sublime.status_message("Vintageous: Invalid value for option.")
 
 
-class ExSet(IrreversibleTextCommand):
-    def run(self, option=None, operator=None, value=None):
+class ExSet(ViWindowCommandBase):
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+
+        option = parsed.command.option
+        value = parsed.command.value
+
+        print (locals())
+
         if option.endswith('?'):
             ex_error.handle_not_implemented()
             return
         try:
-            set_global(self.view, option, value)
+            set_global(self._view, option, value)
         except KeyError:
             sublime.status_message("Vintageuos: No such option.")
         except ValueError:
