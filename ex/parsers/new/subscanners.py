@@ -107,13 +107,8 @@ patterns = {
     r'se(?:t)?(?=$|\s)': scan_command_set,
     r'setl(?:ocal)?': scan_command_set_local,
     r'y(?:ank)?': scan_command_yank,
-<<<<<<< HEAD
-=======
     r'sh(?:ell)?': scan_command_shell,
     r'!(?=.+)': scan_command_shell_out,
-<<<<<<< HEAD
->>>>>>> implement :! and :shell
-=======
     r'r(?:ead)?': scan_command_read_shell_out,
->>>>>>> implement :r
+    r'r(?!eg)(?:ead)?': scan_command_read_shell_out,
 }

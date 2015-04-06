@@ -13,12 +13,9 @@ class Test_ex_shell_out_no_input(ViewTest):
     @unittest.skipIf(os.name == 'nt', 'not supported on Windows')
     def testCommandOutput(self):
         test_string = 'Testing!'
-        test_command_line = ':!echo "' + test_string + '"'
-        ex_cmd = parse_command(test_command_line)
-        ex_cmd.args['line_range'] = ex_cmd.line_range
-
+        test_command_line = '!echo "' + test_string + '"'
         output_panel = self.view.window().get_output_panel('vi_out')
-        self.view.run_command(ex_cmd.command, ex_cmd.args)
+        self.view.window().run_command('ex_shell_out', {'command_line': test_command_line})
 
         actual = output_panel.substr(self.R(0, output_panel.size()))
         expected = test_string + '\n'
@@ -27,15 +24,12 @@ class Test_ex_shell_out_no_input(ViewTest):
     @unittest.skipIf(os.name != 'nt', 'Windows')
     def testCommandOutput(self):
         test_string = 'Testing!'
-        test_command_line = ':!echo "' + test_string + '"'
-        ex_cmd = parse_command(test_command_line)
-        ex_cmd.args['line_range'] = ex_cmd.line_range
-
+        test_command_line = '!echo "' + test_string + '"'
         output_panel = self.view.window().get_output_panel('vi_out')
-        self.view.run_command(ex_cmd.command, ex_cmd.args)
+        self.view.window().run_command('ex_shell_out', {'command_line': test_command_line})
 
         actual = output_panel.substr(self.R(0, output_panel.size()))
-        expected = '\\"{0}\\"'.format(test_string)
+        expected = '\\"{0}\\"\n'.format(test_string)
         self.assertEqual(expected, actual)
 
     def tearDown(self):
