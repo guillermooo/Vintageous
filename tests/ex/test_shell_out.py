@@ -60,10 +60,10 @@ class Test_ex_shell_out_filter_through_shell(ViewTest):
         self.add_sel(self.R((0, 8), (1, 3)))
 
         test_command_line = ":'<,'>!" + word_count_command
-        ex_cmd = parse_command(test_command_line)
-        ex_cmd.args['line_range'] = ex_cmd.line_range
 
-        self.view.run_command(ex_cmd.command, ex_cmd.args)
+        self.view.run_command('ex_shell_out', {
+                'command_line': test_command_line
+                })
 
         actual = self.view.substr(self.R(0, self.view.size()))
         expected = '8\nnine ten.'
@@ -99,7 +99,7 @@ End of Test!
 
         test_command_line = ":'<,'>!" + word_count_command
 
-        self.view.run_command(ex_cmd.command, {
+        self.view.run_command('ex_shell_out', {
                 'command_line': test_command_line
                 })
 
