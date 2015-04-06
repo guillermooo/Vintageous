@@ -5,13 +5,13 @@ from .tokens_base import TokenOfCommand
 
 
 class TokenShell(TokenOfCommand):
-	def __init__(self, params, *args, **kwargs):
-		super().__init__([],
-						 TOKEN_COMMAND_XXX,
-						 'xxx', *args, **kwargs)
-		self.target_command = 'ex_xxx'
+    def __init__(self, *args, **kwargs):
+        super().__init__({},
+                         TOKEN_COMMAND_SHELL,
+                         'shell', *args, **kwargs)
+        self.target_command = 'ex_shell'
 
 
 def scan_command_shell(state):
-	raise NotImplementedError()
-	
+    state.expect(EOF)
+    return None, [TokenShell(), TokenEof()]

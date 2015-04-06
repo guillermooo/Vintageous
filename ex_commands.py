@@ -180,36 +180,52 @@ class ExGoto(ViWindowCommandBase):
         self._view.show(self._view.sel()[0])
 
 
-class ExShellOut(sublime_plugin.TextCommand):
-    """Ex command(s): :!cmd, :'<,>'!cmd
+class ExShellOut(ViWindowCommandBase):
+    """
+    Command: :!{cmd}
+             :!!
 
-    Run cmd in a system's shell or filter selected regions through external
-    command.
+    http://vimdoc.sourceforge.net/htmldoc/various.html#:!
     """
 
+    _last_command = None
+
     @changing_cd
-    def run(self, edit, line_range=None, shell_cmd=''):
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+        shell_cmd = parsed.command.command
+
+        if shell_cmd == '!':
+            if not _last_command:
+                return
+            shell_cmd = ExShellOut._last_command
+
+        # TODO: store only successful commands.
+        ExShellOut._last_command = shell_cmd
+
         try:
-            if line_range['text_range']:
+            if not parsed.line_range.is_empty:
                 shell.filter_thru_shell(
-                                view=self.view,
-                                edit=edit,
-                                regions=get_region_by_range(self.view, line_range=line_range),
-                                cmd=shell_cmd)
+                        view=self._view,
+                        edit=edit,
+                        regions=parsed.line_range.resolve(self._view),
+                        cmd=shell_cmd)
             else:
                 # TODO: Read output into output panel.
                 # shell.run_and_wait(self.view, shell_cmd)
-                out = shell.run_and_read(self.view, shell_cmd)
+                out = shell.run_and_read(self._view, shell_cmd)
 
-                output_view = self.view.window().create_output_panel('vi_out')
+                output_view = self._view.window().create_output_panel('vi_out')
                 output_view.settings().set("line_numbers", False)
                 output_view.settings().set("gutter", False)
                 output_view.settings().set("scroll_past_end", False)
-                output_view = self.view.window().create_output_panel('vi_out')
+                output_view = self._view.window().create_output_panel('vi_out')
                 output_view.run_command('append', {'characters': out,
                                                    'force': True,
                                                    'scroll_to_end': True})
-                self.view.window().run_command("show_panel", {"panel": "output.vi_out"})
+                self._view.window().run_command("show_panel", {"panel": "output.vi_out"})
         except NotImplementedError:
             ex_error.handle_not_implemented()
 
@@ -226,7 +242,9 @@ class ExShell(IrreversibleTextCommand):
         return subprocess.Popen(command, cwd=os.getcwd())
 
     @changing_cd
-    def run(self):
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
         if sublime.platform() == 'linux':
             term = self.view.settings().get('VintageousEx_linux_terminal')
             term = term or os.environ.get('COLORTERM') or os.environ.get("TERM")

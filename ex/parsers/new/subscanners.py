@@ -30,6 +30,7 @@ from .scanner_command_replace_file import scan_command_replace_file
 from .scanner_command_set import scan_command_set
 from .scanner_command_set_local import scan_command_set_local
 from .scanner_command_shell import scan_command_shell
+from .scanner_command_shell import scan_command_shell
 from .scanner_command_shell_out import scan_command_shell_out
 from .scanner_command_substitute import scan_command_substitute
 from .scanner_command_tab_first_command import scan_command_tab_first_command
@@ -103,4 +104,9 @@ patterns = {
     r'se(?:t)?(?=$|\s)': scan_command_set,
     r'setl(?:ocal)?': scan_command_set_local,
     r'y(?:ank)?': scan_command_yank,
+<<<<<<< HEAD
+=======
+    r'sh(?:ell)?': scan_command_shell,
+    r'!(?=.+)': scan_command_shell_out,
+>>>>>>> implement :! and :shell
 }

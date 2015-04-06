@@ -5,13 +5,23 @@ from .tokens_base import TokenOfCommand
 
 
 class TokenShellOut(TokenOfCommand):
-	def __init__(self, params, *args, **kwargs):
-		super().__init__([],
-						 TOKEN_COMMAND_XXX,
-						 'xxx', *args, **kwargs)
-		self.target_command = 'ex_xxx'
+    def __init__(self, params, *args, **kwargs):
+        super().__init__(params,
+                         TOKEN_COMMAND_SHELL_OUT,
+                         '!', *args, **kwargs)
+        self.target_command = 'ex_shell_out'
+
+    @property
+    def command(self):
+        return self.params['cmd']
 
 
 def scan_command_shell_out(state):
-	raise NotImplementedError()
-	
+    params = {
+        'cmd': None,
+    }
+
+    m = state.expect_match(r'(?P<cmd>.+)$')
+    params.update(m.groupdict())
+
+    return None, [TokenShellOut(params), TokenEof()]
