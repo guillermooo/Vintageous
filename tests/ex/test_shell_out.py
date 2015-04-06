@@ -56,22 +56,22 @@ class Test_ex_shell_out_filter_through_shell(ViewTest):
         if not word_count_command:
             return True
         self.view.sel().clear()
-        self.write('One two three four\nfive six seven eight\nnine ten.')
-        self.add_sel(self.R((0, 8), (1, 3)))
+        self.write('''aaa
+bbb
+ccc''')
+        self.add_sel(self.R((0, 2), (0, 2)))
 
-        test_command_line = ":'<,'>!" + word_count_command
+        test_command_line = ".!" + word_count_command
 
         self.view.run_command('ex_shell_out', {
                 'command_line': test_command_line
                 })
 
         actual = self.view.substr(self.R(0, self.view.size()))
-        expected = '8\nnine ten.'
+        expected = '''1
+bbb
+ccc'''
         self.assertEqual(expected, actual)
-        self.assertEqual(1, len(self.view.sel()))
-        cursor = get_sel(self.view, 0)
-        self.assertEqual(cursor.begin(), cursor.end())
-        self.assertEqual(self.view.text_point(0, 0), cursor.begin())
 
     @unittest.skipIf(os.name == 'nt', 'Windows')
     def testMultipleFilterThroughShell(self):
@@ -80,43 +80,22 @@ class Test_ex_shell_out_filter_through_shell(ViewTest):
         if not word_count_command:
             return True
         self.view.sel().clear()
-        self.write('''Beginning of test!
-One two three four
-five six seven eight
-nine ten.
-These two lines shouldn't be replaced
-by the command.
-One two three four five six
-seven eight nine
-ten
-eleven
-twelve
-End of Test!
+        self.write('''aaa
+bbb
+ccc
 ''')
         # Two selections touching all numeric word lines.
-        self.add_sel(self.R((1, 11), (3, 1)))
-        self.add_sel(self.R((6, 1), (10, 5)))
+        self.add_sel(self.R((1, 0), (1, 0)))
 
-        test_command_line = ":'<,'>!" + word_count_command
+        test_command_line = ".!" + word_count_command
 
         self.view.run_command('ex_shell_out', {
                 'command_line': test_command_line
                 })
 
         actual = self.view.substr(self.R(0, self.view.size()))
-        expected = '''Beginning of test!
-10
-These two lines shouldn't be replaced
-by the command.
-12
-End of Test!
+        expected = '''aaa
+1
+ccc
 '''
         self.assertEqual(expected, actual)
-        self.assertEqual(2, len(self.view.sel()))
-        cursor0 = get_sel(self.view, 0)
-        cursor1 = get_sel(self.view, 1)
-        self.assertEqual(cursor0.begin(), cursor0.end())
-        self.assertEqual(cursor1.begin(), cursor1.end())
-        self.assertEqual(self.view.text_point(1, 0), cursor0.begin())
-        self.assertEqual(self.view.text_point(4, 0), cursor1.begin())
-

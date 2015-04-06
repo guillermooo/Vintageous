@@ -95,7 +95,7 @@ class RunVintageousTests(sublime_plugin.WindowCommand):
     @contextlib.contextmanager
     def chdir(self, path=None):
         old_path = os.getcwd()
-        if path is not None:
+        if path:
             assert os.path.exists(path), "'path' is invalid {}".format(path)
             os.chdir(path)
         yield

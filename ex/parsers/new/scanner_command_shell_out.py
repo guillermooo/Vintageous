@@ -9,6 +9,7 @@ class TokenShellOut(TokenOfCommand):
         super().__init__(params,
                          TOKEN_COMMAND_SHELL_OUT,
                          '!', *args, **kwargs)
+        self.addressable = True
         self.target_command = 'ex_shell_out'
 
     @property

@@ -180,7 +180,7 @@ class ExGoto(ViWindowCommandBase):
         self._view.show(self._view.sel()[0])
 
 
-class ExShellOut(ViWindowCommandBase):
+class ExShellOut(sublime_plugin.TextCommand):
     """
     Command: :!{cmd}
              :!!
@@ -191,7 +191,7 @@ class ExShellOut(ViWindowCommandBase):
     _last_command = None
 
     @changing_cd
-    def run(self, command_line=''):
+    def run(self, edit, command_line=''):
         assert command_line, 'expected non-empty command line'
 
         parsed = parse_ex_command(command_line)
@@ -208,24 +208,24 @@ class ExShellOut(ViWindowCommandBase):
         try:
             if not parsed.line_range.is_empty:
                 shell.filter_thru_shell(
-                        view=self._view,
+                        view=self.view,
                         edit=edit,
-                        regions=parsed.line_range.resolve(self._view),
+                        regions=[parsed.line_range.resolve(self.view)],
                         cmd=shell_cmd)
             else:
                 # TODO: Read output into output panel.
                 # shell.run_and_wait(self.view, shell_cmd)
-                out = shell.run_and_read(self._view, shell_cmd)
+                out = shell.run_and_read(self.view, shell_cmd)
 
-                output_view = self._view.window().create_output_panel('vi_out')
+                output_view = self.view.window().create_output_panel('vi_out')
                 output_view.settings().set("line_numbers", False)
                 output_view.settings().set("gutter", False)
                 output_view.settings().set("scroll_past_end", False)
-                output_view = self._view.window().create_output_panel('vi_out')
+                output_view = self.view.window().create_output_panel('vi_out')
                 output_view.run_command('append', {'characters': out,
                                                    'force': True,
                                                    'scroll_to_end': True})
-                self._view.window().run_command("show_panel", {"panel": "output.vi_out"})
+                self.view.window().run_command("show_panel", {"panel": "output.vi_out"})
         except NotImplementedError:
             ex_error.handle_not_implemented()
 
