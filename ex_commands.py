@@ -277,42 +277,49 @@ class ExShell(IrreversibleTextCommand):
 
 
 class ExReadShellOut(sublime_plugin.TextCommand):
-    @changing_cd
-    def run(self, edit, line_range=None, name='', plusplus_args='', forced=False):
-        target_line = self.view.line(self.view.sel()[0].begin())
-        if line_range['text_range']:
-            range = max(ex_range.calculate_range(self.view, line_range=line_range)[0])
-            target_line = self.view.line(self.view.text_point(range, 0))
-        target_point = min(target_line.b + 1, self.view.size())
+    '''
+    Command: :r[ead] [++opt] [name]
+             :{range}r[ead] [++opt] [name]
+             :[range]r[ead] !{cmd}
 
-        # Cheat a little bit to get the parsing right:
-        #   - forced == True means we need to execute a command
-        if forced:
+    http://vimdoc.sourceforge.net/htmldoc/insert.html#:r
+    '''
+
+    @changing_cd
+    def run(self, edit, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        parsed = parse_ex_command(command_line)
+
+        r = parsed.line_range.resolve(self.view)
+
+        target_point = min(r.end(), self.view.size())
+
+        if parsed.command.command:
             if sublime.platform() == 'linux':
-                for s in self.view.sel():
-                    # TODO: make shell command configurable.
-                    the_shell = self.view.settings().get('linux_shell')
-                    the_shell = the_shell or os.path.expandvars("$SHELL")
-                    if not the_shell:
-                        sublime.status_message("Vintageous: No shell name found.")
-                        return
-                    try:
-                        p = subprocess.Popen([the_shell, '-c', name],
-                                                            stdout=subprocess.PIPE)
-                    except Exception as e:
-                        print(e)
-                        sublime.status_message("Vintageous: Error while executing command through shell.")
-                        return
-                    self.view.insert(edit, s.begin(), p.communicate()[0][:-1].decode('utf-8'))
+                # TODO: make shell command configurable.
+                the_shell = self.view.settings().get('linux_shell')
+                the_shell = the_shell or os.path.expandvars("$SHELL")
+                if not the_shell:
+                    sublime.status_message("Vintageous: No shell name found.")
+                    return
+                try:
+                    p = subprocess.Popen([the_shell, '-c', parsed.command.command],
+                                                        stdout=subprocess.PIPE)
+                except Exception as e:
+                    print(e)
+                    sublime.status_message("Vintageous: Error while executing command through shell.")
+                    return
+                self.view.insert(edit, target_point, p.communicate()[0][:-1].decode('utf-8').strip() + '\n')
+
             elif sublime.platform() == 'windows':
-                for s in self.view.sel():
-                    p = subprocess.Popen(['cmd.exe', '/C', name],
-                                            stdout=subprocess.PIPE,
-                                            startupinfo=get_startup_info()
-                                            )
-                    cp = 'cp' + get_oem_cp()
-                    rv = p.communicate()[0].decode(cp)[:-2].strip()
-                    self.view.insert(edit, s.begin(), rv)
+                p = subprocess.Popen(['cmd.exe', '/C', parsed.command.command],
+                                        stdout=subprocess.PIPE,
+                                        startupinfo=get_startup_info()
+                                        )
+                cp = 'cp' + get_oem_cp()
+                rv = p.communicate()[0].decode(cp)[:-2].strip()
+                self.view.insert(edit, target_point, rv.strip() + '\n')
             else:
                 ex_error.handle_not_implemented()
         # Read a file into the current view.

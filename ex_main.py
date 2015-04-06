@@ -162,6 +162,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
                     'ex_yank',
                     'ex_shell',
                     'ex_shell_out',
+                    'ex_read_shell_out',
                     ):
                 raise NotImplementedError()
             self.window.run_command(parsed_new.command.target_command, {'command_line': cmd_line[1:]})

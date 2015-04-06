@@ -25,12 +25,15 @@ from .scanner_command_print_working_dir import scan_command_print_working_dir
 from .scanner_command_quit_all_command import scan_command_quit_all_command
 from .scanner_command_quit_command import scan_command_quit_command
 from .scanner_command_read_shell_out import scan_command_read_shell_out
+from .scanner_command_read_shell_out import scan_command_read_shell_out
 from .scanner_command_register import scan_command_register
 from .scanner_command_replace_file import scan_command_replace_file
 from .scanner_command_set import scan_command_set
 from .scanner_command_set_local import scan_command_set_local
 from .scanner_command_shell import scan_command_shell
 from .scanner_command_shell import scan_command_shell
+from .scanner_command_shell import scan_command_shell
+from .scanner_command_shell_out import scan_command_shell_out
 from .scanner_command_shell_out import scan_command_shell_out
 from .scanner_command_substitute import scan_command_substitute
 from .scanner_command_tab_first_command import scan_command_tab_first_command
@@ -108,5 +111,9 @@ patterns = {
 =======
     r'sh(?:ell)?': scan_command_shell,
     r'!(?=.+)': scan_command_shell_out,
+<<<<<<< HEAD
 >>>>>>> implement :! and :shell
+=======
+    r'r(?:ead)?': scan_command_read_shell_out,
+>>>>>>> implement :r
 }
