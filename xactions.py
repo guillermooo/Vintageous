@@ -1512,14 +1512,10 @@ class _vi_x(ViTextCommandBase):
         def select(view, s):
             nonlocal abort
             if mode == modes.INTERNAL_NORMAL:
-                if view.line(s.b).empty():
-                    abort = True
                 eol = utils.get_eol(view, s.b)
                 return R(s.b, min(s.b + count, eol))
             if s.size() == 1:
                 b = s.b - 1 if s.a < s.b else s.b
-                if view.line(b).empty():
-                    abort = True
             return s
 
         if mode not in (modes.VISUAL,
@@ -1529,6 +1525,11 @@ class _vi_x(ViTextCommandBase):
             # error?
             utils.blink()
             self.enter_normal_mode(mode)
+
+        if mode == modes.INTERNAL_NORMAL:
+            if all(self.view.line(s.b).empty() for s in self.view.sel()):
+                utils.blink()
+                return
 
         abort = False
 
