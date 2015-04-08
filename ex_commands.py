@@ -340,7 +340,7 @@ class ExPromptSelectOpenFile(ViWindowCommandBase):
     http://vimdoc.sourceforge.net/htmldoc/windows.html#:ls
     '''
 
-    def run(self):
+    def run(self, command_line=''):
         self.file_names = [get_view_info(view) for view in self.window.views()]
         self.view_ids = [view.id() for view in self.window.views()]
         self.window.show_quick_panel(self.file_names, self.on_done)

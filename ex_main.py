@@ -104,8 +104,6 @@ class ViColonInput(sublime_plugin.WindowCommand):
         if ViColonInput.interactive_call:
             update_command_line_history('cmdline', cmd_line)
 
-        # Use old parser for most commands.
-        parsed = parse_command(cmd_line)
         try:
             # Use new parser for some commands.
             parsed_new = parse_ex_command(cmd_line[1:])
@@ -113,58 +111,6 @@ class ViColonInput(sublime_plugin.WindowCommand):
             if not parsed_new.command:
                 parsed_new.command = TokenCommandGoto()
 
-            if parsed_new.command.target_command not in (
-                    'ex_abbreviate',
-                    'ex_browse',
-                    'ex_cd',
-                    'ex_cdd',
-                    'ex_copy',
-                    'ex_cquit',
-                    'ex_delete',
-                    'ex_double_ampersand',
-                    'ex_edit',
-                    'ex_exit',
-                    'ex_file',
-                    'ex_global',
-                    'ex_goto',
-                    'ex_let',
-                    'ex_list_registers',
-                    'ex_map',
-                    'ex_move',
-                    'ex_nmap',
-                    'ex_nunmap',
-                    'ex_omap',
-                    'ex_only',
-                    'ex_ounmap',
-                    'ex_print',
-                    'ex_prompt_select_open_file',
-                    'ex_quit',
-                    'ex_substitute',
-                    'ex_tabfirst',
-                    'ex_tablast',
-                    'ex_tabnext',
-                    'ex_tabonly',
-                    'ex_tabprev',
-                    'ex_unmap',
-                    'ex_vmap',
-                    'ex_vsplit',
-                    'ex_new',
-                    'ex_vunmap',
-                    'ex_write_all',
-                    'ex_write_and_quit',
-                    'ex_write_file',
-                    'ex_quit_all',
-                    'ex_print_working_dir',
-                    'ex_unabbreviate',
-                    'ex_unvsplit',
-                    'ex_set',
-                    'ex_set_local',
-                    'ex_yank',
-                    'ex_shell',
-                    'ex_shell_out',
-                    'ex_read_shell_out',
-                    ):
-                raise NotImplementedError()
             self.window.run_command(parsed_new.command.target_command, {'command_line': cmd_line[1:]})
             return
         except VimError as ve:
@@ -174,21 +120,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
         except Exception as e:
             # let the old ex code take care of this
             print ('DEBUG::Vintageous:', e, '(', cmd_line, ')')
-
-        if parsed and parsed.parse_errors:
-            ex_error.display_error(parsed.parse_errors[0])
             return
-
-        if parsed and parsed.name:
-            if parsed.can_have_range:
-                parsed.args['line_range'] = parsed.line_range
-
-            if parsed.forced:
-                parsed.args['forced'] = parsed.forced
-            self.window.run_command(parsed.command, parsed.args)
-        else:
-            ex_error.display_error(ex_error.ERR_UNKNOWN_COMMAND, cmd_line)
-
 
 class ViColonRepeatLast(sublime_plugin.WindowCommand):
     def is_enabled(self):

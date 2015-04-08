@@ -8,8 +8,8 @@ from Vintageous.ex.ex_error import VimError
 
 
 class TokenCommandBuffers(TokenOfCommand):
-    def __init__(self, params, *args, **kwargs):
-        super().__init__([],
+    def __init__(self, *args, **kwargs):
+        super().__init__({},
                         TOKEN_COMMAND_BUFFERS,
                         'write', *args, **kwargs)
         self.target_command = 'ex_prompt_select_open_file'
