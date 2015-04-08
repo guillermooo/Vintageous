@@ -1,3 +1,8 @@
+3.8.10 - 08-04-2015
+
+	- fix #890 - x should delete with multiple carets
+	- fix build script on Linux
+
 3.8.9 - 24-03-2015
 
 	- fix #878: fix c<motion> - ignore exclude whitespace
