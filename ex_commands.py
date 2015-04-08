@@ -8,7 +8,6 @@ import subprocess
 
 from Vintageous.ex import ex_error
 from Vintageous.ex import ex_range
-from Vintageous.ex import parsers
 from Vintageous.ex import shell
 from Vintageous.ex.ex_error import DISPLAY_ALL
 from Vintageous.ex.ex_error import display_error2
@@ -37,7 +36,6 @@ from Vintageous.vi.settings import set_global
 from Vintageous.vi.settings import set_local
 from Vintageous.vi.sublime import has_dirty_buffers
 from Vintageous.vi.utils import first_sel
-from Vintageous.vi.utils import IrreversibleTextCommand
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import R
 from Vintageous.vi.utils import resolve_insertion_point_at_b
@@ -95,31 +93,9 @@ def get_view_info(v):
     return [leaf, path]
 
 
-def get_region_by_range(view, line_range=None, as_lines=False):
-    # If GLOBAL_RANGES exists, the ExGlobal command has been run right before
-    # the current command, and we know we must process these lines.
-    global GLOBAL_RANGES
-    if GLOBAL_RANGES:
-        rv = GLOBAL_RANGES[:]
-        GLOBAL_RANGES = []
-        return rv
-
-    if line_range:
-        vim_range = ex_range.VimRange(view, line_range)
-        if as_lines:
-            return vim_range.lines()
-        else:
-            return vim_range.blocks()
-
-
 class ExTextCommandBase(sublime_plugin.TextCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-    def line_range_to_text(self, line_range):
-        line_block = get_region_by_range(self.view, line_range=line_range)
-        line_block = [self.view.substr(r) for r in line_block]
-        return '\n'.join(line_block) + '\n'
 
     def serialize_sel(self):
         sels = [(r.a, r.b) for r in list(self.view.sel())]
@@ -146,17 +122,6 @@ class ExTextCommandBase(sublime_plugin.TextCommand):
         self.run_ex_command(edit, *args, **kwargs)
         self.set_sel()
         self.set_mode()
-
-
-class ExAddressableCommandMixin(object):
-    def get_address(self, address):
-        # FIXME: We must fix the parser.
-        if address == '0':
-            return 0
-        address_parser = parsers.cmd_line.AddressParser(address)
-        parsed_address = address_parser.parse()
-        address = ex_range.calculate_address(self.view, parsed_address)
-        return address
 
 
 class ExGoto(ViWindowCommandBase):
@@ -230,7 +195,7 @@ class ExShellOut(sublime_plugin.TextCommand):
             ex_error.handle_not_implemented()
 
 
-class ExShell(IrreversibleTextCommand):
+class ExShell(ViWindowCommandBase):
     """Ex command(s): :shell
 
     Opens a shell at the current view's directory. Sublime Text keeps a virtual
@@ -774,7 +739,7 @@ class ExFile(ViWindowCommandBase):
         sublime.status_message('Vintageous: %s' % msg)
 
 
-class ExMove(ExTextCommandBase, ExAddressableCommandMixin):
+class ExMove(ExTextCommandBase):
     '''
     Command: :[range]m[ove] {address}
 
@@ -818,7 +783,7 @@ class ExMove(ExTextCommandBase, ExAddressableCommandMixin):
         self.set_next_sel([[destination.a, destination.a]])
 
 
-class ExCopy(ExTextCommandBase, ExAddressableCommandMixin):
+class ExCopy(ExTextCommandBase):
     '''
     Command: :[range]co[py] {address}
 

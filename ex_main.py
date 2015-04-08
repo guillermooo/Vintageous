@@ -10,11 +10,10 @@ from Vintageous.ex.completions import parse_for_setting
 from Vintageous.ex.completions import wants_fs_completions
 from Vintageous.ex.completions import wants_setting_completions
 from Vintageous.ex.ex_command_parser import EX_COMMANDS
-from Vintageous.ex.ex_command_parser import parse_command
-from Vintageous.ex.parsers.new.scanner_command_goto import TokenCommandGoto
 from Vintageous.ex.ex_error import display_error2
 from Vintageous.ex.ex_error import VimError
 from Vintageous.ex.parsers.new.parser import parse_ex_command
+from Vintageous.ex.parsers.new.scanner_command_goto import TokenCommandGoto
 from Vintageous.state import State
 from Vintageous.vi.settings import iter_settings
 from Vintageous.vi.sublime import show_ipanel

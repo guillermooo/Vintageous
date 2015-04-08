@@ -104,6 +104,6 @@ patterns = {
     r'y(?:ank)?': scan_command_yank,
     r'sh(?:ell)?': scan_command_shell,
     r'!(?=.+)': scan_command_shell_out,
-    r'r(?:ead)?': scan_command_read_shell_out,
+    r'r(?:ead)(?!eg)?': scan_command_read_shell_out,
     r'r(?!eg)(?:ead)?': scan_command_read_shell_out,
 }
