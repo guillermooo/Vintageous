@@ -19,7 +19,7 @@ from Vintageous.ex.ex_error import ERR_OTHER_BUFFER_HAS_CHANGES
 from Vintageous.ex.ex_error import ERR_READONLY_FILE
 from Vintageous.ex.ex_error import handle_not_implemented
 from Vintageous.ex.ex_error import VimError
-from Vintageous.ex.parsers.new.parser import parse_ex_command
+from Vintageous.ex.parser.parser import parse_ex_command
 from Vintageous.ex.plat.windows import get_oem_cp
 from Vintageous.ex.plat.windows import get_startup_info
 from Vintageous.state import State

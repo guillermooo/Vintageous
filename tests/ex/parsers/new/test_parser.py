@@ -1,17 +1,17 @@
 import unittest
 
-from Vintageous.ex.parsers.new.parser import parse_ex_command
-from Vintageous.ex.parsers.new.scanner import Scanner
-from Vintageous.ex.parsers.new.tokens import TokenDot
-from Vintageous.ex.parsers.new.tokens import TokenSearchForward
-from Vintageous.ex.parsers.new.tokens import TokenSearchBackward
-from Vintageous.ex.parsers.new.tokens import TokenDollar
-from Vintageous.ex.parsers.new.tokens import TokenDigits
-from Vintageous.ex.parsers.new.tokens import TokenPercent
-from Vintageous.ex.parsers.new.tokens import TokenMark
-from Vintageous.ex.parsers.new.tokens import TokenOffset
-from Vintageous.ex.parsers.new.tokens import TokenComma
-from Vintageous.ex.parsers.new.tokens import TokenSemicolon
+from Vintageous.ex.parser.parser import parse_ex_command
+from Vintageous.ex.parser.scanner import Scanner
+from Vintageous.ex.parser.tokens import TokenDot
+from Vintageous.ex.parser.tokens import TokenSearchForward
+from Vintageous.ex.parser.tokens import TokenSearchBackward
+from Vintageous.ex.parser.tokens import TokenDollar
+from Vintageous.ex.parser.tokens import TokenDigits
+from Vintageous.ex.parser.tokens import TokenPercent
+from Vintageous.ex.parser.tokens import TokenMark
+from Vintageous.ex.parser.tokens import TokenOffset
+from Vintageous.ex.parser.tokens import TokenComma
+from Vintageous.ex.parser.tokens import TokenSemicolon
 
 
 class parse_line_ref_Tests(unittest.TestCase):

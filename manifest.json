@@ -20,8 +20,7 @@
 			["./tests/commands/*.py", []],
 			["./vi/*.py", []],
 			["./ex/*.py", []],
-			["./ex/parsers/*.py", []],
-			["./ex/parsers/new/*.py", []],
+			["./ex/parser/*.py", []],
 			["./plugins/*.py", []],
 			["./ex/plat/*.py", []],
 
