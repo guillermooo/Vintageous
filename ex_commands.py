@@ -7,7 +7,6 @@ import stat
 import subprocess
 
 from Vintageous.ex import ex_error
-from Vintageous.ex import ex_range
 from Vintageous.ex import shell
 from Vintageous.ex.ex_error import DISPLAY_ALL
 from Vintageous.ex.ex_error import display_error2
