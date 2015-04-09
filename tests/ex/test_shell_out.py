@@ -7,7 +7,6 @@ from Vintageous.tests import get_sel
 from Vintageous.tests import ViewTest
 
 import Vintageous.ex.plat as plat
-from Vintageous.ex.ex_command_parser import parse_command
 
 class Test_ex_shell_out_no_input(ViewTest):
     @unittest.skipIf(os.name == 'nt', 'not supported on Windows')
