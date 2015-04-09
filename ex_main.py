@@ -4,12 +4,12 @@ import sublime_plugin
 import os
 
 from Vintageous.ex import ex_error
+from Vintageous.ex import command_names
 from Vintageous.ex.completions import iter_paths
 from Vintageous.ex.completions import parse
 from Vintageous.ex.completions import parse_for_setting
 from Vintageous.ex.completions import wants_fs_completions
 from Vintageous.ex.completions import wants_setting_completions
-from Vintageous.ex.ex_command_parser import EX_COMMANDS
 from Vintageous.ex.ex_error import display_error2
 from Vintageous.ex.ex_error import VimError
 from Vintageous.ex.parsers.new.parser import parse_ex_command
@@ -28,7 +28,7 @@ def plugin_loaded():
     state.settings.vi['_cmdline_cd'] = d
 
 
-COMPLETIONS = sorted([x[0] for x in EX_COMMANDS.keys()])
+COMPLETIONS = sorted([x[0] for x in command_names])
 
 EX_HISTORY_MAX_LENGTH = 20
 EX_HISTORY = {

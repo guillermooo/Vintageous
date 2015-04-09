@@ -3,8 +3,10 @@ from .state import EOF
 from .tokens import TokenEof
 from .tokens_base import TOKEN_COMMAND_MOVE
 from .tokens_base import TokenOfCommand
+from Vintageous.ex import register_ex_command
 
 
+@register_ex_command('move', 'm')
 class TokenMove(TokenOfCommand):
     def __init__(self, params, *args, **kwargs):
         super().__init__(params,

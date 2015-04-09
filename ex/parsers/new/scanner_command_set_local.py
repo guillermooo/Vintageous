@@ -2,8 +2,10 @@ from .state import EOF
 from .tokens import TokenEof
 from .tokens_base import TOKEN_COMMAND_SET_LOCAL
 from .tokens_base import TokenOfCommand
+from Vintageous.ex import register_ex_command
 
 
+@register_ex_command('setlocal', 'setlocal')
 class TokenSet(TokenOfCommand):
     def __init__(self, params, *args, **kwargs):
         super().__init__(params,

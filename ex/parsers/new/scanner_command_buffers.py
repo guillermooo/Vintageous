@@ -5,8 +5,12 @@ from .tokens_base import TokenOfCommand
 
 from Vintageous.ex.ex_error import ERR_INVALID_ARGUMENT
 from Vintageous.ex.ex_error import VimError
+from Vintageous.ex import register_ex_command
 
 
+@register_ex_command('buffers', 'buffers')
+@register_ex_command('files', 'files')
+@register_ex_command('ls', 'ls')
 class TokenCommandBuffers(TokenOfCommand):
     def __init__(self, *args, **kwargs):
         super().__init__({},

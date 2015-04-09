@@ -2,8 +2,10 @@ from .state import EOF
 from .tokens import TokenEof
 from .tokens_base import TOKEN_COMMAND_CD_COMMAND
 from .tokens_base import TokenOfCommand
+from Vintageous.ex import register_ex_command
 
 
+@register_ex_command('cd', 'cd')
 class TokenCdCommand(TokenOfCommand):
     def __init__(self, params, *args, **kwargs):
         super().__init__(params,

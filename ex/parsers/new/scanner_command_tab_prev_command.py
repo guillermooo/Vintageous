@@ -2,8 +2,10 @@ from .state import EOF
 from .tokens import TokenEof
 from .tokens_base import TOKEN_COMMAND_TAB_PREV_COMMAND
 from .tokens_base import TokenOfCommand
+from Vintageous.ex import register_ex_command
 
 
+@register_ex_command('tabprev', 'tabp')
 class TokenTabPrevCommand(TokenOfCommand):
     def __init__(self, *args, **kwargs):
         super().__init__([],

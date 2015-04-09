@@ -5,8 +5,10 @@ from .tokens_base import TokenOfCommand
 
 from Vintageous.ex.ex_error import ERR_TRAILING_CHARS
 from Vintageous.ex.ex_error import VimError
+from Vintageous.ex import register_ex_command
 
 
+@register_ex_command('file', 'f')
 class TokenCommandFile(TokenOfCommand):
     def __init__(self, *args, **kwargs):
         super().__init__({},

@@ -5,6 +5,7 @@ from .state import EOF
 from .tokens import TokenEof
 from .tokens_base import TOKEN_COMMAND_READ_SHELL_OUT
 from .tokens_base import TokenOfCommand
+from Vintageous.ex import register_ex_command
 
 
 plus_plus_translations = {
@@ -15,6 +16,7 @@ plus_plus_translations = {
 }
 
 
+@register_ex_command('read', 'r')
 class TokenReadShellOut(TokenOfCommand):
     def __init__(self, params, *args, **kwargs):
         super().__init__(params,
