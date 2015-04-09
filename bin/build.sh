@@ -5,6 +5,9 @@ python $DIR/builder.py
 if [ "$(uname)" == "Linux" ]
     then
     cp -f $DIR/../dist/Vintageous.sublime-package ~/.config/sublime-text-3/Installed\ Packages
+elif [ "$(uname)" == "Darwin" ]
+	then
+    cp -f $DIR/../dist/Vintageous.sublime-package ~/Library/Application\ Support/Sublime\ Text\ 3/Installed\ Packages
 else
-    echo "Vintageous: no build script for $(uname) :_("
+	echo "Vintageous: no build script for $(unamej) :_("
 fi
