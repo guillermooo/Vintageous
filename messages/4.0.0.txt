@@ -1,0 +1,48 @@
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+      __     ___       _                                     _  _   
+      \ \   / (_)_ __ | |_ __ _  __ _  ___  ___  _   _ ___  | || |  
+       \ \ / /| | '_ \| __/ _` |/ _` |/ _ \/ _ \| | | / __| | || |_ 
+        \ V / | | | | | || (_| | (_| |  __/ (_) | |_| \__ \ |__   _|
+         \_/  |_|_| |_|\__\__,_|\__, |\___|\___/ \__,_|___/    |_|  
+                                |___/                               
+
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+                          
+Welcome to the next major version of Vintageous!
+
+Vintageous 4 builds on a more solid foundation for ex mode. The ex mode parser
+has been completely reworked (for the curious, it loosely imitates the lexer
+in the go template package and also borrows ideas from the string_scanner
+Dart package).
+
+No new features are included in this version. New bugs and regressions are
+expected due to an incomplete test coverage.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Keep Vintageous alive ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you use Vintageous to get payed work done, you should donate:
+
+https://github.com/guillermooo/Vintageous/blob/master/README.md
+
+Without your support, Vintageous may die rather sooner than later.
+
+V4 and beyond
+=============
+
+The 4.x timeline is expected to focus on testing, bug-fixing and general
+polish. No new features will be added, except while fixing incomplete
+functionality of pre-existing features.
+
+Vintageous is mainly tested on Windows, so please report any bugs
+you encounter and head over to the issue tracker to vote on the issues you
+want fixed first:
+
+https://github.com/guillermooo/Vintageous/issues
+
+Thank you for using Vintageous!
+Guillermo

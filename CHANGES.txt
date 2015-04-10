@@ -1,3 +1,103 @@
+4.0.0 - 10-04-2015
+
+	- Merge pull request #872 from guillermooo-forks/refactor-line-range-node
+	- rename decorator
+	- fixes
+	- improve build script for Mac
+	- fix script
+	- remove old files; reorg file structure
+	- remove old code
+	- remove old code
+	- provide completions via the new parser
+	- remove old parser
+	- remove old parser
+	- fix Linux tests
+	- fix tests
+	- fix test
+	- implement :r command
+	- implement :r
+	- implement :! and :shell
+	- reimplement :yank using the new parser
+	- reimplement :set and :setlocal using the new parser
+	- implement :unvsplit using new parser
+	- remove unused command
+	- implement :pwd and :unabbreviate using the new parser
+	- refactor
+	- add script to gather metrics
+	- add :wa and :wq commands, implemented using the new parser
+	- refactor
+	- implement :unmap using the new parser
+	- refactor
+	- implement tab-management command using the new parser
+	- refactor
+	- implement several mapping commands using the new parser
+	- fix tests
+	- implement :new command using new parser
+	- refactor
+	- implement :move using new parser
+	- implement :map using the new parser
+	- implement :let command
+	- edit comment
+	- implement :global and :print commands
+	- wrap text in test ouput
+	- add :file command
+	- implement :exit, :xit
+	- implement :edit
+	- implement :&& command
+	- implement :delete
+	- implement :cquit
+	- add stubs
+	- implement :copy using new parser; refactor and fix parser
+	- add tokens; implement :cdd using the new parser
+	- implement :browse and :cd using the new parser
+	- implement :vsplit using new parser
+	- remove dead code
+	- edit comments
+	- tweak regex
+	- reimplement :abbreviate using new parser
+	- validate command line for common errors
+	- implement :ls; refactor
+	- fix test
+	- implement ':' command using the new parser
+	- fix error when file has been deleted
+	- supress output
+	- assorted fixes
+	- refactor
+	- sort imports
+	- refactor
+	- improve error handling
+	- refactor
+	- minor changes
+	- add properties
+	- whitespace
+	- bring :write functionality to parity with old implementation
+	- implement more features of :write
+	- append whole buffer is no range info available
+	- share more code between types of Vi commands
+	- start implementing :write command using the new parser
+	- start implementing :write command using new parser
+	- implement ExListRegisters using the new parser
+	- refactor ExOnly command
+	- implement :only command using new parser
+	- don't serialize the parsed command line for now
+	- refactor ExSubstitute command
+	- reimplement :substitute using the new ex command parser
+	- fix typo
+	- edit error message
+	- enable new parser for :substitute command
+	- refactor tokens; add json serialization
+	- don't treat TokenOffset nodes differently
+	- add line
+	- change name
+	- scan negative offsets
+	- improve resolving of line range
+	- improve resolution of line ranges
+	- improve parsing of line ranges
+	- add tests
+	- improve line range resolution
+	- add tests for nodes
+	- refactor RangeNode
+
 3.8.10 - 08-04-2015
 
 	- fix #890 - x should delete with multiple carets
