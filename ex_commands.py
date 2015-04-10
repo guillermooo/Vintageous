@@ -13,6 +13,7 @@ from Vintageous.ex.ex_error import display_error2
 from Vintageous.ex.ex_error import display_message
 from Vintageous.ex.ex_error import DISPLAY_STATUS
 from Vintageous.ex.ex_error import ERR_CANT_WRITE_FILE
+from Vintageous.ex.ex_error import ERR_EMPTY_BUFFER
 from Vintageous.ex.ex_error import ERR_FILE_EXISTS
 from Vintageous.ex.ex_error import ERR_NO_FILE_NAME
 from Vintageous.ex.ex_error import ERR_OTHER_BUFFER_HAS_CHANGES
@@ -1066,6 +1067,10 @@ class ExPrint(ViWindowCommandBase):
     def run(self, command_line='', global_lines=None):
         assert command_line, 'expected non-empty command line'
 
+        if self._view.size() == 0:
+            display_error2(VimError(ERR_EMPTY_BUFFER))
+            return
+
         parsed = parse_command_line(command_line)
 
         r = parsed.line_range.resolve(self._view)
@@ -1087,12 +1092,13 @@ class ExPrint(ViWindowCommandBase):
             display.run_command('append', {'characters': characters})
 
     def get_lines(self, parsed_range, global_lines):
+        # FIXME: this is broken.
         # If :global called us, ignore the parsed range.
         if global_lines:
             return [(self._view.substr(R(a, b)), row_at(self._view, a)) for (a, b) in global_lines]
 
         to_display = []
-        for line in self._view.full_lines(parsed_range):
+        for line in self._view.full_line(parsed_range):
             text = self._view.substr(line)
             to_display.append((text, row_at(self._view, line.begin())))
         return to_display

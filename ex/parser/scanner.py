@@ -2,6 +2,9 @@
 Tokenization for the Vim command line.
 '''
 
+from Vintageous.ex.ex_error import ERR_UNKNOWN_COMMAND
+from Vintageous.ex.ex_error import VimError
+
 from . import subscanners
 from .state import EOF
 from .state import ScannerState
@@ -160,5 +163,5 @@ def scan_command(state):
             state.ignore()
             return subscanner(state)
 
-    state.expect(EOF)
+    state.expect(EOF, lambda: VimError(ERR_UNKNOWN_COMMAND))
     return None, [TokenEof()]

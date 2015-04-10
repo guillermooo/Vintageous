@@ -72,7 +72,7 @@ patterns[r'f(?:ile)?'] = scan_command_file
 patterns[r'g(?:lobal)?(?=[^ ])'] = scan_command_global
 patterns[r'(?:ls|files|buffers)!?'] = scan_command_buffers
 patterns[r'vs(?:plit)?'] = scan_command_vsplit
-patterns[r'x(?:it)?'] = scan_command_exit
+patterns[r'x(?:it)?$'] = scan_command_exit
 patterns[r'^cd(?=[^d]|$)'] = scan_command_cd_command
 patterns[r'^cdd'] = scan_command_cdd_command
 patterns[r'e(?:dit)?(?= |$)?'] = scan_command_edit
@@ -85,7 +85,7 @@ patterns[r'nun(?:map)?'] = scan_command_nunmap
 patterns[r'om(?:ap)?'] = scan_command_omap
 patterns[r'on(?:ly)?(?=!$|$)'] = scan_command_only
 patterns[r'ounm(?:ap)?'] = scan_command_ounmap
-patterns[r'p(?:rint)?'] = scan_command_print
+patterns[r'p(?:rint)?$'] = scan_command_print
 patterns[r'pwd?$'] = scan_command_print_working_dir
 patterns[r'q(?!a)(?:uit)?'] = scan_command_quit_command
 patterns[r'qa(?:ll)?'] = scan_command_quit_all_command
