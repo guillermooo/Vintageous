@@ -55,6 +55,7 @@ from .scanner_command_yank import scan_command_yank
 patterns = OrderedDict()
 
 # TODO: compile regexes. ??
+# IMPORTANT: Order matters.
 patterns[r'!(?=.+)'] = scan_command_shell_out
 patterns[r'&&?'] = scan_command_double_ampersand
 patterns[r'ab(?:breviate)?'] = scan_command_abbreviate
@@ -87,7 +88,6 @@ patterns[r'qa(?:ll)?'] = scan_command_quit_all_command
 patterns[r'r(?!eg)(?:ead)?'] = scan_command_read_shell_out
 patterns[r'reg(?:isters)?(?=\s+[a-z0-9]+$|$)'] = scan_command_register
 patterns[r's(?:ubstitute)?(?=[%&:/=]|$)'] = scan_command_substitute
-# TODO: implement other set variants.
 patterns[r'se(?:t)?(?=$|\s)'] = scan_command_set
 patterns[r'setl(?:ocal)?'] = scan_command_set_local
 patterns[r'sh(?:ell)?'] = scan_command_shell
