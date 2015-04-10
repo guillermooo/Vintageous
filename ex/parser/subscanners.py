@@ -1,3 +1,7 @@
+'''
+Centralizes all subscanners for ex commands.
+'''
+
 from collections import OrderedDict
 
 from .scanner_command_abbreviate import scan_command_abbreviate
