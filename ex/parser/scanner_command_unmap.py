@@ -2,10 +2,10 @@ from .state import EOF
 from .tokens import TokenEof
 from .tokens_base import TOKEN_COMMAND_UNMAP
 from .tokens_base import TokenOfCommand
-from Vintageous.ex import register_ex_command
+from Vintageous import ex
 
 
-@register_ex_command('unmap', 'unm')
+@ex.command('unmap', 'unm')
 class TokenCommandUnmap(TokenOfCommand):
     def __init__(self, params, *args, **kwargs):
         super().__init__(params,

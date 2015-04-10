@@ -2,10 +2,10 @@ from .state import EOF
 from .tokens import TokenEof
 from .tokens_base import TOKEN_COMMAND_MAP
 from .tokens_base import TokenOfCommand
-from Vintageous.ex import register_ex_command
+from Vintageous import ex
 
 
-@register_ex_command('map', 'map')
+@ex.command('map', 'map')
 class TokenCommandMap(TokenOfCommand):
     def __init__(self, params, *args, **kwargs):
         super().__init__(params,

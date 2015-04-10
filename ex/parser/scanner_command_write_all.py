@@ -2,10 +2,10 @@ from .state import EOF
 from .tokens import TokenEof
 from .tokens_base import TOKEN_COMMAND_WRITE_ALL
 from .tokens_base import TokenOfCommand
-from Vintageous.ex import register_ex_command
+from Vintageous import ex
 
 
-@register_ex_command('wall', 'wa')
+@ex.command('wall', 'wa')
 class TokenWriteAllCommand(TokenOfCommand):
     def __init__(self, *args, **kwargs):
         super().__init__({},

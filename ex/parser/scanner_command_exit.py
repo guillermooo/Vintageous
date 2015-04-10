@@ -2,11 +2,11 @@ from .state import EOF
 from .tokens import TokenEof
 from .tokens_base import TOKEN_COMMAND_EXIT
 from .tokens_base import TokenOfCommand
-from Vintageous.ex import register_ex_command
+from Vintageous import ex
 
 
-@register_ex_command('exit', 'exi')
-@register_ex_command('xit', 'x')
+@ex.command('exit', 'exi')
+@ex.command('xit', 'x')
 class TokenCommandExit(TokenOfCommand):
 	def __init__(self, params, *args, **kwargs):
 		super().__init__(params,

@@ -2,10 +2,10 @@ from .state import EOF
 from .tokens import TokenEof
 from .tokens_base import TOKEN_COMMAND_SHELL
 from .tokens_base import TokenOfCommand
-from Vintageous.ex import register_ex_command
+from Vintageous import ex
 
 
-@register_ex_command('shell', 'shell')
+@ex.command('shell', 'shell')
 class TokenShell(TokenOfCommand):
     def __init__(self, *args, **kwargs):
         super().__init__({},

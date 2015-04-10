@@ -1,9 +1,26 @@
+'''
+Misc stuff needed for ex commands.
+'''
 
+# Used to provide completions on the ex command line.
 command_names = []
 
 
-def register_ex_command(name, abbrev=None):
+def command(name, abbrev):
+    """
+    Registers the name of an ex command with `command_names`.
+
+    Meant to be imported like this:
+
+        from Vintageous import ex
+
+        ...
+
+        @ex.command('foo', 'f')
+        class ExFooCommand(...):
+            ...
+    """
     command_names.append((name, abbrev))
-    def inner_decorator(f):
+    def inner(f):
         return f
-    return inner_decorator
+    return inner

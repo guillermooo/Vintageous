@@ -2,10 +2,10 @@ from .state import EOF
 from .tokens import TokenEof
 from .tokens_base import TOKEN_COMMAND_PRINT_WORKING_DIR
 from .tokens_base import TokenOfCommand
-from Vintageous.ex import register_ex_command
+from Vintageous import ex
 
 
-@register_ex_command('pwd', 'pwd')
+@ex.command('pwd', 'pwd')
 class TokenPrintWorkingDir(TokenOfCommand):
 	def __init__(self, *args, **kwargs):
 		super().__init__({},

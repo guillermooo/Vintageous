@@ -2,11 +2,11 @@ from .state import EOF
 from .tokens import TokenEof
 from .tokens_base import TOKEN_COMMAND_TAB_FIRST_COMMAND
 from .tokens_base import TokenOfCommand
-from Vintageous.ex import register_ex_command
+from Vintageous import ex
 
 
-@register_ex_command('tabfirst', 'tabfir')
-@register_ex_command('tabrewind', 'tabr')
+@ex.command('tabfirst', 'tabfir')
+@ex.command('tabrewind', 'tabr')
 class TokenTabFirstCommand(TokenOfCommand):
     def __init__(self, *args, **kwargs):
         super().__init__([],

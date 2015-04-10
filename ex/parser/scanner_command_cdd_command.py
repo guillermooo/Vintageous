@@ -2,10 +2,10 @@ from .state import EOF
 from .tokens import TokenEof
 from .tokens_base import TOKEN_COMMAND_CDD_COMMAND
 from .tokens_base import TokenOfCommand
-from Vintageous.ex import register_ex_command
+from Vintageous import ex
 
 
-@register_ex_command('cdd', 'cdd')
+@ex.command('cdd', 'cdd')
 class TokenCddCommand(TokenOfCommand):
 	def __init__(self, *args, **kwargs):
 		super().__init__({},

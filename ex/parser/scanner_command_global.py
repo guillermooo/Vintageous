@@ -3,10 +3,10 @@ from .tokens import TokenEof
 from .tokens_base import TOKEN_COMMAND_GLOBAL
 from .tokens_base import TokenOfCommand
 from .parser import parse_ex_command
-from Vintageous.ex import register_ex_command
+from Vintageous import ex
 
 
-@register_ex_command('global', 'g')
+@ex.command('global', 'g')
 class TokenCommandGlobal(TokenOfCommand):
     def __init__(self, params, *args, **kwargs):
         super().__init__(params,

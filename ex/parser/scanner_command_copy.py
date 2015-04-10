@@ -3,10 +3,10 @@ from .tokens import TokenEof
 from .tokens_base import TOKEN_COMMAND_COPY
 from .tokens_base import TokenOfCommand
 from .parser import parse_ex_command
-from Vintageous.ex import register_ex_command
+from Vintageous import ex
 
 
-@register_ex_command('copy', 'co')
+@ex.command('copy', 'co')
 class TokenCopy(TokenOfCommand):
     def __init__(self, params, *args, **kwargs):
         super().__init__(params,
