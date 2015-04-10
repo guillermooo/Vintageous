@@ -19,7 +19,7 @@ from Vintageous.ex.ex_error import ERR_OTHER_BUFFER_HAS_CHANGES
 from Vintageous.ex.ex_error import ERR_READONLY_FILE
 from Vintageous.ex.ex_error import handle_not_implemented
 from Vintageous.ex.ex_error import VimError
-from Vintageous.ex.parser.parser import parse_ex_command
+from Vintageous.ex.parser.parser import parse_command_line
 from Vintageous.ex.plat.windows import get_oem_cp
 from Vintageous.ex.plat.windows import get_startup_info
 from Vintageous.state import State
@@ -129,7 +129,7 @@ class ExGoto(ViWindowCommandBase):
             # No-op: user issues ':'.
             return
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         r = parsed.line_range.resolve(self._view)
         line_nr = row_at(self._view, r.a) + 1
@@ -158,7 +158,7 @@ class ExShellOut(sublime_plugin.TextCommand):
     def run(self, edit, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
         shell_cmd = parsed.command.command
 
         if shell_cmd == '!':
@@ -253,7 +253,7 @@ class ExReadShellOut(sublime_plugin.TextCommand):
     def run(self, edit, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         r = parsed.line_range.resolve(self.view)
 
@@ -330,7 +330,7 @@ class ExMap(ViWindowCommandBase):
     # def run(self, edit, mode=None, count=None, cmd=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         if not (parsed.command.keys and parsed.command.command):
             handle_not_implemented('Showing mappings now implemented')
@@ -351,7 +351,7 @@ class ExUnmap(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        unmap = parse_ex_command(command_line)
+        unmap = parse_command_line(command_line)
 
         mappings = Mappings(self.state)
         try:
@@ -370,7 +370,7 @@ class ExNmap(ViWindowCommandBase):
     """
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
-        nmap_command = parse_ex_command(command_line)
+        nmap_command = parse_command_line(command_line)
         keys, command = (nmap_command.command.keys,
                 nmap_command.command.command)
         mappings = Mappings(self.state)
@@ -385,7 +385,7 @@ class ExNunmap(ViWindowCommandBase):
     """
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
-        nunmap_command = parse_ex_command(command_line)
+        nunmap_command = parse_command_line(command_line)
         mappings = Mappings(self.state)
         try:
             mappings.remove(modes.NORMAL, nunmap_command.command.keys)
@@ -401,7 +401,7 @@ class ExOmap(ViWindowCommandBase):
     """
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
-        omap_command = parse_ex_command(command_line)
+        omap_command = parse_command_line(command_line)
         keys, command = (omap_command.command.keys,
                 omap_command.command.command)
         mappings = Mappings(self.state)
@@ -416,7 +416,7 @@ class ExOunmap(ViWindowCommandBase):
     """
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
-        ounmap_command = parse_ex_command(command_line)
+        ounmap_command = parse_command_line(command_line)
         mappings = Mappings(self.state)
         try:
             mappings.remove(modes.OPERATOR_PENDING, ounmap_command.command.keys)
@@ -432,7 +432,7 @@ class ExVmap(ViWindowCommandBase):
     """
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
-        vmap_command = parse_ex_command(command_line)
+        vmap_command = parse_command_line(command_line)
         keys, command = (vmap_command.command.keys,
                 vmap_command.command.command)
         mappings = Mappings(self.state)
@@ -449,7 +449,7 @@ class ExVunmap(ViWindowCommandBase):
     """
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
-        vunmap_command = parse_ex_command(command_line)
+        vunmap_command = parse_command_line(command_line)
         mappings = Mappings(self.state)
         try:
             mappings.remove(modes.VISUAL, vunmap_command.command.keys)
@@ -471,7 +471,7 @@ class ExAbbreviate(ViWindowCommandBase):
             self.show_abbreviations()
             return
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         if not (parsed.command.short and parsed.command.full):
             handle_not_implemented(':abbreviate not fully implemented')
@@ -498,7 +498,7 @@ class ExUnabbreviate(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         if not parsed.command.short:
             return
@@ -549,7 +549,7 @@ class ExWriteFile(ViWindowCommandBase):
         if not command_line:
             raise ValueError('empty command line; that seems to be an error')
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         if parsed.command.options:
             handle_not_implemented("++opt isn't implemented for :write")
@@ -685,7 +685,7 @@ class ExWriteAll(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
         forced = parsed.command.forced
 
         for v in (v for v in self.window.views() if v.file_name()):
@@ -747,7 +747,7 @@ class ExMove(ExTextCommandBase):
     def run_ex_command(self, edit, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        move_command = parse_ex_command(command_line)
+        move_command = parse_command_line(command_line)
 
         if move_command.command.address is None:
             ex_error.display_error2(ex_error.ERR_INVALID_ADDRESS)
@@ -795,7 +795,7 @@ class ExCopy(ExTextCommandBase):
     def run_ex_command(self, edit, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         unresolved = parsed.command.calculate_address()
 
@@ -838,7 +838,7 @@ class ExOnly(ViWindowCommandBase):
         if not command_line:
             raise ValueError('empty command line; that seems wrong')
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         if not parsed.command.forced and has_dirty_buffers(self.window):
                 display_error2(VimError(ERR_OTHER_BUFFER_HAS_CHANGES))
@@ -866,7 +866,7 @@ class ExDoubleAmpersand(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         new_command_line = '{0}substitute///{1} {2}'.format(
                 str(parsed.line_range),
@@ -899,7 +899,7 @@ class ExSubstitute(sublime_plugin.TextCommand):
         # We parse the command line again because the alternative is to
         # serialize the parsed command line before calling this command.
         # Parsing twice seems simpler.
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
         pattern = parsed.command.pattern
         replacement = parsed.command.replacement
         count = parsed.command.count
@@ -970,7 +970,7 @@ class ExDelete(ExTextCommandBase):
     def run_ex_command(self, edit, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         r = parsed.line_range.resolve(self.view)
 
@@ -1016,7 +1016,7 @@ class ExGlobal(ViWindowCommandBase):
 
         assert command_line, 'expected non-empty command_line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         global_range = None
         if parsed.line_range.is_empty:
@@ -1066,7 +1066,7 @@ class ExPrint(ViWindowCommandBase):
     def run(self, command_line='', global_lines=None):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         r = parsed.line_range.resolve(self._view)
 
@@ -1107,7 +1107,7 @@ class ExQuitCommand(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         view = self._view
         if parsed.command.forced:
@@ -1135,7 +1135,7 @@ class ExQuitAllCommand(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         if parsed.command.forced:
             for v in self.window.views():
@@ -1158,7 +1158,7 @@ class ExWriteAndQuitCommand(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         # TODO: implement this
         if parsed.command.forced:
@@ -1203,7 +1203,7 @@ class ExEdit(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         if parsed.command.file_name:
             file_name = os.path.expanduser(
@@ -1298,7 +1298,7 @@ class ExListRegisters(ViWindowCommandBase):
             lines_display = '... [+{0}]'.format(line_count - 1)
             return lines_display if line_count > 1 else ''
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         # TODO: implement arguments.
 
@@ -1338,7 +1338,7 @@ class ExYank(sublime_plugin.TextCommand):
     def run(self, edit, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         register = parsed.command.register
         line_range = parsed.line_range.resolve(self.view)
@@ -1399,7 +1399,7 @@ class ExTabnextCommand(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         self.window.run_command("tab_control", {"command": "next"}, )
 
@@ -1413,7 +1413,7 @@ class ExTabprevCommand(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         self.window.run_command("tab_control", {"command": "prev"}, )
 
@@ -1427,7 +1427,7 @@ class ExTablastCommand(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         self.window.run_command("tab_control", {"command": "last"}, )
 
@@ -1441,7 +1441,7 @@ class ExTabfirstCommand(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         self.window.run_command("tab_control", {"command": "first"}, )
 
@@ -1455,7 +1455,7 @@ class ExTabonlyCommand(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         self.window.run_command("tab_control", {"command": "only", "forced": parsed.command.forced})
 
@@ -1477,7 +1477,7 @@ class ExCdCommand(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         if self._view.is_dirty() and not parsed.command.forced:
             display_error2(ex_error.ERR_UNSAVED_CHANGES)
@@ -1524,7 +1524,7 @@ class ExCddCommand(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         if self._view.is_dirty() and not parsed.command.forced:
             display_error2(VimError(ex_error.ERR_UNSAVED_CHANGES))
@@ -1555,7 +1555,7 @@ class ExVsplit(ViWindowCommandBase):
     }
 
     def run(self, command_line=''):
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         file_name = parsed.command.params['file_name']
 
@@ -1611,7 +1611,7 @@ class ExSetLocal(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
         option = parsed.command.option
         value = parsed.command.value
 
@@ -1630,7 +1630,7 @@ class ExSet(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
 
         option = parsed.command.option
         value = parsed.command.value
@@ -1656,6 +1656,6 @@ class ExLet(ViWindowCommandBase):
     '''
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
-        parsed = parse_ex_command(command_line)
+        parsed = parse_command_line(command_line)
         self.state.variables.set(parsed.command.variable_name,
                 parsed.command.variable_value)

@@ -2,7 +2,7 @@ from .state import EOF
 from .tokens import TokenEof
 from .tokens_base import TOKEN_COMMAND_COPY
 from .tokens_base import TokenOfCommand
-from .parser import parse_ex_command
+from .parser import parse_command_line
 from Vintageous import ex
 
 
@@ -21,7 +21,7 @@ class TokenCopy(TokenOfCommand):
 
     def calculate_address(self):
         # TODO: must calc only the first line ref?
-        calculated = parse_ex_command(self.address)
+        calculated = parse_command_line(self.address)
         if calculated is None:
             return None
 

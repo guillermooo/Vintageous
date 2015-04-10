@@ -12,7 +12,7 @@ from Vintageous.ex.completions import wants_fs_completions
 from Vintageous.ex.completions import wants_setting_completions
 from Vintageous.ex.ex_error import display_error2
 from Vintageous.ex.ex_error import VimError
-from Vintageous.ex.parser.parser import parse_ex_command
+from Vintageous.ex.parser.parser import parse_command_line
 from Vintageous.ex.parser.scanner_command_goto import TokenCommandGoto
 from Vintageous.state import State
 from Vintageous.vi.settings import iter_settings
@@ -105,7 +105,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
 
         try:
             # Use new parser for some commands.
-            parsed_new = parse_ex_command(cmd_line[1:])
+            parsed_new = parse_command_line(cmd_line[1:])
 
             if not parsed_new.command:
                 parsed_new.command = TokenCommandGoto()

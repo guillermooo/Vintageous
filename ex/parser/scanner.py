@@ -1,5 +1,5 @@
 '''
-Tokenization of ex command lines.
+Tokenization for the Vim command line.
 '''
 
 from . import subscanners
@@ -76,7 +76,7 @@ def scan_range(state):
     if c in '/?':
         return scan_search(state)
 
-    if c == '+' or c == '-':
+    if c in '+-':
         return scan_offset(state)
 
     if c == '%':

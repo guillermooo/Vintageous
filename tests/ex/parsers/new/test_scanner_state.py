@@ -1,7 +1,7 @@
 import unittest
 
-from Vintageous.ex.parser.state import ScannerState
 from Vintageous.ex.parser.state import EOF
+from Vintageous.ex.parser.state import ScannerState
 from Vintageous.ex.parser.tokens import TOKEN_UNKNOWN
 
 
