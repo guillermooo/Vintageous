@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from .scanner_command_abbreviate import scan_command_abbreviate
 from .scanner_command_browse import scan_command_browse
 from .scanner_command_buffers import scan_command_buffers
@@ -50,58 +52,57 @@ from .scanner_command_write_file import scan_command_write_file
 from .scanner_command_yank import scan_command_yank
 
 
-# TODO: compile regexes.
-# TODO: Use ordered dict?
-patterns = {
-    r'!(?=.+)': scan_command_shell_out,
-    r'&&?': scan_command_double_ampersand,
-    r'ab(?:breviate)?': scan_command_abbreviate,
-    r'bro(?:wse)?': scan_command_browse,
-    r'co(?:py)?': scan_command_copy,
-    r'cq(?:uit)?': scan_command_cquit,
-    r'd(?:elete)?': scan_command_delete,
-    r'exi(?:t)?': scan_command_exit,
-    r'f(?:ile)?': scan_command_file,
-    r'g(?:lobal)?(?=[^ ])': scan_command_global,
-    r'(?:ls|files|buffers)!?': scan_command_buffers,
-    r'vs(?:plit)?': scan_command_vsplit,
-    r'x(?:it)?': scan_command_exit,
-    r'^cd(?=[^d]|$)': scan_command_cd_command,
-    r'^cdd': scan_command_cdd_command,
-    r'e(?:dit)?(?= |$)?': scan_command_edit,
-    r'let\s': scan_command_let,
-    r'm(?:ove)?(?=[^a]|$)': scan_command_move,
-    r'map': scan_command_map,
-    r'new': scan_command_new,
-    r'nm(?:ap)?': scan_command_nmap,
-    r'nun(?:map)?': scan_command_nunmap,
-    r'om(?:ap)?': scan_command_omap,
-    r'on(?:ly)?(?=!$|$)': scan_command_only,
-    r'ounm(?:ap)?': scan_command_ounmap,
-    r'p(?:rint)?': scan_command_print,
-    r'pwd?$': scan_command_print_working_dir,
-    r'q(?!a)(?:uit)?': scan_command_quit_command,
-    r'qa(?:ll)?': scan_command_quit_all_command,
-    r'r(?!eg)(?:ead)?': scan_command_read_shell_out,
-    r'reg(?:isters)?(?=\s+[a-z0-9]+$|$)': scan_command_register,
-    r's(?:ubstitute)?(?=[%&:/=]|$)': scan_command_substitute,
-    # TODO: implement other set variants.
-    r'se(?:t)?(?=$|\s)': scan_command_set,
-    r'setl(?:ocal)?': scan_command_set_local,
-    r'sh(?:ell)?': scan_command_shell,
-    r'tabfir(?:st)?': scan_command_tab_first_command,
-    r'tabl(?:ast)?': scan_command_tab_last_command,
-    r'tabn(?:ext)?': scan_command_tab_next_command,
-    r'tabo(?:nly)?': scan_command_tab_only_command,
-    r'tabp(?:revious)?': scan_command_tab_prev_command,
-    r'tabr(?:ewind)?': scan_command_tab_first_command,
-    r'una(?:bbreviate)?': scan_command_unabbreviate,
-    r'unm(?:ap)?': scan_command_unmap,
-    r'unvsplit$': scan_command_unvsplit,
-    r'vm(?:ap)?': scan_command_vmap,
-    r'vu(?:nmap)?': scan_command_vunmap,
-    r'w(?:rite)?(?=(?:!?(?:\+\+|>>| |$)))': scan_command_write,
-    r'wa(?:ll)?': scan_command_write_all,
-    r'wq(?=[^a-zA-Z]|$)?': scan_command_write_and_quit_command,
-    r'y(?:ank)?': scan_command_yank,
-}
+patterns = OrderedDict()
+
+# TODO: compile regexes. ??
+patterns[r'!(?=.+)'] = scan_command_shell_out
+patterns[r'&&?'] = scan_command_double_ampersand
+patterns[r'ab(?:breviate)?'] = scan_command_abbreviate
+patterns[r'bro(?:wse)?'] = scan_command_browse
+patterns[r'co(?:py)?'] = scan_command_copy
+patterns[r'cq(?:uit)?'] = scan_command_cquit
+patterns[r'd(?:elete)?'] = scan_command_delete
+patterns[r'exi(?:t)?'] = scan_command_exit
+patterns[r'f(?:ile)?'] = scan_command_file
+patterns[r'g(?:lobal)?(?=[^ ])'] = scan_command_global
+patterns[r'(?:ls|files|buffers)!?'] = scan_command_buffers
+patterns[r'vs(?:plit)?'] = scan_command_vsplit
+patterns[r'x(?:it)?'] = scan_command_exit
+patterns[r'^cd(?=[^d]|$)'] = scan_command_cd_command
+patterns[r'^cdd'] = scan_command_cdd_command
+patterns[r'e(?:dit)?(?= |$)?'] = scan_command_edit
+patterns[r'let\s'] = scan_command_let
+patterns[r'm(?:ove)?(?=[^a]|$)'] = scan_command_move
+patterns[r'map'] = scan_command_map
+patterns[r'new'] = scan_command_new
+patterns[r'nm(?:ap)?'] = scan_command_nmap
+patterns[r'nun(?:map)?'] = scan_command_nunmap
+patterns[r'om(?:ap)?'] = scan_command_omap
+patterns[r'on(?:ly)?(?=!$|$)'] = scan_command_only
+patterns[r'ounm(?:ap)?'] = scan_command_ounmap
+patterns[r'p(?:rint)?'] = scan_command_print
+patterns[r'pwd?$'] = scan_command_print_working_dir
+patterns[r'q(?!a)(?:uit)?'] = scan_command_quit_command
+patterns[r'qa(?:ll)?'] = scan_command_quit_all_command
+patterns[r'r(?!eg)(?:ead)?'] = scan_command_read_shell_out
+patterns[r'reg(?:isters)?(?=\s+[a-z0-9]+$|$)'] = scan_command_register
+patterns[r's(?:ubstitute)?(?=[%&:/=]|$)'] = scan_command_substitute
+# TODO: implement other set variants.
+patterns[r'se(?:t)?(?=$|\s)'] = scan_command_set
+patterns[r'setl(?:ocal)?'] = scan_command_set_local
+patterns[r'sh(?:ell)?'] = scan_command_shell
+patterns[r'tabfir(?:st)?'] = scan_command_tab_first_command
+patterns[r'tabl(?:ast)?'] = scan_command_tab_last_command
+patterns[r'tabn(?:ext)?'] = scan_command_tab_next_command
+patterns[r'tabo(?:nly)?'] = scan_command_tab_only_command
+patterns[r'tabp(?:revious)?'] = scan_command_tab_prev_command
+patterns[r'tabr(?:ewind)?'] = scan_command_tab_first_command
+patterns[r'una(?:bbreviate)?'] = scan_command_unabbreviate
+patterns[r'unm(?:ap)?'] = scan_command_unmap
+patterns[r'unvsplit$'] = scan_command_unvsplit
+patterns[r'vm(?:ap)?'] = scan_command_vmap
+patterns[r'vu(?:nmap)?'] = scan_command_vunmap
+patterns[r'w(?:rite)?(?=(?:!?(?:\+\+|>>| |$)))'] = scan_command_write
+patterns[r'wa(?:ll)?'] = scan_command_write_all
+patterns[r'wq(?=[^a-zA-Z]|$)?'] = scan_command_write_and_quit_command
+patterns[r'y(?:ank)?'] = scan_command_yank
