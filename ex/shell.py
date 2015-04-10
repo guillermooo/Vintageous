@@ -45,7 +45,7 @@ def filter_thru_shell(view, edit, regions, cmd):
     new_points = []
     for r in regions:
         r_shifted = sublime.Region(r.begin() + accumulated_delta, r.end() + accumulated_delta)
-        rv = filter_func(view, view.substr(r_shifted), cmd)
+        rv = filter_func(view, view.substr(r_shifted), cmd).rstrip() + '\n'
         view.replace(edit, r_shifted, rv)
         new_points.append(r_shifted.a)
         accumulated_delta += len(rv) - r_shifted.size()

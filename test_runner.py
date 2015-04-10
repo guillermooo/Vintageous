@@ -95,7 +95,7 @@ class RunVintageousTests(sublime_plugin.WindowCommand):
     @contextlib.contextmanager
     def chdir(self, path=None):
         old_path = os.getcwd()
-        if path is not None:
+        if path:
             assert os.path.exists(path), "'path' is invalid {}".format(path)
             os.chdir(path)
         yield
@@ -114,7 +114,8 @@ class RunVintageousTests(sublime_plugin.WindowCommand):
             suite = unittest.TestLoader().discover(p, pattern=patt)
 
             file_regex = r'^\s*File\s*"([^.].*?)",\s*line\s*(\d+),.*$'
-            display = OutputPanel('vintageous.tests', file_regex=file_regex)
+            display = OutputPanel('vintageous.tests', file_regex=file_regex,
+                    word_wrap=True)
             display.show()
             runner = unittest.TextTestRunner(stream=display, verbosity=1)
 

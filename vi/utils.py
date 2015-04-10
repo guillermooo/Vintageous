@@ -392,7 +392,7 @@ def get_bol(view, pt):
 
 
 def replace_sel(view, new_sel):
-    if not new_sel:
+    if new_sel is None or new_sel == []:
         raise ValueError('no new_sel')
     view.sel().clear()
     if isinstance(new_sel, list):

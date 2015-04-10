@@ -10,6 +10,24 @@ def find_in_range(view, term, start, end, flags=0):
         return found
 
 
+def find_all_in_range(view, term, start, end, flags=0):
+    matches = []
+    while True:
+        m = find_in_range(view, term, start, end, flags)
+
+        if m == sublime.Region(-1, -1):
+            return matches
+
+        if not m:
+            return matches
+
+        if m.end() > end or m.begin() < start:
+            return matches
+
+        matches.append(m)
+        start = m.end()
+
+
 def find_wrapping(view, term, start, end, flags=0, times=1):
     current_sel = view.sel()[0]
     # Search wrapping around the end of the buffer.

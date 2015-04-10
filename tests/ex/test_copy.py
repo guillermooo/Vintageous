@@ -15,7 +15,7 @@ class Test_ex_copy_Copying_InNormalMode_SingleLine_DefaultStart(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_copy', {'address': '3'})
+        self.view.run_command('ex_copy', {'command_line': 'copy3'})
 
         actual = self.view.substr(self.R(0, self.view.size()))
         expected = 'abc\nxxx\nabc\nxxx\nabc'
@@ -26,7 +26,7 @@ class Test_ex_copy_Copying_InNormalMode_SingleLine_DefaultStart(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_copy', {'address': '4'})
+        self.view.run_command('ex_copy', {'command_line': 'copy4'})
 
         actual = self.view.substr(self.R(0, self.view.size()))
         expected = 'abc\nxxx\nabc\nabc\nxxx'
@@ -37,7 +37,7 @@ class Test_ex_copy_Copying_InNormalMode_SingleLine_DefaultStart(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_copy', {'address': '0'})
+        self.view.run_command('ex_copy', {'command_line': 'copy0'})
 
         actual = self.view.substr(self.R(0, self.view.size()))
         expected = 'xxx\nabc\nxxx\nabc\nabc'
@@ -48,7 +48,7 @@ class Test_ex_copy_Copying_InNormalMode_SingleLine_DefaultStart(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_copy', {'address': '4'})
+        self.view.run_command('ex_copy', {'command_line': 'copy4'})
 
         actual = self.view.substr(self.R(0, self.view.size()))
         expected = 'abc\nxxx\nabc\n\nxxx\nabc'
@@ -59,7 +59,7 @@ class Test_ex_copy_Copying_InNormalMode_SingleLine_DefaultStart(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_copy', {'address': '2'})
+        self.view.run_command('ex_copy', {'command_line': 'copy2'})
 
         actual = self.view.substr(self.R(0, self.view.size()))
         expected = 'abc\nxxx\nxxx\nabc\nabc'
@@ -77,7 +77,7 @@ class Test_ex_copy_Copying_InNormalMode_MultipleLines(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_copy', {'address': '4', 'line_range': self.range})
+        self.view.run_command('ex_copy', {'command_line': '.,.+1copy4'})
 
         expected = 'abc\nxxx\nxxx\nabc\nxxx\nxxx\nabc'
         actual = self.view.substr(self.R(0, self.view.size()))
@@ -88,7 +88,7 @@ class Test_ex_copy_Copying_InNormalMode_MultipleLines(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_copy', {'address': '5', 'line_range': self.range})
+        self.view.run_command('ex_copy', {'command_line': '.,.+1copy5'})
 
         expected = 'abc\nxxx\nxxx\nabc\nabc\nxxx\nxxx'
         actual = self.view.substr(self.R(0, self.view.size()))
@@ -99,7 +99,7 @@ class Test_ex_copy_Copying_InNormalMode_MultipleLines(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_copy', {'address': '0', 'line_range': self.range})
+        self.view.run_command('ex_copy', {'command_line': '.,.+1copy0'})
 
         expected = 'xxx\nxxx\nabc\nxxx\nxxx\nabc\nabc'
         actual = self.view.substr(self.R(0, self.view.size()))
@@ -110,7 +110,7 @@ class Test_ex_copy_Copying_InNormalMode_MultipleLines(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_copy', {'address': '5', 'line_range': self.range})
+        self.view.run_command('ex_copy', {'command_line': '.,.+1copy5'})
 
         expected = 'abc\nxxx\nxxx\nabc\n\nxxx\nxxx\nabc'
         actual = self.view.substr(self.R(0, self.view.size()))
@@ -121,7 +121,7 @@ class Test_ex_copy_Copying_InNormalMode_MultipleLines(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_copy', {'address': '2', 'line_range': self.range})
+        self.view.run_command('ex_copy', {'command_line': '.,.+1copy2'})
 
         expected = 'abc\nxxx\nxxx\nxxx\nxxx\nabc\nabc'
         actual = self.view.substr(self.R(0, self.view.size()))
@@ -134,7 +134,7 @@ class Test_ex_copy_InNormalMode_CaretPosition(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_copy', {'address': '3'})
+        self.view.run_command('ex_copy', {'command_line': 'copy3'})
 
         actual = list(self.view.sel())
         expected = [self.R((3, 0), (3, 0))]
@@ -168,7 +168,7 @@ class Test_ex_copy_ModeTransition(ViewTest):
         state.enter_visual_mode()
         prev_mode = state.mode
 
-        self.view.run_command('ex_copy', {'address': '3'})
+        self.view.run_command('ex_copy', {'command_line': 'copy3'})
 
         state = State(self.view)
         new_mode = state.mode

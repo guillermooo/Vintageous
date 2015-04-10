@@ -17,7 +17,7 @@ class Test_ex_move_Moving_InNormalMode_SingleLine_DefaultStart(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_move', {'address': '3'})
+        self.view.run_command('ex_move', {'command_line': 'move3'})
 
         actual = self.view.substr(self.R(0, self.view.size()))
         expected = 'abc\nabc\nxxx\nabc'
@@ -28,7 +28,7 @@ class Test_ex_move_Moving_InNormalMode_SingleLine_DefaultStart(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_move', {'address': '4'})
+        self.view.run_command('ex_move', {'command_line': 'move4'})
 
         actual = self.view.substr(self.R(0, self.view.size()))
         expected = 'abc\nabc\nabc\nxxx'
@@ -39,7 +39,7 @@ class Test_ex_move_Moving_InNormalMode_SingleLine_DefaultStart(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_move', {'address': '0'})
+        self.view.run_command('ex_move', {'command_line': 'move0'})
 
         actual = self.view.substr(self.R(0, self.view.size()))
         expected = 'xxx\nabc\nabc\nabc'
@@ -50,7 +50,7 @@ class Test_ex_move_Moving_InNormalMode_SingleLine_DefaultStart(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_move', {'address': '4'})
+        self.view.run_command('ex_move', {'command_line': 'move4'})
 
         actual = self.view.substr(self.R(0, self.view.size()))
         expected = 'abc\nabc\n\nxxx\nabc'
@@ -79,20 +79,20 @@ class Test_ex_move_Moveing_InNormalMode_MultipleLines(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_move', {'address': '4', 'line_range': self.range})
+        self.view.run_command('ex_move', {'command_line': 'move4'})
 
-        expected = 'abc\nabc\nxxx\nxxx\nabc'
+        expected = 'abc\nxxx\nabc\nxxx\nabc'
         actual = self.view.substr(self.R(0, self.view.size()))
         self.assertEqual(expected, actual)
 
     def testCanMoveToEof(self):
-        self.write('abc\nxxx\nxxx\nabc\nabc')
+        self.write('aaa\nxxx\nxxx\naaa\naaa')
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_move', {'address': '5', 'line_range': self.range})
+        self.view.run_command('ex_move', {'command_line': 'move5'})
 
-        expected = 'abc\nabc\nabc\nxxx\nxxx'
+        expected = 'aaa\nxxx\naaa\naaa\nxxx'
         actual = self.view.substr(self.R(0, self.view.size()))
         self.assertEqual(expected, actual)
 
@@ -101,20 +101,20 @@ class Test_ex_move_Moveing_InNormalMode_MultipleLines(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_move', {'address': '0', 'line_range': self.range})
+        self.view.run_command('ex_move', {'command_line': 'move0'})
 
-        expected = 'xxx\nxxx\nabc\nabc\nabc'
+        expected = 'xxx\nabc\nxxx\nabc\nabc'
         actual = self.view.substr(self.R(0, self.view.size()))
         self.assertEqual(expected, actual)
 
     def testCanMoveToEmptyLine(self):
-        self.write('abc\nxxx\nxxx\nabc\n\nabc')
+        self.write('aaa\nxxx\nxxx\naaa\n\naaa')
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_move', {'address': '5', 'line_range': self.range})
+        self.view.run_command('ex_move', {'command_line': 'move5'})
 
-        expected = 'abc\nabc\n\nxxx\nxxx\nabc'
+        expected = 'aaa\nxxx\naaa\n\nxxx\naaa'
         actual = self.view.substr(self.R(0, self.view.size()))
         self.assertEqual(expected, actual)
 
@@ -137,7 +137,7 @@ class Test_ex_move_InNormalMode_CaretPosition(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_move', {'address': '3'})
+        self.view.run_command('ex_move', {'command_line': 'move3'})
 
         actual = list(self.view.sel())
         expected = [self.R((2, 0), (2, 0))]
@@ -173,7 +173,7 @@ class Test_ex_move_ModeTransition(ViewTest):
         state.enter_visual_mode()
         prev_mode = state.mode
 
-        self.view.run_command('ex_move', {'address': '3'})
+        self.view.run_command('ex_move', {'command_line': 'move3'})
 
         state = State(self.view)
         new_mode = state.mode

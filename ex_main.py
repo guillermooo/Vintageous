@@ -3,20 +3,22 @@ import sublime_plugin
 
 import os
 
-from Vintageous.ex.parsers.new.parser import start_parsing
 from Vintageous.ex import ex_error
-from Vintageous.ex.ex_command_parser import EX_COMMANDS
-from Vintageous.ex.ex_command_parser import parse_command
+from Vintageous.ex import command_names
 from Vintageous.ex.completions import iter_paths
 from Vintageous.ex.completions import parse
 from Vintageous.ex.completions import parse_for_setting
 from Vintageous.ex.completions import wants_fs_completions
 from Vintageous.ex.completions import wants_setting_completions
+from Vintageous.ex.ex_error import display_error2
+from Vintageous.ex.ex_error import VimError
+from Vintageous.ex.parser.parser import parse_ex_command
+from Vintageous.ex.parser.scanner_command_goto import TokenCommandGoto
+from Vintageous.state import State
 from Vintageous.vi.settings import iter_settings
 from Vintageous.vi.sublime import show_ipanel
-from Vintageous.vi.utils import modes
-from Vintageous.state import State
 from Vintageous.vi.utils import mark_as_widget
+from Vintageous.vi.utils import modes
 
 
 def plugin_loaded():
@@ -26,7 +28,7 @@ def plugin_loaded():
     state.settings.vi['_cmdline_cd'] = d
 
 
-COMPLETIONS = sorted([x[0] for x in EX_COMMANDS.keys()])
+COMPLETIONS = sorted([x[0] for x in command_names])
 
 EX_HISTORY_MAX_LENGTH = 20
 EX_HISTORY = {
@@ -101,30 +103,23 @@ class ViColonInput(sublime_plugin.WindowCommand):
         if ViColonInput.interactive_call:
             update_command_line_history('cmdline', cmd_line)
 
-        # Use old parser for most commands.
-        parsed = parse_command(cmd_line)
         try:
             # Use new parser for some commands.
-            parsed_new = start_parsing(cmd_line[1:])
-            # print('Vintageous:', parsed_new)
-        except Exception:
-            # TODO: Display errors from parser.
-            pass
+            parsed_new = parse_ex_command(cmd_line[1:])
 
-        if parsed and parsed.parse_errors:
-            ex_error.display_error(parsed.parse_errors[0])
+            if not parsed_new.command:
+                parsed_new.command = TokenCommandGoto()
+
+            self.window.run_command(parsed_new.command.target_command, {'command_line': cmd_line[1:]})
             return
-
-        if parsed and parsed.name:
-            if parsed.can_have_range:
-                parsed.args['line_range'] = parsed.line_range
-
-            if parsed.forced:
-                parsed.args['forced'] = parsed.forced
-            self.window.run_command(parsed.command, parsed.args)
-        else:
-            ex_error.display_error(ex_error.ERR_UNKNOWN_COMMAND, cmd_line)
-
+        except VimError as ve:
+            # only new code emits VimErrors, so handle it.
+            display_error2(ve)
+            return
+        except Exception as e:
+            # let the old ex code take care of this
+            print ('DEBUG::Vintageous:', e, '(', cmd_line, ')')
+            return
 
 class ViColonRepeatLast(sublime_plugin.WindowCommand):
     def is_enabled(self):

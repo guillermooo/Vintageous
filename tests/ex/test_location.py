@@ -9,7 +9,6 @@ from Vintageous.ex.ex_location import find_line
 from Vintageous.ex.ex_location import search_in_range
 from Vintageous.ex.ex_location import find_last_match
 from Vintageous.ex.ex_location import reverse_search
-from Vintageous.ex.ex_range import calculate_relative_ref
 
 
 class TestHelpers(unittest.TestCase):
@@ -89,17 +88,6 @@ class TestSearchHelpers(unittest.TestCase):
 
         for actual, expected in values:
             self.assertEquals(actual, expected)
-
-    @unittest.skip('todo: revise tests')
-    def testCalculateRelativeRef(self):
-        self.assertEquals(calculate_relative_ref(g_test_view, '.'), 1)
-        self.assertEquals(calculate_relative_ref(g_test_view, '$'), 538)
-
-        select_line(g_test_view, 100)
-        self.assertEquals(calculate_relative_ref(g_test_view, '.'), 100)
-
-        select_line(g_test_view, 200)
-        self.assertEquals(calculate_relative_ref(g_test_view, '.'), 200)
 
     def setUp(self):
         super().setUp()

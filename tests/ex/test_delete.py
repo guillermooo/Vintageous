@@ -20,7 +20,7 @@ class Test_ex_delete_Deleting_InNormalMode_SingleLine_DefaultStart(ViewTest):
         self.clear_sel()
         self.add_sel(self.R((1, 0), (1, 0)))
 
-        self.view.run_command('ex_delete')
+        self.view.run_command('ex_delete', {'command_line': 'delete'})
 
         actual = self.view.substr(self.R(0, self.view.size()))
         expected = 'abc\nabc\nabc'
@@ -33,7 +33,7 @@ class Test_ex_delete_Deleting_InNormalMode_SingleLine_DefaultStart(ViewTest):
 
         r = CURRENT_LINE_RANGE.copy()
         r['left_ref'] = '4'
-        self.view.run_command('ex_delete', {'line_range': r})
+        self.view.run_command('ex_delete', {'command_line': '4delete'})
 
         actual = self.view.substr(self.R(0, self.view.size()))
         expected = 'abc\nabc\nabc\n'
@@ -46,7 +46,7 @@ class Test_ex_delete_Deleting_InNormalMode_SingleLine_DefaultStart(ViewTest):
 
         r = CURRENT_LINE_RANGE.copy()
         r['left_ref'] = '4'
-        self.view.run_command('ex_delete', {'line_range': r})
+        self.view.run_command('ex_delete', {'command_line': 'delete'})
 
         actual = self.view.substr(self.R(0, self.view.size()))
         expected = 'abc\nabc\nabc\n'
@@ -61,7 +61,7 @@ class Test_ex_delete_Deleting_InNormalMode_SingleLine_DefaultStart(ViewTest):
         r['text_range'] = '0'
         # If we don't do this, it will default to '.' and the test will fail.
         r['left_ref'] = '0'
-        self.view.run_command('ex_delete', {'line_range': r})
+        self.view.run_command('ex_delete', {'command_line': '0delete'})
 
         actual = self.view.substr(self.R(0, self.view.size()))
         expected = 'abc\nabc\nabc'
@@ -77,7 +77,7 @@ class Test_ex_delete_Deleting_InNormalMode_SingleLine_DefaultStart(ViewTest):
         r['left_ref'] = None
         r['text_range'] = '3'
         r['left_offset'] = 3
-        self.view.run_command('ex_delete', {'line_range': r})
+        self.view.run_command('ex_delete', {'command_line': '3delete'})
 
         actual = self.view.substr(self.R(0, self.view.size()))
         expected = 'abc\nabc\nabc'
@@ -150,7 +150,7 @@ class Test_ex_delete_InNormalMode_CaretPosition(ViewTest):
 
         self.range['left_offset'] = 2
         self.range['text_range'] = '2,4'
-        self.view.run_command('ex_delete', {'line_range': self.range})
+        self.view.run_command('ex_delete', {'command_line': '2,4delete'})
 
         actual = list(self.view.sel())
         expected = [self.R((1, 0), (1, 0))]
@@ -197,7 +197,7 @@ class Test_ex_delete_ModeTransition(ViewTest):
         self.range['left_ref'] = "'<"
         self.range['right_ref'] = "'>"
         self.range['text_range'] = "'<,'>"
-        self.view.run_command('ex_delete', {'line_range': self.range})
+        self.view.run_command('ex_delete', {'command_line': "'<,'>delete"})
 
         state = State(self.view)
         new_mode = state.mode
