@@ -54,7 +54,7 @@ def reverse_find_wrapping(view, term, start, end, flags=0, times=1):
     for x in range(times):
         match = reverse_search(view, term, start, end, flags)
         # Start searching in the lower half of the buffer if we aren't doing it yet.
-        if not match and start < current_sel.b:
+        if not match and start <= current_sel.b:
             start = current_sel.b
             end = view.size()
             match = reverse_search(view, term, start, end, flags)

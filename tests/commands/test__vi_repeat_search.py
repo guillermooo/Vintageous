@@ -145,7 +145,7 @@ class Test_vi_repeat_question_mark_InNormalMode(ViewTest):
     def testRepeatForward(self):
         self.write('foo\nabc\nbar\nabc\nmoo\nabc\nend')
         self.clear_sel()
-        self.add_sel(self.R(27, 27)) # TODO: 0, 0 should work since question mark should wrap around...
+        self.add_sel(self.R(0, 0))
 
         self.view.run_command('_vi_question_mark_impl', {'mode': modes.NORMAL, 'search_string': 'abc'})
         self.state.last_buffer_search_command = 'vi_question_mark'
@@ -157,7 +157,7 @@ class Test_vi_repeat_question_mark_InNormalMode(ViewTest):
     def testRepeatReverse(self):
         self.write('foo\nabc\nbar\nabc\nmoo\nabc\nend')
         self.clear_sel()
-        self.add_sel(self.R(27, 27)) # TODO: 0, 0 should work since question mark should wrap around...
+        self.add_sel(self.R(0, 0))
 
         self.view.run_command('_vi_question_mark_impl', {'mode': modes.NORMAL, 'search_string': 'abc'})
         self.state.last_buffer_search_command = 'vi_question_mark'
@@ -169,7 +169,7 @@ class Test_vi_repeat_question_mark_InNormalMode(ViewTest):
     def testRepeatPartial(self):
         self.write('foo\nabc\nbar\nabcxmoo\nabc\nend')
         self.clear_sel()
-        self.add_sel(self.R(27, 27)) # TODO: 0, 0 should work since question mark should wrap around...
+        self.add_sel(self.R(0, 0))
 
         self.view.run_command('_vi_question_mark_impl', {'mode': modes.NORMAL, 'search_string': 'abc'})
         self.state.last_buffer_search_command = 'vi_question_mark'
