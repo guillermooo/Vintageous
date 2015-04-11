@@ -1034,7 +1034,8 @@ class _vi_cc(ViTextCommandBase):
 
         regions_transformer(self.view, motion)
         self.state.registers.yank(self, register)
-        self.view.run_command ('right_delete')
+        if not all(s.empty() for s in self.view.sel()):
+            self.view.run_command ('right_delete')
         self.enter_insert_mode(mode)
         self.set_xpos(self.state)
 
