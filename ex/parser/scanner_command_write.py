@@ -3,9 +3,9 @@ from .tokens import TokenEof
 from .tokens_base import TOKEN_COMMAND_WRITE
 from .tokens_base import TokenOfCommand
 
+from Vintageous import ex
 from Vintageous.ex.ex_error import ERR_INVALID_ARGUMENT
 from Vintageous.ex.ex_error import VimError
-from Vintageous import ex
 
 
 plus_plus_translations = {
@@ -14,6 +14,7 @@ plus_plus_translations = {
     'enc': 'fileencoding',
     'nobin': 'nobinary',
 }
+
 
 @ex.command('write', 'w')
 class TokenCommandWrite(TokenOfCommand):
@@ -80,6 +81,7 @@ def scan_command_write(state):
             name = m.group(0)
             params['++'] = plus_plus_translations.get(name, name)
             state.ignore()
+            raise NotImplementedError('++opt not implemented for :write')
             continue
 
         if c == '>':
@@ -94,6 +96,7 @@ def scan_command_write(state):
             state.ignore()
             state.match(r'.*$')
             params ['cmd'] = state.emit()
+            raise NotImplementedError('!cmd not implemented for :write')
             continue
 
         if c != ' ':
