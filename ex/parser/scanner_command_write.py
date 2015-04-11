@@ -81,7 +81,6 @@ def scan_command_write(state):
             name = m.group(0)
             params['++'] = plus_plus_translations.get(name, name)
             state.ignore()
-            raise NotImplementedError('++opt not implemented for :write')
             continue
 
         if c == '>':
@@ -96,7 +95,6 @@ def scan_command_write(state):
             state.ignore()
             state.match(r'.*$')
             params ['cmd'] = state.emit()
-            raise NotImplementedError('!cmd not implemented for :write')
             continue
 
         if c != ' ':

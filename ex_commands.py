@@ -556,6 +556,10 @@ class ExWriteFile(ViWindowCommandBase):
             handle_not_implemented("++opt isn't implemented for :write")
             return
 
+        if parsed.command.command:
+            handle_not_implemented('!cmd not implememted for :write')
+            return
+
         if not self._view:
             return
 

@@ -52,7 +52,6 @@ from .scanner_command_vunmap import scan_command_vunmap
 from .scanner_command_write import scan_command_write
 from .scanner_command_write_all import scan_command_write_all
 from .scanner_command_write_and_quit_command import scan_command_write_and_quit_command
-from .scanner_command_write_file import scan_command_write_file
 from .scanner_command_yank import scan_command_yank
 
 
