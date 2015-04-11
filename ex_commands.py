@@ -662,18 +662,19 @@ class ExWriteFile(ViWindowCommandBase):
         assert r is not None, "range cannot be None"
 
         try:
-            # FIXME: we should write in the current dir, but I don't think we're doing that.
+            # FIXME: Use full path to file?
             with open(fname, 'wt') as f:
                 text = self._view.substr(r)
                 f.write(text)
-            display_message('Saved ' + os.path.abspath(fname),
-                    devices=DISPLAY_STATUS)
+            self._view.retarget(fname)
+            self.window.run_command('save')
+
         except IOError as e:
             # TODO: Add logging.
             display_error2(VimError(ERR_CANT_WRITE_FILE))
-            print('Vintageous =======')
+            print('Vintageous ==============================================')
             print (e)
-            print('==================')
+            print('=========================================================')
 
 
 class ExWriteAll(ViWindowCommandBase):
