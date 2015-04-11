@@ -3041,8 +3041,7 @@ class ViRepeatSearchForward(ViMotionDef):
         cmd['motion_args'] = {
             'mode': state.mode,
             'count': state.count,
-            'search_string': state.last_buffer_search,
-            'forward': state.last_buffer_search_command == 'vi_slash',
+            'reverse': False
             }
 
         return cmd
@@ -3065,8 +3064,7 @@ class ViRepeatSearchBackward(ViMotionDef):
         cmd['motion_args'] = {
             'mode': state.mode,
             'count': state.count,
-            'search_string': state.last_buffer_search,
-            'forward': not (state.last_buffer_search_command == 'vi_slash'),
+            'reverse': True
             }
         return cmd
 

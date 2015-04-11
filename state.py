@@ -267,7 +267,7 @@ class State(object):
         previous command.
 
         Returns the name of the last character search command, namely:
-        'vi_slash', 'vi_question_mark'.
+        'vi_slash', 'vi_question_mark', 'vi_star', 'vi_octothorp'
         """
         name = self.settings.window['_vintageous_last_buffer_search_command']
         return name or 'vi_slash'
