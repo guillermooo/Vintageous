@@ -179,18 +179,31 @@ def regions_transformer(view, f):
     view.sel().add_all(new)
 
 
-def resolve_insertion_point_at_b(r):
-    if r.a < r.b:
-        return (r.b - 1)
-    return r.b
+def resolve_insertion_point_at_b(region):
+    """
+    Returns the insertion point closest to @region.b for a visual region.
+
+    For non-visual regions, the insertion point is always any of the region's
+    ends, so using this function is pointless.
+
+    @region
+      A Sublime Text region.
+    """
+    if region.a < region.b:
+        return (region.b - 1)
+    return region.b
 
 
 def resolve_insertion_point_at_a(region):
-    """Returns the actual insertion point closest to @region.a for a visual
+    """
+    Returns the actual insertion point closest to @region.a for a visual
     region.
 
     For non-visual regions, the insertion point is always any of the region's
     ends, so using this function is pointless.
+
+    @region
+      A Sublime Text region.
     """
     if region.size() == 0:
         raise TypeError('not a visual region')
