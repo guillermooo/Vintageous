@@ -3,16 +3,17 @@ import sublime_plugin
 
 import os
 
-from Vintageous.ex import ex_error
 from Vintageous.ex import command_names
+from Vintageous.ex import ex_error
 from Vintageous.ex.completions import iter_paths
 from Vintageous.ex.completions import parse
 from Vintageous.ex.completions import parse_for_setting
 from Vintageous.ex.completions import wants_fs_completions
 from Vintageous.ex.completions import wants_setting_completions
 from Vintageous.ex.ex_error import display_error2
+from Vintageous.ex.ex_error import handle_not_implemented
 from Vintageous.ex.ex_error import VimError
-from Vintageous.ex.parser.parser import parse_ex_command
+from Vintageous.ex.parser.parser import parse_command_line
 from Vintageous.ex.parser.scanner_command_goto import TokenCommandGoto
 from Vintageous.state import State
 from Vintageous.vi.settings import iter_settings
@@ -105,7 +106,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
 
         try:
             # Use new parser for some commands.
-            parsed_new = parse_ex_command(cmd_line[1:])
+            parsed_new = parse_command_line(cmd_line[1:])
 
             if not parsed_new.command:
                 parsed_new.command = TokenCommandGoto()
@@ -117,8 +118,8 @@ class ViColonInput(sublime_plugin.WindowCommand):
             display_error2(ve)
             return
         except Exception as e:
-            # let the old ex code take care of this
-            print ('DEBUG::Vintageous:', e, '(', cmd_line, ')')
+            message = str(e) +  ' ' + "(%s)" % cmd_line
+            handle_not_implemented(message)
             return
 
 class ViColonRepeatLast(sublime_plugin.WindowCommand):

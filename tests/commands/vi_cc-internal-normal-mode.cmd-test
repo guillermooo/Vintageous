@@ -1,0 +1,10 @@
+_vi_cc mode:mode_internal_normal
+Does not delete empty lines.
+***
+aaa
+^$
+bbb
+---
+aaa
+^$
+bbb

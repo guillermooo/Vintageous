@@ -23,6 +23,7 @@ ERR_NO_BANG_ALLOWED = 477 # Command doesn't allow !.
 ERR_NO_RANGE_ALLOWED = 481 # Command can't take a range.
 ERR_TRAILING_CHARS = 488 # Unknown command.
 ERR_UNKNOWN_COMMAND = 492 # Command can't take arguments.
+ERR_EMPTY_BUFFER = 749 # for example, :print in an empty buffer
 
 
 ERR_MESSAGES = {
@@ -44,6 +45,7 @@ ERR_MESSAGES = {
     ERR_NO_RANGE_ALLOWED: 'No range allowed.',
     ERR_TRAILING_CHARS: 'Traling characters.',
     ERR_UNKNOWN_COMMAND: 'Not an editor command.',
+    ERR_EMPTY_BUFFER: 'Empty buffer.',
 }
 
 
@@ -84,6 +86,7 @@ def handle_not_implemented(message=None, devices=DISPLAY_ALL):
     display_message(message, devices=devices)
 
 
+# TODO: report faulty command line.
 class VimError(Exception):
     '''
     Represents e Vim error.

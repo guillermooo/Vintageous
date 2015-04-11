@@ -1,6 +1,13 @@
+'''
+Tokenization for the Vim command line.
+'''
+
+from Vintageous.ex.ex_error import ERR_UNKNOWN_COMMAND
+from Vintageous.ex.ex_error import VimError
+
 from . import subscanners
 from .state import EOF
-from .state import State
+from .state import ScannerState
 from .tokens import TokenComma
 from .tokens import TokenDigits
 from .tokens import TokenDollar
@@ -14,16 +21,28 @@ from .tokens import TokenSearchForward
 from .tokens import TokenSemicolon
 
 
+# TODO: make this a function. We don't need state.
 class Scanner(object):
+    '''
+    Produces ex command-line tokens from a string.
+    '''
     def __init__(self, source):
-        self.state = State(source)
+        self.state = ScannerState(source)
 
     def scan(self):
+        '''
+        Generates ex command-line tokens for `source`.
+
+        The scanner works its way through the source string by passing the
+        current state to the next scanning function.
+        '''
         next_func = scan_range
         while True:
-            # We return multiple tokens so that we can work around cyclic imports
-            # Functions that need to, return TokenEof without having to call
-            # a different function.
+            # We return multiple tokens so that we can work around cyclic imports:
+            # functions that need to, return TokenEof without having to call
+            # a function in this module from a separate module.
+            #
+            # Keep scanning while we get a scanning function.
             (next_func, items) = next_func(self.state)
             yield from items
             if not next_func:
@@ -31,6 +50,11 @@ class Scanner(object):
 
 
 def scan_range(state):
+    '''
+    Produces tokens found in a command line range.
+
+    http://vimdoc.sourceforge.net/htmldoc/cmdline.html#cmdline-ranges
+    '''
     c = state.consume()
 
     if c == EOF:
@@ -55,7 +79,7 @@ def scan_range(state):
     if c in '/?':
         return scan_search(state)
 
-    if c == '+' or c == '-':
+    if c in '+-':
         return scan_offset(state)
 
     if c == '%':
@@ -139,5 +163,5 @@ def scan_command(state):
             state.ignore()
             return subscanner(state)
 
-    state.expect(EOF)
+    state.expect(EOF, lambda: VimError(ERR_UNKNOWN_COMMAND))
     return None, [TokenEof()]

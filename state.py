@@ -1,6 +1,6 @@
-import sublime
-
 from collections import Counter
+
+import sublime
 
 from Vintageous import local_logger
 from Vintageous.vi import cmd_base

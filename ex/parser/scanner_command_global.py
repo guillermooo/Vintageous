@@ -2,7 +2,7 @@ from .state import EOF
 from .tokens import TokenEof
 from .tokens_base import TOKEN_COMMAND_GLOBAL
 from .tokens_base import TokenOfCommand
-from .parser import parse_ex_command
+from .parser import parse_command_line
 from Vintageous import ex
 
 
@@ -27,7 +27,7 @@ class TokenCommandGlobal(TokenOfCommand):
 def scan_command_global(state):
     params = {
         'pattern': None,
-        'subcommand': parse_ex_command('print').command
+        'subcommand': parse_command_line('print').command
     }
 
     c = state.consume()
@@ -53,7 +53,7 @@ def scan_command_global(state):
             break
 
     command = state.match(r'.*$').group(0).strip()
-    command = parse_ex_command(command).command or params['subcommand']
+    command = parse_command_line(command).command or params['subcommand']
     params['subcommand'] = command
 
     return None, [TokenCommandGlobal(params, forced=bang), TokenEof()]

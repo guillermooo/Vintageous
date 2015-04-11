@@ -1,3 +1,12 @@
+'''
+Tools for testing commands.
+
+Command tests are declared in a special text format in files with the .cmd-test extension.
+Several tests can be declared in the same file. This makes it easier to group tests.
+
+Special attention must be payed to whitespace: it counts for tests.
+'''
+
 from collections import defaultdict
 import glob
 import os
@@ -6,9 +15,13 @@ import unittest
 import sublime
 
 
-TEST_DELIM = '\n---///---\n'
+# Comes after the header.
 TEST_HEADER_DELIM = '***\n'
+# Delimits tests.
+TEST_DELIM = '\n---///---\n'
+# Separates the test declaration from the expected result.
 TEST_RESULTS_DELIM = '\n---\n'
+
 
 _converters = defaultdict(lambda: (lambda x: str(x)))
 _converters ['mode'] = str
@@ -30,10 +43,12 @@ def process_notation(text, sel_start_token='^', sel_end_token='$'):
     @text
       Text that contains @sel_start_token's and @sel_end_token's to define
       selection regions.
+
     @sel_start_token
-      Marks the start of a selection region.
+      Marks the start of a selection region. Removed from the test.
+
     @sel_end_token
-      Marks the end of a selection region.
+      Marks the end of a selection region. Removed from the text.
 
     Reversed selections can be defined too.
 
@@ -120,11 +135,11 @@ class ViCmdTest (object):
 
 
 class ViCmdTester (unittest.TestCase):
-    """
+    '''
     Runs tests based in cmd-test spec files (cmd-test).
 
     Subclasses must implement setUp() and in it set self.path_to_test_specs.
-    """
+    '''
 
     def get_motion_tests(self):
         specs = self.get_tests("*.motion-test")
