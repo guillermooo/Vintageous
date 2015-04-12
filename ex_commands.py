@@ -18,6 +18,7 @@ from Vintageous.ex.ex_error import ERR_FILE_EXISTS
 from Vintageous.ex.ex_error import ERR_NO_FILE_NAME
 from Vintageous.ex.ex_error import ERR_OTHER_BUFFER_HAS_CHANGES
 from Vintageous.ex.ex_error import ERR_READONLY_FILE
+from Vintageous.ex.ex_error import ERR_UNSAVED_CHANGES
 from Vintageous.ex.ex_error import handle_not_implemented
 from Vintageous.ex.ex_error import VimError
 from Vintageous.ex.parser.parser import parse_command_line
@@ -694,6 +695,7 @@ class ExWriteAll(ViWindowCommandBase):
         parsed = parse_command_line(command_line)
         forced = parsed.command.forced
 
+        # TODO: read-only views don't get properly saved.
         for v in (v for v in self.window.views() if v.file_name()):
             if v.is_read_only() and not forced:
                 continue
@@ -1670,3 +1672,39 @@ class ExLet(ViWindowCommandBase):
         parsed = parse_command_line(command_line)
         self.state.variables.set(parsed.command.variable_name,
                 parsed.command.variable_value)
+
+
+class ExWriteAndQuitAll(ViWindowCommandBase):
+    '''
+    Commmand: :wqa[ll] [++opt]
+              :xa[ll]
+
+    http://vimdoc.sourceforge.net/htmldoc/editing.html#:wqall
+    '''
+
+    def run(self, command_line=''):
+        assert command_line, 'expected non-empty command line'
+
+        if self._view.is_dirty():
+            display_error2(VimError(ERR_UNSAVED_CHANGES))
+            utils.blink()
+            return
+
+        if not all(v.file_name() for v in self.window.views()):
+            display_error2(VimError(ERR_OTHER_BUFFER_HAS_CHANGES))
+            utils.blink()
+            return
+
+        if any(v.is_read_only() for v in self.window.views()):
+            display_error2(VimError(ERR_READONLY_FILE))
+            utils.blink()
+            return
+
+        self.window.run_command('save_all')
+
+        if any(v.is_dirty() for v in self.window.views()):
+            utils.blink()
+            return
+
+        self.window.run_command('close_all')
+        self.window.run_command('exit')
