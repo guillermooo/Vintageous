@@ -695,6 +695,7 @@ class ExWriteAll(ViWindowCommandBase):
         parsed = parse_command_line(command_line)
         forced = parsed.command.forced
 
+        # TODO: read-only views don't get properly saved.
         for v in (v for v in self.window.views() if v.file_name()):
             if v.is_read_only() and not forced:
                 continue
