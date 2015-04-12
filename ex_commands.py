@@ -18,6 +18,7 @@ from Vintageous.ex.ex_error import ERR_FILE_EXISTS
 from Vintageous.ex.ex_error import ERR_NO_FILE_NAME
 from Vintageous.ex.ex_error import ERR_OTHER_BUFFER_HAS_CHANGES
 from Vintageous.ex.ex_error import ERR_READONLY_FILE
+from Vintageous.ex.ex_error import ERR_UNSAVED_CHANGES
 from Vintageous.ex.ex_error import handle_not_implemented
 from Vintageous.ex.ex_error import VimError
 from Vintageous.ex.parser.parser import parse_command_line
@@ -1126,13 +1127,19 @@ class ExQuitCommand(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_command_line(command_line)
+        quit_command = parse_command_line(command_line)
 
         view = self._view
-        if parsed.command.forced:
+
+        if quit_command.command.forced:
             view.set_scratch(True)
+
         if view.is_dirty():
-            sublime.status_message("There are unsaved changes!")
+            display_error2(VimError(ERR_UNSAVED_CHANGES))
+            return
+
+        if not view.file_name():
+            display_error2(VimError(ERR_NO_FILE_NAME))
             return
 
         self.window.run_command('close')
@@ -1140,6 +1147,7 @@ class ExQuitCommand(ViWindowCommandBase):
             self.window.run_command('close')
             return
 
+        # FIXME: Probably doesn't work as expected.
         # Close the current group if there aren't any views left in it.
         if not self.window.views_in_group(self.window.active_group()):
             self.window.run_command('ex_unvsplit')
