@@ -1,3 +1,21 @@
+4.0.1 - 12-04-2015
+
+	- save to absolute path
+	- Fix ? wraparound for first character in the buffer (Thanks Arseny Kapoulkine)
+	- Fix n/N motions after */# (Thanks Arseny Kapoulkine)
+	- fixes for :w
+	- add comment
+	- fix #391 - implement :wqall
+	- fix #900 - cc should not delete empty lines
+	- fixes; remove dead code
+	- better handling of not implemented command-lines
+	- fix saving to inexisting file
+	- add docstrings
+	- handle more errors
+	- add comments and docstrings
+	- comments
+	- stick patterns in an OrderedDict
+
 4.0.0 - 10-04-2015
 
 	- Merge pull request #872 from guillermooo-forks/refactor-line-range-node
