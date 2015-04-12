@@ -9,7 +9,7 @@ from Vintageous import ex
 class TokenTabLastCommand(TokenOfCommand):
     def __init__(self, *args, **kwargs):
         super().__init__([],
-                         TOKEN_COMMAND_TAB_FLAST_COMMAND,
+                         TOKEN_COMMAND_TAB_LAST_COMMAND,
                          'tablast', *args, **kwargs)
         self.target_command = 'ex_tablast'
 
