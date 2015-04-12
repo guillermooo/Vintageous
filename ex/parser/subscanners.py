@@ -51,6 +51,7 @@ from .scanner_command_vsplit import scan_command_vsplit
 from .scanner_command_vunmap import scan_command_vunmap
 from .scanner_command_write import scan_command_write
 from .scanner_command_write_all import scan_command_write_all
+from .scanner_command_write_and_quit_all import scan_command_write_and_quit_all
 from .scanner_command_write_and_quit_command import scan_command_write_and_quit_command
 from .scanner_command_yank import scan_command_yank
 
@@ -106,6 +107,8 @@ patterns[r'unvsplit$'] = scan_command_unvsplit
 patterns[r'vm(?:ap)?'] = scan_command_vmap
 patterns[r'vu(?:nmap)?'] = scan_command_vunmap
 patterns[r'w(?:rite)?(?=(?:!?(?:\+\+|>>| |$)))'] = scan_command_write
+patterns[r'wqa(?:ll)?'] = scan_command_write_and_quit_all
+patterns[r'xa(?:ll)?'] = scan_command_write_and_quit_all
 patterns[r'wa(?:ll)?'] = scan_command_write_all
 patterns[r'wq(?=[^a-zA-Z]|$)?'] = scan_command_write_and_quit_command
 patterns[r'y(?:ank)?'] = scan_command_yank
