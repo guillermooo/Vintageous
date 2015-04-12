@@ -1383,39 +1383,55 @@ class ExYank(sublime_plugin.TextCommand):
             state.registers['0'] = [text]
 
 
-class TabControlCommand(sublime_plugin.WindowCommand):
+class TabControlCommand(ViWindowCommandBase):
     def run(self, command, file_name=None, forced=False):
         window = self.window
-        selfview = window.active_view()
+        current_view = self._view
         max_index = len(window.views())
-        (group, index) = window.get_view_index(selfview)
-        if (command == "open"):
+        (group, index) = window.get_view_index(current_view)
+
+        if command == 'open':
             if file_name is None:  # TODO: file completion
-                window.run_command("show_overlay", {"overlay": "goto", "show_files": True, })
+                window.run_command('show_overlay', {
+                        'overlay': 'goto', 'show_files': True, })
             else:
-                cur_dir = os.path.dirname(selfview.file_name())
+                cur_dir = os.path.dirname(current_view.file_name())
                 window.open_file(os.path.join(cur_dir, file_name))
-        elif command == "next":
-            window.run_command("select_by_index", {"index": (index + 1) % max_index}, )
-        elif command == "prev":
-            window.run_command("select_by_index", {"index": (index + max_index - 1) % max_index, })
+
+        elif command == 'next':
+            window.run_command('select_by_index', {
+                    'index': (index + 1) % max_index})
+
+        elif command == 'prev':
+            window.run_command('select_by_index', {
+                    'index': (index + max_index - 1) % max_index})
+
         elif command == "last":
-            window.run_command("select_by_index", {"index": max_index - 1, })
+            window.run_command('select_by_index', {'index': max_index - 1})
+
         elif command == "first":
-            window.run_command("select_by_index", {"index": 0, })
-        elif command == "only":
+            window.run_command('select_by_index', {'index': 0})
+
+        elif command == 'only':
+            quit_command_line = 'quit' + '' if not forced else '!'
+
             for view in window.views_in_group(group):
-                if view.id() != selfview.id():
-                    window.focus_view(view)
-                    window.run_command("ex_quit", {"forced": forced})
-            window.focus_view(selfview)
+                if view.id() == current_view.id():
+                    continue
+                window.focus_view(view)
+                window.run_command('ex_quit', {
+                        'command_line': quit_command_line})
+
+            window.focus_view(current_view)
+
         else:
-            sublime.status_message("Unknown TabControl Command")
+            display_message("Unknown TabControl Command", devices=DISPLAY_ALL)
 
 
 class ExTabOpenCommand(sublime_plugin.WindowCommand):
     def run(self, file_name=None):
-        self.window.run_command("tab_control", {"command": "open", "file_name": file_name}, )
+        self.window.run_command('tab_control', {
+                'command': 'open', 'file_name': file_name}, )
 
 
 class ExTabnextCommand(ViWindowCommandBase):
