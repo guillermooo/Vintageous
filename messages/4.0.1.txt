@@ -13,6 +13,8 @@ Guillermo
 CHANGES
 -------
 
+  - :browse uses current directory as initial directory
+  - fix tab management commands
   - save to absolute path
   - Fix ? wraparound for first character in the buffer (Thanks Arseny Kapoulkine)
   - Fix n/N motions after */# (Thanks Arseny Kapoulkine)
