@@ -535,6 +535,12 @@ class ExWriteFile(ViWindowCommandBase):
     '''
 
     def check_is_readonly(self, fname):
+        '''
+        Returns `True` if @fname is read-only on the filesystem.
+
+        @fname
+          Path to a file.
+        '''
         if not fname:
             return
 
@@ -643,10 +649,10 @@ class ExWriteFile(ViWindowCommandBase):
             print('=======================')
             return
 
-    def do_write(self, parsed_command):
-        fname = parsed_command.command.target_file
+    def do_write(self, ex_command):
+        fname = ex_command.command.target_file
 
-        if not parsed_command.command.forced:
+        if not ex_command.command.forced:
             if os.path.exists(fname):
                 utils.blink()
                 display_error2(VimError(ERR_FILE_EXISTS))
@@ -657,21 +663,23 @@ class ExWriteFile(ViWindowCommandBase):
                 display_error2(VimError(ERR_READONLY_FILE))
                 return
 
-        r = None
-        if parsed_command.line_range.is_empty:
+        region = None
+        if ex_command.line_range.is_empty:
             # If the user didn't provide any range data, Vim writes whe whole buffer.
-            r = R(0, self._view.size())
+            region = R(0, self._view.size())
         else:
-            r = parsed_command.line_range.resolve(self._view)
+            region = ex_command.line_range.resolve(self._view)
 
-        assert r is not None, "range cannot be None"
+        assert region is not None, "range cannot be None"
 
         try:
             # FIXME: Use full path to file?
-            with open(fname, 'wt') as f:
-                text = self._view.substr(r)
+            expanded_path = os.path.expandvars(os.path.expanduser(fname))
+            with open(expanded_path, 'wt') as f:
+                text = self._view.substr(region)
                 f.write(text)
-            self._view.retarget(fname)
+            # FIXME: Does this do what we think it does?
+            self._view.retarget(expanded_path)
             self.window.run_command('save')
 
         except IOError as e:
@@ -1120,13 +1128,19 @@ class ExQuitCommand(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        parsed = parse_command_line(command_line)
+        quit_command = parse_command_line(command_line)
 
         view = self._view
-        if parsed.command.forced:
+
+        if quit_command.command.forced:
             view.set_scratch(True)
+
         if view.is_dirty():
-            sublime.status_message("There are unsaved changes!")
+            display_error2(VimError(ERR_UNSAVED_CHANGES))
+            return
+
+        if not view.file_name():
+            display_error2(VimError(ERR_NO_FILE_NAME))
             return
 
         self.window.run_command('close')
@@ -1134,6 +1148,7 @@ class ExQuitCommand(ViWindowCommandBase):
             self.window.run_command('close')
             return
 
+        # FIXME: Probably doesn't work as expected.
         # Close the current group if there aren't any views left in it.
         if not self.window.views_in_group(self.window.active_group()):
             self.window.run_command('ex_unvsplit')
