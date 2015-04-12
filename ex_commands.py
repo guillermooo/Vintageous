@@ -1213,7 +1213,9 @@ class ExBrowse(ViWindowCommandBase):
     def run(self, command_line):
         assert command_line, 'expected a non-empty command line'
 
-        self.window.run_command('prompt_open_file')
+        self.window.run_command('prompt_open_file', {
+            'initial_directory': self.state.settings.vi['_cmdline_cd']
+            })
 
 
 class ExEdit(ViWindowCommandBase):
