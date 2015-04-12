@@ -517,7 +517,7 @@ class ExPrintWorkingDir(ViWindowCommandBase):
     @changing_cd
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
-        sublime.status_message(os.getcwd())
+        display_message(os.getcwd(), devices=DISPLAY_STATUS)
 
 
 class ExWriteFile(ViWindowCommandBase):
@@ -673,8 +673,8 @@ class ExWriteFile(ViWindowCommandBase):
         assert region is not None, "range cannot be None"
 
         try:
-            # FIXME: Use full path to file?
             expanded_path = os.path.expandvars(os.path.expanduser(fname))
+            expanded_path = os.path.abspath(expanded_path)
             with open(expanded_path, 'wt') as f:
                 text = self._view.substr(region)
                 f.write(text)
@@ -1562,7 +1562,7 @@ class ExCddCommand(ViWindowCommandBase):
 
         try:
             self.state.settings.vi['_cmdline_cd'] = path
-            self._view.run_command('ex_print_working_dir')
+            display_message(path, devices=DISPLAY_STATUS)
         except IOError:
             ex_error.display_error(ex_error.ERR_CANT_FIND_DIR_IN_CDPATH)
 
