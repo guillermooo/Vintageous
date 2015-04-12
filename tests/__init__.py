@@ -2,7 +2,7 @@ import sublime
 import unittest
 
 from Vintageous.state import State
-
+from Vintageous.vi.utils import modes
 
 class ViewTest(unittest.TestCase):
     """

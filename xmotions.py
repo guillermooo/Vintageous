@@ -1205,7 +1205,7 @@ class _vi_big_m(ViMotionCommand):
 
 
 class _vi_star(ViMotionCommand, ExactWordBufferSearchBase):
-    def run(self, count=1, mode=None, exact_word=True):
+    def run(self, count=1, mode=None, search_string=None):
         def f(view, s):
             pattern = self.build_pattern(query)
             flags = self.calculate_flags()
@@ -1228,9 +1228,9 @@ class _vi_star(ViMotionCommand, ExactWordBufferSearchBase):
             if match:
                 if mode == modes.INTERNAL_NORMAL:
                     return sublime.Region(s.a, match.begin())
-                elif state.mode == modes.VISUAL:
+                elif mode == modes.VISUAL:
                     return sublime.Region(s.a, match.begin())
-                elif state.mode == modes.NORMAL:
+                elif mode == modes.NORMAL:
                     return sublime.Region(match.begin(), match.begin())
 
             elif mode == modes.NORMAL:
@@ -1241,7 +1241,7 @@ class _vi_star(ViMotionCommand, ExactWordBufferSearchBase):
 
         state = self.state
 
-        query = self.get_query()
+        query = search_string or self.get_query()
         if query:
             self.hilite(query)
             # Ensure n and N can repeat this search later.
@@ -1249,9 +1249,12 @@ class _vi_star(ViMotionCommand, ExactWordBufferSearchBase):
 
         regions_transformer(self.view, f)
 
+        if not search_string:
+            state.last_buffer_search_command = 'vi_star'
+
 
 class _vi_octothorp(ViMotionCommand, ExactWordBufferSearchBase):
-    def run(self, count=1, mode=None, exact_word=True):
+    def run(self, count=1, mode=None, search_string=None):
         def f(view, s):
             pattern = self.build_pattern(query)
             flags = self.calculate_flags()
@@ -1274,9 +1277,9 @@ class _vi_octothorp(ViMotionCommand, ExactWordBufferSearchBase):
             if match:
                 if mode == modes.INTERNAL_NORMAL:
                     return sublime.Region(s.b, match.begin())
-                elif state.mode == modes.VISUAL:
+                elif mode == modes.VISUAL:
                     return sublime.Region(s.b, match.begin())
-                elif state.mode == modes.NORMAL:
+                elif mode == modes.NORMAL:
                     return sublime.Region(match.begin(), match.begin())
 
             elif mode == modes.NORMAL:
@@ -1287,7 +1290,7 @@ class _vi_octothorp(ViMotionCommand, ExactWordBufferSearchBase):
 
         state = self.state
 
-        query = self.get_query()
+        query = search_string or self.get_query()
         if query:
             self.hilite(query)
             # Ensure n and N can repeat this search later.
@@ -1295,6 +1298,9 @@ class _vi_octothorp(ViMotionCommand, ExactWordBufferSearchBase):
 
         start_sel = self.view.sel()[0]
         regions_transformer(self.view, f)
+
+        if not search_string:
+            state.last_buffer_search_command = 'vi_octothorp'
 
 
 class _vi_b(ViMotionCommand):
@@ -1772,16 +1778,20 @@ class _vi_question_mark(ViMotionCommand, BufferSearchBase):
 
 class _vi_repeat_buffer_search(ViMotionCommand):
     # TODO: This is a jump.
-    def run(self, mode=None, count=1, search_string='', forward=True):
-        if forward:
-            self.view.run_command('_vi_slash_impl', {
-                'mode': mode,
-                'count': count,
-                'search_string': search_string
-                })
-            return
+    commands = {
+        'vi_slash': ['_vi_slash_impl', '_vi_question_mark_impl'],
+        'vi_question_mark': ['_vi_question_mark_impl', '_vi_slash_impl'],
+        'vi_star': ['_vi_star', '_vi_octothorp'],
+        'vi_octothorp': ['_vi_octothorp', '_vi_star'],
+    }
 
-        self.view.run_command('_vi_question_mark_impl', {
+    def run(self, mode=None, count=1, reverse=False):
+        state = self.state
+        search_string = state.last_buffer_search
+        search_command = state.last_buffer_search_command
+        command = self.commands[search_command][int(reverse)]
+
+        self.view.run_command(command, {
             'mode': mode,
             'count': count,
             'search_string': search_string
