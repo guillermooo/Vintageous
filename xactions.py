@@ -148,21 +148,28 @@ class _vi_gq(ViTextCommandBase):
             raise ValueError('bad mode: ' + mode)
 
 
-class _vi_u(IrreversibleTextCommand):
+class _vi_u(ViWindowCommandBase):
+    '''
+    Undoes last change.
+    '''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    # TODO: surely must accept a mode?
     def run(self, count=1):
         for i in range(count):
-            self.view.run_command('undo')
+            self._view.run_command('undo')
 
-        if self.view.has_non_empty_selection_region():
+        if self._view.has_non_empty_selection_region():
             def reverse(view, s):
                 return R(s.end(), s.begin())
 
             # TODO: xpos is misaligned after this.
-            regions_transformer(self.view, reverse)
-            self.view.window().run_command('_enter_normal_mode', {'mode': modes.VISUAL})
+            regions_transformer(self._view, reverse)
+            # FIXME: why from modes.VISUAL?
+            self.window.run_command('_enter_normal_mode', {
+                    'mode': modes.VISUAL
+                    })
 
 
 class _vi_ctrl_r(IrreversibleTextCommand):
