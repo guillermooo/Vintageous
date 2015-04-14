@@ -4,8 +4,6 @@ from functools import partial
 import re
 
 import sublime
-import sublime_plugin
-
 from Vintageous import local_logger
 from Vintageous.state import _init_vintageous
 from Vintageous.state import State
@@ -181,7 +179,7 @@ class _vi_ctrl_r(IrreversibleTextCommand):
             self.view.run_command('redo')
 
 
-class _vi_a(sublime_plugin.TextCommand):
+class _vi_a(ViTextCommandBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -349,7 +347,7 @@ class _enter_normal_mode(ViTextCommandBase):
         sublime.status_message('')
 
 
-class _enter_normal_mode_impl(sublime_plugin.TextCommand):
+class _enter_normal_mode_impl(ViTextCommandBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -472,7 +470,7 @@ class _enter_visual_mode(ViTextCommandBase):
         state.display_status()
 
 
-class _enter_visual_mode_impl(sublime_plugin.TextCommand):
+class _enter_visual_mode_impl(ViTextCommandBase):
     """
     Transforms the view's selections. We don't do this inside the
     EnterVisualMode window command because ST seems to neglect to repaint the
@@ -526,7 +524,7 @@ class _enter_visual_line_mode(ViTextCommandBase):
         state.display_status()
 
 
-class _enter_visual_line_mode_impl(sublime_plugin.TextCommand):
+class _enter_visual_line_mode_impl(ViTextCommandBase):
     """
     Transforms the view's selections.
     """
@@ -1047,7 +1045,7 @@ class _vi_cc(ViTextCommandBase):
         self.set_xpos(self.state)
 
 
-class _vi_visual_o(sublime_plugin.TextCommand):
+class _vi_visual_o(ViTextCommandBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -1600,7 +1598,7 @@ class _vi_r(ViTextCommandBase):
         self.enter_normal_mode(mode)
 
 
-class _vi_less_than_less_than(sublime_plugin.TextCommand):
+class _vi_less_than_less_than(ViTextCommandBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -2144,7 +2142,7 @@ class _vi_zz(IrreversibleTextCommand):
         self.view.set_viewport_position(new_pos)
 
 
-class _vi_modify_numbers(sublime_plugin.TextCommand):
+class _vi_modify_numbers(ViTextCommandBase):
     """
     Base class for Ctrl-x and Ctrl-a.
     """
@@ -2229,7 +2227,7 @@ class _vi_select_big_j(IrreversibleTextCommand):
         self.view.run_command('_enter_normal_mode', {'mode': mode})
 
 
-class _vi_big_j(sublime_plugin.TextCommand):
+class _vi_big_j(ViTextCommandBase):
     WHITE_SPACE = ' \t'
 
     def __init__(self, *args, **kwargs):
@@ -2302,7 +2300,7 @@ class _vi_gv(IrreversibleTextCommand):
         self.view.sel().add_all(sels)
 
 
-class _vi_ctrl_e(sublime_plugin.TextCommand):
+class _vi_ctrl_e(ViTextCommandBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -2317,7 +2315,7 @@ class _vi_ctrl_e(sublime_plugin.TextCommand):
         self.view.run_command('scroll_lines', {'amount': -1, 'extend': extend})
 
 
-class _vi_ctrl_y(sublime_plugin.TextCommand):
+class _vi_ctrl_y(ViTextCommandBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -2332,7 +2330,7 @@ class _vi_ctrl_y(sublime_plugin.TextCommand):
         self.view.run_command('scroll_lines', {'amount': 1, 'extend': extend})
 
 
-class _vi_ctrl_r_equal(sublime_plugin.TextCommand):
+class _vi_ctrl_r_equal(ViTextCommandBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -2721,7 +2719,7 @@ class _vi_ctrl_x_ctrl_l(ViTextCommandBase):
         self.view.sel().add(R(pt))
 
 
-class __replace_line(sublime_plugin.TextCommand):
+class __replace_line(ViTextCommandBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -2807,7 +2805,7 @@ class _vi_gcc_action(ViTextCommandBase):
         self.view.sel().add(R(self.view.text_point(row, 0)))
 
 
-class _vi_gcc_motion(sublime_plugin.TextCommand):
+class _vi_gcc_motion(ViTextCommandBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
