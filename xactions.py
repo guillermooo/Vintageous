@@ -170,13 +170,13 @@ class _vi_u(ViWindowCommandBase):
                     })
 
 
-class _vi_ctrl_r(IrreversibleTextCommand):
+class _vi_ctrl_r(ViWindowCommandBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def run(self, count=1, mode=None):
         for i in range(count):
-            self.view.run_command('redo')
+            self._view.run_command('redo')
 
 
 class _vi_a(ViTextCommandBase):
