@@ -1135,15 +1135,16 @@ class ExQuitCommand(ViWindowCommandBase):
         if quit_command.command.forced:
             view.set_scratch(True)
 
-        if view.is_dirty():
+        if view.is_dirty() and not quit_command.command.forced:
             display_error2(VimError(ERR_UNSAVED_CHANGES))
             return
 
-        if not view.file_name():
+        if not view.file_name() and not quit_command.command.forced:
             display_error2(VimError(ERR_NO_FILE_NAME))
             return
 
         self.window.run_command('close')
+
         if len(self.window.views()) == 0:
             self.window.run_command('close')
             return
@@ -1718,13 +1719,8 @@ class ExWriteAndQuitAll(ViWindowCommandBase):
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
 
-        if self._view.is_dirty():
-            display_error2(VimError(ERR_UNSAVED_CHANGES))
-            utils.blink()
-            return
-
         if not all(v.file_name() for v in self.window.views()):
-            display_error2(VimError(ERR_OTHER_BUFFER_HAS_CHANGES))
+            display_error2(VimError(ERR_NO_FILE_NAME))
             utils.blink()
             return
 
@@ -1735,9 +1731,7 @@ class ExWriteAndQuitAll(ViWindowCommandBase):
 
         self.window.run_command('save_all')
 
-        if any(v.is_dirty() for v in self.window.views()):
-            utils.blink()
-            return
+        assert not any(v.is_dirty() for v in self.window.views())
 
         self.window.run_command('close_all')
         self.window.run_command('exit')
