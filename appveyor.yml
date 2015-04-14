@@ -5,6 +5,8 @@ environment:
     matrix:
         - SUBLIME_TEXT_VERSION: "3"
 
+clone_depth: 1
+
 install:
     - ps: start-filedownload "https://raw.githubusercontent.com/randy3k/UnitTesting/master/sbin/appveyor.ps1"
     - ps: .\appveyor.ps1 "bootstrap" -verbose
