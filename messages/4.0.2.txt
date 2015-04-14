@@ -1,0 +1,59 @@
+==============================================================================
+Vintageous 4.0.2
+==============================================================================
+
+*** Follow important announcements on Twitter: @VintageousS3 ***
+
+This version includes regression fixes and assorted bugfixes.
+
+This version finally attempts to fix a long-standing issue regarding unclosed
+edit objects.
+
+Unclosed edit objects cause erratic undo, redo, and macro behavior in ST
+native. Even though Vintageous does not rely on all ST native commands affected
+by the edit object's lifecycle, it does use some of them. Thus, until now,
+some Vintageous commands didn't interact properly with undo and redo. In some
+scenarios, ST would undelete too many edits. While perhaps not all problems
+will be solved in this version, a substantial improvement should be noticed
+by most users.
+
+On a related note, the caret should now stop blinking while in motion. Before
+it would keep blinking and become hard to follow.
+
+Thanks!
+Guillermo
+
+
+CHANGES
+-------
+
+  - fix redo
+  - address #913 - unify base classes for some commands
+  - make sure to close all undo objects
+  - :q! should always quit active view
+
+
+FOUND BUGS?
+-----------
+
+Please report them here:
+
+    https://github.com/guillermooo/Vintageous/issues
+
+
+SUPPORT VINTAGEOUS
+------------------
+
+Is Vintageous worth your time? Developing Vintageous is hard work. If you use
+it often, please consider donating and make it worth my time too.
+
+    PayPal: http://www.pledgie.com/campaigns/19122
+    Gittip: https://www.gratipay.com/guillermooo/
+
+I'm the creator and main author of Vintageous, but some generous people have
+contributed their time and effort as well. See the more active ones here; you
+may want to show them some gratitude too:
+
+https://github.com/guillermooo/Vintageous/graphs/contributors
+
+Thanks for reading and for using Vintageous!

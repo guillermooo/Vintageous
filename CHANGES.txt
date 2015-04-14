@@ -1,3 +1,12 @@
+4.0.2 - 14-04-2015
+
+	- faster appveyor
+	- fix redo
+	- address #913 - unify base classes for some commands
+	- make sure to close all undo objects
+	- update ci config
+	- :q! should always quit active view
+
 4.0.1 - 12-04-2015
 
 	- :browse uses current directory as initial directory
