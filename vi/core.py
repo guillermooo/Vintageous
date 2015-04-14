@@ -118,7 +118,9 @@ class ViTextCommandBase(sublime_plugin.TextCommand, ViCommandMixin):
         super().__init__(*args, **kwargs)
 
 
-class ViMotionCommand(ViTextCommandBase, IrreversibleTextCommand):
+# Due to MRO in Python subclasses, IrreversibleTextCommand must come first so
+# that the modified .run_() method is found first.
+class ViMotionCommand(IrreversibleTextCommand, ViTextCommandBase):
     """
     Motions should bypass the undo stack.
     """

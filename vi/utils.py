@@ -277,14 +277,25 @@ class IrreversibleTextCommand(sublime_plugin.TextCommand):
     def __init__(self, view):
         sublime_plugin.TextCommand.__init__(self, view)
 
-    def run_(self, edit_token, kwargs):
-        if kwargs and 'event' in kwargs:
-            del kwargs['event']
-
-        if kwargs:
-            self.run(**kwargs)
+    def run_(self, edit_token, args):
+        # We discard the edit_token because we don't want an IrreversibleTextCommand
+        # to be added to the undo stack, but Sublime Text seems to still require
+        # us to begin..end the token. If we removed those calls, the caret
+        # would blink while motion keys were pressed, because --apparently--
+        # we'd have an unclosed edit object around.
+        args = self.filter_args(args)
+        if args:
+            edit = self.view.begin_edit(edit_token, self.name(), args)
+            try:
+                return self.run(**args)
+            finally:
+                self.view.end_edit(edit)
         else:
-            self.run()
+            edit = self.view.begin_edit(edit_token, self.name())
+            try:
+                return self.run()
+            finally:
+                self.view.end_edit(edit)
 
     def run(self, **kwargs):
         pass
