@@ -169,6 +169,10 @@ class _vi_u(ViWindowCommandBase):
                     'mode': modes.VISUAL
                     })
 
+        # If we yy, then u, we might end up with outlined regions if we
+        # don't erase them here, because ST will restore them when undoing.
+        self._view.erase_regions('vi_yy_target')
+
 
 class _vi_ctrl_r(ViWindowCommandBase):
     def __init__(self, *args, **kwargs):
