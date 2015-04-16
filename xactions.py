@@ -1078,6 +1078,8 @@ class _vi_yy(ViTextCommandBase):
                 end = view.text_point(row + count - 1, 0)
                 return R(view.line(s.a).a, view.full_line(end).b)
 
+            if view.line(s.b).empty():
+                return R(s.b, min(view.size(), s.b + 1))
             return view.full_line(s.b)
 
         def restore():
