@@ -1988,7 +1988,10 @@ class _vi_p(ViTextCommandBase):
             self.view.sel().add_all([R(loc) for loc in pts])
             return
 
-        self.view.sel().add_all([R(loc + 1) for loc in pts])
+        pts = [utils.next_non_white_space_char(self.view, pt + 1)
+                    for pt in pts]
+
+        self.view.sel().add_all([R(pt) for pt in pts])
 
     def prepare_fragment(self, text):
         if text.endswith('\n') and text != '\n':
