@@ -27,6 +27,7 @@ def run_and_wait(view, cmd):
 def run_and_read(view, cmd):
     out, err = subprocess.Popen(['cmd.exe', '/c', cmd],
                                 stdout=PIPE,
+                                stderr=PIPE,
                                 shell=True,
                                 startupinfo=get_startup_info()).communicate()
     try:
@@ -46,11 +47,12 @@ def filter_region(view, txt, command):
         script.close()
 
         p = subprocess.Popen([script.name],
-                             stdout=subprocess.PIPE,
+                             stdout=PIPE,
+                             stderr=PIPE,
                              startupinfo=get_startup_info())
 
-        rv = p.communicate()
-        return rv[0].decode(get_oem_cp()).replace('\r\n', '\n')[:-1].strip()
+        our, err = p.communicate()
+        return (out or err).decode(get_oem_cp()).replace('\r\n', '\n')[:-1].strip()
     finally:
         os.remove(script.name)
         os.remove(contents.name)

@@ -169,6 +169,10 @@ class _vi_u(ViWindowCommandBase):
                     'mode': modes.VISUAL
                     })
 
+        # If we yy, then u, we might end up with outlined regions if we
+        # don't erase them here, because ST will restore them when undoing.
+        self._view.erase_regions('vi_yy_target')
+
 
 class _vi_ctrl_r(ViWindowCommandBase):
     def __init__(self, *args, **kwargs):
@@ -1078,6 +1082,8 @@ class _vi_yy(ViTextCommandBase):
                 end = view.text_point(row + count - 1, 0)
                 return R(view.line(s.a).a, view.full_line(end).b)
 
+            if view.line(s.b).empty():
+                return R(s.b, min(view.size(), s.b + 1))
             return view.full_line(s.b)
 
         def restore():
@@ -1982,7 +1988,10 @@ class _vi_p(ViTextCommandBase):
             self.view.sel().add_all([R(loc) for loc in pts])
             return
 
-        self.view.sel().add_all([R(loc + 1) for loc in pts])
+        pts = [utils.next_non_white_space_char(self.view, pt + 1)
+                    for pt in pts]
+
+        self.view.sel().add_all([R(pt) for pt in pts])
 
     def prepare_fragment(self, text):
         if text.endswith('\n') and text != '\n':

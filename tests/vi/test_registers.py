@@ -347,7 +347,7 @@ class Test_get_selected_text(ViewTest):
             _yanks_linewise = True
 
         rv = self.regs.get_selected_text(vi_cmd_data)
-        self.assertEqual(rv, ["\n\n", "\n\n"])
+        self.assertEqual(rv, ["\n", "\n"])
 
     def testYankLinewiseIfTwoTrailingNewLines(self):
         self.regs.view.substr.return_value = "\n\n"
