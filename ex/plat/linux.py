@@ -12,7 +12,10 @@ def run_and_wait(view, cmd):
 
 
 def run_and_read(view, cmd):
-    out, err = subprocess.Popen([cmd], stdout=PIPE, shell=True).communicate()
+    out, err = subprocess.Popen([cmd],
+            stdout=PIPE,
+            stderr=PIPE,
+            shell=True).communicate()
     try:
         return (out or err).decode('utf-8')
     except AttributeError:
@@ -23,5 +26,6 @@ def filter_region(view, text, command):
     shell = view.settings().get('VintageousEx_linux_shell')
     shell = shell or os.path.expandvars("$SHELL")
     p = subprocess.Popen([shell, '-c', 'echo "%s" | %s' % (text, command)],
-                         stdout=subprocess.PIPE)
+             stderr=subprocess.PIPE,
+             stdout=subprocess.PIPE)
     return p.communicate()[0][:-1].decode('utf-8')
