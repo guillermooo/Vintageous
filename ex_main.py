@@ -10,8 +10,8 @@ from Vintageous.ex.completions import parse
 from Vintageous.ex.completions import parse_for_setting
 from Vintageous.ex.completions import wants_fs_completions
 from Vintageous.ex.completions import wants_setting_completions
-from Vintageous.ex.ex_error import display_error2
-from Vintageous.ex.ex_error import handle_not_implemented
+from Vintageous.ex.ex_error import show_error
+from Vintageous.ex.ex_error import show_not_implemented
 from Vintageous.ex.ex_error import VimError
 from Vintageous.ex.parser.parser import parse_command_line
 from Vintageous.ex.parser.scanner_command_goto import TokenCommandGoto
@@ -115,11 +115,11 @@ class ViColonInput(sublime_plugin.WindowCommand):
             return
         except VimError as ve:
             # only new code emits VimErrors, so handle it.
-            display_error2(ve)
+            show_error(ve)
             return
         except Exception as e:
             message = str(e) +  ' ' + "(%s)" % cmd_line
-            handle_not_implemented(message)
+            show_not_implemented(message)
             return
 
 class ViColonRepeatLast(sublime_plugin.WindowCommand):
