@@ -1388,44 +1388,49 @@ class ExYank(sublime_plugin.TextCommand):
 
 class TabControlCommand(ViWindowCommandBase):
     def run(self, command, file_name=None, forced=False):
-        window = self.window
-        current_view = self._view
-        max_index = len(window.views())
-        (group, index) = window.get_view_index(current_view)
+        view_count = len(self.window.views())
+        (group_index, view_index) = self.window.get_view_index(self._view)
 
         if command == 'open':
-            if file_name is None:  # TODO: file completion
-                window.run_command('show_overlay', {
-                        'overlay': 'goto', 'show_files': True, })
+            if not file_name:  # TODO: file completion
+                self.window.run_command('show_overlay', {
+                        'overlay': 'goto',
+                        'show_files': True,
+                        })
             else:
-                cur_dir = os.path.dirname(current_view.file_name())
-                window.open_file(os.path.join(cur_dir, file_name))
+                cur_dir = os.path.dirname(self._view.file_name())
+                self.window.open_file(os.path.join(cur_dir, file_name))
 
         elif command == 'next':
-            window.run_command('select_by_index', {
-                    'index': (index + 1) % max_index})
+            self.window.run_command('select_by_index', {
+                    'index': (view_index + 1) % view_count})
 
         elif command == 'prev':
-            window.run_command('select_by_index', {
-                    'index': (index + max_index - 1) % max_index})
+            self.window.run_command('select_by_index', {
+                    'index': (view_index + view_count - 1) % view_count})
 
         elif command == "last":
-            window.run_command('select_by_index', {'index': max_index - 1})
+            self.window.run_command('select_by_index', {'index': view_count - 1})
 
         elif command == "first":
-            window.run_command('select_by_index', {'index': 0})
+            self.window.run_command('select_by_index', {'index': 0})
 
         elif command == 'only':
             quit_command_line = 'quit' + '' if not forced else '!'
 
-            for view in window.views_in_group(group):
-                if view.id() == current_view.id():
+            group = self.window.views_in_group(group_index)
+            if any(view.is_dirty() for view in group):
+                display_error2(VimError(ERR_OTHER_BUFFER_HAS_CHANGES))
+                return
+
+            for view in group:
+                if view.id() == self._view.id():
                     continue
-                window.focus_view(view)
-                window.run_command('ex_quit', {
+                self.window.focus_view(view)
+                self.window.run_command('ex_quit', {
                         'command_line': quit_command_line})
 
-            window.focus_view(current_view)
+            self.window.focus_view(self._view)
 
         else:
             display_message("Unknown TabControl Command", devices=DISPLAY_ALL)
