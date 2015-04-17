@@ -61,6 +61,7 @@ PAIRS = {
     '<': (('<', '>'), BRACKET),
     '>': (('<', '>'), BRACKET),
     'b': (('\\(', '\\)'), BRACKET),
+    'B': (('\\{', '\\}'), BRACKET),
     'p': (None, PARAGRAPH),
     's': (None, SENTENCE),
     't': (None, TAG),
