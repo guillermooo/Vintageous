@@ -2120,9 +2120,10 @@ class _vi_z_enter(IrreversibleTextCommand):
 
     def run(self, count=1, mode=None):
         first_sel = self.view.sel()[0]
-        current_position = self.view.text_to_layout(first_sel.b)
+        pt = self.view.line(first_sel.b).begin()
+        pt = self.view.text_to_layout(pt)
 
-        self.view.set_viewport_position(current_position)
+        self.view.set_viewport_position(pt)
 
 
 class _vi_z_minus(IrreversibleTextCommand):
