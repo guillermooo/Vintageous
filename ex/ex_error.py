@@ -94,6 +94,13 @@ def show_message(message, displays=Display.CONSOLE):
         sublime.status_message(message)
 
 
+def show_status(message):
+    '''
+    Shows a status message in Sublime Text.
+    '''
+    show_message(message, displays=Display.STATUS)
+
+
 def show_error(error, displays=Display.ALL, log=False):
     '''
     Displays error messages to the user.
@@ -115,11 +122,3 @@ def show_not_implemented(message=None, displays=Display.ALL):
 
 def get_error_message(error_code):
     return ERR_MESSAGES.get(error_code, '')
-
-
-def display_error(error_code, arg='', log=False):
-    err_fmt = "Vintageous: E%d %s"
-    if arg:
-        err_fmt += " (%s)" % arg
-    message = get_error_message(error_code)
-    sublime.status_message(err_fmt % (error_code, message))
