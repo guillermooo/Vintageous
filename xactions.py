@@ -1,5 +1,3 @@
-# TODO: weird name to avoid init issues with state.py::State.
-
 from functools import partial
 import re
 
@@ -36,6 +34,10 @@ _logger = local_logger(__name__)
 
 
 class _vi_g_big_u(ViTextCommandBase):
+    '''
+    Command: gU
+    '''
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
