@@ -4,6 +4,7 @@ from functools import partial
 import re
 
 import sublime
+
 from Vintageous import local_logger
 from Vintageous.state import _init_vintageous
 from Vintageous.state import State
@@ -20,12 +21,14 @@ from Vintageous.vi.keys import key_names
 from Vintageous.vi.keys import KeySequenceTokenizer
 from Vintageous.vi.keys import to_bare_command_name
 from Vintageous.vi.mappings import Mappings
+from Vintageous.vi.utils import first_sel
 from Vintageous.vi.utils import gluing_undo_groups
 from Vintageous.vi.utils import IrreversibleTextCommand
 from Vintageous.vi.utils import is_view
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import R
 from Vintageous.vi.utils import regions_transformer
+from Vintageous.vi.utils import resolve_insertion_point_at_b
 from Vintageous.vi.utils import restoring_sel
 
 
@@ -2114,16 +2117,22 @@ class _vi_ctrl_w_big_h(IrreversibleTextCommand):
             w.focus_group(current_group - 1)
 
 
+# TODO: z<CR> != zt
 class _vi_z_enter(IrreversibleTextCommand):
-    def __init__(self, view):
-        IrreversibleTextCommand.__init__(self, view)
+    '''
+    Command: z<cr>
+
+    http://vimdoc.sourceforge.net/htmldoc/scroll.html#z<CR>
+    '''
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def run(self, count=1, mode=None):
-        first_sel = self.view.sel()[0]
-        pt = self.view.line(first_sel.b).begin()
-        pt = self.view.text_to_layout(pt)
+        pt = resolve_insertion_point_at_b(first_sel(self.view))
+        home_line = self.view.line(pt)
 
-        self.view.set_viewport_position(pt)
+        taget_pt = self.view.text_to_layout(home_line.begin())
+        self.view.set_viewport_position(taget_pt)
 
 
 class _vi_z_minus(IrreversibleTextCommand):
