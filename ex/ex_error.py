@@ -57,59 +57,6 @@ class Display:
     ALL = STATUS | CONSOLE
 
 
-def display_message(content, displays=Display.CONSOLE):
-    '''
-    Displays a message.
-
-    @content
-      The message's content.
-
-    @displays
-      A `Display` where the message should be output to.
-    '''
-    content = 'Vintageous: {}'.format(content)
-
-    if displays == Display.NONE:
-        return
-
-    if (displays & Display.CONSOLE) == Display.CONSOLE:
-        print(content)
-
-    if (displays & Display.STATUS) == Display.STATUS:
-        sublime.status_message(content)
-
-
-def get_error_message(error_code):
-    return ERR_MESSAGES.get(error_code, '')
-
-
-def display_error(error_code, arg='', log=False):
-    err_fmt = "Vintageous: E%d %s"
-    if arg:
-        err_fmt += " (%s)" % arg
-    msg = get_error_message(error_code)
-    sublime.status_message(err_fmt % (error_code, msg))
-
-
-def error(err, displays=Display.ALL, log=False):
-    '''
-    Displays error messages to the user.
-
-    @err
-      An instance of Exception.
-
-    @displays
-      Where to output the message to.
-    '''
-    assert isinstance(err, Exception), "'err' must be an instance of 'Exception'"
-    display_message(str(err), displays=displays)
-
-
-def handle_not_implemented(message=None, displays=Display.ALL):
-    message = message if message else 'Not implemented'
-    display_message(message, displays=displays)
-
-
 # TODO: report faulty command line.
 class VimError(Exception):
     '''
@@ -123,3 +70,56 @@ class VimError(Exception):
 
     def __str__(self):
         return 'E{0} {1}'.format(self.code, self.message)
+
+
+def show_message(message, displays=Display.CONSOLE):
+    '''
+    Displays a message.
+
+    @message
+      The message's message.
+
+    @displays
+      A `Display` where the message should be output to.
+    '''
+    message = 'Vintageous: {}'.format(message)
+
+    if displays == Display.NONE:
+        return
+
+    if (displays & Display.CONSOLE) == Display.CONSOLE:
+        print(message)
+
+    if (displays & Display.STATUS) == Display.STATUS:
+        sublime.status_message(message)
+
+
+def show_error(error, displays=Display.ALL, log=False):
+    '''
+    Displays error messages to the user.
+
+    @error
+      An instance of Exception.
+
+    @displays
+      Where to output the message to.
+    '''
+    assert isinstance(error, Exception), "'error' must be an instance of 'Exception'"
+    show_message(str(error), displays=displays)
+
+
+def show_not_implemented(message=None, displays=Display.ALL):
+    message = message if message else 'Not implemented'
+    show_message(message, displays=displays)
+
+
+def get_error_message(error_code):
+    return ERR_MESSAGES.get(error_code, '')
+
+
+def display_error(error_code, arg='', log=False):
+    err_fmt = "Vintageous: E%d %s"
+    if arg:
+        err_fmt += " (%s)" % arg
+    message = get_error_message(error_code)
+    sublime.status_message(err_fmt % (error_code, message))

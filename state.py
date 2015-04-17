@@ -654,7 +654,7 @@ class State(object):
                 print(e)
                 _logger.error(
                     'Vintageous: Error when setting xpos. Defaulting to 0.')
-                _logger.error(e)
+                _logger.show_error(e)
                 self.xpos = 0
                 return
             else:

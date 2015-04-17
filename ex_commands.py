@@ -1,16 +1,16 @@
-import sublime
-import sublime_plugin
-
 import os
 import re
 import stat
 import subprocess
 
+import sublime
+import sublime_plugin
+
 from Vintageous.ex import ex_error
 from Vintageous.ex import shell
 from Vintageous.ex.ex_error import Display
-from Vintageous.ex.ex_error import error
-from Vintageous.ex.ex_error import display_message
+from Vintageous.ex.ex_error import show_error
+from Vintageous.ex.ex_error import show_message
 from Vintageous.ex.ex_error import ERR_CANT_WRITE_FILE
 from Vintageous.ex.ex_error import ERR_EMPTY_BUFFER
 from Vintageous.ex.ex_error import ERR_FILE_EXISTS
@@ -18,7 +18,7 @@ from Vintageous.ex.ex_error import ERR_NO_FILE_NAME
 from Vintageous.ex.ex_error import ERR_OTHER_BUFFER_HAS_CHANGES
 from Vintageous.ex.ex_error import ERR_READONLY_FILE
 from Vintageous.ex.ex_error import ERR_UNSAVED_CHANGES
-from Vintageous.ex.ex_error import handle_not_implemented
+from Vintageous.ex.ex_error import show_not_implemented
 from Vintageous.ex.ex_error import VimError
 from Vintageous.ex.parser.parser import parse_command_line
 from Vintageous.ex.plat.windows import get_oem_cp
@@ -192,7 +192,7 @@ class ExShellOut(sublime_plugin.TextCommand):
                                                    'scroll_to_end': True})
                 self.view.window().run_command("show_panel", {"panel": "output.vi_out"})
         except NotImplementedError:
-            ex_error.handle_not_implemented()
+            ex_error.show_not_implemented()
 
 
 class ExShell(ViWindowCommandBase):
@@ -238,7 +238,7 @@ class ExShell(ViWindowCommandBase):
             self.open_shell(['cmd.exe', '/k']).wait()
         else:
             # XXX OSX (make check explicit)
-            ex_error.handle_not_implemented()
+            ex_error.show_not_implemented()
 
 
 class ExReadShellOut(sublime_plugin.TextCommand):
@@ -286,13 +286,13 @@ class ExReadShellOut(sublime_plugin.TextCommand):
                 rv = p.communicate()[0].decode(cp)[:-2].strip()
                 self.view.insert(edit, target_point, rv.strip() + '\n')
             else:
-                ex_error.handle_not_implemented()
+                ex_error.show_not_implemented()
         # Read a file into the current view.
         else:
             # According to Vim's help, :r should read the current file's content
             # if no file name is given, but Vim doesn't do that.
             # TODO: implement reading a file into the buffer.
-            ex_error.handle_not_implemented()
+            ex_error.show_not_implemented()
             return
 
 
@@ -334,7 +334,7 @@ class ExMap(ViWindowCommandBase):
         parsed = parse_command_line(command_line)
 
         if not (parsed.command.keys and parsed.command.command):
-            handle_not_implemented('Showing mappings now implemented')
+            show_not_implemented('Showing mappings now implemented')
             return
 
         mappings = Mappings(self.state)
@@ -475,7 +475,7 @@ class ExAbbreviate(ViWindowCommandBase):
         parsed = parse_command_line(command_line)
 
         if not (parsed.command.short and parsed.command.full):
-            handle_not_implemented(':abbreviate not fully implemented')
+            show_not_implemented(':abbreviate not fully implemented')
             return
 
         abbrev.Store().set(parsed.command.short, parsed.command.full)
@@ -516,7 +516,7 @@ class ExPrintWorkingDir(ViWindowCommandBase):
     @changing_cd
     def run(self, command_line=''):
         assert command_line, 'expected non-empty command line'
-        display_message(os.getcwd(), displays=Display.STATUS)
+        show_message(os.getcwd(), displays=Display.STATUS)
 
 
 class ExWriteFile(ViWindowCommandBase):
@@ -559,11 +559,11 @@ class ExWriteFile(ViWindowCommandBase):
         parsed = parse_command_line(command_line)
 
         if parsed.command.options:
-            handle_not_implemented("++opt isn't implemented for :write")
+            show_not_implemented("++opt isn't implemented for :write")
             return
 
         if parsed.command.command:
-            handle_not_implemented('!cmd not implememted for :write')
+            show_not_implemented('!cmd not implememted for :write')
             return
 
         if not self._view:
@@ -574,7 +574,7 @@ class ExWriteFile(ViWindowCommandBase):
             return
 
         if parsed.command.command:
-            handle_not_implemented("!cmd isn't implemented for :write")
+            show_not_implemented("!cmd isn't implemented for :write")
             return
 
         if parsed.command.target_file:
@@ -582,7 +582,7 @@ class ExWriteFile(ViWindowCommandBase):
             return
 
         if not self._view.file_name():
-            error(VimError(ERR_NO_FILE_NAME))
+            show_error(VimError(ERR_NO_FILE_NAME))
             return
 
         read_only = (self.check_is_readonly(self._view.file_name())
@@ -590,7 +590,7 @@ class ExWriteFile(ViWindowCommandBase):
 
         if read_only and not parsed.command.forced:
             utils.blink()
-            error(VimError(ERR_READONLY_FILE))
+            show_error(VimError(ERR_READONLY_FILE))
             return
 
         self.window.run_command('save')
@@ -630,7 +630,7 @@ class ExWriteFile(ViWindowCommandBase):
         fname = parsed_command.command.target_file
 
         if not parsed_command.command.forced and not os.path.exists(fname):
-            error(VimError(ERR_CANT_WRITE_FILE))
+            show_error(VimError(ERR_CANT_WRITE_FILE))
             return
 
         try:
@@ -638,7 +638,7 @@ class ExWriteFile(ViWindowCommandBase):
                 text = self._view.substr(r)
                 f.write(text)
             # TODO: make this `show_info` instead.
-            display_message('Appended to ' + os.path.abspath(fname),
+            message('Appended to ' + os.path.abspath(fname),
                     displays=Display.STATUS)
             return
         except IOError as e:
@@ -654,12 +654,12 @@ class ExWriteFile(ViWindowCommandBase):
         if not ex_command.command.forced:
             if os.path.exists(fname):
                 utils.blink()
-                error(VimError(ERR_FILE_EXISTS))
+                show_error(VimError(ERR_FILE_EXISTS))
                 return
 
             if self.check_is_readonly(fname):
                 utils.blink()
-                error(VimError(ERR_READONLY_FILE))
+                show_error(VimError(ERR_READONLY_FILE))
                 return
 
         region = None
@@ -683,7 +683,7 @@ class ExWriteFile(ViWindowCommandBase):
 
         except IOError as e:
             # TODO: Add logging.
-            error(VimError(ERR_CANT_WRITE_FILE))
+            show_error(VimError(ERR_CANT_WRITE_FILE))
             print('Vintageous ==============================================')
             print (e)
             print('=========================================================')
@@ -765,13 +765,13 @@ class ExMove(ExTextCommandBase):
         move_command = parse_command_line(command_line)
 
         if move_command.command.address is None:
-            ex_error.error(ex_error.ERR_INVALID_ADDRESS)
+            ex_error.show_error(ex_error.ERR_INVALID_ADDRESS)
             return
 
         source = move_command.line_range.resolve(self.view)
 
         if any(s.contains(source) for s in self.view.sel()):
-            error(ex_error.ERR_CANT_MOVE_LINES_ONTO_THEMSELVES)
+            show_error(ex_error.ERR_CANT_MOVE_LINES_ONTO_THEMSELVES)
             return
 
         destination = move_command.command.address.resolve(self.view)
@@ -815,7 +815,7 @@ class ExCopy(ExTextCommandBase):
         unresolved = parsed.command.calculate_address()
 
         if unresolved is None:
-            error(VimError(ex_error.ERR_INVALID_ADDRESS))
+            show_error(VimError(ex_error.ERR_INVALID_ADDRESS))
             return
 
         # TODO: how do we signal row 0?
@@ -856,7 +856,7 @@ class ExOnly(ViWindowCommandBase):
         parsed = parse_command_line(command_line)
 
         if not parsed.command.forced and has_dirty_buffers(self.window):
-                error(VimError(ERR_OTHER_BUFFER_HAS_CHANGES))
+                show_error(VimError(ERR_OTHER_BUFFER_HAS_CHANGES))
                 return
 
         current_id = self._view.id()
@@ -1082,7 +1082,7 @@ class ExPrint(ViWindowCommandBase):
         assert command_line, 'expected non-empty command line'
 
         if self._view.size() == 0:
-            error(VimError(ERR_EMPTY_BUFFER))
+            show_error(VimError(ERR_EMPTY_BUFFER))
             return
 
         parsed = parse_command_line(command_line)
@@ -1135,11 +1135,11 @@ class ExQuitCommand(ViWindowCommandBase):
             view.set_scratch(True)
 
         if view.is_dirty() and not quit_command.command.forced:
-            error(VimError(ERR_UNSAVED_CHANGES))
+            show_error(VimError(ERR_UNSAVED_CHANGES))
             return
 
         if not view.file_name() and not quit_command.command.forced:
-            error(VimError(ERR_NO_FILE_NAME))
+            show_error(VimError(ERR_NO_FILE_NAME))
             return
 
         self.window.run_command('close')
@@ -1190,7 +1190,7 @@ class ExWriteAndQuitCommand(ViWindowCommandBase):
 
         # TODO: implement this
         if parsed.command.forced:
-            ex_error.handle_not_implemented()
+            ex_error.show_not_implemented()
             return
         if self._view.is_read_only():
             sublime.status_message("Can't write a read-only buffer.")
@@ -1240,12 +1240,12 @@ class ExEdit(ViWindowCommandBase):
                     os.path.expandvars(parsed.command.file_name))
 
             if self._view.is_dirty() and not parsed.command.forced:
-                error(VimError(ex_error.ERR_UNSAVED_CHANGES))
+                show_error(VimError(ex_error.ERR_UNSAVED_CHANGES))
                 return
 
             if os.path.isdir(file_name):
                 # TODO: Open a file-manager in a buffer.
-                display_message('Cannot open directory', displays=Display.ALL)
+                message('Cannot open directory', displays=Display.ALL)
                 # 'prompt_open_file' does not accept initial root parameter
                 # self.window.run_command('prompt_open_file', {'path': file_name})
                 return
@@ -1264,10 +1264,10 @@ class ExEdit(ViWindowCommandBase):
 
                 # Give ST some time to load the new view.
                 sublime.set_timeout(
-                        lambda: display_message(msg, displays=Displays.ALL), 150)
+                        lambda: show_message(msg, displays=Displays.ALL), 150)
                 return
 
-            handle_not_implemented(
+            show_not_implemented(
                     'not implemented case for :edit ({0})'.format(command_line))
             return
 
@@ -1276,10 +1276,10 @@ class ExEdit(ViWindowCommandBase):
             return
 
         if self._view.is_dirty():
-            error(VimError(ex_error.ERR_UNSAVED_CHANGES))
+            show_error(VimError(ex_error.ERR_UNSAVED_CHANGES))
             return
 
-        error(VimError(ex_error.ERR_UNSAVED_CHANGES))
+        show_error(VimError(ex_error.ERR_UNSAVED_CHANGES))
 
 
 class ExCquit(ViWindowCommandBase):
@@ -1419,7 +1419,7 @@ class TabControlCommand(ViWindowCommandBase):
 
             group = self.window.views_in_group(group_index)
             if any(view.is_dirty() for view in group):
-                error(VimError(ERR_OTHER_BUFFER_HAS_CHANGES))
+                show_error(VimError(ERR_OTHER_BUFFER_HAS_CHANGES))
                 return
 
             for view in group:
@@ -1432,7 +1432,7 @@ class TabControlCommand(ViWindowCommandBase):
             self.window.focus_view(self._view)
 
         else:
-            display_message("Unknown TabControl Command", displays=Displays.ALL)
+            message("Unknown TabControl Command", displays=Displays.ALL)
 
 
 class ExTabOpenCommand(sublime_plugin.WindowCommand):
@@ -1531,7 +1531,7 @@ class ExCdCommand(ViWindowCommandBase):
         parsed = parse_command_line(command_line)
 
         if self._view.is_dirty() and not parsed.command.forced:
-            error(ex_error.ERR_UNSAVED_CHANGES)
+            show_error(ex_error.ERR_UNSAVED_CHANGES)
             return
 
         if not parsed.command.path:
@@ -1551,7 +1551,7 @@ class ExCdCommand(ViWindowCommandBase):
         path = os.path.realpath(os.path.expandvars(os.path.expanduser(parsed.command.path)))
         if not os.path.exists(path):
             # TODO: Add error number in ex_error.py.
-            error(VimError(ex_error.ERR_CANT_FIND_DIR_IN_CDPATH))
+            show_error(VimError(ex_error.ERR_CANT_FIND_DIR_IN_CDPATH))
             return
 
         self.state.settings.vi['_cmdline_cd'] = path
@@ -1578,14 +1578,14 @@ class ExCddCommand(ViWindowCommandBase):
         parsed = parse_command_line(command_line)
 
         if self._view.is_dirty() and not parsed.command.forced:
-            error(VimError(ex_error.ERR_UNSAVED_CHANGES))
+            show_error(VimError(ex_error.ERR_UNSAVED_CHANGES))
             return
 
         path = os.path.dirname(self._view.file_name())
 
         try:
             self.state.settings.vi['_cmdline_cd'] = path
-            display_message(path, displays=Displays.STATUS)
+            show_message(path, displays=Displays.STATUS)
         except IOError:
             ex_error.display_error(ex_error.ERR_CANT_FIND_DIR_IN_CDPATH)
 
@@ -1612,7 +1612,7 @@ class ExVsplit(ViWindowCommandBase):
 
         groups = self.window.num_groups()
         if groups >= ExVsplit.MAX_SPLITS:
-            display_message("Can't create more groups.", displays=Displays.ALL)
+            message("Can't create more groups.", displays=Displays.ALL)
             return
 
         old_view = self._view
@@ -1667,7 +1667,7 @@ class ExSetLocal(ViWindowCommandBase):
         value = parsed.command.value
 
         if option.endswith('?'):
-            ex_error.handle_not_implemented()
+            ex_error.show_not_implemented()
             return
         try:
             set_local(self._view, option, value)
@@ -1689,7 +1689,7 @@ class ExSet(ViWindowCommandBase):
         print (locals())
 
         if option.endswith('?'):
-            ex_error.handle_not_implemented()
+            ex_error.show_not_implemented()
             return
         try:
             set_global(self._view, option, value)
@@ -1724,12 +1724,12 @@ class ExWriteAndQuitAll(ViWindowCommandBase):
         assert command_line, 'expected non-empty command line'
 
         if not all(v.file_name() for v in self.window.views()):
-            error(VimError(ERR_NO_FILE_NAME))
+            show_error(VimError(ERR_NO_FILE_NAME))
             utils.blink()
             return
 
         if any(v.is_read_only() for v in self.window.views()):
-            error(VimError(ERR_READONLY_FILE))
+            show_error(VimError(ERR_READONLY_FILE))
             utils.blink()
             return
 
