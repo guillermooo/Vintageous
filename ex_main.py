@@ -10,7 +10,7 @@ from Vintageous.ex.completions import parse
 from Vintageous.ex.completions import parse_for_setting
 from Vintageous.ex.completions import wants_fs_completions
 from Vintageous.ex.completions import wants_setting_completions
-from Vintageous.ex.ex_error import display_error2
+from Vintageous.ex.ex_error import error
 from Vintageous.ex.ex_error import handle_not_implemented
 from Vintageous.ex.ex_error import VimError
 from Vintageous.ex.parser.parser import parse_command_line
@@ -115,7 +115,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
             return
         except VimError as ve:
             # only new code emits VimErrors, so handle it.
-            display_error2(ve)
+            error(ve)
             return
         except Exception as e:
             message = str(e) +  ' ' + "(%s)" % cmd_line

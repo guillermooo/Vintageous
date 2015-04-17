@@ -49,18 +49,33 @@ ERR_MESSAGES = {
 }
 
 
-DISPLAY_STATUS = 1
-DISPLAY_CONSOLE = 1 << 1
-DISPLAY_ALL = DISPLAY_STATUS | DISPLAY_CONSOLE
+# UI elements where messages are output to.
+class Display:
+    NONE = 0
+    STATUS = 1
+    CONSOLE = 1 << 1
+    ALL = STATUS | CONSOLE
 
 
-def display_message(content, devices=DISPLAY_CONSOLE):
+def display_message(content, displays=Display.CONSOLE):
+    '''
+    Displays a message.
+
+    @content
+      The message's content.
+
+    @displays
+      A `Display` where the message should be output to.
+    '''
     content = 'Vintageous: {}'.format(content)
 
-    if devices & DISPLAY_CONSOLE == DISPLAY_CONSOLE:
+    if displays == Display.NONE:
+        return
+
+    if (displays & Display.CONSOLE) == Display.CONSOLE:
         print(content)
 
-    if devices & DISPLAY_STATUS == DISPLAY_STATUS:
+    if (displays & Display.STATUS) == Display.STATUS:
         sublime.status_message(content)
 
 
@@ -76,14 +91,23 @@ def display_error(error_code, arg='', log=False):
     sublime.status_message(err_fmt % (error_code, msg))
 
 
-def display_error2(error, devices=DISPLAY_ALL, log=False):
-    assert isinstance(error, VimError), "'error' must be an instance of 'VimError'"
-    display_message(str(error), devices=devices)
+def error(err, displays=Display.ALL, log=False):
+    '''
+    Displays error messages to the user.
+
+    @err
+      An instance of Exception.
+
+    @displays
+      Where to output the message to.
+    '''
+    assert isinstance(err, Exception), "'err' must be an instance of 'Exception'"
+    display_message(str(err), displays=displays)
 
 
-def handle_not_implemented(message=None, devices=DISPLAY_ALL):
+def handle_not_implemented(message=None, displays=Display.ALL):
     message = message if message else 'Not implemented'
-    display_message(message, devices=devices)
+    display_message(message, displays=displays)
 
 
 # TODO: report faulty command line.
