@@ -46,11 +46,10 @@ from Vintageous.vi.utils import row_to_pt
 
 
 class _vi_find_in_line(ViMotionCommand):
-    """
-    Contrary to *f*, *t* does not look past the caret's position, so if
-    @character is under the caret, nothing happens.
-    """
     def run(self, char=None, mode=None, count=1, inclusive=True, skipping=False):
+        # Contrary to *f*, *t* does not look past the caret's position, so if
+        # @character is under the caret, nothing happens.
+
         def f(view, s):
             if mode == modes.VISUAL_LINE:
                 raise ValueError(
@@ -68,14 +67,12 @@ class _vi_find_in_line(ViMotionCommand):
 
             eol = view.line(b).end()
 
-            match = sublime.Region(b + 1)
+            match = R(b + 1)
             for i in range(count):
                 # Define search range as 'rest of the line to the right'.
-                search_range = sublime.Region(match.end(), eol)
-                match = find_in_range(view, char,
-                                            search_range.a,
-                                            search_range.b,
-                                            sublime.LITERAL)
+                search_range = R(match.end(), eol)
+                match = find_in_range(view, char, search_range.a,
+                            search_range.b, sublime.LITERAL)
 
                 # Count too high or simply no match; break.
                 if match is None:
@@ -86,9 +83,9 @@ class _vi_find_in_line(ViMotionCommand):
                 target_pos = target_pos - 1
 
             if mode == modes.NORMAL:
-                return sublime.Region(target_pos)
+                return R(target_pos)
             elif mode == modes.INTERNAL_NORMAL:
-                return sublime.Region(s.a, target_pos + 1)
+                return R(s.a, target_pos + 1)
             # For visual modes...
             else:
                 new_a = resolve_insertion_point_at_a(s)
