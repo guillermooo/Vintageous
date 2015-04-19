@@ -117,7 +117,7 @@ class RunVintageousTests(sublime_plugin.WindowCommand):
             if kwargs.get('active_file_only') is True:
                 patt = os.path.basename(self.window.active_view().file_name())
                 # run text-based tests
-                if patt.endswith('.cmd-test'):
+                if patt.endswith(('.cmd-test', '.cmd-test-solo')):
                     patt = 'test_all_cmds.py'
             suite = unittest.TestLoader().discover(p, pattern=patt)
 

@@ -1,0 +1,29 @@
+_vi_l mode:mode_normal count:1
+Can move one char.
+***
+^$aaa
+---
+a^$aa
+---///---
+_vi_l mode:mode_normal count:2
+Can move 2 chars.
+***
+^$aaa
+---
+aa^$a
+---///---
+_vi_l mode:mode_normal count:3
+Can move to EOL.
+***
+^$aaa
+---
+aa^$a
+---///---
+_vi_l mode:mode_normal count:300
+Large count does not move past EOL.
+***
+^$aaa
+bbb
+---
+aa^$a
+bbb
