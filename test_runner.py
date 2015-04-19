@@ -1,11 +1,10 @@
-import sublime
-import sublime_plugin
-
+from threading import Thread
+import contextlib
 import os
 import unittest
-import contextlib
 
-from threading import Thread
+import sublime
+import sublime_plugin
 
 
 class __vi_tests_write_buffer(sublime_plugin.TextCommand):
@@ -25,11 +24,16 @@ class __vi_tests_erase_all(sublime_plugin.TextCommand):
 
 
 class OutputPanel(object):
-    def __init__(self, name, file_regex='', line_regex='', base_dir=None,
-                 word_wrap=False, line_numbers=False, gutter=False,
-                 scroll_past_end=False,
-                 syntax='Packages/Text/Plain text.tmLanguage',
-                 ):
+    def __init__(self, name,
+            file_regex='',
+            line_regex='',
+            base_dir=None,
+            word_wrap=False,
+            line_numbers=False,
+            gutter=False,
+            scroll_past_end=False,
+            syntax='',
+            ):
 
         self.name = name
         self.window = sublime.active_window()
@@ -75,15 +79,19 @@ class OutputPanel(object):
 
 
 class RunVintageousTests(sublime_plugin.WindowCommand):
-    '''Runs tests and displays the result.
+    '''
+    Runs tests and displays the results.
 
-    - Do not use ST while tests are running.
+    - Do not use Sublime Text while tests are running.
 
     @working_dir
       Required. Should be the parent of the top-level directory for `tests`.
 
     @loader_pattern
       Optional. Only run tests matching this glob.
+
+    @tests_dir
+      Name of the directory containing tests.
 
     @active_file_only
       Optional. Only run tests in the active file in ST. Shadows
@@ -92,6 +100,44 @@ class RunVintageousTests(sublime_plugin.WindowCommand):
     To use this runner conveniently, open the command palette and select one
     of the `Build: Vintageous - Test *` commands.
     '''
+
+    def run(self, working_dir,
+            loader_pattern="test*.py",
+            tests_dir="tests",
+            **kwargs):
+        assert os.path.exists(working_dir), 'working_dir must exist'
+
+        with self.chdir(working_dir):
+            p = os.path.join(os.getcwd(), tests_dir)
+
+            patt = loader_pattern
+            # TODO(guillermooo): I can't get $file to expand in the build
+            # system. It should be possible to make the following code simpler
+            # with it.
+            if kwargs.get('active_file_only') is True:
+                patt = os.path.basename(self.window.active_view().file_name())
+                # run text-based tests
+                if patt.endswith('.cmd-test'):
+                    patt = 'test_all_cmds.py'
+            suite = unittest.TestLoader().discover(p, pattern=patt)
+
+            file_regex = r'^\s*File\s*"([^.].*?)",\s*line\s*(\d+),.*$'
+            display = OutputPanel('vintageous.tests',
+                    file_regex=file_regex,
+                    word_wrap=True
+                    )
+
+            display.show()
+            runner = unittest.TextTestRunner(stream=display, verbosity=1)
+
+            def run_and_display():
+                runner.run(suite)
+                # XXX: If we don't do this, custom mappings won't be available
+                # after running the test suite.
+                self.window.run_command('reset_vintageous')
+
+            Thread(target=run_and_display).start()
+
     @contextlib.contextmanager
     def chdir(self, path=None):
         old_path = os.getcwd()
@@ -101,29 +147,3 @@ class RunVintageousTests(sublime_plugin.WindowCommand):
         yield
         if path is not None:
             os.chdir(old_path)
-
-    def run(self, **kwargs):
-        with self.chdir(kwargs.get('working_dir')):
-            p = os.path.join(os.getcwd(), 'tests')
-            patt = kwargs.get('loader_pattern', 'test*.py',)
-            # TODO(guillermooo): I can't get $file to expand in the build
-            # system. It should be possible to make the following code simpler
-            # with it.
-            if kwargs.get('active_file_only') is True:
-                patt = os.path.basename(self.window.active_view().file_name())
-            suite = unittest.TestLoader().discover(p, pattern=patt)
-
-            file_regex = r'^\s*File\s*"([^.].*?)",\s*line\s*(\d+),.*$'
-            display = OutputPanel('vintageous.tests', file_regex=file_regex,
-                    word_wrap=True)
-            display.show()
-            runner = unittest.TextTestRunner(stream=display, verbosity=1)
-
-            def run_and_display():
-                runner.run(suite)
-                display.show()
-                # If we don't do this, custom mappings won't be available
-                # after running the test suite.
-                self.window.run_command('reset_vintageous')
-
-            Thread(target=run_and_display).start()
