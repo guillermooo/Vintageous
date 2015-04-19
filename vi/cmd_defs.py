@@ -787,6 +787,7 @@ class ViScrollToScreenTop(ViOperatorDef):
 
 
 @keys.assign(seq=seqs.ZB, modes=_MODES_ACTION)
+@keys.assign(seq=seqs.Z_MINUS, modes=_MODES_ACTION)
 class ViScrollToScreenBottom(ViOperatorDef):
     """
     Vim: `zb`

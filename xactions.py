@@ -2061,62 +2061,58 @@ class _vi_ctrl_w_q(IrreversibleTextCommand):
         self.view.close()
 
 
-class _vi_ctrl_w_v(IrreversibleTextCommand):
+class _vi_ctrl_w_v(ViWindowCommandBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def run(self, count=1, mode=None):
-        self.view.window().run_command('ex_vsplit')
+        self.window.run_command('ex_vsplit')
 
 
-class _vi_ctrl_w_l(IrreversibleTextCommand):
+class _vi_ctrl_w_l(ViWindowCommandBase):
     # TODO: Should be a window command instead.
     # TODO: Should focus the group to the right only, not the 'next' group.
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def run(self, mode=None, count=None):
-        w = self.view.window()
-        current_group = w.active_group()
-        if w.num_groups() > 1:
-            w.focus_group(current_group + 1)
+        current_group = self.window.active_group()
+        if self.window.num_groups() > 1:
+            self.window.focus_group(current_group + 1)
 
 
-class _vi_ctrl_w_big_l(IrreversibleTextCommand):
+class _vi_ctrl_w_big_l(ViWindowCommandBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def run(self, mode=None, count=1):
-        w = self.view.window()
-        current_group = w.active_group()
-        if w.num_groups() > 1:
-            w.set_view_index(self.view, current_group + 1, 0)
-            w.focus_group(current_group + 1)
+        current_group = self.window.active_group()
+        if self.window.num_groups() > 1:
+            self.window.set_view_index(self.view, current_group + 1, 0)
+            self.window.focus_group(current_group + 1)
 
 
-class _vi_ctrl_w_h(IrreversibleTextCommand):
+class _vi_ctrl_w_h(ViWindowCommandBase):
     # TODO: Should be a window command instead.
     # TODO: Should focus the group to the left only, not the 'previous' group.
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def run(self, mode=None, count=1):
-        w = self.view.window()
-        current_group = w.active_group()
+        current_group = self.window.active_group()
         if current_group > 0:
-            w.focus_group(current_group - 1)
+            self.window.focus_group(current_group - 1)
 
 
-class _vi_ctrl_w_big_h(IrreversibleTextCommand):
+class _vi_ctrl_w_big_h(ViWindowCommandBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def run(self, mode=None, count=1):
-        w = self.view.window()
-        current_group = w.active_group()
+        current_group = self.window.active_group()
         if current_group > 0:
-            w.set_view_index(self.view, current_group - 1, 0)
-            w.focus_group(current_group - 1)
+            self.window.set_view_index(self.view, current_group - 1, 0)
+            self.window.focus_group(current_group - 1)
 
 
 # TODO: z<CR> != zt
@@ -2138,19 +2134,20 @@ class _vi_z_enter(IrreversibleTextCommand):
 
 
 class _vi_z_minus(IrreversibleTextCommand):
-    def __init__(self, view):
-        IrreversibleTextCommand.__init__(self, view)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def run(self, count=1, mode=None):
-        first_sel = self.view.sel()[0]
-        current_position = self.view.text_to_layout(first_sel.b)
-        viewport_dim = self.view.viewport_extent()
-        new_pos =(0.0, current_position[1] - viewport_dim[1])
+        layout_coord = self.view.text_to_layout(first_sel(self.view).b)
+        viewport_extent = self.view.viewport_extent()
+        new_pos = (0.0, layout_coord[1] - viewport_extent[1])
 
         self.view.set_viewport_position(new_pos)
 
 
 class _vi_zz(IrreversibleTextCommand):
+
     def __init__(self, view):
         IrreversibleTextCommand.__init__(self, view)
 
