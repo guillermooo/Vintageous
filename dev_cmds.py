@@ -14,19 +14,24 @@ def find_project_path(path):
 
 
 class RunTestsForActiveViewCommand(sublime_plugin.WindowCommand):
-    '''Runs tests:
-
-    - From a file with the name 'test_<active_file_basename>' if it exists.
-    - Else, from the active file.
     '''
+    Runs tests:
+
+    - from a file with the name 'test_<active_file_basename>' if it exists,
+    - from a file with the .cmd-test[-solo] extension,
+    - else, from the active file.
+    '''
+
     def run(self):
         v = self.window.active_view()
         if v is None:
             return
 
         proj_path = find_project_path(v.file_name())
-        if not proj_path or not v.file_name().endswith('.py'):
-            print('Vintageous (Dev): Not a project or python file.')
+        if not proj_path or not v.file_name().endswith(('.py', '.cmd-test', '.cmd-test-solo')):
+            print(
+                'Vintageous (Dev): Not a project, cmd-test or python file: '
+                + v.file_name())
             return
 
         # If it's a test_* file, run it.
