@@ -1,5 +1,16 @@
 _vi_cc mode:mode_internal_normal
-Does not delete empty lines.
+Can cc one line.
+***
+aaa
+^$xxx
+bbb
+---
+aaa
+^$
+bbb
+---///---
+_vi_cc mode:mode_internal_normal
+Does not delete empty line.
 ***
 aaa
 ^$
@@ -7,4 +18,27 @@ bbb
 ---
 aaa
 ^$
+bbb
+---///---
+_vi_cc mode:mode_internal_normal
+Skips over lhs indentation
+***
+aaa
+    x^$xx
+bbb
+---
+aaa
+    ^$
+bbb
+---///---
+_vi_cc mode:mode_internal_normal count:2
+Can delete 2 lines
+***
+aaa
+    x^$xx
+xxx
+bbb
+---
+aaa
+    ^$
 bbb

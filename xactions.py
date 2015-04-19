@@ -1071,6 +1071,7 @@ class _vi_visual_o(ViTextCommandBase):
         self.view.show(self.view.sel()[0].b, False)
 
 
+# TODO: is this really a text command?
 class _vi_yy(ViTextCommandBase):
 
     _can_yank = True

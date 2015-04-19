@@ -31,7 +31,7 @@ _converters ['count'] = int
 def _make_args(args):
     arg_dict = {}
     for a in args:
-        name, value = a.split(':')
+        name, value = a.split(':', 1)
         arg_dict[name] = _converters[name](value)
     return arg_dict
 
@@ -93,7 +93,7 @@ def process_notation(text, sel_start_token='^', sel_end_token='$'):
 class ViCmdTest (object):
 
     def __init__(self, cmd_name, args, description,
-                before_text, after_text, file_name, test_nr):
+                before_text, after_text, file_name, test_nr, options=None):
         self.cmd_name = cmd_name
         self.args = args
         self.description = description
@@ -101,6 +101,7 @@ class ViCmdTest (object):
         self.after_text = after_text
         self.file_name = file_name
         self.test_nr = test_nr
+        self.options = options
 
     @property
     def message(self):
@@ -113,12 +114,28 @@ class ViCmdTest (object):
         '''
         header, body = text.split(TEST_HEADER_DELIM, 1)
         header, description = header.split('\n', 1)
+        description, options = ViCmdTest.process_description(description)
         cmd_name, args = header.split(' ', 1)
         args = _make_args(args.split())
         assert 'mode' in args, 'all commands need to know the current mode'
         before, after = body.split(TEST_RESULTS_DELIM)
         return ViCmdTest(cmd_name, args, description, before, after,
-            file_name, test_nr)
+            file_name, test_nr, options)
+
+    @staticmethod
+    def process_description(text):
+        lines = text.split('\n')
+        description = lines
+        options_line = lines[0]
+
+        opts = {}
+        if options_line.startswith('//options: '):
+            description = lines[1:]
+            raw_opts = options_line[11:].split()
+            opts = _make_args(raw_opts)
+
+        return '\n'.join(description), opts
+
 
     def run_with(self, runner):
         before_sels, before_text = process_notation(self.before_text)
@@ -130,9 +147,10 @@ class ViCmdTest (object):
 
         after_sels, after_text = process_notation(self.after_text)
 
-        runner.assertEqual(view.substr(sublime.Region(0, view.size())), after_text, self.message)
-        runner.assertEqual(list(view.sel()), after_sels, self.message)
+        runner.assertEqual(view.substr(sublime.Region(0, view.size())),
+                after_text, self.message)
 
+        runner.assertEqual(list(view.sel()), after_sels, self.message)
 
 class ViCmdTester (unittest.TestCase):
     '''
