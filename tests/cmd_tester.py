@@ -173,10 +173,8 @@ class ViCmdTester (unittest.TestCase):
         """
         specs = glob.glob(os.path.join(self.path_to_test_specs, ext + "-solo"))
         if specs:
-            print ('XXXXXXXXXXXXXXXXXXXXXXXXXXX', specs)
             specs = specs[0:1]
         else:
-            print ('XXXXXXXXXXXXXXXXXXXXXXXXXXX', specs)
             specs = glob.glob(os.path.join(self.path_to_test_specs, ext))
         return specs
 
