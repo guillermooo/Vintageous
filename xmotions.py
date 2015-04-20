@@ -6,7 +6,6 @@ import sublime_plugin
 from itertools import chain
 from collections import Counter
 
-
 from Vintageous import state as state_module
 from Vintageous.state import State
 from Vintageous.vi import cmd_defs
