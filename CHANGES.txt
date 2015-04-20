@@ -1,3 +1,22 @@
+4.0.3 - 20-04-2015
+
+	- show matches when :substituting with the c flag
+	- fix #442 - gm moves to the line's mid point
+	- fix #321 - add 'c' flag to :s
+	- remove debug prints
+	- add tests
+	- add comments
+	- refactor testing code
+	- enable z-
+	- refactor
+	- fix #921 - :tabonly must abort if any buffer is dirty
+	- fix #847 - B is a synonym for '{' object
+	- adjust end position for z<cr>
+	- adjust caret location after `p`
+	- ensure that yyu does not restore outlined regions
+	- fix #922 - read stderr when !cmd fails
+	- fix #925 - pasting empty lines
+
 4.0.2 - 14-04-2015
 
 	- faster appveyor

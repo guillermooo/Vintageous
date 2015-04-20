@@ -1,0 +1,51 @@
+==============================================================================
+Vintageous 4.0.3
+==============================================================================
+
+*** Follow important announcements on Twitter: @VintageousS3 ***
+
+This version includes multiple fixes and polish.
+
+Thanks!
+Guillermo
+
+
+CHANGES
+-------
+
+	- fix #442 - gm moves to the line's mid point
+	- fix #321 - add 'c' flag to :s
+	- re-enable z-
+	- fix #921 - :tabonly must abort if any buffer is dirty
+	- fix #847 - B is a synonym for '{' object
+	- adjust end position for z<cr>
+	- adjust caret location after `p`
+	- ensure that yyu does not restore outlined regions
+	- fix #922 - read stderr when !cmd fails
+	- fix #925 - pasting empty lines
+
+
+FOUND BUGS?
+-----------
+
+Please report them here:
+
+    https://github.com/guillermooo/Vintageous/issues
+
+
+SUPPORT VINTAGEOUS
+------------------
+
+Is Vintageous worth your time? Developing Vintageous is hard work. If you use
+it often, please consider donating and make it worth my time too.
+
+    PayPal: http://www.pledgie.com/campaigns/19122
+    Gittip: https://www.gratipay.com/guillermooo/
+
+I'm the creator and main author of Vintageous, but some generous people have
+contributed their time and effort as well. See the more active ones here; you
+may want to show them some gratitude too:
+
+https://github.com/guillermooo/Vintageous/graphs/contributors
+
+Thanks for reading and for using Vintageous!
