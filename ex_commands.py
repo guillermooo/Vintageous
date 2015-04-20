@@ -39,6 +39,7 @@ from Vintageous.vi.search import find_all_in_range
 from Vintageous.vi.settings import set_global
 from Vintageous.vi.settings import set_local
 from Vintageous.vi.sublime import has_dirty_buffers
+from Vintageous.vi.utils import adding_regions
 from Vintageous.vi.utils import first_sel
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import R
@@ -956,9 +957,36 @@ class ExSubstitute(sublime_plugin.TextCommand):
         replace_count = 0 if (flags and 'g' in flags) else 1
 
         target_region = parsed.line_range.resolve(self.view)
+
+        if 'c' in flags:
+            self.replace_confirming(edit, pattern, compiled_rx, replacement, replace_count, target_region)
+            return
+
         line_text = self.view.substr(target_region)
         new_text = re.sub(compiled_rx, replacement, line_text, count=replace_count)
         self.view.replace(edit, target_region, new_text)
+
+    def replace_confirming(self, edit, pattern, compiled_rx, replacement,
+                replace_count, target_region):
+        last_row = row_at(self.view, target_region.b - 1)
+        start = target_region.begin()
+
+        while True:
+            match = self.view.find(pattern, start)
+
+            # no match or match out of range -- stop
+            if (match == R(-1)) or (row_at(self.view, match.a) > last_row):
+                return
+
+            size_before = self.view.size()
+
+            with adding_regions(self.view, 's_confirm', [match], 'comment'):
+                if sublime.ok_cancel_dialog("Confirm replacement?"):
+                    text = self.view.substr(match)
+                    substituted = re.sub(compiled_rx, replacement, text, count=replace_count)
+                    self.view.replace(edit, match, substituted)
+
+            start = match.b + (self.view.size() - size_before)
 
 
 class ExDelete(ExTextCommandBase):

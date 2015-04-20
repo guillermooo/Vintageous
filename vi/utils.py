@@ -455,3 +455,10 @@ def resize_visual_region(r, b):
         return R(r.a, b + 1)
 
     return R(b, b + 1)
+
+
+@contextmanager
+def adding_regions(view, name, regions, scope_name):
+    view.add_regions(name, regions, scope_name)
+    yield
+    view.erase_regions(name)

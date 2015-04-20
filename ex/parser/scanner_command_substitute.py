@@ -30,7 +30,7 @@ class TokenCommandSubstitute(TokenOfCommand):
     @property
     def count(self):
         # XXX why 0?
-        return self.params.get('count', 0)
+        return self.params.get('count', 1)
 
 
 def scan_command_substitute(state):
