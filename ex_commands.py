@@ -976,11 +976,13 @@ class ExSubstitute(sublime_plugin.TextCommand):
 
             # no match or match out of range -- stop
             if (match == R(-1)) or (row_at(self.view, match.a) > last_row):
+                self.view.show(first_sel(self.view).begin())
                 return
 
             size_before = self.view.size()
 
             with adding_regions(self.view, 's_confirm', [match], 'comment'):
+                self.view.show(match.a, True)
                 if sublime.ok_cancel_dialog("Confirm replacement?"):
                     text = self.view.substr(match)
                     substituted = re.sub(compiled_rx, replacement, text, count=replace_count)

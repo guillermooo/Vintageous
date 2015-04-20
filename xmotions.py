@@ -6,7 +6,6 @@ import sublime_plugin
 from itertools import chain
 from collections import Counter
 
-
 from Vintageous import state as state_module
 from Vintageous.state import State
 from Vintageous.vi import cmd_defs
@@ -2007,14 +2006,17 @@ class _vi_gm(ViMotionCommand):
     Vim: `gm`
     """
     def run(self, mode=None, count=1):
+        def advance(view, s):
+            line = view.line(s.b)
+            if line.empty():
+                return s
+            mid_pt = line.size() // 2
+            row_start = row_to_pt(self.view, row_at(self.view, s.b))
+            return R(min(row_start + mid_pt, line.b - 1))
+
         if mode != modes.NORMAL:
             utils.blink()
             return
-
-        def advance(view, s):
-            line = view.line(s.b)
-            delta = (line.b - s.b) // 2
-            return sublime.Region(min(s.b + delta, line.b - 1))
 
         regions_transformer(self.view, advance)
 
