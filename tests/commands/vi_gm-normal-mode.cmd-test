@@ -1,0 +1,42 @@
+_vi_gm mode:mode_normal count:1
+Can locate mid point in short line.
+***
+^$aaa
+---
+a^$aa
+---///---
+_vi_gm mode:mode_normal count:1
+Can locate mid point in short line.
+***
+aa^$a aaa aaa aaa
+---
+aaa aaa^$ aaa aaa
+---///---
+_vi_gm mode:mode_normal count:1
+Can locate mid point if it's before the caret.
+***
+aaa aaa aaa a^$aa
+---
+aaa aaa^$ aaa aaa
+---///---
+_vi_gm mode:mode_normal count:1
+Can locate mid point in empty string.
+***
+aaa
+^$
+bbb
+---
+aaa
+^$
+bbb
+---///---
+_vi_gm mode:mode_normal count:1
+Can locate mid point in 1-char-length line.
+***
+aaa
+^$a
+bbb
+---
+aaa
+^$a
+bbb
