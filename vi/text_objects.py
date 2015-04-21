@@ -1,5 +1,6 @@
-import sublime
+import re
 
+import sublime
 from sublime import CLASS_WORD_START
 from sublime import CLASS_WORD_END
 from sublime import CLASS_PUNCTUATION_START
@@ -8,13 +9,12 @@ from sublime import CLASS_LINE_END
 from sublime import CLASS_LINE_START
 from sublime import CLASS_EMPTY_LINE
 
-from Vintageous.vi.search import reverse_search_by_pt
-from Vintageous.vi.search import find_in_range
+from Vintageous.vi import search
 from Vintageous.vi import units
 from Vintageous.vi import utils
-from Vintageous.vi import search
-
-import re
+from Vintageous.vi.search import find_in_range
+from Vintageous.vi.search import reverse_search_by_pt
+from Vintageous.vi.utils import resolve_insertion_point_at_b
 
 
 RX_ANY_TAG = r'</?([0-9A-Za-z-]+).*?>'
@@ -240,8 +240,9 @@ def get_text_object_region(view, s, text_object, inclusive=False, count=1):
         return find_paragraph_text_object(view, s, inclusive=inclusive, count=count)
 
     if type_ == BRACKET:
-        opening = find_prev_lone_bracket(view, s.b, delims)
-        closing = find_next_lone_bracket(view, s.b, delims)
+        b = resolve_insertion_point_at_b(s)
+        opening = find_prev_lone_bracket(view, b, delims)
+        closing = find_next_lone_bracket(view, b, delims)
 
         if not (opening and closing):
             return s
@@ -368,6 +369,12 @@ def find_next_lone_bracket(view, start, items, unbalanced=0):
 def find_prev_lone_bracket(view, start, tags, unbalanced=0):
     # TODO: Extract common functionality from here and the % motion instead of
     # duplicating code.
+
+    # XXX: refactor this
+    if view.substr(start) == tags[0][1] if len(tags[0]) > 1 else tags[0]:
+        if not unbalanced and view.substr(start - 1) != '\\':
+            return sublime.Region(start, start + 1)
+
     new_start = start
     for i in range(unbalanced or 1):
         prev_opening_bracket = reverse_search_by_pt(view, tags[0],
