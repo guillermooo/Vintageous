@@ -25,6 +25,7 @@ TESTS = (
 
     test(content='foo {bar {foo} bar', start=16, brackets=('\\{', '\\}'), expected=R(4, 5), msg='should find outer if unbalanced outer'),
     test(content='foo {bar {foo} bar', start=12, brackets=('\\{', '\\}'), expected=R(9, 10), msg='should find inner if unbalanced outer'),
+    test(content='foo {bar {foo} bar', start=4, brackets=('\\{', '\\}'), expected=R(4, 5), msg='should find bracket at caret position'),
 
     test(content='a\\{bc', start=2, brackets=('\\{', '\\}'), expected=None, msg='should not find escaped bracket at caret position'),
     test(content='a\\{bc', start=3, brackets=('\\{', '\\}'), expected=None, msg='should not find escaped bracket'),
@@ -34,6 +35,7 @@ TESTS = (
 TESTS_NEXT_BRACKET = (
     test(content='a\\}bc', start=2, brackets=('\\{', '\\}'), expected=None, msg='should not find escaped bracket at caret position'),
     test(content='a\\}bc', start=0, brackets=('\\{', '\\}'), expected=None, msg='should not find escaped bracket'),
+    test(content='foo {bar foo bar}', start=16, brackets=('\\{', '\\}'), expected=R(16, 17), msg='should find next bracket at caret position'),
 )
 
 
