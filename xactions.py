@@ -1181,6 +1181,14 @@ class _vi_d(ViTextCommandBase):
 
         self.enter_normal_mode(mode)
 
+        # XXX: abstract this out for all types of selections.
+        def advance_to_text_start(view, s):
+            pt = utils.next_non_white_space_char(self.view, s.b)
+            return R(pt)
+
+        if mode == modes.INTERNAL_NORMAL:
+            regions_transformer(self.view, advance_to_text_start)
+
 
 class _vi_big_a(ViTextCommandBase):
     def __init__(self, *args, **kwargs):

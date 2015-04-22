@@ -1372,17 +1372,29 @@ class _vi_underscore(ViMotionCommand):
                 target_row = last_row
 
             bol = self.view.text_point(target_row, 0)
-            bol = utils.next_non_white_space_char(self.view, bol, white_space='\t ')
 
             if mode == modes.NORMAL:
+                bol = utils.next_non_white_space_char(self.view, bol, white_space='\t ')
                 return sublime.Region(bol)
+
             elif mode == modes.INTERNAL_NORMAL:
                 # TODO: differentiate between 'd' and 'c'
                 begin = self.view.line(b).a
                 target_row_bol = self.view.text_point(target_row, 0)
                 end = self.view.line(target_row_bol).b
-                return sublime.Region(begin, end)
+
+                # XXX: There may be better ways to communicate between actions
+                # and motions than by inspecting state.
+                try:
+                    # when testing, there'll be no command in some
+                    # cases and this branch will error.
+                    if self.state.action['command'] == '_vi_c':
+                        return R(begin, end)
+                except TypeError:
+                    return R(begin, end + 1)
+
             elif mode == modes.VISUAL:
+                bol = utils.next_non_white_space_char(self.view, bol, white_space='\t ')
                 return utils.new_inclusive_region(a, bol)
             else:
                 return s
