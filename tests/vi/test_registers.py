@@ -74,12 +74,16 @@ class TestCaseRegisters(ViewTest):
     def setUp(self):
         super().setUp()
         sublime.set_clipboard('')
-        registers._REGISTER_DATA = {}
+        registers._REGISTER_DATA = registers.init_register_data()
         self.view.settings().erase('vintage')
         self.view.settings().erase('vintageous_use_sys_clipboard')
         # self.regs = Registers(view=self.view,
                               # settings=SettingsManager(view=self.view))
         self.regs = State(self.view).registers
+
+    def tearDown(self):
+        super().tearDown()
+        registers._REGISTER_DATA = registers.init_register_data()
 
     def testCanInitializeClass(self):
         self.assertEqual(self.regs.view, self.view)
@@ -210,7 +214,7 @@ class TestCaseRegisters(ViewTest):
         self.assertEqual(registers._REGISTER_DATA[registers.REG_EXPRESSION], '')
 
     def testCanGetNumberRegister(self):
-        registers._REGISTER_DATA['5'] = ['foo']
+        registers._REGISTER_DATA['1-9'][4] = ['foo']
         self.assertEqual(self.regs.get('5'), ['foo'])
 
     def testCanGetRegisterEvenIfRequestingItThroughACapitalLetter(self):
@@ -253,11 +257,15 @@ class Test_get_selected_text(ViewTest):
     def setUp(self):
         super().setUp()
         sublime.set_clipboard('')
-        registers._REGISTER_DATA = {}
+        registers._REGISTER_DATA = registers.init_register_data()
         self.view.settings().erase('vintage')
         self.view.settings().erase('vintageous_use_sys_clipboard')
         self.regs = State(self.view).registers
         self.regs.view = mock.Mock()
+
+    def tearDown(self):
+        super().tearDown()
+        registers._REGISTER_DATA = registers.init_register_data()
 
     def testExtractsSubstrings(self):
         self.regs.view.sel.return_value = [10, 20, 30]
@@ -365,11 +373,15 @@ class Test_yank(ViewTest):
     def setUp(self):
         super().setUp()
         sublime.set_clipboard('')
-        registers._REGISTER_DATA = {}
+        registers._REGISTER_DATA = registers.init_register_data()
         self.view.settings().erase('vintage')
         self.view.settings().erase('vintageous_use_sys_clipboard')
         self.regs = State(self.view).registers
         self.regs.view = mock.Mock()
+
+    def tearDown(self):
+        super().tearDown()
+        registers._REGISTER_DATA = registers.init_register_data()
 
     def testDontYankIfWeDontHaveTo(self):
         class vi_cmd_data:
@@ -377,7 +389,10 @@ class Test_yank(ViewTest):
             _populates_small_delete_register = False
 
         self.regs.yank(vi_cmd_data)
-        self.assertEqual(registers._REGISTER_DATA, {})
+        self.assertEqual(registers._REGISTER_DATA, {
+            '1-9': [None] * 9,
+            '0': None,
+            })
 
     def testYanksToUnnamedRegisterIfNoRegisterNameProvided(self):
         class vi_cmd_data:
@@ -390,7 +405,11 @@ class Test_yank(ViewTest):
         with mock.patch.object(self.regs, 'get_selected_text') as gst:
             gst.return_value = ['foo']
             self.regs.yank(vi_cmd_data)
-            self.assertEqual(registers._REGISTER_DATA, {'"': ['foo']})
+            self.assertEqual(registers._REGISTER_DATA, {
+                '"': ['foo'],
+                '0': ['foo'],
+                '1-9': [None] * 9,
+                })
 
     def testYanksToRegisters(self):
         class vi_cmd_data:
@@ -400,7 +419,12 @@ class Test_yank(ViewTest):
         with mock.patch.object(self.regs, 'get_selected_text') as gst:
             gst.return_value = ['foo']
             self.regs.yank(vi_cmd_data, register='a')
-            self.assertEqual(registers._REGISTER_DATA, {'"': ['foo'], 'a': ['foo']})
+            self.assertEqual(registers._REGISTER_DATA, {
+                '"': ['foo'],
+                'a': ['foo'],
+                '0': None,
+                '1-9': [None] * 9,
+                })
 
     def testCanPopulateSmallDeleteRegister(self):
         class vi_cmd_data:
@@ -413,7 +437,11 @@ class Test_yank(ViewTest):
                 self.regs.view.sel.return_value = range(1)
                 a.return_value = True
                 self.regs.yank(vi_cmd_data)
-                self.assertEqual(registers._REGISTER_DATA, {'"': ['foo'], '-': ['foo']})
+                self.assertEqual(registers._REGISTER_DATA, {
+                    '"': ['foo'],
+                    '-': ['foo'],
+                    '0': ['foo'],
+                    '1-9': [None] * 9})
 
     def testDoesNotPopulateSmallDeleteRegisterIfWeShouldNot(self):
         class vi_cmd_data:
@@ -426,5 +454,7 @@ class Test_yank(ViewTest):
                 self.regs.view.sel.return_value = range(1)
                 a.return_value = False
                 self.regs.yank(vi_cmd_data)
-                self.assertEqual(registers._REGISTER_DATA, {})
-
+                self.assertEqual(registers._REGISTER_DATA, {
+                    '1-9': [None] * 9,
+                    '0': None,
+                    })
