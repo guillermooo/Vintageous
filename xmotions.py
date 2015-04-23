@@ -1468,7 +1468,9 @@ class _vi_g__(ViMotionCommand):
                     return R(s.a, eol)
                 else:
                     eol = view.line(s.b).b
-                    return R(s.a - 1, eol)
+                    if eol > s.a:
+                        return R(s.a - 1, eol)
+                    return R(s.a, eol)
 
             elif mode == modes.INTERNAL_NORMAL:
                 eol = view.line(s.b).b
