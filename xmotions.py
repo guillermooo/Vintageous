@@ -1459,15 +1459,20 @@ class _vi_g__(ViMotionCommand):
         def f(view, s):
             if mode == modes.NORMAL:
                 eol = view.line(s.b).b
-                return sublime.Region(eol - 1, eol - 1)
+                return R(eol - 1, eol - 1)
 
             elif mode == modes.VISUAL:
-                eol = view.line(s.b - 1).b
-                return sublime.Region(s.a, eol)
+                eol = None
+                if s.a < s.b:
+                    eol = view.line(s.b - 1).b
+                    return R(s.a, eol)
+                else:
+                    eol = view.line(s.b).b
+                    return R(s.a - 1, eol)
 
             elif mode == modes.INTERNAL_NORMAL:
                 eol = view.line(s.b).b
-                return sublime.Region(s.a, eol)
+                return R(s.a, eol)
 
             return s
 
