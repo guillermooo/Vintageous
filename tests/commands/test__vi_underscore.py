@@ -12,9 +12,9 @@ NORMAL_CASES = (
 
 INTERNAL_NORMAL_CASES = (
     # Test cases for 'c' behavior, 'd' behaves differently
-    test_data(' 12\n 56', (0, 0), modes.INTERNAL_NORMAL, 1, (0, 3), 'Internal before first space'),
-    test_data(' 12\n 56', (2, 2), modes.INTERNAL_NORMAL, 1, (0, 3), 'Internal after first space'),
-    test_data(' 12\n 56', (6, 6), modes.INTERNAL_NORMAL, 1, (4, 7), 'Internal from 2nd line'),
+    test_data(' 12\n 56', (0, 0), modes.INTERNAL_NORMAL, 1, (0, 4), 'Internal before first space'),
+    test_data(' 12\n 56', (2, 2), modes.INTERNAL_NORMAL, 1, (0, 4), 'Internal after first space'),
+    test_data(' 12\n 56', (6, 6), modes.INTERNAL_NORMAL, 1, (4, 8), 'Internal from 2nd line'),
 )
 
 VISUAL_MULTI_CHAR_CASES = (
@@ -46,8 +46,8 @@ MULTI_COUNT_NORMAL_CASES = (
 
 MULTI_COUNT_INTERNAL_NORMAL_CASES = (
     # Test cases for 'c' behavior, 'd' behaves differently
-    test_data(' 123\n 678\n bcd', (2, 2), modes.INTERNAL_NORMAL, 2, (0, 9),  'Internal count 2'),
-    test_data(' 123\n 678\n bcd', (7, 7), modes.INTERNAL_NORMAL, 3, (5, 14), 'Internal over count'),
+    test_data(' 123\n 678\n bcd', (2, 2), modes.INTERNAL_NORMAL, 2, (0, 10),  'Internal count 2'),
+    test_data(' 123\n 678\n bcd', (7, 7), modes.INTERNAL_NORMAL, 3, (5, 15), 'Internal over count'),
 )
 
 MULTI_COUNT_VISUAL_CASES = (

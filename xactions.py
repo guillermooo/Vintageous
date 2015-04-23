@@ -1020,7 +1020,7 @@ class _vi_dd(ViTextCommandBase):
             self.view.sel().add_all([R(pt) for pt in new])
 
         regions_transformer(self.view, do_motion)
-        self.state.registers.yank(self, register)
+        self.state.registers.yank(self, register, operation='delete')
         self.view.run_command('right_delete')
         set_sel()
         # TODO(guillermooo): deleting last line leaves the caret at \n
@@ -1174,12 +1174,20 @@ class _vi_d(ViTextCommandBase):
                 return
 
         state = self.state
-        state.registers.yank(self, register)
+        state.registers.yank(self, register, operation='delete')
 
         self.view.run_command('left_delete')
         self.view.run_command('_vi_adjust_carets')
 
         self.enter_normal_mode(mode)
+
+        # XXX: abstract this out for all types of selections.
+        def advance_to_text_start(view, s):
+            pt = utils.next_non_white_space_char(self.view, s.b)
+            return R(pt)
+
+        if mode == modes.INTERNAL_NORMAL:
+            regions_transformer(self.view, advance_to_text_start)
 
 
 class _vi_big_a(ViTextCommandBase):

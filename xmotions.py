@@ -1372,17 +1372,29 @@ class _vi_underscore(ViMotionCommand):
                 target_row = last_row
 
             bol = self.view.text_point(target_row, 0)
-            bol = utils.next_non_white_space_char(self.view, bol, white_space='\t ')
 
             if mode == modes.NORMAL:
+                bol = utils.next_non_white_space_char(self.view, bol, white_space='\t ')
                 return sublime.Region(bol)
+
             elif mode == modes.INTERNAL_NORMAL:
                 # TODO: differentiate between 'd' and 'c'
                 begin = self.view.line(b).a
                 target_row_bol = self.view.text_point(target_row, 0)
                 end = self.view.line(target_row_bol).b
-                return sublime.Region(begin, end)
+
+                # XXX: There may be better ways to communicate between actions
+                # and motions than by inspecting state.
+                try:
+                    # when testing, there'll be no command in some
+                    # cases and this branch will error.
+                    if self.state.action['command'] == '_vi_c':
+                        return R(begin, end)
+                except TypeError:
+                    return R(begin, end + 1)
+
             elif mode == modes.VISUAL:
+                bol = utils.next_non_white_space_char(self.view, bol, white_space='\t ')
                 return utils.new_inclusive_region(a, bol)
             else:
                 return s
@@ -1447,15 +1459,22 @@ class _vi_g__(ViMotionCommand):
         def f(view, s):
             if mode == modes.NORMAL:
                 eol = view.line(s.b).b
-                return sublime.Region(eol - 1, eol - 1)
+                return R(eol - 1, eol - 1)
 
             elif mode == modes.VISUAL:
-                eol = view.line(s.b - 1).b
-                return sublime.Region(s.a, eol)
+                eol = None
+                if s.a < s.b:
+                    eol = view.line(s.b - 1).b
+                    return R(s.a, eol)
+                else:
+                    eol = view.line(s.b).b
+                    if eol > s.a:
+                        return R(s.a - 1, eol)
+                    return R(s.a, eol)
 
             elif mode == modes.INTERNAL_NORMAL:
                 eol = view.line(s.b).b
-                return sublime.Region(s.a, eol)
+                return R(s.a, eol)
 
             return s
 

@@ -1,62 +1,47 @@
-**Plaform** | **Status**
-------------|------------
-Linux | [![Build Status](https://travis-ci.org/guillermooo/Vintageous.svg?branch=master)](https://travis-ci.org/guillermooo/Vintageous)
-Windows | [![Build status](https://ci.appveyor.com/api/projects/status/pvea8jg8bdoq2rmn/branch/master)](https://ci.appveyor.com/project/guillermooo/vintageous/branch/master)
+[![Build Status](https://travis-ci.org/guillermooo/Vintageous.svg?branch=master)](https://travis-ci.org/guillermooo/Vintageous) [![Build status](https://ci.appveyor.com/api/projects/status/pvea8jg8bdoq2rmn/branch/master)](https://ci.appveyor.com/project/guillermooo/vintageous/branch/master)
 
-Vintageous
-==========
+## Vintageous
 
 <a href='http://www.pledgie.com/campaigns/19122'><img alt='Click here to lend your support to: Vintageous and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/19122.png?skin_name=chrome' border='0' /></a>
 
 
-Overview
---------
-
-**Vintageous** is a vi/Vim editing package for Sublime Text 3.
-
-Vintageous is a rewrite of [Vintage](http://www.sublimetext.com/docs/2/vintage.html) with the aim to make
-it more similar to Vim.
+**Vintageous** is a comprehensive vi/Vim emulation layer for Sublime Text 3.
 
 
-Download
---------
+### Installing
 
-The [current build](https://bitbucket.org/guillermooo/vintageous/downloads/Vintageous.sublime-package) of Vintageous is updated frequently.
+**Make sure that Vintage
+is in the `ignored_packages` list
+in your user preferences.**
+
+You can install Vintageous in multiple ways:
 
 
-Install
--------
+##### Using Package Control
 
-1. Ensure the built-in Vintage package is in the `ignored_packages` list in your user preferences.
+Search for 'Vintageous' and install.
+
+
+##### Using a Pre-built Version
+
+1. Download the [current build](https://bitbucket.org/guillermooo/vintageous/downloads/Vintageous.sublime-package)
 2. Copy *Vintageous.sublime-package* to the *Installed Packages* folder located under the data directory.
 
 
-Development Version
--------------------
+##### Building from Source
 
-To use this development version, you should:
-
-1. Ensure the built-in Vintage package is in the `ignored_packages` list in your user preferences.
-2. Clone this repository.
-3. Edit files as needed.
-4. Run `build.sh` (OS X/Linux) or `bin/Publish.ps1` (Windows).
+1. Clone this repository
+2. Optionally, update to a specific tag
+3. Run `./bin/build.sh` (OS X/Linux) or `bin/Publish.ps1` (Windows).
 
 Refer to the [wiki](https://github.com/guillermooo/Vintageous/wiki) for more information.
 
 
-Documentation
--------------
+### Documentation
 
 Refer to the [wiki](https://github.com/guillermooo/Vintageous/wiki).
 
 
-Settings
---------
+### Settings
 
 See [Vintageous/Preferences.sublime-settings](https://github.com/guillermooo/Vintageous/blob/master/Preferences.sublime-settings) for a comprehensive list of settings.
-
-
-Credits
--------
-
-Vintageous' design is heavily inspired by previous work done by [dlo](https://github.com/dlo).

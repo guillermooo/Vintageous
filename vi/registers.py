@@ -13,8 +13,8 @@ REG_EXPRESSION = '='
 REG_SYS_CLIPBOARD_1 = '*'
 REG_SYS_CLIPBOARD_2 = '+'
 REG_SYS_CLIPBOARD_ALL = (REG_SYS_CLIPBOARD_1, REG_SYS_CLIPBOARD_2)
-REG_VALID_NAMES = tuple("{0}".format(c) for c in "abcdefghijklmnopqrstuvwxyz")
-REG_VALID_NUMBERS = tuple("{0}".format(c) for c in "0123456789")
+REG_VALID_NAMES = tuple('abcdefghijklmnopqrstuvwxyz')
+REG_VALID_NUMBERS = tuple('0123456789')
 REG_SPECIAL = (REG_UNNAMED, REG_SMALL_DELETE, REG_BLACK_HOLE,
                REG_LAST_INSERTED_TEXT, REG_FILE_NAME, REG_ALT_FILE_NAME,
                REG_SYS_CLIPBOARD_1, REG_SYS_CLIPBOARD_2)
@@ -24,14 +24,22 @@ REG_ALL = REG_SPECIAL + REG_VALID_NUMBERS + REG_VALID_NAMES
 # todo(guillermo): "* and "+ don't do what they should in linux
 
 
-# Registers must be available globally, so store here the data.
-_REGISTER_DATA = {}
+def init_register_data():
+    return {
+        '0': None,
+        # init registers 1-9
+        '1-9': [None] * 9,
+    }
+
+
+# Stores register data.
+_REGISTER_DATA = init_register_data()
 
 
 # todo(guillermooo): Subclass dict properly.
 class Registers(object):
     """
-    Registers hold global data mainly used by yank, delete and paste.
+    Registers hold global data used mainly by yank, delete and paste.
 
     This class is meant to be used a descriptor.
 
@@ -40,8 +48,8 @@ class Registers(object):
             ...
 
         state = State()
-        state.registers["%"] # now state.registers has access to the
-                              # current view.
+        state.registers['%'] # now state.registers has access to the
+                             # current view.
 
     And this is how you access registers:
 
@@ -91,11 +99,12 @@ class Registers(object):
         In order to honor multiple selections in Sublime Text, we need to
         store register data as lists, one per selection. The paste command
         will then make the final decision about what to insert into the buffer
-        when faced with unbalanced selection number / availabl e register data.
+        when faced with unbalanced selection number / available register data.
         """
+
         # We accept integers as register names.
         name = str(name)
-        assert len(str(name)) == 1, "Register names must be 1 char long."
+        assert len(str(name)) == 1, "Register names must be 1 char long: " + name
 
         if name == REG_BLACK_HOLE:
             return
@@ -170,19 +179,35 @@ class Registers(object):
             return value
 
         # We requested an [a-z0-9"] register.
+        if name.isdigit():
+            if name == '0':
+                return _REGISTER_DATA[name]
+            return _REGISTER_DATA['1-9'][int(name) - 1]
         try:
             # In Vim, "A and "a seem to be synonyms, so accept either.
             return _REGISTER_DATA[name.lower()]
         except KeyError:
             pass
 
-    def yank(self, vi_cmd_data, register=None):
+    def yank(self, vi_cmd_data, register=None, operation='yank'):
         # Populate registers if we have to.
         if vi_cmd_data._can_yank:
-            if register:
+            if register and register != REG_UNNAMED:
                 self[register] = self.get_selected_text(vi_cmd_data)
             else:
                 self[REG_UNNAMED] = self.get_selected_text(vi_cmd_data)
+                # if yanking, the 0 register gets set
+                if operation == 'yank':
+                    _REGISTER_DATA['0'] = self.get_selected_text(vi_cmd_data)
+                # if chaning or deleting, the numbered registers get set
+                elif operation in ('change', 'delete'):
+                    text = self.get_selected_text(vi_cmd_data)
+                    # TODO: very inefficient
+                    _REGISTER_DATA['1-9'].insert(0, text)
+                    if len(_REGISTER_DATA['1-9']) > 10:
+                        _REGISTER_DATA['1-9'].pop()
+                else:
+                    raise ValueError('unsupported operation: ' + operation)
 
         # # XXX: Small register delete. Improve this implementation.
         if vi_cmd_data._populates_small_delete_register:
