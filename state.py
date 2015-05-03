@@ -652,9 +652,8 @@ class State(object):
                         ((counter['\t'] * tab_size) - counter['\t']))
             except Exception as e:
                 print(e)
-                _logger.error(
+                _logger().error(
                     'Vintageous: Error when setting xpos. Defaulting to 0.')
-                _logger.show_error(e)
                 self.xpos = 0
                 return
             else:
