@@ -39,6 +39,7 @@ def ifind_files(patterns):
 
 
 def build(target_dir="dist", release="dev"):
+    os.chdir(PROJECT_ROOT)
     manifest = get_manifest()
     name = manifest['name'] + '.sublime-package'
 
