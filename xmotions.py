@@ -1746,6 +1746,8 @@ class _vi_question_mark_impl(ViMotionCommand, BufferSearchBase):
 
         regions_transformer(self.view, f)
         self.hilite(search_string)
+
+
 class _vi_question_mark(ViMotionCommand, BufferSearchBase):
     def run(self, default=''):
         self.state.reset_during_init = False
