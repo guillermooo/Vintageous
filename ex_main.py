@@ -122,6 +122,7 @@ class ViColonInput(sublime_plugin.WindowCommand):
             show_not_implemented(message)
             return
 
+
 class ViColonRepeatLast(sublime_plugin.WindowCommand):
     def is_enabled(self):
         return ((len(self.window.views()) > 0) and
@@ -302,6 +303,7 @@ class ViSettingCompletion(sublime_plugin.TextCommand):
                                        'completion': next(ViSettingCompletion.items)})
             except StopIteration:
                 return
+
 
 class CmdlineContextProvider(sublime_plugin.EventListener):
     """
