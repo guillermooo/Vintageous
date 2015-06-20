@@ -1,13 +1,13 @@
 import re
 
-from Vintageous import local_logger
+from Vintageous import PluginLogger
 from Vintageous.vi.utils import modes
 from Vintageous.vi import cmd_base
 from Vintageous.plugins import plugins
 from Vintageous.vi import variables
 
 
-_logger = local_logger(__name__)
+_logger = PluginLogger(__name__)
 
 
 class mapping_scopes:
@@ -257,7 +257,7 @@ def seq_to_command(state, seq, mode=None):
     """
     mode = mode or state.mode
 
-    _logger().info('[seq_to_command] state/seq: {0}/{1}'.format(mode, seq))
+    _logger.info('[seq_to_command] state/seq: {0}/{1}'.format(mode, seq))
 
     command = None
 

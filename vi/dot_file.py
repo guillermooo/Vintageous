@@ -1,11 +1,11 @@
-from Vintageous import local_logger
+from Vintageous import PluginLogger
 
 import sublime
 
 import os
 
 
-_logger = local_logger(__name__)
+_logger = PluginLogger(__name__)
 
 
 class DotFile(object):
@@ -23,14 +23,14 @@ class DotFile(object):
                 for line in f:
                     cmd, args = self.parse(line)
                     if cmd:
-                        _logger().info('[DotFile] running: {0} {1}'.format(cmd, args))
+                        _logger.info('[DotFile] running: {0} {1}'.format(cmd, args))
                         sublime.active_window().run_command(cmd, args)
         except FileNotFoundError:
             pass
 
     def parse(self, line):
         try:
-            _logger().info('[DotFile] parsing line: {0}'.format(line))
+            _logger.info('[DotFile] parsing line: {0}'.format(line))
             if line.startswith((':map ')):
                 line = line[1:]
                 return ('ex_map', {'command_line': line.rstrip()})
@@ -48,6 +48,6 @@ class DotFile(object):
                 return ('ex_let', {'command_line': line.strip()})
         except Exception:
             print('Vintageous: bad config in dotfile: "%s"' % line.rstrip())
-            _logger().debug('bad config inf dotfile: "%s"', line.rstrip())
+            _logger.debug('bad config inf dotfile: "%s"', line.rstrip())
 
         return None, None
