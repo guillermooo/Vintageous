@@ -7,7 +7,6 @@ import threading
 import sublime
 import sublime_plugin
 
-from Vintageous import local_logger
 from Vintageous.state import _init_vintageous
 from Vintageous.state import State
 from Vintageous.vi import settings
@@ -15,9 +14,6 @@ from Vintageous.vi import cmd_defs
 from Vintageous.vi.dot_file import DotFile
 from Vintageous.vi.utils import modes
 from Vintageous.vi.utils import regions_transformer
-
-
-_logger = local_logger(__name__)
 
 
 class _vi_slash_on_parser_done(sublime_plugin.WindowCommand):

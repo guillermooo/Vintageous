@@ -2,7 +2,8 @@ from collections import Counter
 
 import sublime
 
-from Vintageous import local_logger
+from Vintageous import PluginLogger
+from Vintageous import NullPluginLogger
 from Vintageous.vi import cmd_base
 from Vintageous.vi import cmd_defs
 from Vintageous.vi import settings
@@ -26,7 +27,7 @@ from Vintageous.vi.variables import Variables
 from Vintageous.plugins import plugins as user_plugins
 
 
-_logger = local_logger(__name__)
+_logger = PluginLogger(__name__)
 
 
 def _init_vintageous(view, new_session=False):
@@ -39,9 +40,11 @@ def _init_vintageous(view, new_session=False):
       wiped.
     """
 
+    _logger.debug("running init for view %d", view.id())
+
     if not is_view(view):
         # Abort if we got a widget, panel...
-        _logger().info(
+        _logger.info(
             '[_init_vintageous] ignoring view: {0}'.format(
                 view.name() or view.file_name() or '<???>'))
         try:
@@ -55,10 +58,10 @@ def _init_vintageous(view, new_session=False):
                 sublime.status_message(
                     'Vintageous: Vim emulation disabled for the current view')
         except AttributeError:
-            _logger().info(
+            _logger.info(
                 '[_init_vintageous] probably received the console view')
         except Exception:
-            _logger().error('[_init_vintageous] error initializing view')
+            _logger.error('[_init_vintageous] error initializing view')
         finally:
             return
 
@@ -139,7 +142,7 @@ def plugin_unloaded():
         view.settings().set('command_mode', False)
         view.settings().set('inverse_caret_state', False)
     except AttributeError:
-        _logger().warn(
+        _logger.warn(
             'could not access sublime.active_window().active_view().settings '
             ' while unloading')
 
@@ -176,7 +179,7 @@ class State(object):
         #   - window settings (settings.window).
         self.settings = SettingsManager(self.view)
 
-        _logger().debug(
+        _logger.debug(
             '[State] Is .view an ST/Vintageous widget? {0}/{1}'.format(
                 bool(self.settings.view['is_widget']),
                 bool(self.settings.view['is_vintageous_widget']))
@@ -479,7 +482,7 @@ class State(object):
     @property
     def logger(self):
         global _logger
-        return _logger()
+        return _logger
 
     @property
     def register(self):
@@ -652,7 +655,7 @@ class State(object):
                         ((counter['\t'] * tab_size) - counter['\t']))
             except Exception as e:
                 print(e)
-                _logger().error(
+                _logger.error(
                     'Vintageous: Error when setting xpos. Defaulting to 0.')
                 self.xpos = 0
                 return
@@ -683,7 +686,7 @@ class State(object):
     def process_user_input2(self, key):
         assert self.must_collect_input, "call only if input is required"
 
-        _logger().info('[State] processing input {0}'.format(key))
+        _logger.info('[State] processing input {0}'.format(key))
 
         if self.motion and self.motion.accept_input:
             motion = self.motion

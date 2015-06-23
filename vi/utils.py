@@ -3,11 +3,8 @@ import sublime_plugin
 from Vintageous.vi.sublime import is_view as sublime_is_view
 
 from contextlib import contextmanager
-import logging
 import re
 
-
-logging.basicConfig(level=logging.INFO)
 
 # alias
 R = sublime.Region
@@ -82,23 +79,15 @@ def is_console(view):
 
 
 def get_logger():
-    v = sublime.active_window().active_view()
-    level = v.settings().get('vintageous_log_level', 'ERROR')
-    # logging.basicConfig(level=_str_to_log_level(level))
-    logging.basicConfig(level=0)
-    return logging
+    return None
 
 
 def get_logging_level():
-    v = sublime.active_window().active_view()
-    level = v.settings().get('vintageous_log_level', 'ERROR')
-    return getattr(logging, level.upper(), logging.ERROR)
+    return None
 
 
 def get_user_defined_log_level():
-    v = sublime.active_window().active_view()
-    level = v.settings().get('vintageous_log_level', 'ERROR')
-    return getattr(logging, level.upper(), logging.ERROR)
+    return None
 
 
 # Use strings because we need to pass modes as arguments in
