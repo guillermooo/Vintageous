@@ -187,6 +187,20 @@ class _vi_ctrl_r(ViWindowCommandBase):
         for i in range(count):
             self._view.run_command('redo')
 
+        self.correct_xpos()
+
+    # XXX: make this a global 'service'?
+    # XXX: In fact, this may indicate that the redone command is at fault. For example, it seems
+    # that de near EOL does not adjust xpos as it should. In summary: we need to revise commands
+    # and probably remove this here.
+    def correct_xpos(self):
+        def f(view, s):
+            if (view.substr(s.b) == '\n' and not view.line(s.b).empty()):
+                return R(s.b - 1)
+            return s
+
+        regions_transformer(self._view, f)
+
 
 class _vi_a(ViTextCommandBase):
     def __init__(self, *args, **kwargs):
