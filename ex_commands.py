@@ -1278,7 +1278,7 @@ class ExEdit(ViWindowCommandBase):
 
             if os.path.isdir(file_name):
                 # TODO: Open a file-manager in a buffer.
-                message('Cannot open directory', displays=Display.ALL)
+                show_message('Cannot open directory', displays=Display.ALL)
                 # 'prompt_open_file' does not accept initial root parameter
                 # self.window.run_command('prompt_open_file', {'path': file_name})
                 return
@@ -1297,7 +1297,7 @@ class ExEdit(ViWindowCommandBase):
 
                 # Give ST some time to load the new view.
                 sublime.set_timeout(
-                        lambda: show_message(msg, displays=Displays.ALL), 150)
+                        lambda: show_message(msg, displays=Display.ALL), 150)
                 return
 
             show_not_implemented(
@@ -1465,7 +1465,7 @@ class TabControlCommand(ViWindowCommandBase):
             self.window.focus_view(self._view)
 
         else:
-            message("Unknown TabControl Command", displays=Displays.ALL)
+            show_message("Unknown TabControl Command", displays=Display.ALL)
 
 
 class ExTabOpenCommand(sublime_plugin.WindowCommand):
@@ -1645,7 +1645,7 @@ class ExVsplit(ViWindowCommandBase):
 
         groups = self.window.num_groups()
         if groups >= ExVsplit.MAX_SPLITS:
-            message("Can't create more groups.", displays=Displays.ALL)
+            show_message("Can't create more groups.", displays=Display.ALL)
             return
 
         old_view = self._view

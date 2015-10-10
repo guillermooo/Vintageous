@@ -78,18 +78,6 @@ def is_console(view):
     return (getattr(view, 'settings') is None)
 
 
-def get_logger():
-    return None
-
-
-def get_logging_level():
-    return None
-
-
-def get_user_defined_log_level():
-    return None
-
-
 # Use strings because we need to pass modes as arguments in
 # Default.sublime-keymap and it's more readable.
 class modes:
