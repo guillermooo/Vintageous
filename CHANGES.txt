@@ -1,3 +1,23 @@
+4.0.4 - 10-10-2015
+
+	- fixes #1000 - beter eol handling when redoing
+	- Installer script now handles spaces in `pwd' (Thanks Nima Talebi)
+	- change new lines for some files
+	- fix names
+	- remove unused functions
+	- fix logging
+	- Fix failures when translate_tabs_to_spaces is enabled (Thanks Gerard Roche)
+	- white space
+	- Fix builder.py (only packaging files in bin). (Thanks Jakukyo Friel)
+	- fix reference to logger (Thanks Tomáš Kuča)
+	- edit readme
+	- fix tests
+	- tweak g_
+	- fix #684 - improve g_ in visual mode
+	- fix #683, fix #682 - improve d_
+	- fix #831 - improve bracket text object
+	- refactor
+
 4.0.3 - 20-04-2015
 
 	- show matches when :substituting with the c flag

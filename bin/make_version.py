@@ -98,12 +98,12 @@ def update_changelog(new_tag):
         with open(path, 'r') as original:
             try:
                 with open(os.path.join(PROJECT_ROOT,
-                          'CHANGES_NEW.txt'), 'w') as n:
-                    n.write(heading)
+                          'CHANGES_NEW.txt'), 'wb') as n:
+                    n.write(heading.encode('utf-8'))
                     for line in get_commit_messages(vcs, tag):
-                        n.write("\t- [DRAFT] {0}\n".format(line))
-                    n.write('\n')
-                    n.write(original.read())
+                        n.write("\t- [DRAFT] {0}\n".format(line).encode('utf-8', errors="replace"))
+                    n.write(b'\n')
+                    n.write(original.read().encode('utf-8', errors="replace"))
             except Exception as e:
                 try:
                     os.unlink(os.path.join(PROJECT_ROOT, 'CHANGES_NEW.txt'))
