@@ -1,13 +1,26 @@
-DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+#!/bin/bash
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-python $DIR/builder.py
-
-if [ "$(uname)" == "Linux" ]
-    then
-    cp -f $DIR/../dist/Vintageous.sublime-package ~/.config/sublime-text-3/Installed\ Packages
-elif [ "$(uname)" == "Darwin" ]
-    then
-    cp -f $DIR/../dist/Vintageous.sublime-package ~/Library/Application\ Support/Sublime\ Text\ 3/Installed\ Packages
+e=1
+if python "$DIR/builder.py"; then
+    case "$(uname)" in
+        Linux)
+            cp -f "$DIR/../dist/Vintageous.sublime-package"\
+                "${HOME}/.config/sublime-text-3/Installed Packages"
+            e=$?
+        ;;
+        Darwin)
+            cp -f "$DIR/../dist/Vintageous.sublime-package"\
+                "${HOME}/Library/Application Support/Sublime Text 3/Installed Packages/"
+            e=$?
+        ;;
+        *)
+            echo "Vintageous: no build script for $(uname) :_("
+        ;;
+    esac
 else
-    echo "Vintageous: no build script for $(uname) :_("
+    echo "Failed to execute $DIR/builder.py"
+    e=2
 fi
+
+exit $e
