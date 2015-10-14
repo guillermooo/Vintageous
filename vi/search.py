@@ -29,20 +29,20 @@ def find_all_in_range(view, term, start, end, flags=0):
 
 
 def find_wrapping(view, term, start, end, flags=0, times=1):
-    current_sel = view.sel()[0]
-    # Search wrapping around the end of the buffer.
+    try:
+        current_sel = view.sel()[0]
+    except IndexError:
+        return
+
     for x in range(times):
         match = find_in_range(view, term, start, end, flags)
-        # Start searching in the upper half of the buffer if we aren't doing it yet.
+        # make sure we wrap around the end of the buffer
         if not match:
             start = 0
             end = current_sel.a
             match = find_in_range(view, term, start, end, flags)
             if not match:
                 return
-        # No luck in the whole buffer.
-        elif not match:
-            return
         start = match.b
 
     return match
