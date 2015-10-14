@@ -1686,7 +1686,7 @@ class _vi_greater_than_greater_than(ViTextCommandBase):
 
     def run(self, edit, mode=None, count=1):
         def f(view, s):
-            bol = utils.get.bol(view, s.begin())
+            bol = utils.get_bol(view, s.begin())
             pt = utils.next_non_white_space_char(view, bol, white_space='\t ')
             return R(pt)
 
