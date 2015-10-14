@@ -1,6 +1,8 @@
 import unittest
 import os
 
+import sublime
+
 from Vintageous.tests import set_text
 from Vintageous.tests import add_sel
 from Vintageous.tests import get_sel
@@ -48,7 +50,7 @@ class Test_ex_shell_out_filter_through_shell(ViewTest):
         else:
             return 'wc -w'
 
-    @unittest.skipIf(os.name == 'nt', 'Windows')
+    @unittest.skipIf(sublime.platform() == 'windows' or sublime.platform() == "osx", 'Windows or OSX')
     def testSimpleFilterThroughShell(self):
         word_count_command = self.__class__.getWordCountCommand()
         # TODO implement test for Windows.
@@ -72,7 +74,7 @@ bbb
 ccc'''
         self.assertEqual(expected, actual)
 
-    @unittest.skipIf(os.name == 'nt', 'Windows')
+    @unittest.skipIf(sublime.platform() == 'windows' or sublime.platform() == "osx", 'Windows or OSX')
     def testMultipleFilterThroughShell(self):
         word_count_command = self.__class__.getWordCountCommand()
         # TODO implement test for Windows.
