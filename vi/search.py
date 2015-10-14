@@ -34,7 +34,7 @@ def find_wrapping(view, term, start, end, flags=0, times=1):
     for x in range(times):
         match = find_in_range(view, term, start, end, flags)
         # Start searching in the upper half of the buffer if we aren't doing it yet.
-        if not match and start > current_sel.b:
+        if not match:
             start = 0
             end = current_sel.a
             match = find_in_range(view, term, start, end, flags)
