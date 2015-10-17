@@ -1,6 +1,7 @@
 from Vintageous.ex.ex_error import ERR_NO_RANGE_ALLOWED
 from Vintageous.ex.ex_error import VimError
 from Vintageous.ex.parser.tokens import TokenDigits
+from Vintageous.ex.parser.tokens import TokenDollar
 from Vintageous.ex.parser.tokens import TokenDot
 from Vintageous.ex.parser.tokens import TokenMark
 from Vintageous.ex.parser.tokens import TokenOffset
@@ -67,6 +68,9 @@ class RangeNode(Node):
             return max(int(str(token)) - 1, -1)
 
         if isinstance(token, TokenPercent):
+            return row_at(view, view.size())
+
+        if isinstance(token, TokenDollar):
             return row_at(view, view.size())
 
         if isinstance(token, TokenOffset):
