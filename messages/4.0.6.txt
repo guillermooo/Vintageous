@@ -2,6 +2,16 @@
 Vintageous 4.0.6
 ==============================================================================
 
-* This version fixes an issue introduced with the announcement of Six. :-(
+The announcement of Sublime Six caused unpublished Vintageous changes to be
+committed. Those changes triggered a CI build that reported errors. This
+version fixes the CI build errors and includes the unpublished changes.
+
+Vintageous is still discontinued, in spite of all evidence to the contrary.
+
+See you in Sublime Six.
+
+http://sublimesix.com/
+
+Regards,
 
 Guillermo
