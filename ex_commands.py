@@ -941,7 +941,7 @@ class ExSubstitute(sublime_plugin.TextCommand):
         ExSubstitute.last_replacement = replacement
         ExSubstitute.last_flags = flags
 
-        computed_flags = 0
+        computed_flags = re.MULTILINE
         computed_flags |= re.IGNORECASE if ('i' in flags) else 0
 
         try:

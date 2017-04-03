@@ -657,7 +657,14 @@ class _vi_go_to_line(ViMotionCommand):
                 non_ws = utils.next_non_white_space_char(view, dest)
                 return sublime.Region(non_ws, non_ws)
             elif mode == modes.INTERNAL_NORMAL:
-                return sublime.Region(view.line(s.a).a, view.line(dest).b)
+                start_line = view.full_line(s.a)
+                dest_line = view.full_line(dest)
+                if start_line.a == dest_line.a:
+                    return dest_line
+                elif start_line.a < dest_line.a:
+                    return sublime.Region(start_line.a, dest_line.b)
+                else:
+                    return sublime.Region(start_line.b, dest_line.a)
             elif mode == modes.VISUAL:
                 if dest < s.a and s.a < s.b:
                     return sublime.Region(s.a + 1, dest)
