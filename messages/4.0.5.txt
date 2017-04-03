@@ -1,0 +1,39 @@
+==============================================================================
+Vintageous 4.0.5
+==============================================================================
+
+ ___ __  __ ____   ___  ____ _____  _    _   _ _____
+|_ _|  \/  |  _ \ / _ \|  _ \_   _|/ \  | \ | |_   _|
+ | || |\/| | |_) | | | | |_) || | / _ \ |  \| | | |
+ | || |  | |  __/| |_| |  _ < | |/ ___ \| |\  | | |
+|___|_|  |_|_|    \___/|_| \_\|_/_/   \_\_| \_| |_|
+
+
+Vintageous has been discontinued.
+
+The successor to Vintageous is Sublime Six.
+
+Sublime Six greatly improves the architecture of Vintageous to enable further
+emulation of Vim inside Sublime Text as a pure Python plugin. For example, the
+dot operator, macros and caret positioning now work much better. Motions and
+commands also replicate Vim more closely.
+
+I've switched to Sublime Six full-time and I'm actively working on it.
+
+Sublime Six can be evaluated without any restrictions, but a license must be
+purchased for continued use.
+
+For details, visit http://www.sublimesix.com.
+
+You can also follow updates on Twitter: https://twitter.com/sublimesix
+
+The price of a Sublime Six license while in alpha is 10 EUR.
+
+For any questions, you can contact hi@sublimesix.com.
+
+Thank you for using Vintageous and I hope you'll like Sublime Six!
+
+Guillermo
+
+(This announcement will be broadcasted multiple times over the coming months.)
+(This version does not include any changes to Vintageous.)
