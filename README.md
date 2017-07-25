@@ -7,6 +7,16 @@
 
 **Vintageous** is a comprehensive vi/Vim emulation layer for Sublime Text 3.
 
+Vintageous has been discontinued.
+
+The successor to Vintageous is Sublime Six.
+
+See you in Sublime Six.
+
+https://github.com/guillermooo/Six
+
+http://sublimesix.com/
+
 
 ### Installing
 
