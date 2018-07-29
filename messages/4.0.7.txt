@@ -1,0 +1,37 @@
+==============================================================================
+Vintageous 4.0.7
+==============================================================================
+
+ ___ __  __ ____   ___  ____ _____  _    _   _ _____
+|_ _|  \/  |  _ \ / _ \|  _ \_   _|/ \  | \ | |_   _|
+ | || |\/| | |_) | | | | |_) || | / _ \ |  \| | | |
+ | || |  | |  __/| |_| |  _ < | |/ ___ \| |\  | | |
+|___|_|  |_|_|    \___/|_| \_\|_/_/   \_\_| \_| |_|
+
+
+Vintageous has been discontinued (for a while now!).
+
+The successor to Vintageous is Sublime Six.
+
+Sublime Six includes many improvements over Vintageous, both internally and
+user-facing. For example, the dot operator, macros and caret positioning now
+work much better in Six. Motions and operators in Six also replicate Vim more
+closely.
+
+Sublime Six is now in beta after a year of development.
+
+You can evaluate Six without any restrictions, but a license must be
+purchased for continued use.
+
+For details, visit http://www.sublimesix.com.
+
+You can also follow updates on Twitter: https://twitter.com/sublimesix
+
+For any questions, you can contact hi@sublimesix.com.
+
+Thank you for using Vintageous and I hope you'll like Sublime Six even more!
+
+Guillermo
+
+(This message will be repeated occassionally when Six reaches important milestones.)
+(This version does not include any changes to Vintageous.)
